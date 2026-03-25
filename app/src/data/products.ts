@@ -12,6 +12,7 @@ export interface ProductData {
   isFeatured: boolean
   origin: string
   emoji: string
+  imageUrl?: string
   isActive?: boolean
 }
 
@@ -31,6 +32,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'South Africa',
     emoji: '🍎',
+    imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-002',
@@ -46,6 +48,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍏',
+    imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-003',
@@ -61,6 +64,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'China',
     emoji: '🍎',
+    imageUrl: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-004',
@@ -76,6 +80,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'New Zealand',
     emoji: '🍎',
+    imageUrl: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-005',
@@ -91,6 +96,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'USA',
     emoji: '🍎',
+    imageUrl: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-006',
@@ -106,6 +112,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Australia',
     emoji: '🍏',
+    imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-007',
@@ -121,6 +128,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Ecuador',
     emoji: '🍌',
+    imageUrl: 'https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-008',
@@ -136,6 +144,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍌',
+    imageUrl: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-009',
@@ -151,6 +160,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Spain',
     emoji: '🍊',
+    imageUrl: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-010',
@@ -166,6 +176,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Egypt',
     emoji: '🍊',
+    imageUrl: 'https://images.unsplash.com/photo-1580052614034-c55d20bfee3b?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-011',
@@ -181,6 +192,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Morocco',
     emoji: '🍊',
+    imageUrl: 'https://images.unsplash.com/photo-1587486936739-78978df5e89a?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-012',
@@ -196,6 +208,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Turkey',
     emoji: '🍋',
+    imageUrl: 'https://images.unsplash.com/photo-1582476395462-999d8f0e64c1?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-013',
@@ -211,6 +224,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Turkey',
     emoji: '🍋',
+    imageUrl: 'https://images.unsplash.com/photo-1582476395462-999d8f0e64c1?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-014',
@@ -226,6 +240,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍋',
+    imageUrl: 'https://images.unsplash.com/photo-1590502593747-42a996133562?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-015',
@@ -241,6 +256,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Brazil',
     emoji: '🥭',
+    imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-016',
@@ -248,7 +264,7 @@ export const products: ProductData[] = [
     nameAr: 'مانجو تيمور',
     slug: 'mango-taimoor',
     categorySlug: 'fruits',
-    description: 'Premium Chaunsa-style Taimoor mangoes from Pakistan's finest farms.',
+    description: 'Premium Chaunsa-style Taimoor mangoes from Pakistan\'s finest farms.',
     priceAED: 19.00,
     unit: 'kg',
     stock: 60,
@@ -256,6 +272,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Pakistan',
     emoji: '🥭',
+    imageUrl: 'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-017',
@@ -271,6 +288,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'UAE',
     emoji: '🍉',
+    imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-018',
@@ -286,6 +304,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🍈',
+    imageUrl: 'https://images.unsplash.com/photo-1571575173700-afb9492e6a50?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-019',
@@ -301,6 +320,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Australia',
     emoji: '🍈',
+    imageUrl: 'https://images.unsplash.com/photo-1571575173700-afb9492e6a50?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-020',
@@ -316,6 +336,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍇',
+    imageUrl: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-021',
@@ -331,6 +352,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍇',
+    imageUrl: 'https://images.unsplash.com/photo-1596363505818-87bf58e6d7d0?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-022',
@@ -346,6 +368,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍇',
+    imageUrl: 'https://images.unsplash.com/photo-1515779122185-2390ccdf060b?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-023',
@@ -361,6 +384,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Egypt',
     emoji: '🍓',
+    imageUrl: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-024',
@@ -376,6 +400,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Peru',
     emoji: '🫐',
+    imageUrl: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-025',
@@ -391,6 +416,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫐',
+    imageUrl: 'https://images.unsplash.com/photo-1587132137056-bfbf0166836e?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-026',
@@ -406,6 +432,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Iran',
     emoji: '🍎',
+    imageUrl: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-027',
@@ -421,6 +448,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Iran',
     emoji: '🍎',
+    imageUrl: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-028',
@@ -436,6 +464,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Philippines',
     emoji: '🍍',
+    imageUrl: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-029',
@@ -451,6 +480,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Philippines',
     emoji: '🍍',
+    imageUrl: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-030',
@@ -466,6 +496,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Malaysia',
     emoji: '🍈',
+    imageUrl: 'https://images.unsplash.com/photo-1526318472351-c75fcf070305?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-031',
@@ -481,6 +512,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'New Zealand',
     emoji: '🥝',
+    imageUrl: 'https://images.unsplash.com/photo-1585059895524-72359e06133a?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-032',
@@ -496,6 +528,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'New Zealand',
     emoji: '🥝',
+    imageUrl: 'https://images.unsplash.com/photo-1585059895524-72359e06133a?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-033',
@@ -511,6 +544,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Spain',
     emoji: '🍑',
+    imageUrl: 'https://images.unsplash.com/photo-1595743825637-cdafc8ad4173?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-034',
@@ -526,6 +560,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Chile',
     emoji: '🍑',
+    imageUrl: 'https://images.unsplash.com/photo-1562051036-e0eea191d42f?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-035',
@@ -541,6 +576,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍐',
+    imageUrl: 'https://images.unsplash.com/photo-1514756331096-242fdeb70d4a?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-036',
@@ -556,6 +592,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Turkey',
     emoji: '🍒',
+    imageUrl: 'https://images.unsplash.com/photo-1528821128474-27f963b062bf?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-037',
@@ -571,6 +608,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍐',
+    imageUrl: 'https://images.unsplash.com/photo-1536511132770-e5058c7e8c46?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-038',
@@ -586,6 +624,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍐',
+    imageUrl: 'https://images.unsplash.com/photo-1536511132770-e5058c7e8c46?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-039',
@@ -601,6 +640,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Vietnam',
     emoji: '🐉',
+    imageUrl: 'https://images.unsplash.com/photo-1527325678964-54921661f888?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-040',
@@ -616,6 +656,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Colombia',
     emoji: '🍈',
+    imageUrl: 'https://images.unsplash.com/photo-1604495772376-9657f1fb2e97?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-041',
@@ -631,6 +672,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍊',
+    imageUrl: 'https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-042',
@@ -646,6 +688,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍊',
+    imageUrl: 'https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-043',
@@ -661,6 +704,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Turkey',
     emoji: '🍈',
+    imageUrl: 'https://images.unsplash.com/photo-1601379329542-31c59347e2b7?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-044',
@@ -676,6 +720,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Kenya',
     emoji: '🥑',
+    imageUrl: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&h=400&fit=crop',
   },
   {
     id: 'fruit-045',
@@ -691,6 +736,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Thailand',
     emoji: '🥥',
+    imageUrl: 'https://images.unsplash.com/photo-1559181567-c3190ca9be46?w=400&h=400&fit=crop',
   },
 
   // ─────────── VEGETABLES ───────────
@@ -708,6 +754,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'UAE',
     emoji: '🍅',
+    imageUrl: 'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-002',
@@ -723,6 +770,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🍅',
+    imageUrl: 'https://images.unsplash.com/photo-1559181568-b8de7b0bfa9e?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-003',
@@ -738,6 +786,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🍅',
+    imageUrl: 'https://images.unsplash.com/photo-1561136594-7f68413baa99?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-004',
@@ -753,6 +802,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Egypt',
     emoji: '🥔',
+    imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-005',
@@ -768,6 +818,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Egypt',
     emoji: '🥔',
+    imageUrl: 'https://images.unsplash.com/photo-1596097635121-14b38c5d7a75?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-006',
@@ -783,6 +834,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🧅',
+    imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-007',
@@ -798,6 +850,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Egypt',
     emoji: '🧅',
+    imageUrl: 'https://images.unsplash.com/photo-1580201092675-a0a6a6cafbb1?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-008',
@@ -813,6 +866,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'UAE',
     emoji: '🥒',
+    imageUrl: 'https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-009',
@@ -828,6 +882,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥒',
+    imageUrl: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-010',
@@ -843,6 +898,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Australia',
     emoji: '🥕',
+    imageUrl: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-011',
@@ -858,6 +914,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥕',
+    imageUrl: 'https://images.unsplash.com/photo-1447175008436-054170c2e979?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-012',
@@ -873,6 +930,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🫑',
+    imageUrl: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-013',
@@ -888,6 +946,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫑',
+    imageUrl: 'https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-014',
@@ -903,6 +962,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫑',
+    imageUrl: 'https://images.unsplash.com/photo-1594282418426-4e6d6ccf87c5?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-015',
@@ -918,6 +978,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫑',
+    imageUrl: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-016',
@@ -933,6 +994,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Netherlands',
     emoji: '🥦',
+    imageUrl: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-017',
@@ -948,6 +1010,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥦',
+    imageUrl: 'https://images.unsplash.com/photo-1568584711271-6c929fb49b60?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-018',
@@ -963,6 +1026,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1594282418426-4e6d6ccf87c5?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-019',
@@ -978,6 +1042,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1594282418426-4e6d6ccf87c5?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-020',
@@ -993,6 +1058,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-021',
@@ -1008,6 +1074,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-022',
@@ -1023,6 +1090,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-023',
@@ -1038,6 +1106,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-024',
@@ -1053,6 +1122,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🟣',
+    imageUrl: 'https://images.unsplash.com/photo-1593105544559-ecb03bf76f82?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-025',
@@ -1068,6 +1138,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'China',
     emoji: '🧄',
+    imageUrl: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-026',
@@ -1083,6 +1154,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'China',
     emoji: '🧄',
+    imageUrl: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-027',
@@ -1098,6 +1170,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫚',
+    imageUrl: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-028',
@@ -1113,6 +1186,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫚',
+    imageUrl: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-029',
@@ -1128,6 +1202,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1616167069429-3b7d2ea6b07b?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-030',
@@ -1143,6 +1218,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥬',
+    imageUrl: 'https://images.unsplash.com/photo-1590868309235-ea34bed7bd7f?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-031',
@@ -1158,6 +1234,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Peru',
     emoji: '🥦',
+    imageUrl: 'https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-032',
@@ -1173,6 +1250,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥒',
+    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-033',
@@ -1188,6 +1266,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🍆',
+    imageUrl: 'https://images.unsplash.com/photo-1613145997970-db84a7975fbb?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-034',
@@ -1203,6 +1282,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥦',
+    imageUrl: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-035',
@@ -1218,6 +1298,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Kenya',
     emoji: '🫛',
+    imageUrl: 'https://images.unsplash.com/photo-1567375698348-5d9d5ae99de0?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-036',
@@ -1233,6 +1314,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫛',
+    imageUrl: 'https://images.unsplash.com/photo-1587735243615-c03f25aaff15?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-037',
@@ -1248,6 +1330,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌽',
+    imageUrl: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-038',
@@ -1263,6 +1346,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🎃',
+    imageUrl: 'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-039',
@@ -1278,6 +1362,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🍄',
+    imageUrl: 'https://images.unsplash.com/photo-1552825897-bb44bc7f3b69?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-040',
@@ -1293,6 +1378,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🍄',
+    imageUrl: 'https://images.unsplash.com/photo-1573045602-dca0d7e03523?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-041',
@@ -1308,6 +1394,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
+    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-042',
@@ -1323,6 +1410,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
+    imageUrl: 'https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-043',
@@ -1338,6 +1426,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
+    imageUrl: 'https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-044',
@@ -1353,6 +1442,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
+    imageUrl: 'https://images.unsplash.com/photo-1590868309235-ea34bed7bd7f?w=400&h=400&fit=crop',
   },
   {
     id: 'veg-045',
@@ -1368,5 +1458,6 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🌶️',
+    imageUrl: 'https://images.unsplash.com/photo-1583119022894-919a68a3d0e3?w=400&h=400&fit=crop',
   },
 ]

@@ -3,7 +3,7 @@ const { withPayload } = require('@payloadcms/next-payload')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'images.unsplash.com'],
   },
 }
 
