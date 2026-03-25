@@ -1,202 +1,236 @@
-# 🇦🇪 UAE Market Specifics — TMFoodStuff
+# 🇦🇪 UAE Market Guide
 
-This document covers all UAE-specific requirements for the TMFoodStuff e-commerce platform.
+Everything you need to know to run TMFoodStuff as a compliant, UAE-native e-commerce operation.
 
 ---
 
-## Currency: AED (UAE Dirham)
+## AED Currency Setup
 
-- **Symbol:** AED / د.إ
-- **Smallest unit in Medusa:** 1 fil = 0.01 AED (100 fils = 1 AED)
-- All prices stored internally in **fils** (like cents in USD)
-- Display format: `AED 12.50` or `د.إ 12.50`
-- Use `Intl.NumberFormat('en-AE', { style: 'currency', currency: 'AED' })` for formatting
+All prices in TMFoodStuff are stored and displayed in **UAE Dirhams (AED)**. The currency is hard-coded throughout the app — there's no multi-currency complexity to manage.
 
-```ts
-// storefront/src/lib/utils.ts
-export function formatAED(amountInFils: number): string {
-  return new Intl.NumberFormat('en-AE', {
-    style: 'currency',
-    currency: 'AED',
-  }).format(amountInFils / 100) // Convert fils → AED
+### In Code
+
+The `formatAED()` utility in `src/lib/utils.ts` formats prices:
+
+```typescript
+formatAED(12.5) // → "AED 12.50"
+```
+
+### Product Pricing
+
+When adding products in the Payload admin, the `priceAED` field accepts decimal values. Always enter the full price **inclusive of VAT** for display to customers, then let the system break it down at checkout.
+
+---
+
+## 5% VAT — FTA Compliance
+
+The UAE Federal Tax Authority (FTA) mandates 5% VAT on most goods including food (some staples are zero-rated, but fresh produce sold commercially is standard-rated).
+
+### How TMFoodStuff Handles VAT
+
+VAT is calculated at checkout using the utility functions in `src/lib/utils.ts`:
+
+```typescript
+export const VAT_RATE = 0.05
+
+export function calculateVAT(subtotal: number): number {
+  return parseFloat((subtotal * VAT_RATE).toFixed(2))
 }
 ```
 
----
+The checkout page shows the VAT breakdown line-by-line:
+- Subtotal (ex-VAT)
+- VAT (5%)
+- Delivery fee
+- **Total (inc. VAT)**
 
-## VAT — 5% UAE Federal VAT
+### FTA Registration
 
-- **Rate:** 5% (as per UAE Federal Tax Authority)
-- **Mandatory:** Must be shown separately on invoices and at checkout
-- **Tax Registration Number (TRN):** Must be displayed in footer/invoices
-- **Medusa setup:** Create a Tax Rate of 5% under the UAE region
-- VAT must be applied to all products sold in UAE
+To legally collect VAT in the UAE, you must be registered with the FTA:
 
-### Medusa Tax Rate Setup (Admin)
-1. Medusa Admin → Settings → Regions → UAE
-2. Add Tax Rate: `UAE VAT` → `5%` → Code: `UAE-VAT`
-3. Ensure it applies to all product categories
+1. Register at [https://eservices.tax.gov.ae](https://eservices.tax.gov.ae)
+2. Obtain your **Tax Registration Number (TRN)**
+3. Add your TRN to receipts and invoices — update the Footer component to display it:
+   ```tsx
+   <span>TRN: 100XXXXXXXXXX</span>
+   ```
+4. File VAT returns quarterly (or monthly if turnover > AED 150M)
 
-### Invoice Requirements (FTA)
-- Supplier name and TRN
-- Customer name and address
-- Invoice date
-- Item descriptions with unit prices
-- Tax amount (5% VAT) shown separately
-- Total amount (inclusive and exclusive of VAT)
+Threshold for mandatory registration: **AED 375,000 annual taxable supplies**.
 
 ---
 
-## Payment Gateways
+## Telr Payment Gateway
 
-### Telr
-- **Website:** https://telr.com
-- **Coverage:** UAE, Saudi Arabia, and wider MENA
-- **Supported cards:** Visa, Mastercard, Amex, mada
-- **Features:** 3D Secure, recurring payments, installments
-- **Integration:** REST API + Medusa payment plugin
-- **Account:** Requires UAE trade license
+[Telr](https://telr.com) is the UAE's leading payment gateway, licensed by the UAE Central Bank. It supports Visa, Mastercard, AMEX, and local payment methods.
 
-### PayTabs
-- **Website:** https://paytabs.com
-- **Coverage:** UAE and GCC
-- **Supported:** Visa, Mastercard, mada, KNET, Apple Pay
-- **Features:** Hosted payment page, split payments
-- **Integration:** REST API + Medusa payment plugin
-- **Account:** UAE business registration required
+### Step 1: Create a Telr Account
 
-> ⚠️ Both gateways require a **UAE trade license** and bank account for merchant onboarding.
+1. Go to [https://telr.com/sign-up](https://telr.com/sign-up)
+2. Select **UAE** as your country
+3. Provide your business details:
+   - Trade license number
+   - Emirates ID of owner
+   - Bank account in UAE (for payouts)
+4. Telr reviews and approves accounts (typically 2–5 business days)
 
----
+### Step 2: Get API Credentials
 
-## RTL (Right-to-Left) Arabic Support
+Once approved, log into [https://secure.telr.com](https://secure.telr.com):
 
-### Implementation
-- Use `next-intl` for i18n routing (EN + AR locales)
-- Set `dir="rtl"` on `<html>` for Arabic
-- Cairo font for Arabic text (loaded via Google Fonts)
+1. Go to **Settings** → **API**
+2. Note your:
+   - **Store ID** (e.g., `12345`)
+   - **Auth Key** (e.g., `abc123xyz`)
+3. Add a test store for sandbox testing
 
-```tsx
-// layout.tsx — RTL toggle based on locale
-<html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-```
-
-### Tailwind RTL
-Tailwind CSS v3 supports `rtl:` variants:
-```html
-<div class="text-left rtl:text-right">
-  <!-- Left-aligned in LTR, right-aligned in RTL -->
-</div>
-```
-
-### Arabic Font
-```css
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-
-[dir='rtl'] body {
-  font-family: 'Cairo', sans-serif;
-}
-```
-
----
-
-## WhatsApp Business
-
-WhatsApp is the **de facto** communication channel in UAE for:
-- Order confirmations
-- Delivery updates
-- Customer support
-
-### Setup
-1. Register a **WhatsApp Business** account with a UAE number (+971)
-2. Apply for **WhatsApp Business API** via an official BSP (Business Solution Provider)
-   - Recommended: Twilio, 360dialog, or Vonage
-3. Send templated messages for order events
-
-### Message Templates (FTA-compliant)
-```
-Order Confirmation: "Hello {name}! Your order #{id} has been confirmed. Total: AED {amount} (incl. 5% VAT). Estimated delivery: {date}."
-
-Delivery Update: "Your TMFoodStuff order #{id} is out for delivery! Track: {link}"
-```
-
----
-
-## Delivery Zones
-
-| Emirate | Typical Delivery Time | Notes |
-|---------|----------------------|-------|
-| Dubai | Same day / Next day | Largest market |
-| Abu Dhabi | Next day | High demand |
-| Sharjah | Same day | Close to Dubai warehouses |
-| Ajman | Next day | — |
-| Ras Al Khaimah | 1–2 days | Northern UAE |
-| Fujairah | 1–2 days | East coast |
-| Umm Al Quwain | 1–2 days | Smaller market |
-
----
-
-## Timezone
-
-- **Name:** Gulf Standard Time (GST)
-- **UTC Offset:** UTC+4
-- **No Daylight Saving:** UAE does not observe DST
-- **Node.js:** Set `TZ=Asia/Dubai` environment variable
+### Step 3: Add to Environment Variables
 
 ```env
-TZ=Asia/Dubai
+TELR_STORE_ID=12345
+TELR_AUTH_KEY=abc123xyz
+TELR_TEST_MODE=true   # Set to false in production
 ```
 
----
+### Step 4: Implement Telr Checkout
 
-## Working Week
+Telr uses a hosted payment page (HPP). The flow is:
 
-- **Standard working week:** Sunday–Thursday (government & many businesses)
-- **Weekend:** Friday–Saturday
-- **Note:** Many private businesses operate Sunday–Thursday or Monday–Friday
-- **Ramadan:** Reduced working hours; may affect delivery schedules
-- **National holidays:** Eid Al Fitr, Eid Al Adha, UAE National Day (Dec 2–3)
+1. Your server calls Telr API to create a payment session
+2. Customer is redirected to Telr's secure page
+3. After payment, Telr redirects back to your `return_url` with success/failure
 
----
+Create `app/src/app/api/payment/create/route.ts`:
 
-## Food Safety & Compliance
+```typescript
+import { NextRequest, NextResponse } from 'next/server'
 
-- **Dubai Municipality:** All food businesses must comply with Dubai Municipality food safety regulations
-  - Reference: https://www.dm.gov.ae/business/food-safety
-- **Abu Dhabi Agriculture & Food Safety Authority (ADAFSA):** For Abu Dhabi operations
-- **ESMA (Emirates Authority for Standardization):** UAE product standards
-- **Cold chain:** Refrigerated transport required for perishables
-- **Halal:** All products must be Halal-certified or clearly labeled
-- **Country of origin:** Must be displayed on product listings
+export async function POST(req: NextRequest) {
+  const { orderNumber, totalAED, customerEmail } = await req.json()
 
----
+  const response = await fetch('https://secure.telr.com/gateway/order.json', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      method: 'create',
+      store: process.env.TELR_STORE_ID,
+      authkey: process.env.TELR_AUTH_KEY,
+      order: {
+        cartid: orderNumber,
+        test: process.env.TELR_TEST_MODE === 'true' ? 1 : 0,
+        amount: totalAED.toFixed(2),
+        currency: 'AED',
+        description: `TMFoodStuff Order ${orderNumber}`,
+      },
+      return: {
+        authorised: `${process.env.NEXT_PUBLIC_SERVER_URL}/order/success`,
+        declined: `${process.env.NEXT_PUBLIC_SERVER_URL}/order/failed`,
+        cancelled: `${process.env.NEXT_PUBLIC_SERVER_URL}/checkout`,
+      },
+      customer: {
+        email: customerEmail,
+      },
+    }),
+  })
 
-## Address System
-
-UAE uses several address systems:
-1. **Standard:** Building name, street, area, emirate
-2. **Makani** (Dubai): 10-digit geo-code (e.g., 21345 67890)
-3. **Abu Dhabi Address:** Plot number + zone + street
-
-### Address Form Fields
-```ts
-interface UAEAddress {
-  emirate: Emirate
-  area: string        // District / community
-  building: string    // Building name or villa number
-  floor?: string
-  apartment?: string
-  street?: string
-  makaniNumber?: string  // Dubai-specific
-  plusCode?: string      // Google Plus Code (universal)
+  const data = await response.json()
+  return NextResponse.json({ url: data.order?.url })
 }
 ```
 
 ---
 
-## Local SEO Notes
+## Delivery Zones Configuration
 
-- Target keywords in both English and Arabic
-- Register on **Google My Business** (maps important in UAE)
-- List on **Zomato, Noon**, and **Amazon.ae** as secondary channels
-- UAE consumers heavily use **Instagram** for product discovery
+TMFoodStuff delivers across all 7 UAE emirates. The `Orders` collection stores the emirate as a select field.
+
+### Delivery Fee Logic
+
+Current configuration in `src/lib/utils.ts`:
+- Orders **above AED 150**: Free delivery
+- Orders **below AED 150**: AED 10 flat fee
+
+Adjust these constants to match your actual logistics costs:
+
+```typescript
+export const FREE_DELIVERY_THRESHOLD = 150  // AED
+export const DELIVERY_FEE = 10              // AED
+```
+
+### Per-Emirate Delivery Rules
+
+You may want different fees or lead times per emirate. Consider extending the logic:
+
+```typescript
+const EMIRATE_DELIVERY_FEES: Record<string, number> = {
+  'Dubai': 10,
+  'Abu Dhabi': 15,
+  'Sharjah': 12,
+  'Ajman': 12,
+  'Ras Al Khaimah': 20,
+  'Fujairah': 25,
+  'Umm Al Quwain': 15,
+}
+```
+
+---
+
+## Makani Address Format
+
+**Makani** (معكاني) is Dubai's digital address system — a unique 10-digit number that pinpoints any location in Dubai to within 3 meters.
+
+Every building and villa in Dubai has a Makani number. Customers can find theirs via the **Makani app** (available on iOS/Android) or on the building directory.
+
+The checkout form includes an optional **Makani Number** field. When provided, your delivery drivers can use the Makani app or Dubai Maps to navigate precisely.
+
+**Implementation note:** The `deliveryAddress.makani` field in the Orders collection stores this. Display it prominently on order confirmation emails and the admin order view so drivers can use it.
+
+---
+
+## WhatsApp Business API for Order Notifications
+
+UAE customers expect WhatsApp communications. Set up automated order notifications:
+
+### Option 1: Twilio WhatsApp API (Recommended)
+
+1. Sign up at [https://www.twilio.com](https://www.twilio.com)
+2. Apply for WhatsApp Business API approval (requires Facebook Business Manager)
+3. Add `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_WHATSAPP_FROM` to your `.env`
+4. Send order confirmations from a Payload afterChange hook:
+
+```typescript
+// In Orders collection
+hooks: {
+  afterChange: [async ({ doc, operation }) => {
+    if (operation === 'create') {
+      await fetch('/api/notifications/whatsapp', {
+        method: 'POST',
+        body: JSON.stringify({
+          to: doc.customerPhone,
+          message: `✅ Order #${doc.orderNumber} confirmed! Total: AED ${doc.totalAED}. We'll deliver to ${doc.deliveryAddress.area}, ${doc.deliveryAddress.emirate}.`
+        })
+      })
+    }
+  }]
+}
+```
+
+### Option 2: WhatsApp Cloud API (Free, Meta)
+
+1. Create a Meta Business account at [https://business.facebook.com](https://business.facebook.com)
+2. Set up a WhatsApp Business Platform app at [https://developers.facebook.com](https://developers.facebook.com)
+3. Verify your phone number
+4. Use the Messages API directly (free up to 1,000 conversations/month)
+
+---
+
+## Legal Requirements Summary
+
+| Requirement | Action |
+|------------|--------|
+| VAT Registration | Register at eservices.tax.gov.ae if turnover > AED 375K |
+| Trade License | Required to operate e-commerce in UAE |
+| Payment Gateway | Use UAE Central Bank licensed gateway (Telr ✓) |
+| Data Protection | Comply with UAE PDPL (Personal Data Protection Law) |
+| Consumer Protection | UAE Federal Law No. 15 of 2020 applies |
+| Price Display | Must show AED prices inclusive of VAT |

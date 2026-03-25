@@ -1,123 +1,166 @@
-# 🚀 TMFoodStuff — Deployment Guide
+# 🚀 Vercel Deployment Guide
 
-## Overview
-
-| Service | Platform | Notes |
-|---------|----------|-------|
-| Storefront (Next.js) | Vercel | Free tier, edge CDN |
-| Backend (Medusa) | Railway | Easy Docker deploy |
-| Database (PostgreSQL) | Supabase | Managed, free tier |
-| CMS (Sanity) | Sanity Cloud | Built-in hosting |
-| Media | Cloudinary | CDN image delivery |
+This guide covers deploying TMFoodStuff to Vercel with a production MongoDB Atlas cluster.
 
 ---
 
-## 1. Database — Supabase
+## Step 1: Prepare MongoDB Atlas for Production
 
-1. Create account at https://supabase.com
-2. New project → note the **Connection String** (postgres://...)
-3. Use the connection string as `DATABASE_URL` in your backend `.env`
+### 1. Create a Production Cluster
 
+For production, upgrade from M0 (free) or create a new cluster:
+
+1. Log into [https://cloud.mongodb.com](https://cloud.mongodb.com)
+2. Click **Create** → choose **M10** (dedicated, ~$57/month) or stay on **M0** for initial launch
+3. Select region closest to UAE: **eu-west-1 (Ireland)** or **me-south-1 (Bahrain)** if available
+4. Name it: `tmfoodstuff-prod`
+
+### 2. Create a Production Database User
+
+1. Go to **Database Access** → **Add New Database User**
+2. Username: `tmfoodstuff-prod`
+3. Password: Generate with **Autogenerate Secure Password** — copy it
+4. Database User Privileges: **Atlas Admin** (or **Read and write to any database**)
+5. Click **Add User**
+
+### 3. Whitelist Vercel IPs
+
+Vercel uses dynamic IPs, so you need to allow all traffic:
+
+1. Go to **Network Access** → **Add IP Address**
+2. Click **Allow Access from Anywhere** (adds `0.0.0.0/0`)
+3. Click **Confirm**
+
+> ⚠️ For stricter security on paid plans, use Vercel's static IP feature and whitelist only those.
+
+### 4. Get Your Production Connection String
+
+1. Click **Connect** on your cluster → **Drivers** → Node.js
+2. Copy the URI and format it:
 ```
-DATABASE_URL=postgres://postgres:[password]@db.[ref].supabase.co:5432/postgres
+mongodb+srv://tmfoodstuff-prod:YOURPASSWORD@tmfoodstuff-prod.xxxxx.mongodb.net/tmfoodstuff?retryWrites=true&w=majority&appName=tmfoodstuff-prod
 ```
 
 ---
 
-## 2. CMS — Sanity Cloud
+## Step 2: Set Up Vercel
+
+### 1. Install Vercel CLI (optional but useful)
 
 ```bash
-cd cms
-npm run deploy
+npm install -g vercel
+vercel login
 ```
 
-Your Sanity Studio will be hosted at: `https://your-project.sanity.studio`
+### 2. Connect GitHub Repository
 
-To deploy GraphQL API:
+1. Go to [https://vercel.com](https://vercel.com) and log in (or sign up)
+2. Click **Add New Project**
+3. Click **Import Git Repository**
+4. Select **GitHub** and authorize Vercel
+5. Find `Suefyawn/TMFoodStuff` and click **Import**
+
+### 3. Configure Build Settings
+
+On the import screen, set:
+
+| Setting | Value |
+|---------|-------|
+| **Framework Preset** | Next.js |
+| **Root Directory** | `app` |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `.next` (auto-detected) |
+| **Install Command** | `npm install` |
+
+Click **Root Directory** → type `app` → click **Continue**.
+
+---
+
+## Step 3: Set Environment Variables
+
+On the Vercel project settings, go to **Settings** → **Environment Variables** and add:
+
+| Variable | Value | Environment |
+|----------|-------|-------------|
+| `MONGODB_URI` | `mongodb+srv://...` | Production, Preview, Development |
+| `PAYLOAD_SECRET` | 64-char random hex string | Production, Preview, Development |
+| `NEXT_PUBLIC_SERVER_URL` | `https://yourdomain.com` | Production |
+| `NEXT_PUBLIC_SERVER_URL` | `https://tmfoodstuff.vercel.app` | Preview |
+
+**Generate a production-strength PAYLOAD_SECRET:**
 ```bash
-npm run deploy-graphql
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
+
+> ⚠️ Use a **different** `PAYLOAD_SECRET` in production than in development. Never reuse secrets across environments.
+
+Click **Deploy** to trigger the first deployment.
 
 ---
 
-## 3. Backend — Railway
+## Step 4: Custom Domain Setup
 
-1. Create account at https://railway.app
-2. **New Project → Deploy from GitHub** → select `TMFoodStuff` → `backend/`
-3. Add environment variables in Railway dashboard:
+### 1. Add Your Domain in Vercel
 
+1. Go to your project → **Settings** → **Domains**
+2. Click **Add Domain**
+3. Enter your domain: `tmfoodstuff.ae` or `www.tmfoodstuff.com`
+4. Click **Add**
+
+### 2. Update Your DNS
+
+Vercel will show you DNS records to add. Depending on your domain registrar:
+
+**For apex domain (tmfoodstuff.ae):**
+- Add an **A record**: `@` → `76.76.21.21`
+
+**For www subdomain:**
+- Add a **CNAME record**: `www` → `cname.vercel-dns.com`
+
+DNS propagation takes 5 minutes to 48 hours.
+
+### 3. Update NEXT_PUBLIC_SERVER_URL
+
+Once your custom domain is live, update the production environment variable:
 ```
-DATABASE_URL=        (from Supabase)
-REDIS_URL=           (Railway Redis addon)
-JWT_SECRET=          (generate random 64 chars)
-COOKIE_SECRET=       (generate random 64 chars)
-STORE_CORS=          (your Vercel storefront URL)
-ADMIN_CORS=          (your Vercel admin URL or Railway URL)
-NODE_ENV=production
+NEXT_PUBLIC_SERVER_URL=https://www.tmfoodstuff.ae
 ```
 
-4. Railway will auto-detect `npm run start` and deploy.
+Redeploy after updating env vars (Vercel → Deployments → Redeploy latest).
 
 ---
 
-## 4. Storefront — Vercel
+## Step 5: Post-Deploy Checklist
 
-1. Go to https://vercel.com → **Import Project** from GitHub
-2. Set **Root Directory** to `storefront`
-3. Framework: **Next.js** (auto-detected)
-4. Add environment variables:
+After your first successful deployment:
 
+- [ ] Visit `https://yourdomain.com` — storefront loads
+- [ ] Visit `https://yourdomain.com/admin` — Payload admin loads
+- [ ] Create first admin user in production
+- [ ] Add test category and product
+- [ ] Test checkout form renders
+- [ ] Test cart page renders
+- [ ] Verify MongoDB Atlas shows connections under **Metrics** tab
+- [ ] Set up Atlas **Database Triggers** for order email notifications (optional)
+- [ ] Enable **Atlas Backup** for production data safety
+
+---
+
+## Redeployments
+
+Every push to the `main` branch on GitHub automatically triggers a Vercel deployment. Preview branches get their own URL for testing.
+
+To manually redeploy:
+```bash
+vercel --prod
 ```
-NEXT_PUBLIC_MEDUSA_BACKEND_URL=   (Railway backend URL, e.g. https://tmfoodstuff-backend.railway.app)
-NEXT_PUBLIC_SANITY_PROJECT_ID=    (from sanity.io/manage)
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME= (from cloudinary.com)
-NEXT_PUBLIC_BASE_URL=             (your Vercel URL, e.g. https://tmfoodstuff.vercel.app)
-```
 
-5. Deploy → Vercel provides a live URL instantly.
-
----
-
-## Environment Variables Checklist
-
-### Before going live, verify:
-
-- [ ] `JWT_SECRET` is a random 64-char string (NOT "supersecret")
-- [ ] `COOKIE_SECRET` is a random 64-char string (NOT "supersecret")
-- [ ] `STORE_CORS` matches your actual storefront domain
-- [ ] `ADMIN_CORS` matches your actual admin domain
-- [ ] `DATABASE_URL` points to production Supabase
-- [ ] `REDIS_URL` points to production Redis
-- [ ] Cloudinary credentials are set
-- [ ] Sanity project ID is correct
-- [ ] UAE VAT is configured in Medusa (5% tax region for AE)
-- [ ] AED currency region is created in Medusa admin
-
----
-
-## Post-Deploy Checklist
-
-1. [ ] Run Medusa migrations on production: `npx medusa migrations run`
-2. [ ] Create admin user: `npx medusa user -e admin@tmfoodstuff.ae -p your_password`
-3. [ ] Add AED currency in Medusa Admin → Regions → UAE
-4. [ ] Set 5% VAT tax rate in Medusa Admin → Regions → UAE → Tax Rates
-5. [ ] Upload product catalog
-6. [ ] Test checkout flow end-to-end
-7. [ ] Configure Telr or PayTabs payment plugin
-
----
-
-## SSL / Domain
-
-- Vercel: Custom domain via `vercel.com/domains` — SSL auto-provisioned
-- Railway: Custom domain in Railway project settings
-- Sanity: Custom domain via Sanity Studio settings
+Or trigger from the Vercel dashboard: **Deployments** → **...** → **Redeploy**.
 
 ---
 
 ## Monitoring
 
-- Vercel Analytics: Built-in (enable in Vercel dashboard)
-- Railway Logs: Available in Railway dashboard
-- Supabase Logs: Available at supabase.com → your project → Logs
+- **Vercel Analytics:** Enable in project settings for Core Web Vitals
+- **MongoDB Atlas Monitoring:** Charts available under your cluster's **Metrics** tab
+- **Error tracking:** Consider adding Sentry (`npm install @sentry/nextjs`) for production error monitoring
