@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import ProductCard from '@/components/ProductCard'
+import { products } from '@/data/products'
 
-const categories = [
+const homeCategories = [
   { name: 'Fruits', nameAr: 'فواكه', slug: 'fruits', emoji: '🍎', color: 'bg-red-50 hover:bg-red-100' },
   { name: 'Vegetables', nameAr: 'خضروات', slug: 'vegetables', emoji: '🥦', color: 'bg-green-50 hover:bg-green-100' },
   { name: 'Organic', nameAr: 'عضوي', slug: 'organic', emoji: '🌱', color: 'bg-emerald-50 hover:bg-emerald-100' },
@@ -10,6 +12,8 @@ const categories = [
 ]
 
 export default function HomePage() {
+  const featured = products.filter(p => p.isFeatured).slice(0, 10)
+
   return (
     <main>
       {/* Hero */}
@@ -35,14 +39,14 @@ export default function HomePage() {
             <Link href="/shop" className="bg-white text-green-700 font-black px-10 py-4 rounded-2xl text-lg hover:bg-yellow-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5">
               Shop Now →
             </Link>
-            <Link href="/shop/fruits" className="border-2 border-white/50 text-white font-bold px-10 py-4 rounded-2xl text-lg hover:bg-white/15 transition-all backdrop-blur-sm">
+            <Link href="/shop" className="border-2 border-white/50 text-white font-bold px-10 py-4 rounded-2xl text-lg hover:bg-white/15 transition-all backdrop-blur-sm">
               Browse Fruits 🍎
             </Link>
           </div>
           {/* Stats */}
           <div className="mt-16 grid grid-cols-3 gap-6 max-w-lg mx-auto text-center">
             {[
-              { num: '500+', label: 'Products' },
+              { num: '90+', label: 'Products' },
               { num: '6', label: 'Emirates' },
               { num: 'Daily', label: 'Fresh Delivery' },
             ].map(s => (
@@ -78,10 +82,10 @@ export default function HomePage() {
           <p className="text-gray-500 text-lg">Everything fresh, delivered to your door</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map(cat => (
+          {homeCategories.map(cat => (
             <Link
               key={cat.slug}
-              href={`/shop/${cat.slug}`}
+              href={`/shop`}
               className={`${cat.color} rounded-2xl p-6 text-center transition-all hover:shadow-md hover:-translate-y-1 group cursor-pointer`}
             >
               <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-200">{cat.emoji}</div>
@@ -89,6 +93,26 @@ export default function HomePage() {
               <div className="text-xs text-gray-500 mt-1 font-medium">{cat.nameAr}</div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-4xl font-black text-gray-900 mb-1">Fresh Today</h2>
+              <p className="text-gray-500">Handpicked bestsellers</p>
+            </div>
+            <Link href="/shop" className="text-green-600 font-bold hover:underline text-sm">
+              View all →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {featured.map(product => (
+              <ProductCard key={product.id} product={product as any} />
+            ))}
+          </div>
         </div>
       </section>
 
