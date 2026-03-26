@@ -1,7 +1,6 @@
-import { buildConfig } from 'payload/config'
+import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { webpackBundler } from '@payloadcms/bundler-webpack'
-import { slateEditor } from '@payloadcms/richtext-slate'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { Products } from './collections/Products'
 import { Categories } from './collections/Categories'
 import { Orders } from './collections/Orders'
@@ -12,13 +11,13 @@ export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
   admin: {
     user: 'customers',
-    bundler: webpackBundler(),
   },
-  editor: slateEditor({}),
+  editor: lexicalEditor({}),
   collections: [Products, Categories, Orders, Customers, Media],
   db: mongooseAdapter({
     url: process.env.MONGODB_URI || '',
   }),
+  secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: './src/types/payload-types.ts',
   },
