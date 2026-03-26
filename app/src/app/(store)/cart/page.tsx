@@ -11,12 +11,13 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <ShoppingCart size={40} className="text-gray-400" />
+      <div className="max-w-4xl mx-auto px-4 py-24 text-center">
+        <div className="w-32 h-32 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+          <ShoppingCart size={52} className="text-green-300" strokeWidth={1.5} />
         </div>
         <h1 className="text-3xl font-black text-gray-900 mb-3">Your cart is empty</h1>
-        <p className="text-gray-500 mb-8 text-lg">Add some fresh produce to get started</p>
+        <p className="text-gray-500 mb-2 text-lg">Looks like you haven&apos;t added anything yet.</p>
+        <p className="text-gray-400 text-sm mb-8">Browse our fresh produce and fill it up!</p>
         <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
           Browse Products <ArrowRight size={16} />
         </Link>
@@ -113,8 +114,19 @@ export default function CartPage() {
                 <span>Delivery</span>
                 <span>{deliveryFee === 0 ? <span className="text-green-600 font-semibold">Free</span> : formatAED(deliveryFee)}</span>
               </div>
-              {deliveryFee > 0 && (
-                <p className="text-xs text-gray-400">Add {formatAED(150 - sub)} more for free delivery</p>
+              {deliveryFee > 0 && sub < 150 && (
+                <div className="mt-2 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                  <div className="flex justify-between text-xs font-semibold text-amber-800 mb-2">
+                    <span>Add {formatAED(150 - sub)} more for free delivery</span>
+                    <span>{Math.round((sub / 150) * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-amber-200 rounded-full h-2">
+                    <div
+                      className="bg-amber-500 h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((sub / 150) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
               )}
               <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                 <span>Total</span>

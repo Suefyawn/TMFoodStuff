@@ -1,9 +1,10 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, Suspense } from 'react'
 import { Search, X, SlidersHorizontal, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, Package } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { products } from '@/data/products'
 import { categories } from '@/data/categories'
+import { useSearchParams } from 'next/navigation'
 import type { ReactElement } from 'react'
 
 type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'organic-first'
@@ -24,10 +25,17 @@ const categoryIconMap: Record<string, ReactElement> = {
   gifts: <Gift size={14} />,
 }
 
-export default function ShopPage() {
+function ShopPageInner() {
+  const searchParams = useSearchParams()
   const [activeCategory, setActiveCategory] = useState('')
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(searchParams.get('q') || '')
   const [sortBy, setSortBy] = useState<SortOption>('featured')
+
+  // Sync URL q param on mount / navigation
+  useEffect(() => {
+    const q = searchParams.get('q')
+    if (q) setSearch(q)
+  }, [searchParams])
 
   const filtered = useMemo(() => {
     let result = products.filter(p => {
@@ -224,5 +232,13 @@ export default function ShopPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopPageInner />
+    </Suspense>
   )
 }

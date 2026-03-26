@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { formatAED } from '@/lib/utils'
 import AddToCartButton from './AddToCartButton'
+import { ProductImage } from './ProductImage'
 import { Leaf, MapPin, ShoppingCart } from 'lucide-react'
 
 interface ProductCardProps {
@@ -27,10 +28,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.slug}`} className="block">
         <div className={`relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center ${!inStock ? 'grayscale' : ''}`}>
           {product.imageUrl ? (
-            <img
+            <ProductImage
               src={product.imageUrl}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+              emoji={product.emoji}
             />
           ) : (
             <span className="text-7xl group-hover:scale-110 transition-transform duration-300">

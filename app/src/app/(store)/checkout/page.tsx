@@ -58,8 +58,12 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <p className="text-gray-500 mb-4">Your cart is empty.</p>
+      <div className="max-w-2xl mx-auto px-4 py-24 text-center">
+        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <ShoppingBag size={40} className="text-gray-300" strokeWidth={1.5} />
+        </div>
+        <h2 className="text-2xl font-black text-gray-900 mb-3">Nothing to checkout</h2>
+        <p className="text-gray-500 mb-8">Your cart is empty. Add some fresh produce first!</p>
         <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
           Browse Products
         </Link>

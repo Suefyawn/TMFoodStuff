@@ -1,7 +1,9 @@
 'use client'
+import { useState } from 'react'
 import { ShoppingCart, Plus, Minus } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED } from '@/lib/utils'
+import { Toast } from './Toast'
 
 interface Props {
   product: {
@@ -20,13 +22,24 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
   const { items, addItem, updateQty } = useCartStore()
   const cartItem = items.find(i => i.id === product.id)
   const qty = cartItem?.quantity ?? 0
+  const [showToast, setShowToast] = useState(false)
+
+  function handleAdd() {
+    addItem(product, 1)
+    setShowToast(true)
+  }
 
   if (size === 'lg') {
     return (
       <div>
+        <Toast
+          message={`${product.name} added to cart`}
+          show={showToast}
+          onClose={() => setShowToast(false)}
+        />
         {qty === 0 ? (
           <button
-            onClick={() => addItem(product, 1)}
+            onClick={handleAdd}
             className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99]"
           >
             <ShoppingCart size={20} /> Add to Cart
@@ -44,7 +57,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
               <div className="text-xs text-gray-400">{formatAED(product.priceAED * qty)}</div>
             </div>
             <button
-              onClick={() => addItem(product, 1)}
+              onClick={handleAdd}
               className="w-14 h-14 rounded-2xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors shadow"
             >
               <Plus size={18} />
@@ -57,9 +70,14 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
 
   return (
     <div>
+      <Toast
+        message={`${product.name} added to cart`}
+        show={showToast}
+        onClose={() => setShowToast(false)}
+      />
       {qty === 0 ? (
         <button
-          onClick={() => addItem(product, 1)}
+          onClick={handleAdd}
           className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95"
         >
           <ShoppingCart size={14} /> Add
@@ -74,7 +92,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
           </button>
           <span className="flex-1 text-center font-black text-gray-900 text-base">{qty}</span>
           <button
-            onClick={() => addItem(product, 1)}
+            onClick={handleAdd}
             className="w-9 h-9 rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors"
           >
             <Plus size={13} />

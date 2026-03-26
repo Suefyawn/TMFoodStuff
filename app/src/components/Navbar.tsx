@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ShoppingCart, Menu, X, Search, Leaf, User } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store'
+import { usePathname, useRouter } from 'next/navigation'
 
 const navLinks = [
   { label: 'Fruits', href: '/shop' },
@@ -14,7 +15,26 @@ const navLinks = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [mobileSearch, setMobileSearch] = useState('')
   const totalItems = useCartStore(state => state.totalItems())
+  const pathname = usePathname()
+  const router = useRouter()
+
+  function handleSearch(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`)
+      setSearchQuery('')
+    }
+  }
+
+  function handleMobileSearch(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' && mobileSearch.trim()) {
+      router.push(`/shop?q=${encodeURIComponent(mobileSearch.trim())}`)
+      setMobileSearch('')
+      setOpen(false)
+    }
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -34,9 +54,11 @@ export default function Navbar() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input
                 type="text"
-                placeholder="Search fruits, vegetables..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                placeholder="Search fruits, vegetables... (press Enter)"
                 className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-transparent rounded-full text-sm focus:outline-none focus:bg-white focus:border-green-400 transition-all"
-                readOnly
               />
             </div>
           </div>
@@ -47,7 +69,7 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="nav-link px-3 py-2"
+                className={`nav-link px-3 py-2 ${pathname === link.href || pathname.startsWith('/shop') ? 'text-green-600' : ''}`}
               >
                 {link.label}
               </Link>
@@ -62,7 +84,11 @@ export default function Navbar() {
             </Link>
             <Link
               href="/cart"
-              className="relative flex items-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 transition-colors shadow-sm"
+              className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${
+                pathname === '/cart'
+                  ? 'bg-green-700 text-white'
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
             >
               <ShoppingCart size={16} />
               <span className="hidden sm:inline">Cart</span>
@@ -94,9 +120,11 @@ export default function Navbar() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input
                 type="text"
-                placeholder="Search products..."
+                value={mobileSearch}
+                onChange={e => setMobileSearch(e.target.value)}
+                onKeyDown={handleMobileSearch}
+                placeholder="Search products... (press Enter)"
                 className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:bg-white focus:border-green-400 border border-transparent transition-all"
-                readOnly
               />
             </div>
           </div>
@@ -105,7 +133,11 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="block px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                className={`block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                  pathname === link.href || pathname.startsWith('/shop')
+                    ? 'text-green-600 bg-green-50'
+                    : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
+                }`}
                 onClick={() => setOpen(false)}
               >
                 {link.label}

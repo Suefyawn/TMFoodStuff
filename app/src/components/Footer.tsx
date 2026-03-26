@@ -181,7 +181,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between items-center text-xs gap-2">
-          <span className="text-gray-500">© 2024 TMFoodStuff. All rights reserved. | VAT Registered UAE</span>
+          <span className="text-gray-500">© 2025 TMFoodStuff. All rights reserved. | VAT Registered UAE</span>
           <span className="text-gray-500">All prices in AED · 5% VAT included</span>
         </div>
       </footer>

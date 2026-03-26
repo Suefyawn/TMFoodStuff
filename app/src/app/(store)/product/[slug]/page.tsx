@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 import { products } from '@/data/products'
 import { categories } from '@/data/categories'
 import AddToCartButton from '@/components/AddToCartButton'
 import ProductCard from '@/components/ProductCard'
+import { ProductImage } from '@/components/ProductImage'
 import { formatAED, calculateVAT } from '@/lib/utils'
 
 interface Props {
@@ -30,6 +32,15 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
+      {/* Back button */}
+      <Link
+        href="/shop"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors mb-6 group"
+      >
+        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+        Back to Shop
+      </Link>
+
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
         <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
@@ -50,10 +61,11 @@ export default async function ProductPage({ params }: Props) {
         {/* Image */}
         <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative">
           {product.imageUrl ? (
-            <img
+            <ProductImage
               src={product.imageUrl}
               alt={product.name}
               className="w-full h-full object-cover"
+              emoji={product.emoji}
             />
           ) : (
             <span className="text-[120px]">{product.emoji}</span>
