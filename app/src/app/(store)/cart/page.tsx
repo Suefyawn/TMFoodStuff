@@ -100,7 +100,10 @@ export default function CartPage() {
         {/* Order summary */}
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm sticky top-24">
-            <h2 className="font-black text-gray-900 text-xl mb-6">Order Summary</h2>
+            <h2 className="font-black text-gray-900 text-xl mb-4">Order Summary</h2>
+            <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex items-center gap-1.5">
+              🚚 <span>Free delivery on orders above <span className="font-black">AED 150</span></span>
+            </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)</span>

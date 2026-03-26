@@ -1,10 +1,11 @@
 import Link from 'next/link'
-import { MessageCircle, Smartphone, CreditCard, Mail, Phone, MapPin, Leaf, Apple, Sprout, Sparkles, Gift, Truck } from 'lucide-react'
+import { MessageCircle, Smartphone, CreditCard, Phone, MapPin, Leaf, Apple, Sprout, Sparkles, Gift, Truck, Mail } from 'lucide-react'
+import { NewsletterForm } from './NewsletterForm'
 
 export default function Footer() {
   return (
     <>
-      {/* WhatsApp floating button */}
+      {/* WhatsApp floating button — positioned above scroll-to-top (bottom-20) */}
       <a
         href="https://wa.me/971500000000"
         target="_blank"
@@ -26,19 +27,7 @@ export default function Footer() {
               </h3>
               <p className="text-gray-400 text-sm">Weekly deals, new arrivals, and exclusive offers.</p>
             </div>
-            <div className="flex gap-2 w-full md:w-auto">
-              <div className="relative flex-1 md:w-64">
-                <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-green-500 transition-colors"
-                />
-              </div>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-3 rounded-xl text-sm transition-colors whitespace-nowrap">
-                Subscribe
-              </button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
 

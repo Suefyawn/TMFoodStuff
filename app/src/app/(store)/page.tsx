@@ -245,7 +245,7 @@ export default function HomePage() {
             return (
               <Link
                 key={cat.slug}
-                href="/shop"
+                href={`/shop?category=${cat.slug}`}
                 className={`${cat.color} ${cat.border} border rounded-2xl p-6 text-center transition-all hover:shadow-md hover:-translate-y-1 group cursor-pointer flex-shrink-0 w-36 md:w-auto`}
               >
                 <div className={`flex justify-center mb-3 group-hover:scale-110 transition-transform duration-200 ${cat.iconColor}`}>

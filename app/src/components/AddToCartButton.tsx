@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ShoppingCart, Plus, Minus } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED } from '@/lib/utils'
@@ -23,10 +23,29 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
   const cartItem = items.find(i => i.id === product.id)
   const qty = cartItem?.quantity ?? 0
   const [showToast, setShowToast] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   function handleAdd() {
     addItem(product, 1)
     setShowToast(true)
+  }
+
+  // Prevent hydration mismatch: render neutral button until client store is loaded
+  if (!mounted) {
+    if (size === 'lg') {
+      return (
+        <button className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99]">
+          <ShoppingCart size={20} /> Add to Cart
+        </button>
+      )
+    }
+    return (
+      <button className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95">
+        <ShoppingCart size={14} /> Add
+      </button>
+    )
   }
 
   if (size === 'lg') {

@@ -6,10 +6,10 @@ import { useCartStore } from '@/lib/store'
 import { usePathname, useRouter } from 'next/navigation'
 
 const navLinks = [
-  { label: 'Fruits', href: '/shop' },
-  { label: 'Vegetables', href: '/shop' },
-  { label: 'Organic', href: '/shop' },
-  { label: 'Exotic', href: '/shop' },
+  { label: 'Fruits', href: '/shop?category=fruits' },
+  { label: 'Vegetables', href: '/shop?category=vegetables' },
+  { label: 'Organic', href: '/shop?category=organic' },
+  { label: 'Exotic', href: '/shop?category=exotic' },
   { label: 'All Products', href: '/shop' },
 ]
 
@@ -69,7 +69,7 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className={`nav-link px-3 py-2 ${pathname === link.href || pathname.startsWith('/shop') ? 'text-green-600' : ''}`}
+                className={`nav-link px-3 py-2 ${pathname.startsWith('/shop') ? 'text-green-600' : ''}`}
               >
                 {link.label}
               </Link>
@@ -134,7 +134,7 @@ export default function Navbar() {
                 key={link.label}
                 href={link.href}
                 className={`block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                  pathname === link.href || pathname.startsWith('/shop')
+                  pathname.startsWith('/shop')
                     ? 'text-green-600 bg-green-50'
                     : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
                 }`}

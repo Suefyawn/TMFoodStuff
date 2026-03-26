@@ -11,6 +11,7 @@ export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCartStore()
   const [paymentMethod, setPaymentMethod] = useState('telr')
   const [submitted, setSubmitted] = useState(false)
+  const [orderNumber, setOrderNumber] = useState('')
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
@@ -36,6 +37,7 @@ export default function CheckoutPage() {
       return
     }
     // In production this would POST to /api/orders
+    setOrderNumber(`TM-${Math.random().toString(36).substr(2, 6).toUpperCase()}`)
     clearCart()
     setSubmitted(true)
   }
@@ -48,6 +50,9 @@ export default function CheckoutPage() {
         </div>
         <h1 className="text-3xl font-black text-gray-900 mb-3">Order Placed!</h1>
         <p className="text-gray-500 mb-2 text-lg">Thank you, {form.fullName}.</p>
+        {orderNumber && (
+          <p className="text-green-700 font-black text-xl mb-2">Order #{orderNumber}</p>
+        )}
         <p className="text-gray-500 mb-8">We&apos;ll send you a WhatsApp confirmation shortly.</p>
         <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
           <ShoppingBag size={18} /> Continue Shopping
@@ -83,9 +88,10 @@ export default function CheckoutPage() {
               <h2 className="font-black text-gray-900 text-xl mb-6">Delivery Details</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
+                  <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
                   <input
                     type="text"
+                    id="fullName"
                     name="fullName"
                     value={form.fullName}
                     onChange={handleChange}
@@ -95,9 +101,10 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number *</label>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number *</label>
                   <input
                     type="tel"
+                    id="phone"
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
@@ -107,9 +114,10 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
                   <input
                     type="email"
+                    id="email"
                     name="email"
                     value={form.email}
                     onChange={handleChange}
@@ -118,8 +126,9 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Emirate *</label>
+                  <label htmlFor="emirate" className="block text-sm font-semibold text-gray-700 mb-1.5">Emirate *</label>
                   <select
+                    id="emirate"
                     name="emirate"
                     value={form.emirate}
                     onChange={handleChange}
@@ -131,9 +140,10 @@ export default function CheckoutPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Area / District *</label>
+                  <label htmlFor="area" className="block text-sm font-semibold text-gray-700 mb-1.5">Area / District *</label>
                   <input
                     type="text"
+                    id="area"
                     name="area"
                     value={form.area}
                     onChange={handleChange}
@@ -143,9 +153,10 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Building / Villa</label>
+                  <label htmlFor="building" className="block text-sm font-semibold text-gray-700 mb-1.5">Building / Villa</label>
                   <input
                     type="text"
+                    id="building"
                     name="building"
                     value={form.building}
                     onChange={handleChange}
@@ -154,11 +165,12 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  <label htmlFor="makani" className="block text-sm font-semibold text-gray-700 mb-1.5">
                     Makani Number <span className="text-gray-400 font-normal">(optional)</span>
                   </label>
                   <input
                     type="text"
+                    id="makani"
                     name="makani"
                     value={form.makani}
                     onChange={handleChange}
@@ -167,8 +179,9 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Order Notes</label>
+                  <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 mb-1.5">Order Notes</label>
                   <textarea
+                    id="notes"
                     name="notes"
                     value={form.notes}
                     onChange={handleChange}
@@ -259,8 +272,14 @@ export default function CheckoutPage() {
                     }
                   </span>
                 </div>
-                {deliveryFee > 0 && (
-                  <p className="text-xs text-gray-400">Add {formatAED(150 - sub)} more for free delivery</p>
+                {deliveryFee > 0 ? (
+                  <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 text-xs text-amber-800 font-semibold">
+                    Add {formatAED(150 - sub)} more for <span className="font-black">free delivery</span> (orders above AED 150)
+                  </div>
+                ) : (
+                  <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-1.5">
+                    🎉 <span>Free delivery applied!</span>
+                  </div>
                 )}
                 <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                   <span>Total</span>
