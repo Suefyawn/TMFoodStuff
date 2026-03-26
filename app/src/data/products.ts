@@ -72,7 +72,7 @@ export const products: ProductData[] = [
     nameAr: 'تفاح رويال جالا',
     slug: 'apple-royal-gala',
     categorySlug: 'fruits',
-    description: 'Mildly sweet Royal Gala apples from New Zealand's finest orchards.',
+    description: "Mildly sweet Royal Gala apples from New Zealand's finest orchards.",
     priceAED: 11.00,
     unit: 'kg',
     stock: 70,
