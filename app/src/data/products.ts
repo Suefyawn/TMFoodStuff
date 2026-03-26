@@ -32,7 +32,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'USA',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple_red_400-500g.jpg',
     isActive: true,
   },
   {
@@ -49,7 +49,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍏',
-    imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple_granny_smith.jpg',
     isActive: true,
   },
   {
@@ -66,7 +66,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'China',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple-fuji-1-kg.jpg',
     isActive: true,
   },
   {
@@ -83,7 +83,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple-royal-gala-5-kg.jpg',
     isActive: true,
   },
   {
@@ -100,7 +100,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'USA',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple-green-1kg.jpg',
     isActive: true,
   },
   {
@@ -117,7 +117,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Chile',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple_ambrosia_400-500g.jpg',
     isActive: true,
   },
   {
@@ -134,7 +134,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'New Zealand',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple_jazz_1kg.jpg',
     isActive: true,
   },
   {
@@ -151,7 +151,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'India',
     emoji: '🍌',
-    imageUrl: 'https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/banana_small_1.png',
     isActive: true,
   },
   {
@@ -168,7 +168,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍌',
-    imageUrl: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/banana-green-500g.jpg',
     isActive: true,
   },
   {
@@ -185,7 +185,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍌',
-    imageUrl: 'https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/banana-red-poovan-1100.jpg',
     isActive: true,
   },
   {
@@ -202,7 +202,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'South Africa',
     emoji: '🍊',
-    imageUrl: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/o/r/orange-valencia-3-kg-box.jpg',
     isActive: true,
   },
   {
@@ -219,7 +219,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Egypt',
     emoji: '🍊',
-    imageUrl: 'https://images.unsplash.com/photo-1580052614034-c55d20bfee3b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/o/r/orange-navel-500g.jpg',
     isActive: true,
   },
   {
@@ -236,7 +236,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Morocco',
     emoji: '🍊',
-    imageUrl: 'https://images.unsplash.com/photo-1587486936739-78978df5e89a?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/m/a/mandarin-5-kg.jpg',
     isActive: true,
   },
   {
@@ -253,7 +253,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Lebanon',
     emoji: '🍊',
-    imageUrl: 'https://images.unsplash.com/photo-1580052614034-c55d20bfee3b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/o/r/orange-valencia-1kg.jpg',
     isActive: true,
   },
   {
@@ -270,7 +270,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍋',
-    imageUrl: 'https://images.unsplash.com/photo-1582476395462-999d8f0e64c1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/e/lemon-500gms_1.jpg',
     isActive: true,
   },
   {
@@ -287,7 +287,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍋',
-    imageUrl: 'https://images.unsplash.com/photo-1590502593747-42a996133562?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/i/lime-green-seedless-250gms_1.jpg',
     isActive: true,
   },
   {
@@ -304,7 +304,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍊',
-    imageUrl: 'https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/grapefruit-_organic_1.jpg',
     isActive: true,
   },
   {
@@ -338,7 +338,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Brazil',
     emoji: '🥭',
-    imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/i/timoor_mango_2.jpg',
     isActive: true,
   },
   {
@@ -355,7 +355,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Pakistan',
     emoji: '🥭',
-    imageUrl: 'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/i/timoor_mango_2.jpg',
     isActive: true,
   },
   {
@@ -372,7 +372,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥭',
-    imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/i/timoor_mango_2.jpg',
     isActive: true,
   },
   {
@@ -389,7 +389,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'UAE',
     emoji: '🍉',
-    imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/w/a/watermelons_india_1_1_.png',
     isActive: true,
   },
   {
@@ -406,7 +406,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🍈',
-    imageUrl: 'https://images.unsplash.com/photo-1571575173700-afb9492e6a50?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/w/sweet-melon.jpg',
     isActive: true,
   },
   {
@@ -423,7 +423,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Australia',
     emoji: '🍈',
-    imageUrl: 'https://images.unsplash.com/photo-1571575173700-afb9492e6a50?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/r/o/rock-melon-cantaloupe-melon-1piece.jpg',
     isActive: true,
   },
   {
@@ -440,7 +440,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Spain',
     emoji: '🍈',
-    imageUrl: 'https://images.unsplash.com/photo-1571575173700-afb9492e6a50?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/w/sweet-melon.jpg',
     isActive: true,
   },
   {
@@ -457,7 +457,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'India',
     emoji: '🍇',
-    imageUrl: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/o/sonaka_grapes_1.jpg',
     isActive: true,
   },
   {
@@ -474,7 +474,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍇',
-    imageUrl: 'https://images.unsplash.com/photo-1596363505818-87bf58e6d7d0?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/o/sonaka_grapes_1.jpg',
     isActive: true,
   },
   {
@@ -491,7 +491,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍇',
-    imageUrl: 'https://images.unsplash.com/photo-1515779122185-2390ccdf060b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/grapes_black_500g.jpg',
     isActive: true,
   },
   {
@@ -508,7 +508,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Egypt',
     emoji: '🍓',
-    imageUrl: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/n/e/new_pure_harvest.jpg',
     isActive: true,
   },
   {
@@ -525,7 +525,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'South Africa',
     emoji: '🫐',
-    imageUrl: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/l/blueberry1.jpg',
     isActive: true,
   },
   {
@@ -542,7 +542,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🫐',
-    imageUrl: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/l/blueberry1.jpg',
     isActive: true,
   },
   {
@@ -559,7 +559,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Morocco',
     emoji: '🫐',
-    imageUrl: 'https://images.unsplash.com/photo-1587132137056-bfbf0166836e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/r/a/raspberry_125g.jpg',
     isActive: true,
   },
   {
@@ -576,7 +576,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🫐',
-    imageUrl: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/l/blackberry-125g.jpg',
     isActive: true,
   },
   {
@@ -593,7 +593,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Colombia',
     emoji: '🍒',
-    imageUrl: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/o/golden_berries_170g_1_1.jpg',
     isActive: true,
   },
   {
@@ -610,7 +610,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Iran',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/o/pomegranate-2piece.jpg',
     isActive: true,
   },
   {
@@ -627,7 +627,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Philippines',
     emoji: '🍍',
-    imageUrl: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/u/cut_fruits-04.jpg',
     isActive: true,
   },
   {
@@ -644,7 +644,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Malaysia',
     emoji: '🍈',
-    imageUrl: 'https://images.unsplash.com/photo-1526318472351-c75fcf070305?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/a/papaya-green-1kg.jpg',
     isActive: true,
   },
   {
@@ -661,7 +661,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'New Zealand',
     emoji: '🥝',
-    imageUrl: 'https://images.unsplash.com/photo-1585059895524-72359e06133a?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/k/i/kiwi_iran_400-500g.jpg',
     isActive: true,
   },
   {
@@ -678,7 +678,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'New Zealand',
     emoji: '🥝',
-    imageUrl: 'https://images.unsplash.com/photo-1585059895524-72359e06133a?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/o/golden_kiwi_500g.jpg',
     isActive: true,
   },
   {
@@ -746,7 +746,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍐',
-    imageUrl: 'https://images.unsplash.com/photo-1514756331096-242fdeb70d4a?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/h/shutterstock_268746017.jpg',
     isActive: true,
   },
   {
@@ -763,7 +763,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Turkey',
     emoji: '🍒',
-    imageUrl: 'https://images.unsplash.com/photo-1528821128474-27f963b062bf?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/o/tomato-cherry-red-1pkt_1_1.jpg',
     isActive: true,
   },
   {
@@ -797,7 +797,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍐',
-    imageUrl: 'https://images.unsplash.com/photo-1536511132770-e5058c7e8c46?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/u/guava_ripe_1.jpg',
     isActive: true,
   },
   {
@@ -814,7 +814,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Kenya',
     emoji: '🥑',
-    imageUrl: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/v/avocado_ready_to_eat_1pc.jpg',
     isActive: true,
   },
   {
@@ -831,7 +831,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Vietnam',
     emoji: '🐉',
-    imageUrl: 'https://images.unsplash.com/photo-1527325678964-54921661f888?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/d/r/dragon-fruit-red-flesh.jpg',
     isActive: true,
   },
   {
@@ -848,7 +848,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Colombia',
     emoji: '🍈',
-    imageUrl: 'https://images.unsplash.com/photo-1604495772376-9657f1fb2e97?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/granadilla-150-200g.jpg',
     isActive: true,
   },
   {
@@ -865,7 +865,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Vietnam',
     emoji: '🥥',
-    imageUrl: 'https://images.unsplash.com/photo-1559181567-c3190ca9be46?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/e/tender_coconut1_1pc_1_1.jpg',
     isActive: true,
   },
   {
@@ -933,7 +933,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Egypt',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1571575173700-afb9492e6a50?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/u/sugarcane-1kg.jpg',
     isActive: true,
   },
   {
@@ -967,7 +967,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🟤',
-    imageUrl: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/w/sweet-tamarind-1pkt.jpg',
     isActive: true,
   },
   {
@@ -1001,7 +1001,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Colombia',
     emoji: '🍈',
-    imageUrl: 'https://images.unsplash.com/photo-1604495772376-9657f1fb2e97?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/granadilla_2.5_kg_box_1.jpg',
     isActive: true,
   },
 
@@ -1020,7 +1020,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Turkey',
     emoji: '🍋',
-    imageUrl: 'https://images.unsplash.com/photo-1582476395462-999d8f0e64c1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/e/lemon-organic_1.jpg',
     isActive: true,
   },
   {
@@ -1037,7 +1037,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍋',
-    imageUrl: 'https://images.unsplash.com/photo-1590502593747-42a996133562?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/i/lime-green-seedless-250gms_1.jpg',
     isActive: true,
   },
   {
@@ -1054,7 +1054,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Iran',
     emoji: '🍎',
-    imageUrl: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/o/pomegranate_organic_1.png',
     isActive: true,
   },
   {
@@ -1071,7 +1071,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Philippines',
     emoji: '🍍',
-    imageUrl: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/i/pineapple-1100_1_1_1.jpg',
     isActive: true,
   },
   {
@@ -1088,7 +1088,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'New Zealand',
     emoji: '🥝',
-    imageUrl: 'https://images.unsplash.com/photo-1585059895524-72359e06133a?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/k/i/kiwi_iran_400-500g.jpg',
     isActive: true,
   },
   {
@@ -1105,7 +1105,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Australia',
     emoji: '🍏',
-    imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/a/p/apple_granny_smith.jpg',
     isActive: true,
   },
   {
@@ -1122,7 +1122,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🍊',
-    imageUrl: 'https://images.unsplash.com/photo-1577234286642-fc512a5f8f11?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/grapefruit-_organic_1.jpg',
     isActive: true,
   },
   {
@@ -1139,7 +1139,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🍐',
-    imageUrl: 'https://images.unsplash.com/photo-1536511132770-e5058c7e8c46?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/u/guava_ripe_1_1_upload.jpg',
     isActive: true,
   },
   {
@@ -1156,7 +1156,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Australia',
     emoji: '🍈',
-    imageUrl: 'https://images.unsplash.com/photo-1571575173700-afb9492e6a50?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/h/shutterstock_1190097205.jpg',
     isActive: true,
   },
   {
@@ -1173,7 +1173,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🟤',
-    imageUrl: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/h/chikoo-sapodilla-premium-200-250g.jpg',
     isActive: true,
   },
   {
@@ -1190,7 +1190,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🟣',
-    imageUrl: 'https://images.unsplash.com/photo-1593105544559-ecb03bf76f82?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/e/beetroot-organic_1.jpg',
     isActive: true,
   },
   {
@@ -1207,7 +1207,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🧄',
-    imageUrl: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/a/garlic-organic_1_1.jpg',
     isActive: true,
   },
   {
@@ -1224,7 +1224,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫚',
-    imageUrl: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/i/ginger-organic_1_1.jpg',
     isActive: true,
   },
   {
@@ -1241,7 +1241,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/o/r/organic_pointed.jpg',
     isActive: true,
   },
   {
@@ -1258,7 +1258,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/a/galka_org.jpg',
     isActive: true,
   },
 
@@ -1277,7 +1277,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'UAE',
     emoji: '🍅',
-    imageUrl: 'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/o/tomato-1kg_1.jpg',
     isActive: true,
   },
   {
@@ -1294,7 +1294,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🍅',
-    imageUrl: 'https://images.unsplash.com/photo-1559181568-b8de7b0bfa9e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/o/tomato-cherry-red-1pkt_1_1.jpg',
     isActive: true,
   },
   {
@@ -1311,7 +1311,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Tunisia',
     emoji: '🍅',
-    imageUrl: 'https://images.unsplash.com/photo-1561136594-7f68413baa99?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/o/tomato_beef_500g.jpg',
     isActive: true,
   },
   {
@@ -1328,7 +1328,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Pakistan',
     emoji: '🥔',
-    imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/o/potato-1kg.jpg',
     isActive: true,
   },
   {
@@ -1345,7 +1345,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Egypt',
     emoji: '🥔',
-    imageUrl: 'https://images.unsplash.com/photo-1596097635121-14b38c5d7a75?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/o/potato-sweet-1kg.jpg',
     isActive: true,
   },
   {
@@ -1362,7 +1362,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥔',
-    imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/o/potato_peeled_500g.jpg',
     isActive: true,
   },
   {
@@ -1379,7 +1379,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥔',
-    imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/o/potato_wedges_500g_with_label.jpg',
     isActive: true,
   },
   {
@@ -1396,7 +1396,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🧅',
-    imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/o/n/onion-red-india-1kg.jpg',
     isActive: true,
   },
   {
@@ -1413,7 +1413,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Egypt',
     emoji: '🧅',
-    imageUrl: 'https://images.unsplash.com/photo-1580201092675-a0a6a6cafbb1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/o/n/onion_white_peeled_1kg.jpg',
     isActive: true,
   },
   {
@@ -1430,7 +1430,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/u/cucumber-box.jpg',
     isActive: true,
   },
   {
@@ -1447,7 +1447,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/u/cucumber_baby_org_1.jpg',
     isActive: true,
   },
   {
@@ -1464,7 +1464,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/green-apple-fresh-washed-and-sanitized.jpg',
     isActive: true,
   },
   {
@@ -1481,7 +1481,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Australia',
     emoji: '🥕',
-    imageUrl: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/carrot-aus-500gms_1.jpg',
     isActive: true,
   },
   {
@@ -1498,7 +1498,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥕',
-    imageUrl: 'https://images.unsplash.com/photo-1447175008436-054170c2e979?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/baby_carrots_peeled.jpg',
     isActive: true,
   },
   {
@@ -1515,7 +1515,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥕',
-    imageUrl: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/carrot_strips_250g_with_label.jpg',
     isActive: true,
   },
   {
@@ -1532,7 +1532,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥕',
-    imageUrl: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/carrotgajar_1.jpg',
     isActive: true,
   },
   {
@@ -1549,7 +1549,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🫑',
-    imageUrl: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/green_capsicum_washed_sanitized.jpg',
     isActive: true,
   },
   {
@@ -1566,7 +1566,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫑',
-    imageUrl: 'https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/r/e/red_capsicum_500g_with_label.jpg',
     isActive: true,
   },
   {
@@ -1583,7 +1583,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫑',
-    imageUrl: 'https://images.unsplash.com/photo-1594282418426-4e6d6ccf87c5?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/y/e/yellow_capsicum_500g_with_label.jpg',
     isActive: true,
   },
   {
@@ -1600,7 +1600,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫑',
-    imageUrl: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/capsicum-mix-500g.jpg',
     isActive: true,
   },
   {
@@ -1617,7 +1617,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🫑',
-    imageUrl: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/capsicum-mix-500g.jpg',
     isActive: true,
   },
   {
@@ -1634,7 +1634,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Netherlands',
     emoji: '🥦',
-    imageUrl: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/i/gi4a6191.jpg',
     isActive: true,
   },
   {
@@ -1651,7 +1651,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥦',
-    imageUrl: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/i/gi4a6191.jpg',
     isActive: true,
   },
   {
@@ -1668,7 +1668,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥦',
-    imageUrl: 'https://images.unsplash.com/photo-1568584711271-6c929fb49b60?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/cauliflower-700-1000g.jpg',
     isActive: true,
   },
   {
@@ -1685,7 +1685,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥦',
-    imageUrl: 'https://images.unsplash.com/photo-1568584711271-6c929fb49b60?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/cauliflower_florets_350g_1.jpg',
     isActive: true,
   },
   {
@@ -1702,7 +1702,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1594282418426-4e6d6ccf87c5?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/i/gi4a6171.jpg',
     isActive: true,
   },
   {
@@ -1719,7 +1719,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1594282418426-4e6d6ccf87c5?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/cabbage-savoy-800-1000g.jpg',
     isActive: true,
   },
   {
@@ -1736,7 +1736,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/a/cabbage-savoy-800-1000g.jpg',
     isActive: true,
   },
   {
@@ -1753,7 +1753,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/p/spinach_250g.jpg',
     isActive: true,
   },
   {
@@ -1770,7 +1770,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/baby_spinach.png',
     isActive: true,
   },
   {
@@ -1787,7 +1787,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/baby_spinach.png',
     isActive: true,
   },
   {
@@ -1804,7 +1804,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/e/lettuce_romain_5kg_box.jpg',
     isActive: true,
   },
   {
@@ -1821,7 +1821,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/e/lettuce-iceberg-1piece.jpg',
     isActive: true,
   },
   {
@@ -1838,7 +1838,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/e/lettuce_mixed_sanitized_175g.jpg',
     isActive: true,
   },
   {
@@ -1855,7 +1855,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/e/lettuce-lollo-bionda-uae-1piece.jpg',
     isActive: true,
   },
   {
@@ -1872,7 +1872,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/l/e/lettuce-radicchio-250-300g.jpg',
     isActive: true,
   },
   {
@@ -1906,7 +1906,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🟣',
-    imageUrl: 'https://images.unsplash.com/photo-1593105544559-ecb03bf76f82?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/e/beetroot-2piece_1.jpg',
     isActive: true,
   },
   {
@@ -1923,7 +1923,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🟣',
-    imageUrl: 'https://images.unsplash.com/photo-1593105544559-ecb03bf76f82?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/e/beetroots.jpg',
     isActive: true,
   },
   {
@@ -1940,7 +1940,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'China',
     emoji: '🧄',
-    imageUrl: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/a/garlic_china_-.jpg',
     isActive: true,
   },
   {
@@ -1957,7 +1957,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'China',
     emoji: '🧄',
-    imageUrl: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/a/garlic_peeled_250g_with_label.jpg',
     isActive: true,
   },
   {
@@ -1974,7 +1974,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'China',
     emoji: '🧄',
-    imageUrl: 'https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/a/garlic_chopped_250g.jpg',
     isActive: true,
   },
   {
@@ -1991,7 +1991,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫚',
-    imageUrl: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/i/gi4a6182.jpg',
     isActive: true,
   },
   {
@@ -2008,7 +2008,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫚',
-    imageUrl: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/i/ginger_peeled_250g_with_label.jpg',
     isActive: true,
   },
   {
@@ -2025,7 +2025,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫚',
-    imageUrl: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/i/ginger_chopped_250g_with_label.jpg',
     isActive: true,
   },
   {
@@ -2059,7 +2059,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥬',
-    imageUrl: 'https://images.unsplash.com/photo-1616167069429-3b7d2ea6b07b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/e/celery-500gms.jpg',
     isActive: true,
   },
   {
@@ -2093,7 +2093,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/z/u/zucchini-green-gcc-500gms.jpg',
     isActive: true,
   },
   {
@@ -2110,7 +2110,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/z/u/zucchini-green-gcc-500gms.jpg',
     isActive: true,
   },
   {
@@ -2127,7 +2127,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🍆',
-    imageUrl: 'https://images.unsplash.com/photo-1613145997970-db84a7975fbb?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/e/g/eggplant-aubergine-6piece.jpg',
     isActive: true,
   },
   {
@@ -2144,7 +2144,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥦',
-    imageUrl: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/o/k/okra_pre500g.jpg',
     isActive: true,
   },
   {
@@ -2161,7 +2161,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Kenya',
     emoji: '🫛',
-    imageUrl: 'https://images.unsplash.com/photo-1567375698348-5d9d5ae99de0?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/green_beans_cut_250.png',
     isActive: true,
   },
   {
@@ -2178,7 +2178,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🫛',
-    imageUrl: 'https://images.unsplash.com/photo-1587735243615-c03f25aaff15?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/green-peas.jpg',
     isActive: true,
   },
   {
@@ -2195,7 +2195,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌽',
-    imageUrl: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/baby_corn_100g_1.jpg',
     isActive: true,
   },
   {
@@ -2212,7 +2212,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'South Africa',
     emoji: '🎃',
-    imageUrl: 'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/u/pumpkin-butternut-1-1.5kg.jpg',
     isActive: true,
   },
   {
@@ -2229,7 +2229,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🎃',
-    imageUrl: 'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/u/pumpkin-ash-_kumblam_.jpg',
     isActive: true,
   },
   {
@@ -2246,7 +2246,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🎃',
-    imageUrl: 'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/u/pumpkin-red-cubes-fresh-15mm-350gms.jpg',
     isActive: true,
   },
   {
@@ -2263,7 +2263,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'Netherlands',
     emoji: '🍄',
-    imageUrl: 'https://images.unsplash.com/photo-1552825897-bb44bc7f3b69?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/m/u/mushroom-button-1pkt.jpg',
     isActive: true,
   },
   {
@@ -2280,7 +2280,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🍄',
-    imageUrl: 'https://images.unsplash.com/photo-1573045602-dca0d7e03523?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/m/u/mushroom-oyster-250gms.jpg',
     isActive: true,
   },
   {
@@ -2297,7 +2297,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/baby-marrow_1.jpg',
     isActive: true,
   },
   {
@@ -2331,7 +2331,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/o/coriander-leaves_2.jpg',
     isActive: true,
   },
   {
@@ -2348,7 +2348,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/p/a/parsley-leaves-local.jpg',
     isActive: true,
   },
   {
@@ -2365,7 +2365,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/m/i/mint-leaves-200gms.jpg',
     isActive: true,
   },
   {
@@ -2382,7 +2382,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1590868309235-ea34bed7bd7f?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/p/spring-onion-200gms.jpg',
     isActive: true,
   },
   {
@@ -2399,7 +2399,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🌶️',
-    imageUrl: 'https://images.unsplash.com/photo-1583119022894-919a68a3d0e3?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/g/r/green-chilli.jpg',
     isActive: true,
   },
   {
@@ -2416,7 +2416,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🌶️',
-    imageUrl: 'https://images.unsplash.com/photo-1583119022894-919a68a3d0e3?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/h/chilli_green_premium.jpg',
     isActive: true,
   },
   {
@@ -2433,7 +2433,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/a/banana_leaves_4_kg_box.jpg',
     isActive: true,
   },
   {
@@ -2450,7 +2450,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/h/g/hg.jpg',
     isActive: true,
   },
   {
@@ -2467,7 +2467,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥥',
-    imageUrl: 'https://images.unsplash.com/photo-1559181567-c3190ca9be46?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/o/coconut_grated_250g_with_label.jpg',
     isActive: true,
   },
   {
@@ -2484,7 +2484,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥥',
-    imageUrl: 'https://images.unsplash.com/photo-1559181567-c3190ca9be46?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/c/u/cut_fruits_-_coconut.jpg',
     isActive: true,
   },
   {
@@ -2501,7 +2501,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'UAE',
     emoji: '🥦',
-    imageUrl: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/m/i/mixed_vegetables_250g_with_label_1_.jpg',
     isActive: true,
   },
   {
@@ -2518,7 +2518,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/s/n/snakegourd_premium_500g.jpg',
     isActive: true,
   },
   {
@@ -2535,7 +2535,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🌿',
-    imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/n/4/n47991681a_1_1.jpg',
     isActive: true,
   },
   {
@@ -2552,7 +2552,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥭',
-    imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/t/i/timoor_mango_2.jpg',
     isActive: true,
   },
   {
@@ -2569,7 +2569,7 @@ export const products: ProductData[] = [
     isFeatured: false,
     origin: 'India',
     emoji: '🥒',
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&h=400&fit=crop',
+    imageUrl: 'https://media.barakatfresh.ae/media/catalog/product/cache/68f053fcb0ca893da48f8ea638348c9e/b/i/bitter-gourd.jpg',
     isActive: true,
   },
 ]
