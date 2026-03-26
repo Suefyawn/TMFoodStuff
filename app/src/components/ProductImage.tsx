@@ -8,18 +8,8 @@ interface ProductImageProps {
   emoji?: string
 }
 
-function getProxiedUrl(url?: string): string {
-  if (!url) return ''
-  // Proxy Barakat CDN images through our API
-  if (url.includes('barakatfresh.ae')) {
-    return `/api/image-proxy?url=${encodeURIComponent(url)}`
-  }
-  return url
-}
-
-export default function ProductImage({ src, alt, className, emoji }: ProductImageProps) {
+export function ProductImage({ src, alt, className, emoji }: ProductImageProps) {
   const [error, setError] = useState(false)
-  const proxiedSrc = getProxiedUrl(src)
 
   if (!src || error) {
     return (
@@ -31,7 +21,7 @@ export default function ProductImage({ src, alt, className, emoji }: ProductImag
 
   return (
     <img
-      src={proxiedSrc}
+      src={src}
       alt={alt}
       className={className}
       onError={() => setError(true)}
@@ -40,5 +30,4 @@ export default function ProductImage({ src, alt, className, emoji }: ProductImag
   )
 }
 
-// Also export as named export for backwards compatibility
-export { ProductImage }
+export default ProductImage
