@@ -1,4 +1,4 @@
-import { CollectionConfig } from 'payload/types'
+import { CollectionConfig } from 'payload'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -45,3 +45,4 @@ export const Orders: CollectionConfig = {
     { name: 'notes', type: 'textarea' },
   ],
 }
+

@@ -1,4 +1,4 @@
-import { CollectionConfig } from 'payload/types'
+import { CollectionConfig } from 'payload'
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -24,3 +24,4 @@ export const Products: CollectionConfig = {
     { name: 'tags', type: 'array', fields: [{ name: 'tag', type: 'text' }] },
   ],
 }
+

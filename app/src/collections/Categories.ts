@@ -1,4 +1,4 @@
-import { CollectionConfig } from 'payload/types'
+import { CollectionConfig } from 'payload'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -14,3 +14,4 @@ export const Categories: CollectionConfig = {
     { name: 'order', type: 'number', defaultValue: 0 },
   ],
 }
+
