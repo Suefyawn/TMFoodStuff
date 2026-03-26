@@ -1,35 +1,7 @@
 import Link from 'next/link'
 import { formatAED } from '@/lib/utils'
 import AddToCartButton from './AddToCartButton'
-
-const originFlags: Record<string, string> = {
-  'South Africa': '🇿🇦',
-  'UAE': '🇦🇪',
-  'Egypt': '🇪🇬',
-  'Jordan': '🇯🇴',
-  'Lebanon': '🇱🇧',
-  'Turkey': '🇹🇷',
-  'India': '🇮🇳',
-  'Pakistan': '🇵🇰',
-  'Philippines': '🇵🇭',
-  'Thailand': '🇹🇭',
-  'USA': '🇺🇸',
-  'Chile': '🇨🇱',
-  'Australia': '🇦🇺',
-  'Spain': '🇪🇸',
-  'Italy': '🇮🇹',
-  'Morocco': '🇲🇦',
-  'Kenya': '🇰🇪',
-  'Peru': '🇵🇪',
-  'Mexico': '🇲🇽',
-  'Brazil': '🇧🇷',
-  'China': '🇨🇳',
-  'Vietnam': '🇻🇳',
-  'Malaysia': '🇲🇾',
-  'Indonesia': '🇮🇩',
-  'Sri Lanka': '🇱🇰',
-  'Iran': '🇮🇷',
-}
+import { Leaf, MapPin, ShoppingCart } from 'lucide-react'
 
 interface ProductCardProps {
   product: {
@@ -49,7 +21,6 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const inStock = product.stock > 0
-  const flagEmoji = product.origin ? (originFlags[product.origin] || '🌍') : null
 
   return (
     <div className={`bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-300 hover:-translate-y-1 group flex flex-col shadow-sm hover:shadow-xl ${!inStock ? 'opacity-80' : ''}`}>
@@ -63,14 +34,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             />
           ) : (
             <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
-              {product.emoji || '🛒'}
+              {product.emoji || ''}
             </span>
           )}
           {/* Badges top-left */}
           <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
             {product.isOrganic && (
-              <span className="bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-sm">
-                🌱 Organic
+              <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-sm">
+                <Leaf size={10} />
+                Organic
               </span>
             )}
             {!inStock && (
@@ -79,12 +51,6 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
-          {/* Origin flag top-right */}
-          {flagEmoji && (
-            <div className="absolute top-2.5 right-2.5">
-              <span className="text-lg drop-shadow-sm">{flagEmoji}</span>
-            </div>
-          )}
         </div>
       </Link>
 
@@ -94,6 +60,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
         </Link>
+
+        {product.origin && (
+          <p className="inline-flex items-center gap-1 text-xs text-gray-400 mb-2">
+            <MapPin size={10} className="flex-shrink-0" />
+            {product.origin}
+          </p>
+        )}
+
         <p className="text-xs text-gray-400 mb-3">per {product.unit}</p>
 
         <div className="mt-auto">

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { ShoppingCart, Menu, X, Search, Leaf } from 'lucide-react'
+import { ShoppingCart, Menu, X, Search, Leaf, User } from 'lucide-react'
 import { useState } from 'react'
 
 const navLinks = [
@@ -16,16 +16,14 @@ export default function Navbar() {
   const cartCount = 0
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center group-hover:bg-green-700 transition-colors">
-              <Leaf size={18} className="text-white" />
-            </div>
-            <span className="font-black text-xl text-gray-900">
-              TM<span className="text-green-600">Food</span>Stuff
+          <Link href="/" className="flex items-center gap-1.5 group flex-shrink-0">
+            <Leaf size={20} className="text-green-700 group-hover:text-green-600 transition-colors" />
+            <span className="tracking-tight font-black text-green-700 text-xl">
+              TM FoodStuff
             </span>
           </Link>
 
@@ -48,7 +46,7 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="px-3 py-2 text-sm font-semibold text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all"
+                className="nav-link px-3 py-2"
               >
                 {link.label}
               </Link>
@@ -57,26 +55,26 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Link href="#" className="hidden md:block text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors px-2">
-              Sign In
+            <Link href="#" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
+              <User size={16} />
+              <span>Sign In</span>
             </Link>
-            <Link href="/cart" className="relative flex items-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 transition-colors shadow-sm">
+            <Link
+              href="/cart"
+              className="relative flex items-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm"
+            >
               <ShoppingCart size={16} />
               <span className="hidden sm:inline">Cart</span>
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-amber-400 text-gray-900 rounded-full text-xs font-black flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs font-black flex items-center justify-center animate-pulse">
                   {cartCount}
-                </span>
-              )}
-              {cartCount === 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-gray-200 text-gray-600 rounded-full text-xs font-black flex items-center justify-center">
-                  0
                 </span>
               )}
             </Link>
             <button
               className="md:hidden p-2 text-gray-600 hover:text-gray-900"
               onClick={() => setOpen(!open)}
+              aria-label="Toggle menu"
             >
               {open ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -106,14 +104,18 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="block px-3 py-2.5 text-sm font-semibold text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                className="block px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
             <div className="border-t border-gray-100 pt-2 mt-1">
-              <Link href="#" className="block px-3 py-2.5 text-sm font-semibold text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+              <Link
+                href="#"
+                className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              >
+                <User size={16} />
                 Sign In
               </Link>
             </div>

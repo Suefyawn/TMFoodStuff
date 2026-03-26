@@ -14,6 +14,10 @@ const config: Config = {
           800: '#166534',
         },
       },
+      fontFamily: {
+        inter: ['var(--font-inter)', 'sans-serif'],
+        playfair: ['var(--font-playfair)', 'serif'],
+      },
     },
   },
   plugins: [],

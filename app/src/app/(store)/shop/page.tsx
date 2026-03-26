@@ -1,18 +1,28 @@
 'use client'
 import { useState, useMemo } from 'react'
-import { Search, X, SlidersHorizontal } from 'lucide-react'
+import { Search, X, SlidersHorizontal, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, Package } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { products } from '@/data/products'
 import { categories } from '@/data/categories'
+import type { ReactElement } from 'react'
 
 type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'organic-first'
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'featured', label: '⭐ Featured' },
-  { value: 'price-asc', label: '💰 Price: Low to High' },
-  { value: 'price-desc', label: '💸 Price: High to Low' },
-  { value: 'organic-first', label: '🌱 Organic First' },
+  { value: 'featured', label: 'Featured' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+  { value: 'organic-first', label: 'Organic First' },
 ]
+
+const categoryIconMap: Record<string, ReactElement> = {
+  fruits: <Apple size={14} />,
+  vegetables: <Leaf size={14} />,
+  organic: <Sprout size={14} />,
+  exotic: <Sparkles size={14} />,
+  juices: <Droplets size={14} />,
+  gifts: <Gift size={14} />,
+}
 
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState('')
@@ -30,7 +40,6 @@ export default function ShopPage() {
       return matchCategory && matchSearch && p.isActive !== false
     })
 
-    // Sort
     if (sortBy === 'price-asc') {
       result = [...result].sort((a, b) => a.priceAED - b.priceAED)
     } else if (sortBy === 'price-desc') {
@@ -38,7 +47,6 @@ export default function ShopPage() {
     } else if (sortBy === 'organic-first') {
       result = [...result].sort((a, b) => (b.isOrganic ? 1 : 0) - (a.isOrganic ? 1 : 0))
     } else {
-      // featured: featured first
       result = [...result].sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0))
     }
 
@@ -123,17 +131,19 @@ export default function ShopPage() {
                 cat.slug === 'organic'
                   ? products.filter(p => p.isOrganic && p.isActive !== false).length
                   : products.filter(p => p.categorySlug === cat.slug && p.isActive !== false).length
+              const icon = categoryIconMap[cat.slug] ?? <Leaf size={14} />
               return (
                 <button
                   key={cat.slug}
                   onClick={() => setActiveCategory(cat.slug)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-full border-2 text-sm font-semibold transition-all ${
+                  className={`flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-2 text-sm font-semibold transition-all ${
                     activeCategory === cat.slug
                       ? 'bg-green-600 text-white border-green-600 shadow-sm'
                       : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-green-600 bg-white'
                   }`}
                 >
-                  {cat.emoji} {cat.name} ({count})
+                  {icon}
+                  {cat.name} ({count})
                 </button>
               )
             })}
@@ -146,14 +156,16 @@ export default function ShopPage() {
         {/* Active filter pills + count */}
         <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm text-gray-500 font-medium">
+            <p className="text-sm text-gray-500 font-medium flex items-center gap-1.5">
+              <Package size={14} className="text-gray-400" />
               <span className="text-gray-900 font-black">{filtered.length}</span>{' '}
               product{filtered.length !== 1 ? 's' : ''} found
             </p>
             {/* Active filter chips */}
             {activeCategoryObj && (
               <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
-                {activeCategoryObj.emoji} {activeCategoryObj.name}
+                {categoryIconMap[activeCategoryObj.slug] ?? <Leaf size={12} />}
+                {activeCategoryObj.name}
                 <button onClick={() => setActiveCategory('')} className="hover:text-green-600 ml-0.5">
                   <X size={12} />
                 </button>
@@ -161,7 +173,8 @@ export default function ShopPage() {
             )}
             {search && (
               <span className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1.5 rounded-full">
-                🔍 &quot;{search}&quot;
+                <Search size={11} />
+                &quot;{search}&quot;
                 <button onClick={() => setSearch('')} className="hover:text-blue-600 ml-0.5">
                   <X size={12} />
                 </button>
@@ -169,6 +182,7 @@ export default function ShopPage() {
             )}
             {sortBy !== 'featured' && (
               <span className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">
+                <SlidersHorizontal size={11} />
                 {sortOptions.find(s => s.value === sortBy)?.label}
                 <button onClick={() => setSortBy('featured')} className="hover:text-amber-600 ml-0.5">
                   <X size={12} />
@@ -195,7 +209,9 @@ export default function ShopPage() {
           </div>
         ) : (
           <div className="text-center py-24 text-gray-400">
-            <div className="text-6xl mb-4">🔍</div>
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search size={32} className="text-gray-300" />
+            </div>
             <p className="font-black text-gray-700 text-xl mb-2">No products found</p>
             <p className="text-sm text-gray-400 mb-6">Try a different search or category</p>
             <button
