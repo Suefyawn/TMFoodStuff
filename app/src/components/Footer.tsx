@@ -79,11 +79,11 @@ export default function Footer() {
             <h4 className="font-black text-white mb-5">Shop</h4>
             <ul className="space-y-2.5 text-sm">
               {[
-                { icon: <Apple size={14} />, label: 'Fruits', href: '/shop' },
-                { icon: <Leaf size={14} />, label: 'Vegetables', href: '/shop' },
-                { icon: <Sprout size={14} />, label: 'Organic', href: '/shop' },
-                { icon: <Sparkles size={14} />, label: 'Exotic Fruits', href: '/shop' },
-                { icon: <Gift size={14} />, label: 'Gift Baskets', href: '/shop' },
+                { icon: <Apple size={14} />, label: 'Fruits', href: '/shop?category=fruits' },
+                { icon: <Leaf size={14} />, label: 'Vegetables', href: '/shop?category=vegetables' },
+                { icon: <Sprout size={14} />, label: 'Organic', href: '/shop?category=organic' },
+                { icon: <Sparkles size={14} />, label: 'Exotic Fruits', href: '/shop?category=exotic' },
+                { icon: <Gift size={14} />, label: 'Gift Baskets', href: '/shop?category=gifts' },
                 { icon: <Truck size={14} />, label: 'All Products', href: '/shop' },
               ].map(item => (
                 <li key={item.label}>

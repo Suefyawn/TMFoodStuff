@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: Props) {
         <span>/</span>
         {category && (
           <>
-            <Link href={`/shop/${category.slug}`} className="hover:text-green-600 transition-colors capitalize">{category.name}</Link>
+            <Link href={`/shop?category=${category.slug}`} className="hover:text-green-600 transition-colors capitalize">{category.name}</Link>
             <span>/</span>
           </>
         )}
@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: Props) {
         <div className="flex flex-col justify-center">
           {/* Category badge */}
           {category && (
-            <Link href={`/shop/${category.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-full mb-4 w-fit hover:bg-green-100 transition-colors">
+            <Link href={`/shop?category=${category.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-full mb-4 w-fit hover:bg-green-100 transition-colors">
               {category.emoji} {category.name}
             </Link>
           )}
