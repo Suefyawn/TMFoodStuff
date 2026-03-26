@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { ShoppingCart, Menu, X, Search, Leaf, User } from 'lucide-react'
 import { useState } from 'react'
+import { useCartStore } from '@/lib/store'
 
 const navLinks = [
   { label: 'Fruits', href: '/shop' },
@@ -13,7 +14,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const cartCount = 0
+  const totalItems = useCartStore(state => state.totalItems())
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -61,13 +62,13 @@ export default function Navbar() {
             </Link>
             <Link
               href="/cart"
-              className="relative flex items-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm"
+              className="relative flex items-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 transition-colors shadow-sm"
             >
               <ShoppingCart size={16} />
               <span className="hidden sm:inline">Cart</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs font-black flex items-center justify-center animate-pulse">
-                  {cartCount}
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">
+                  {totalItems > 9 ? '9+' : totalItems}
                 </span>
               )}
             </Link>

@@ -17,8 +17,20 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'TMFoodStuff - Fresh Fruits & Vegetables UAE',
-  description: 'Order fresh fruits and vegetables online. Same-day delivery across Dubai, Abu Dhabi, Sharjah, Ajman and all UAE emirates.',
+  title: {
+    default: 'TMFoodStuff — Fresh Fruits & Vegetables UAE',
+    template: '%s | TMFoodStuff',
+  },
+  description: 'Order fresh fruits and vegetables online. Same-day delivery across Dubai, Abu Dhabi, Sharjah, Ajman and all UAE emirates. Premium quality, farm fresh daily.',
+  keywords: ['fresh fruits UAE', 'vegetables delivery Dubai', 'grocery delivery UAE', 'organic fruits Dubai'],
+  openGraph: {
+    type: 'website',
+    locale: 'en_AE',
+    url: 'https://tm-food-stuff.vercel.app',
+    siteName: 'TMFoodStuff',
+    title: 'TMFoodStuff — Fresh Fruits & Vegetables UAE',
+    description: 'Premium fresh fruits & vegetables delivered across UAE. Same-day delivery.',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

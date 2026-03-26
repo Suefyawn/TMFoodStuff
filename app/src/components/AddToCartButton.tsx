@@ -1,6 +1,6 @@
 'use client'
-import { useState } from 'react'
 import { ShoppingCart, Plus, Minus } from 'lucide-react'
+import { useCartStore } from '@/lib/store'
 import { formatAED } from '@/lib/utils'
 
 interface Props {
@@ -11,28 +11,31 @@ interface Props {
     priceAED: number
     unit: string
     imageUrl?: string
+    emoji?: string
   }
   size?: 'sm' | 'lg'
 }
 
-export default function AddToCartButton({ product, size = 'lg' }: Props) {
-  const [qty, setQty] = useState(0)
+export default function AddToCartButton({ product, size = 'sm' }: Props) {
+  const { items, addItem, updateQty } = useCartStore()
+  const cartItem = items.find(i => i.id === product.id)
+  const qty = cartItem?.quantity ?? 0
 
   if (size === 'lg') {
     return (
       <div>
         {qty === 0 ? (
           <button
-            onClick={() => setQty(1)}
-            className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-black py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99]"
+            onClick={() => addItem(product, 1)}
+            className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99]"
           >
             <ShoppingCart size={20} /> Add to Cart
           </button>
         ) : (
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setQty(q => Math.max(0, q - 1))}
-              className="w-14 h-14 rounded-2xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-xl transition-colors"
+              onClick={() => updateQty(product.id, qty - 1)}
+              className="w-14 h-14 rounded-2xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
             >
               <Minus size={18} />
             </button>
@@ -41,8 +44,8 @@ export default function AddToCartButton({ product, size = 'lg' }: Props) {
               <div className="text-xs text-gray-400">{formatAED(product.priceAED * qty)}</div>
             </div>
             <button
-              onClick={() => setQty(q => q + 1)}
-              className="w-14 h-14 rounded-2xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center font-bold text-xl transition-colors shadow"
+              onClick={() => addItem(product, 1)}
+              className="w-14 h-14 rounded-2xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors shadow"
             >
               <Plus size={18} />
             </button>
@@ -52,23 +55,28 @@ export default function AddToCartButton({ product, size = 'lg' }: Props) {
     )
   }
 
-  // sm size for ProductCard
   return (
     <div>
       {qty === 0 ? (
         <button
-          onClick={() => setQty(1)}
+          onClick={() => addItem(product, 1)}
           className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95"
         >
-          <ShoppingCart size={14} /> Add to Cart
+          <ShoppingCart size={14} /> Add
         </button>
       ) : (
         <div className="flex items-center gap-2">
-          <button onClick={() => setQty(q => Math.max(0, q - 1))} className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+          <button
+            onClick={() => updateQty(product.id, qty - 1)}
+            className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          >
             <Minus size={13} />
           </button>
           <span className="flex-1 text-center font-black text-gray-900 text-base">{qty}</span>
-          <button onClick={() => setQty(q => q + 1)} className="w-9 h-9 rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors">
+          <button
+            onClick={() => addItem(product, 1)}
+            className="w-9 h-9 rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors"
+          >
             <Plus size={13} />
           </button>
         </div>
