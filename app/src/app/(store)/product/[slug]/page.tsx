@@ -7,6 +7,7 @@ import AddToCartButton from '@/components/AddToCartButton'
 import ProductCard from '@/components/ProductCard'
 import { ProductImage } from '@/components/ProductImage'
 import { formatAED, calculateVAT } from '@/lib/utils'
+import StickyProductCTA from '@/components/StickyProductCTA'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -30,19 +31,29 @@ export default async function ProductPage({ params }: Props) {
     .filter(p => p.categorySlug === product.categorySlug && p.slug !== product.slug)
     .slice(0, 5)
 
+  const productForCart = {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    priceAED: product.priceAED,
+    unit: product.unit,
+    imageUrl: product.imageUrl,
+    emoji: product.emoji,
+  }
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 scroll-mt-20">
       {/* Back button */}
       <Link
         href="/shop"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors mb-6 group"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors mb-4 md:mb-6 group min-h-[44px]"
       >
-        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform rtl-flip" />
         Back to Shop
       </Link>
 
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+      {/* Breadcrumb — hidden on mobile to save space */}
+      <nav className="hidden md:flex items-center gap-2 text-sm text-gray-500 mb-8">
         <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
         <span>/</span>
         <Link href="/shop" className="hover:text-green-600 transition-colors">Shop</Link>
@@ -56,10 +67,10 @@ export default async function ProductPage({ params }: Props) {
         <span className="text-gray-800 font-medium">{product.name}</span>
       </nav>
 
-      {/* Product main section */}
-      <div className="grid md:grid-cols-2 gap-10 mb-16">
-        {/* Image */}
-        <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative">
+      {/* Product main section — stack on mobile */}
+      <div className="grid md:grid-cols-2 gap-6 md:gap-10 mb-12 md:mb-16">
+        {/* Image — full width on mobile */}
+        <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative w-full">
           {product.imageUrl ? (
             <ProductImage
               src={product.imageUrl}
@@ -68,38 +79,38 @@ export default async function ProductPage({ params }: Props) {
               emoji={product.emoji}
             />
           ) : (
-            <span className="text-[120px]">{product.emoji}</span>
+            <span className="text-[80px] md:text-[120px]">{product.emoji}</span>
           )}
-          <div className="absolute top-4 left-4 flex flex-col gap-2">
+          <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-2">
             {product.isOrganic && (
-              <span className="bg-green-500 text-white text-sm font-black px-3 py-1.5 rounded-full shadow">🌱 Organic</span>
+              <span className="bg-green-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow">🌱 Organic</span>
             )}
             {product.isFeatured && (
-              <span className="bg-yellow-400 text-yellow-900 text-sm font-black px-3 py-1.5 rounded-full shadow">⭐ Featured</span>
+              <span className="bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1.5 rounded-full shadow">⭐ Featured</span>
             )}
           </div>
         </div>
 
         {/* Info */}
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col justify-start md:justify-center">
           {/* Category badge */}
           {category && (
-            <Link href={`/shop?category=${category.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-full mb-4 w-fit hover:bg-green-100 transition-colors">
+            <Link href={`/shop?category=${category.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-full mb-3 md:mb-4 w-fit hover:bg-green-100 transition-colors">
               {category.emoji} {category.name}
             </Link>
           )}
 
-          <h1 className="text-4xl font-black text-gray-900 mb-1">{product.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-1">{product.name}</h1>
           {product.nameAr && (
-            <p className="text-lg text-gray-500 mb-4 font-medium" dir="rtl">{product.nameAr}</p>
+            <p className="text-base md:text-lg text-gray-500 mb-3 md:mb-4 font-medium" dir="rtl">{product.nameAr}</p>
           )}
 
-          <p className="text-gray-600 leading-relaxed mb-6">{product.description}</p>
+          <p className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base">{product.description}</p>
 
           {/* Price */}
-          <div className="bg-gray-50 rounded-2xl p-5 mb-6">
+          <div className="bg-gray-50 rounded-2xl p-4 md:p-5 mb-5 md:mb-6">
             <div className="flex items-baseline gap-3 mb-2">
-              <span className="text-4xl font-black text-green-700">{formatAED(product.priceAED)}</span>
+              <span className="text-3xl md:text-4xl font-black text-green-700">{formatAED(product.priceAED)}</span>
               <span className="text-gray-500 text-sm">per {product.unit}</span>
             </div>
             <div className="text-xs text-gray-400 space-y-1">
@@ -119,25 +130,20 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           {/* Stock */}
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-5 md:mb-6">
             <div className={`w-2.5 h-2.5 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
             <span className={`text-sm font-semibold ${product.stock > 0 ? 'text-green-700' : 'text-red-600'}`}>
               {product.stock > 20 ? 'In Stock' : product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock'}
             </span>
           </div>
 
-          {/* Add to cart */}
-          <AddToCartButton product={{
-            id: product.id,
-            name: product.name,
-            slug: product.slug,
-            priceAED: product.priceAED,
-            unit: product.unit,
-            imageUrl: product.imageUrl,
-          }} />
+          {/* Add to cart — desktop only (mobile uses sticky bar) */}
+          <div className="hidden md:block">
+            <AddToCartButton product={productForCart} size="lg" />
+          </div>
 
           {/* Meta info */}
-          <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
+          <div className="mt-5 md:mt-6 grid grid-cols-2 gap-2 md:gap-3 text-sm">
             {product.origin && (
               <div className="flex items-center gap-2 text-gray-500">
                 <span>🌍</span>
@@ -165,14 +171,17 @@ export default async function ProductPage({ params }: Props) {
       {/* Related products */}
       {related.length > 0 && (
         <div>
-          <h2 className="text-2xl font-black text-gray-900 mb-6">More {category?.name}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-5 md:mb-6">More {category?.name}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
             {related.map(p => (
               <ProductCard key={p.id} product={p as any} />
             ))}
           </div>
         </div>
       )}
+
+      {/* Sticky Add to Cart on mobile */}
+      <StickyProductCTA product={productForCart} inStock={product.stock > 0} />
     </div>
   )
 }

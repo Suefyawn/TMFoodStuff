@@ -8,10 +8,12 @@ import { formatAED, calculateTotal } from '@/lib/utils'
 const EMIRATES = ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
 
 const DELIVERY_SLOTS = [
-  { id: 'morning', label: 'Morning', time: '8:00 AM – 12:00 PM', icon: '🌅' },
-  { id: 'afternoon', label: 'Afternoon', time: '12:00 PM – 5:00 PM', icon: '☀️' },
-  { id: 'evening', label: 'Evening', time: '5:00 PM – 10:00 PM', icon: '🌙' },
+  { id: 'morning', label: 'Morning', time: '8AM–12PM', icon: '🌅' },
+  { id: 'afternoon', label: 'Afternoon', time: '12PM–5PM', icon: '☀️' },
+  { id: 'evening', label: 'Evening', time: '5PM–10PM', icon: '🌙' },
 ]
+
+const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors"
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCartStore()
@@ -101,16 +103,17 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-black text-gray-900 mb-8">Checkout</h1>
+    <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
+      <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-6 md:mb-8">Checkout</h1>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="lg:col-span-2 space-y-5 md:space-y-6">
             {/* Delivery Details */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-              <h2 className="font-black text-gray-900 text-xl mb-6">Delivery Details</h2>
-              <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
+              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5 md:mb-6">Delivery Details</h2>
+              {/* Single column on mobile, 2-col on md+ */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
                   <input
@@ -120,7 +123,7 @@ export default function CheckoutPage() {
                     value={form.fullName}
                     onChange={handleChange}
                     placeholder="Ahmed Al Mansouri"
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    className={inputClass}
                     required
                   />
                 </div>
@@ -133,7 +136,7 @@ export default function CheckoutPage() {
                     value={form.phone}
                     onChange={handleChange}
                     placeholder="+971 50 000 0000"
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    className={inputClass}
                     required
                   />
                 </div>
@@ -146,7 +149,7 @@ export default function CheckoutPage() {
                     value={form.email}
                     onChange={handleChange}
                     placeholder="you@example.com"
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    className={inputClass}
                   />
                 </div>
                 <div>
@@ -156,7 +159,7 @@ export default function CheckoutPage() {
                     name="emirate"
                     value={form.emirate}
                     onChange={handleChange}
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors bg-white"
+                    className={`${inputClass} bg-white`}
                     required
                   >
                     <option value="">Select Emirate</option>
@@ -172,7 +175,7 @@ export default function CheckoutPage() {
                     value={form.area}
                     onChange={handleChange}
                     placeholder="JLT, Marina, Deira, Khalidiyah..."
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    className={inputClass}
                     required
                   />
                 </div>
@@ -185,7 +188,7 @@ export default function CheckoutPage() {
                     value={form.building}
                     onChange={handleChange}
                     placeholder="Tower name or villa number"
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    className={inputClass}
                   />
                 </div>
                 <div>
@@ -199,7 +202,7 @@ export default function CheckoutPage() {
                     value={form.makani}
                     onChange={handleChange}
                     placeholder="Dubai address code"
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    className={inputClass}
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -209,7 +212,7 @@ export default function CheckoutPage() {
                     name="notes"
                     value={form.notes}
                     onChange={handleChange}
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors"
+                    className={`${inputClass} resize-none`}
                     rows={2}
                     placeholder="Leave at door, call on arrival, specific instructions..."
                   />
@@ -218,13 +221,13 @@ export default function CheckoutPage() {
             </div>
 
             {/* Delivery Slot */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-              <h2 className="font-black text-gray-900 text-xl mb-5">Delivery Slot</h2>
-              <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
+              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-4 md:mb-5">Delivery Slot</h2>
+              <div className="grid grid-cols-3 gap-2 md:gap-3">
                 {DELIVERY_SLOTS.map(slot => (
                   <label
                     key={slot.id}
-                    className={`flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all text-center ${
+                    className={`flex flex-col items-center p-3 md:p-4 border-2 rounded-xl cursor-pointer transition-all text-center ${
                       form.deliverySlot === slot.id
                         ? 'border-green-500 bg-green-50'
                         : 'border-gray-200 hover:border-gray-300'
@@ -238,11 +241,11 @@ export default function CheckoutPage() {
                       onChange={e => setForm(f => ({ ...f, deliverySlot: e.target.value }))}
                       className="sr-only"
                     />
-                    <span className="text-2xl mb-1">{slot.icon}</span>
-                    <span className="font-bold text-gray-900 text-sm">{slot.label}</span>
-                    <span className="text-xs text-gray-500 mt-0.5">{slot.time}</span>
+                    <span className="text-xl md:text-2xl mb-1">{slot.icon}</span>
+                    <span className="font-bold text-gray-900 text-xs md:text-sm">{slot.label}</span>
+                    <span className="text-xs text-gray-500 mt-0.5 leading-tight">{slot.time}</span>
                     {form.deliverySlot === slot.id && (
-                      <span className="text-green-600 font-black text-xs mt-1">✓ Selected</span>
+                      <span className="text-green-600 font-black text-xs mt-1">✓</span>
                     )}
                   </label>
                 ))}
@@ -253,11 +256,11 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-              <h2 className="font-black text-gray-900 text-xl mb-6">Payment Method</h2>
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
+              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5 md:mb-6">Payment Method</h2>
               <div className="space-y-3 mb-6">
                 {[
-                  { id: 'telr', label: 'Pay by Card', sub: 'Visa, Mastercard, AMEX — card charged only if COD order not fulfilled', icon: '💳' },
+                  { id: 'telr', label: 'Pay by Card', sub: 'Visa, Mastercard, AMEX — secure payment', icon: '💳' },
                   { id: 'cod', label: 'Cash on Delivery', sub: 'Card required as guarantee — charged only if delivery fails', icon: '💵' },
                 ].map(method => (
                   <label
@@ -276,7 +279,7 @@ export default function CheckoutPage() {
                     />
                     <span className="text-2xl">{method.icon}</span>
                     <div className="flex-1">
-                      <div className="font-bold text-gray-900">{method.label}</div>
+                      <div className="font-bold text-gray-900 text-sm md:text-base">{method.label}</div>
                       <div className="text-xs text-gray-500 mt-0.5">{method.sub}</div>
                     </div>
                     {paymentMethod === method.id && <span className="text-green-600 font-black text-lg">✓</span>}
@@ -284,18 +287,18 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* Card Details — shown for both methods */}
+              {/* Card Details */}
               <div>
-                <h3 className="font-bold text-gray-900 text-base mb-4">Card Details (Required as security guarantee)</h3>
+                <h3 className="font-bold text-gray-900 text-sm md:text-base mb-4">Card Details (Required as security guarantee)</h3>
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-                  <p className="text-sm font-semibold text-amber-800 flex items-center gap-2">
-                    <ShieldCheck size={16} />
+                  <p className="text-sm font-semibold text-amber-800 flex items-start gap-2">
+                    <ShieldCheck size={16} className="flex-shrink-0 mt-0.5" />
                     {paymentMethod === 'cod'
-                      ? 'Card required as delivery guarantee — only charged if you\'re unavailable at delivery'
+                      ? "Card required as delivery guarantee — only charged if you're unavailable at delivery"
                       : 'Secure card payment via Telr'}
                   </p>
                 </div>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                       Card Number *
@@ -304,7 +307,7 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="1234 5678 9012 3456"
                       maxLength={19}
-                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors font-mono"
+                      className={`${inputClass} font-mono`}
                       onChange={e => {
                         const v = e.target.value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim()
                         e.target.value = v
@@ -317,7 +320,7 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="MM/YY"
                       maxLength={5}
-                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors font-mono"
+                      className={`${inputClass} font-mono`}
                     />
                   </div>
                   <div>
@@ -326,7 +329,7 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="123"
                       maxLength={4}
-                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors font-mono"
+                      className={`${inputClass} font-mono`}
                     />
                   </div>
                 </div>
@@ -339,13 +342,13 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Order Summary */}
+          {/* Order Summary sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm sticky top-24">
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm lg:sticky lg:top-24">
               <h2 className="font-black text-gray-900 text-xl mb-4">Order Summary</h2>
 
               {/* Cart items */}
-              <div className="space-y-3 mb-5 max-h-60 overflow-y-auto">
+              <div className="space-y-3 mb-5 max-h-48 md:max-h-60 overflow-y-auto">
                 {items.map(item => (
                   <div key={item.id} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -403,12 +406,12 @@ export default function CheckoutPage() {
                         value={promoCode}
                         onChange={e => setPromoCode(e.target.value.toUpperCase())}
                         placeholder="Enter promo code"
-                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500"
+                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-base md:text-sm focus:outline-none focus:border-green-500"
                       />
                       <button
                         type="button"
                         onClick={applyPromo}
-                        className="bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors"
+                        className="bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors min-h-[44px]"
                       >
                         Apply
                       </button>
@@ -430,7 +433,7 @@ export default function CheckoutPage() {
 
               <button
                 type="submit"
-                className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg"
+                className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg min-h-[52px]"
               >
                 Place Order →
               </button>

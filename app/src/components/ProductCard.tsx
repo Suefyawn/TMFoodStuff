@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { formatAED } from '@/lib/utils'
 import AddToCartButton from './AddToCartButton'
 import { ProductImage } from './ProductImage'
-import { Leaf, MapPin, ShoppingCart } from 'lucide-react'
+import { Leaf, MapPin } from 'lucide-react'
 
 interface ProductCardProps {
   product: {
@@ -25,7 +25,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className={`bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-300 hover:-translate-y-1 group flex flex-col shadow-sm hover:shadow-xl ${!inStock ? 'opacity-80' : ''}`}>
-      <Link href={`/product/${product.slug}`} className="block">
+      <Link href={`/product/${product.slug}`} className="block active:scale-95 transition-transform">
         <div className={`relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center ${!inStock ? 'grayscale' : ''}`}>
           {product.imageUrl ? (
             <ProductImage
@@ -35,47 +35,47 @@ export default function ProductCard({ product }: ProductCardProps) {
               emoji={product.emoji}
             />
           ) : (
-            <span className="text-7xl group-hover:scale-110 transition-transform duration-300">
+            <span className="text-5xl md:text-7xl group-hover:scale-110 transition-transform duration-300">
               {product.emoji || ''}
             </span>
           )}
           {/* Badges top-left */}
-          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
             {product.isOrganic && (
-              <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-sm">
-                <Leaf size={10} />
-                Organic
+              <span className="inline-flex items-center gap-0.5 bg-green-500 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
+                <Leaf size={9} />
+                <span className="hidden sm:inline">Organic</span>
               </span>
             )}
             {!inStock && (
-              <span className="bg-gray-700 text-white text-xs font-black px-2.5 py-1 rounded-full shadow-sm">
-                Out of Stock
+              <span className="bg-gray-700 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
+                Out
               </span>
             )}
           </div>
         </div>
       </Link>
 
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-2.5 md:p-4 flex flex-col flex-1">
         <Link href={`/product/${product.slug}`}>
-          <h3 className="font-bold text-gray-900 text-sm mb-0.5 hover:text-green-600 transition-colors line-clamp-2 leading-snug">
+          <h3 className="font-bold text-gray-900 text-xs md:text-sm mb-0.5 hover:text-green-600 transition-colors line-clamp-2 leading-snug">
             {product.name}
           </h3>
         </Link>
 
         {product.origin && (
-          <p className="inline-flex items-center gap-1 text-xs text-gray-400 mb-2">
-            <MapPin size={10} className="flex-shrink-0" />
-            {product.origin}
+          <p className="inline-flex items-center gap-1 text-xs text-gray-400 mb-1">
+            <MapPin size={9} className="flex-shrink-0" />
+            <span className="truncate">{product.origin}</span>
           </p>
         )}
 
-        <p className="text-xs text-gray-400 mb-3">per {product.unit}</p>
+        <p className="text-xs text-gray-400 mb-2">per {product.unit}</p>
 
         <div className="mt-auto">
-          <div className="text-xl font-black text-green-600 mb-3 leading-none">
+          <div className="text-base md:text-xl font-black text-green-600 mb-2 leading-none">
             {formatAED(product.priceAED)}
-            <span className="text-xs text-gray-400 font-normal ml-1">/{product.unit}</span>
+            <span className="text-xs text-gray-400 font-normal ml-0.5">/{product.unit}</span>
           </div>
           {inStock ? (
             <AddToCartButton product={product} size="sm" />

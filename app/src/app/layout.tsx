@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import { ScrollToTop } from '@/components/ScrollToTop'
 import LaunchBanner from '@/components/LaunchBanner'
 import HtmlWrapper from '@/components/HtmlWrapper'
+import MobileNav from '@/components/MobileNav'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,9 +44,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <HtmlWrapper>
           <LaunchBanner />
           <Navbar />
-          {children}
+          <div className="pb-16 md:pb-0">
+            {children}
+          </div>
           <ScrollToTop />
           <Footer />
+          <MobileNav />
         </HtmlWrapper>
       </body>
     </html>

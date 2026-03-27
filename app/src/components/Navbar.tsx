@@ -44,7 +44,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-1.5 group flex-shrink-0">
             <Leaf size={20} className="text-green-700 group-hover:text-green-600 transition-colors" />
-            <span className="tracking-tight font-black text-green-700 text-xl">
+            <span className="tracking-tight font-black text-green-700 text-lg md:text-xl">
               TM FoodStuff
             </span>
           </Link>
@@ -88,7 +88,7 @@ export default function Navbar() {
             </div>
             <Link
               href="/cart"
-              className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${
+              className={`relative flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${
                 pathname === '/cart'
                   ? 'bg-green-700 text-white'
                   : 'bg-green-600 text-white hover:bg-green-700'
@@ -103,7 +103,7 @@ export default function Navbar() {
               )}
             </Link>
             <button
-              className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+              className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-600 hover:text-gray-900 rounded-lg"
               onClick={() => setOpen(!open)}
               aria-label="Toggle menu"
             >
@@ -115,7 +115,7 @@ export default function Navbar() {
         {/* Mobile menu with slide-down animation */}
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
           {/* Mobile search */}
@@ -128,7 +128,7 @@ export default function Navbar() {
                 onChange={e => setMobileSearch(e.target.value)}
                 onKeyDown={handleMobileSearch}
                 placeholder="Search products... (press Enter)"
-                className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:bg-white focus:border-green-400 border border-transparent transition-all"
+                className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-base focus:outline-none focus:bg-white focus:border-green-400 border border-transparent transition-all"
               />
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className={`block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                className={`flex items-center px-3 py-3 min-h-[44px] text-sm font-medium rounded-lg transition-colors ${
                   pathname.startsWith('/shop')
                     ? 'text-green-600 bg-green-50'
                     : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
@@ -150,11 +150,19 @@ export default function Navbar() {
             <div className="border-t border-gray-100 pt-2 mt-1">
               <Link
                 href="#"
-                className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
               >
                 <User size={16} />
                 Sign In
               </Link>
+            </div>
+          </div>
+
+          {/* Language toggle in mobile menu */}
+          <div className="border-t border-gray-100 pt-3 pb-4 px-1">
+            <div className="flex items-center justify-between px-2">
+              <span className="text-sm font-medium text-gray-500">Language</span>
+              <LangToggle />
             </div>
           </div>
         </div>

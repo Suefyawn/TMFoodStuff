@@ -95,18 +95,23 @@ export default function HomePage() {
   const featured = products.filter(p => p.isFeatured).slice(0, 10)
 
   return (
-    <main>
+    <main className="scroll-mt-20">
       {/* Promo banner strip */}
       <div className="bg-green-600 text-white text-center py-2.5 px-4 text-sm font-semibold">
-        Free delivery on first order · Use code:{' '}
-        <span className="bg-white/20 px-2 py-0.5 rounded font-black ml-1">FRESH10</span>
-        <span className="mx-3 opacity-50">·</span>
-        <span className="opacity-80">Same-day delivery across UAE</span>
+        <span className="md:hidden">
+          Free delivery · Code: <span className="bg-white/20 px-2 py-0.5 rounded font-black">FRESH10</span>
+        </span>
+        <span className="hidden md:inline">
+          Free delivery on first order · Use code:{' '}
+          <span className="bg-white/20 px-2 py-0.5 rounded font-black ml-1">FRESH10</span>
+          <span className="mx-3 opacity-50">·</span>
+          <span className="opacity-80">Same-day delivery across UAE</span>
+        </span>
       </div>
 
       {/* Hero */}
       <section
-        className="relative overflow-hidden min-h-[92vh] flex items-center"
+        className="relative overflow-hidden min-h-[calc(100vh-4rem)] flex items-center"
         style={{ background: 'linear-gradient(135deg, #14532d 0%, #166534 40%, #15803d 70%, #16a34a 100%)' }}
       >
         {/* SVG geometric pattern overlay */}
@@ -123,59 +128,56 @@ export default function HomePage() {
           <div className="absolute bottom-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 py-20 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text content */}
-            <div className="text-white">
+        <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-20 w-full">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+            {/* Text content — centered on mobile */}
+            <div className="text-white text-center lg:text-left">
               {/* Delivery badge */}
-              <div className="inline-flex items-center gap-2 bg-amber-400/20 backdrop-blur-sm text-amber-300 border border-amber-400/30 text-sm font-bold px-5 py-2.5 rounded-full mb-8">
-                <Zap size={14} className="text-amber-400" />
+              <div className="inline-flex items-center gap-2 bg-amber-400/20 backdrop-blur-sm text-amber-300 border border-amber-400/30 text-xs md:text-sm font-bold px-4 md:px-5 py-2 md:py-2.5 rounded-full mb-6 md:mb-8">
+                <Zap size={12} className="text-amber-400" />
                 2-4 Hour Delivery · All UAE Emirates
               </div>
 
-              <h1 className="font-playfair text-6xl md:text-7xl font-black mb-6 leading-[0.9] tracking-tight">
+              <h1 className="font-playfair text-5xl md:text-6xl lg:text-7xl font-black mb-5 md:mb-6 leading-[0.95] tracking-tight">
                 Farm Fresh<br />
                 <span className="text-amber-400">To Your Door</span><br />
-                <span className="text-white/80 text-5xl md:text-6xl">in Hours</span>
+                <span className="text-white/80 text-4xl md:text-5xl lg:text-6xl">in Hours</span>
               </h1>
 
-              <p className="text-xl text-white/75 mb-8 max-w-lg leading-relaxed">
+              <p className="text-base md:text-xl text-white/75 mb-6 md:mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
                 Premium fruits &amp; vegetables sourced daily from the world&apos;s best farms. Delivered fresh across all UAE emirates.
               </p>
 
               {/* Social proof */}
-              <div className="flex items-center gap-3 mb-10">
+              <div className="flex items-center justify-center lg:justify-start gap-3 mb-8 md:mb-10">
                 <div className="flex -space-x-2">
                   {[0, 1, 2, 3].map(i => (
-                    <div key={i} className="w-9 h-9 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center">
+                    <div key={i} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center">
                       <span className="text-white/60 text-xs font-bold">{String.fromCharCode(65 + i)}</span>
                     </div>
                   ))}
                 </div>
                 <div>
                   <div className="flex items-center gap-1 text-amber-400 text-sm font-bold">
-                    <Star size={12} fill="currentColor" />
-                    <Star size={12} fill="currentColor" />
-                    <Star size={12} fill="currentColor" />
-                    <Star size={12} fill="currentColor" />
-                    <Star size={12} fill="currentColor" />
+                    {[0,1,2,3,4].map(i => <Star key={i} size={12} fill="currentColor" />)}
                     <span className="text-white/80 font-normal ml-1">Trusted by</span>
                   </div>
                   <div className="text-white font-black text-sm">10,000+ UAE families</div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              {/* CTA Buttons — full width stacked on mobile */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link
                   href="/shop"
-                  className="bg-white text-green-700 font-black px-10 py-4 rounded-2xl text-lg hover:bg-amber-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-center inline-flex items-center justify-center gap-2"
+                  className="bg-white text-green-700 font-black px-8 md:px-10 py-4 rounded-2xl text-base md:text-lg hover:bg-amber-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-center inline-flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   Shop Now
                   <ChevronRight size={20} />
                 </Link>
                 <Link
                   href="/shop"
-                  className="border-2 border-white/40 text-white font-bold px-10 py-4 rounded-2xl text-lg hover:bg-white/10 transition-all backdrop-blur-sm text-center"
+                  className="border-2 border-white/40 text-white font-bold px-8 md:px-10 py-4 rounded-2xl text-base md:text-lg hover:bg-white/10 transition-all backdrop-blur-sm text-center w-full sm:w-auto"
                 >
                   Browse All
                 </Link>
@@ -186,12 +188,10 @@ export default function HomePage() {
             <div className="hidden lg:flex items-center justify-center">
               <div className="relative aspect-square w-96 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl">
                 <Leaf size={120} className="text-white/30" />
-                {/* Decorative corner accents */}
                 <div className="absolute top-4 left-4 w-3 h-3 rounded-full bg-amber-400/60" />
                 <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-white/40" />
                 <div className="absolute bottom-4 right-4 w-4 h-4 rounded-full bg-emerald-400/50" />
                 <div className="absolute bottom-4 left-4 w-2 h-2 rounded-full bg-amber-300/40" />
-                {/* Floating category chips */}
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-green-700 text-xs font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
                   <Apple size={12} /> Fresh Fruits
                 </div>
@@ -202,16 +202,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Stats row */}
-          <div className="mt-16 grid grid-cols-3 gap-6 max-w-lg">
+          {/* Stats row — 3 columns on mobile with smaller text */}
+          <div className="mt-12 md:mt-16 grid grid-cols-3 gap-3 md:gap-6 max-w-xs md:max-w-lg mx-auto lg:mx-0">
             {[
               { num: '90+', label: 'Fresh Products' },
               { num: '6', label: 'Emirates' },
               { num: '24/7', label: 'Fresh Restocks' },
             ].map(s => (
               <div key={s.label} className="text-center">
-                <div className="text-4xl font-black text-amber-400">{s.num}</div>
-                <div className="text-sm text-white/60 mt-1 font-medium">{s.label}</div>
+                <div className="text-2xl md:text-4xl font-black text-amber-400">{s.num}</div>
+                <div className="text-xs md:text-sm text-white/60 mt-1 font-medium">{s.label}</div>
               </div>
             ))}
           </div>
@@ -222,10 +222,10 @@ export default function HomePage() {
       <section className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-4 grid grid-cols-2 md:grid-cols-4 gap-3">
           {trustItems.map(item => (
-            <div key={item.text} className="flex items-center justify-center gap-2.5 py-2">
-              <item.icon size={18} className="text-green-600 flex-shrink-0" />
+            <div key={item.text} className="flex items-center justify-center gap-2 md:gap-2.5 py-2">
+              <item.icon size={16} className="text-green-600 flex-shrink-0" />
               <div>
-                <div className="text-sm font-semibold text-gray-800">{item.text}</div>
+                <div className="text-xs md:text-sm font-semibold text-gray-800">{item.text}</div>
                 <div className="text-xs text-gray-400 hidden sm:block">{item.sub}</div>
               </div>
             </div>
@@ -234,25 +234,27 @@ export default function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 py-20">
-        <div className="mb-10">
-          <h2 className="text-4xl font-black text-gray-900 mb-2">Shop by Category</h2>
-          <p className="text-gray-500 text-lg">Everything fresh, delivered to your door</p>
+      <section className="max-w-7xl mx-auto px-4 py-12 md:py-20 scroll-mt-20">
+        <div className="mb-6 md:mb-10">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">Shop by Category</h2>
+          <p className="text-gray-500 text-base md:text-lg">Everything fresh, delivered to your door</p>
         </div>
-        <div className="flex gap-4 overflow-x-auto pb-2 md:overflow-x-visible md:grid md:grid-cols-3 lg:grid-cols-6 scrollbar-hide">
+        {/* Grid on mobile (2 cols), 3 on sm, 6 on lg */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           {homeCategories.map(cat => {
             const IconComp = cat.icon
             return (
               <Link
                 key={cat.slug}
                 href={`/shop?category=${cat.slug}`}
-                className={`${cat.color} ${cat.border} border rounded-2xl p-6 text-center transition-all hover:shadow-md hover:-translate-y-1 group cursor-pointer flex-shrink-0 w-36 md:w-auto`}
+                className={`${cat.color} ${cat.border} border rounded-2xl p-4 md:p-6 text-center transition-all hover:shadow-md hover:-translate-y-1 group cursor-pointer active:scale-95`}
               >
-                <div className={`flex justify-center mb-3 group-hover:scale-110 transition-transform duration-200 ${cat.iconColor}`}>
-                  <IconComp size={40} />
+                <div className={`flex justify-center mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-200 ${cat.iconColor}`}>
+                  <IconComp size={32} className="md:hidden" />
+                  <IconComp size={40} className="hidden md:block" />
                 </div>
                 <div className="font-bold text-gray-900 text-sm">{cat.name}</div>
-                <div className="text-xs text-gray-500 mt-1 font-medium">{cat.nameAr}</div>
+                <div className="text-xs text-gray-500 mt-0.5 font-medium">{cat.nameAr}</div>
               </Link>
             )
           })}
@@ -260,21 +262,21 @@ export default function HomePage() {
       </section>
 
       {/* Today's Picks */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
             <div>
               <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 text-xs font-black px-3 py-1.5 rounded-full mb-3">
                 <Zap size={11} /> FRESHLY RESTOCKED TODAY
               </div>
-              <h2 className="text-4xl font-black text-gray-900 mb-1">Today&apos;s Picks</h2>
-              <p className="text-gray-500">Handpicked bestsellers · Freshest of the day</p>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-1">Today&apos;s Picks</h2>
+              <p className="text-gray-500 text-sm md:text-base">Handpicked bestsellers · Freshest of the day</p>
             </div>
-            <Link href="/shop" className="text-green-600 font-bold hover:underline text-sm hidden sm:block flex items-center gap-1">
+            <Link href="/shop" className="text-green-600 font-bold hover:underline text-sm hidden sm:flex items-center gap-1">
               View all <ChevronRight size={16} className="inline" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
             {featured.map(product => (
               <ProductCard key={product.id} product={product as any} />
             ))}
@@ -288,20 +290,20 @@ export default function HomePage() {
       </section>
 
       {/* Why us */}
-      <section className="bg-gray-950 text-white py-24">
+      <section className="bg-gray-950 text-white py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-5xl font-black mb-4">Why TMFoodStuff?</h2>
-          <p className="text-gray-400 mb-14 max-w-xl mx-auto text-lg">
+          <h2 className="text-3xl md:text-5xl font-black mb-4">Why TMFoodStuff?</h2>
+          <p className="text-gray-400 mb-10 md:mb-14 max-w-xl mx-auto text-base md:text-lg">
             We work directly with farms so you get fresher produce at better prices.
           </p>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4 md:gap-6">
             {whyUs.map(item => (
-              <div key={item.title} className="bg-white/5 border border-white/10 rounded-2xl p-8 text-left hover:bg-white/10 transition-colors">
-                <div className={`w-14 h-14 ${item.bg} rounded-2xl flex items-center justify-center mb-5`}>
-                  <item.icon size={28} className={item.color} />
+              <div key={item.title} className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 text-left hover:bg-white/10 transition-colors">
+                <div className={`w-12 h-12 md:w-14 md:h-14 ${item.bg} rounded-2xl flex items-center justify-center mb-4 md:mb-5`}>
+                  <item.icon size={24} className={item.color} />
                 </div>
-                <h3 className="text-xl font-black mb-3">{item.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg md:text-xl font-black mb-2 md:mb-3">{item.title}</h3>
+                <p className="text-gray-400 leading-relaxed text-sm md:text-base">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -309,17 +311,17 @@ export default function HomePage() {
       </section>
 
       {/* Delivery zones */}
-      <section className="max-w-7xl mx-auto px-4 py-20 text-center">
+      <section className="max-w-7xl mx-auto px-4 py-12 md:py-20 text-center">
         <div className="flex items-center justify-center gap-2 mb-3">
-          <MapPin size={22} className="text-green-600" />
-          <h2 className="text-3xl font-black text-gray-900">Delivering Across UAE</h2>
+          <MapPin size={20} className="text-green-600" />
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900">Delivering Across UAE</h2>
         </div>
-        <p className="text-gray-500 mb-8">We cover all major emirates</p>
-        <div className="flex flex-wrap justify-center gap-3">
+        <p className="text-gray-500 mb-6 md:mb-8">We cover all major emirates</p>
+        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
           {['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'].map(city => (
             <span
               key={city}
-              className="bg-gray-100 text-gray-800 px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-green-100 hover:text-green-800 transition-colors cursor-default"
+              className="bg-gray-100 text-gray-800 px-4 md:px-5 py-2 md:py-2.5 rounded-full font-semibold text-sm hover:bg-green-100 hover:text-green-800 transition-colors cursor-default"
             >
               {city}
             </span>

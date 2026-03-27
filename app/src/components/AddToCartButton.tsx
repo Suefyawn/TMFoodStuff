@@ -36,13 +36,13 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
   if (!mounted) {
     if (size === 'lg') {
       return (
-        <button className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99]">
+        <button className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99] min-h-[52px]">
           <ShoppingCart size={20} /> Add to Cart
         </button>
       )
     }
     return (
-      <button className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95">
+      <button className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95 min-h-[44px]">
         <ShoppingCart size={14} /> Add
       </button>
     )
@@ -59,7 +59,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
         {qty === 0 ? (
           <button
             onClick={handleAdd}
-            className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99]"
+            className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99] min-h-[52px]"
           >
             <ShoppingCart size={20} /> Add to Cart
           </button>
@@ -97,22 +97,22 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
       {qty === 0 ? (
         <button
           onClick={handleAdd}
-          className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95"
+          className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95 min-h-[44px]"
         >
           <ShoppingCart size={14} /> Add
         </button>
       ) : (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => updateQty(product.id, qty - 1)}
-            className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            className="w-11 h-11 md:w-9 md:h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors flex-shrink-0"
           >
             <Minus size={13} />
           </button>
           <span className="flex-1 text-center font-black text-gray-900 text-base">{qty}</span>
           <button
             onClick={handleAdd}
-            className="w-9 h-9 rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors"
+            className="w-11 h-11 md:w-9 md:h-9 rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors flex-shrink-0"
           >
             <Plus size={13} />
           </button>

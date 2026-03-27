@@ -5,12 +5,12 @@ import { NewsletterForm } from './NewsletterForm'
 export default function Footer() {
   return (
     <>
-      {/* WhatsApp floating button — positioned above scroll-to-top (bottom-20) */}
+      {/* WhatsApp floating button — above bottom nav on mobile */}
       <a
         href="https://wa.me/971500000000"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
         title="WhatsApp Us"
       >
         <MessageCircle size={26} fill="currentColor" />
@@ -31,8 +31,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Main footer grid */}
-        <div className="max-w-7xl mx-auto px-4 py-16 grid md:grid-cols-4 gap-10">
+        {/* Main footer grid — single column on mobile, 4 cols on desktop */}
+        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-5">
@@ -170,7 +170,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between items-center text-xs gap-2">
-          <span className="text-gray-500">© 2025 TMFoodStuff. All rights reserved. | VAT Registered UAE</span>
+          <span className="text-gray-500 text-center md:text-left">© 2025 TMFoodStuff. All rights reserved. | VAT Registered UAE</span>
           <span className="text-gray-500">All prices in AED · 5% VAT included</span>
         </div>
       </footer>

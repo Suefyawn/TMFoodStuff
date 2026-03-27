@@ -125,7 +125,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                 value={search}
                 onChange={e => handleSearchChange(e.target.value)}
                 placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-full text-sm focus:outline-none focus:border-green-500 transition-colors bg-gray-50 focus:bg-white"
+                className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-full text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors bg-gray-50 focus:bg-white"
               />
               {search && (
                 <button
@@ -155,10 +155,10 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
           </div>
 
           {/* Category filter pills — horizontal scroll */}
-          <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
             <button
               onClick={() => handleCategoryChange('')}
-              className={`flex-shrink-0 px-4 py-2 rounded-full border-2 text-sm font-semibold transition-all ${
+              className={`flex-shrink-0 whitespace-nowrap px-4 py-2.5 min-h-[44px] rounded-full border-2 text-sm font-semibold transition-all ${
                 !activeCategory
                   ? 'bg-green-600 text-white border-green-600 shadow-sm'
                   : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-green-600 bg-white'
@@ -176,7 +176,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                 <button
                   key={cat.slug}
                   onClick={() => handleCategoryChange(cat.slug)}
-                  className={`flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-2 text-sm font-semibold transition-all ${
+                  className={`flex-shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] rounded-full border-2 text-sm font-semibold transition-all ${
                     activeCategory === cat.slug
                       ? 'bg-green-600 text-white border-green-600 shadow-sm'
                       : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-green-600 bg-white'
