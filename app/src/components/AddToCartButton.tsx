@@ -4,6 +4,7 @@ import { ShoppingCart, Plus, Minus } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED } from '@/lib/utils'
 import { Toast } from './Toast'
+import { useLang } from '@/lib/use-lang'
 
 interface Props {
   product: {
@@ -24,6 +25,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
   const qty = cartItem?.quantity ?? 0
   const [showToast, setShowToast] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const { lang, tr } = useLang()
 
   useEffect(() => setMounted(true), [])
 
@@ -37,13 +39,13 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
     if (size === 'lg') {
       return (
         <button className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99] min-h-[52px]">
-          <ShoppingCart size={20} /> Add to Cart
+          <ShoppingCart size={20} /> {tr.addToCart}
         </button>
       )
     }
     return (
       <button className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95 min-h-[44px]">
-        <ShoppingCart size={14} /> Add
+        <ShoppingCart size={14} /> {lang === 'ar' ? 'أضف' : 'Add'}
       </button>
     )
   }
@@ -61,7 +63,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
             onClick={handleAdd}
             className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99] min-h-[52px]"
           >
-            <ShoppingCart size={20} /> Add to Cart
+            <ShoppingCart size={20} /> {tr.addToCart}
           </button>
         ) : (
           <div className="flex items-center gap-4">
@@ -99,7 +101,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
           onClick={handleAdd}
           className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95 min-h-[44px]"
         >
-          <ShoppingCart size={14} /> Add
+          <ShoppingCart size={14} /> {lang === 'ar' ? 'أضف' : 'Add'}
         </button>
       ) : (
         <div className="flex items-center gap-1.5">

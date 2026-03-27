@@ -1,8 +1,29 @@
+'use client'
 import Link from 'next/link'
 import { MessageCircle, Smartphone, CreditCard, Phone, MapPin, Leaf, Apple, Sprout, Sparkles, Gift, Truck, Mail } from 'lucide-react'
 import { NewsletterForm } from './NewsletterForm'
+import { useLang } from '@/lib/use-lang'
 
 export default function Footer() {
+  const { lang, tr } = useLang()
+
+  const deliveryAreas = lang === 'ar'
+    ? ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
+    : ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
+
+  const shopLinks = [
+    { icon: <Apple size={14} />, label: lang === 'ar' ? 'فواكه' : 'Fruits', href: '/shop?category=fruits' },
+    { icon: <Leaf size={14} />, label: lang === 'ar' ? 'خضروات' : 'Vegetables', href: '/shop?category=vegetables' },
+    { icon: <Sprout size={14} />, label: lang === 'ar' ? 'عضوي' : 'Organic', href: '/shop?category=organic' },
+    { icon: <Sparkles size={14} />, label: lang === 'ar' ? 'فواكه غريبة' : 'Exotic Fruits', href: '/shop?category=exotic' },
+    { icon: <Gift size={14} />, label: lang === 'ar' ? 'سلال هدايا' : 'Gift Baskets', href: '/shop?category=gifts' },
+    { icon: <Truck size={14} />, label: lang === 'ar' ? 'جميع المنتجات' : 'All Products', href: '/shop' },
+  ]
+
+  const companyLinks = lang === 'ar'
+    ? [['من نحن', '#'], ['سياسة التوصيل', '#'], ['سياسة الخصوصية', '#'], ['الشروط والأحكام', '#'], ['اتصل بنا', '#'], ['وظائف', '#']]
+    : [['About Us', '#'], ['Delivery Policy', '#'], ['Privacy Policy', '#'], ['Terms & Conditions', '#'], ['Contact Us', '#'], ['Careers', '#']]
+
   return (
     <>
       {/* WhatsApp floating button — above bottom nav on mobile */}
@@ -11,7 +32,7 @@ export default function Footer() {
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-        title="WhatsApp Us"
+        title={tr.whatsappUs}
       >
         <MessageCircle size={26} fill="currentColor" />
       </a>
@@ -23,9 +44,9 @@ export default function Footer() {
             <div>
               <h3 className="text-white font-black text-xl mb-1 flex items-center gap-2">
                 <Leaf size={20} className="text-green-500" />
-                Get freshness in your inbox
+                {tr.newsletterTitle}
               </h3>
-              <p className="text-gray-400 text-sm">Weekly deals, new arrivals, and exclusive offers.</p>
+              <p className="text-gray-400 text-sm">{tr.newsletterSub}</p>
             </div>
             <NewsletterForm />
           </div>
@@ -42,7 +63,9 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm leading-relaxed mb-6 text-gray-500">
-              Premium fresh fruits &amp; vegetables delivered daily across the UAE. Farm to door, always fresh.
+              {lang === 'ar'
+                ? 'فواكه وخضروات طازجة فاخرة توصل يومياً في جميع أنحاء الإمارات. من المزرعة إلى بابك، دائماً طازج.'
+                : 'Premium fresh fruits & vegetables delivered daily across the UAE. Farm to door, always fresh.'}
             </p>
 
             {/* App download badges */}
@@ -50,14 +73,14 @@ export default function Footer() {
               <button className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors w-full">
                 <Smartphone size={22} className="text-gray-300 flex-shrink-0" />
                 <div className="text-left">
-                  <div className="text-xs text-gray-400">Download on the</div>
+                  <div className="text-xs text-gray-400">{lang === 'ar' ? 'حمّل من' : 'Download on the'}</div>
                   <div className="font-black text-sm">App Store</div>
                 </div>
               </button>
               <button className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors w-full">
                 <Smartphone size={22} className="text-gray-300 flex-shrink-0" />
                 <div className="text-left">
-                  <div className="text-xs text-gray-400">Get it on</div>
+                  <div className="text-xs text-gray-400">{lang === 'ar' ? 'احصل عليه من' : 'Get it on'}</div>
                   <div className="font-black text-sm">Google Play</div>
                 </div>
               </button>
@@ -70,23 +93,16 @@ export default function Footer() {
               className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-green-700 transition-colors"
             >
               <MessageCircle size={16} />
-              WhatsApp Us
+              {tr.whatsappUs}
             </a>
           </div>
 
           {/* Shop */}
           <div>
-            <h4 className="font-black text-white mb-5">Shop</h4>
+            <h4 className="font-black text-white mb-5">{lang === 'ar' ? 'تسوق' : 'Shop'}</h4>
             <ul className="space-y-2.5 text-sm">
-              {[
-                { icon: <Apple size={14} />, label: 'Fruits', href: '/shop?category=fruits' },
-                { icon: <Leaf size={14} />, label: 'Vegetables', href: '/shop?category=vegetables' },
-                { icon: <Sprout size={14} />, label: 'Organic', href: '/shop?category=organic' },
-                { icon: <Sparkles size={14} />, label: 'Exotic Fruits', href: '/shop?category=exotic' },
-                { icon: <Gift size={14} />, label: 'Gift Baskets', href: '/shop?category=gifts' },
-                { icon: <Truck size={14} />, label: 'All Products', href: '/shop' },
-              ].map(item => (
-                <li key={item.label}>
+              {shopLinks.map(item => (
+                <li key={item.href}>
                   <Link href={item.href} className="flex items-center gap-2 hover:text-white transition-colors">
                     <span className="text-gray-600">{item.icon}</span>
                     {item.label}
@@ -100,18 +116,10 @@ export default function Footer() {
           <div>
             <h4 className="font-black text-white mb-5 flex items-center gap-2">
               <MapPin size={16} className="text-green-500" />
-              Delivery Areas
+              {tr.deliveryAreas}
             </h4>
             <ul className="space-y-2.5 text-sm">
-              {[
-                'Dubai',
-                'Abu Dhabi',
-                'Sharjah',
-                'Ajman',
-                'Ras Al Khaimah',
-                'Fujairah',
-                'Umm Al Quwain',
-              ].map(city => (
+              {deliveryAreas.map(city => (
                 <li key={city} className="hover:text-white transition-colors cursor-default">
                   {city}
                 </li>
@@ -121,16 +129,9 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-black text-white mb-5">Company</h4>
+            <h4 className="font-black text-white mb-5">{tr.company}</h4>
             <ul className="space-y-2.5 text-sm">
-              {[
-                ['About Us', '#'],
-                ['Delivery Policy', '#'],
-                ['Privacy Policy', '#'],
-                ['Terms & Conditions', '#'],
-                ['Contact Us', '#'],
-                ['Careers', '#'],
-              ].map(([label, href]) => (
+              {companyLinks.map(([label, href]) => (
                 <li key={label}>
                   <Link href={href} className="hover:text-white transition-colors">
                     {label}
@@ -153,7 +154,7 @@ export default function Footer() {
 
             {/* Payment methods */}
             <div className="mt-6">
-              <h5 className="text-white font-bold text-sm mb-3">We Accept</h5>
+              <h5 className="text-white font-bold text-sm mb-3">{tr.weAccept}</h5>
               <div className="flex flex-wrap gap-2">
                 <span className="bg-blue-600 text-white text-xs font-black px-3 py-1.5 rounded-lg">VISA</span>
                 <span className="bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-lg">MC</span>
@@ -170,8 +171,8 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between items-center text-xs gap-2">
-          <span className="text-gray-500 text-center md:text-left">© 2025 TMFoodStuff. All rights reserved. | VAT Registered UAE</span>
-          <span className="text-gray-500">All prices in AED · 5% VAT included</span>
+          <span className="text-gray-500 text-center md:text-left">© 2025 TMFoodStuff. {tr.allRights} | {tr.vatRegistered}</span>
+          <span className="text-gray-500">{tr.pricesIncludeVAT}</span>
         </div>
       </footer>
     </>

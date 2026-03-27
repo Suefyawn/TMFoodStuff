@@ -5,14 +5,7 @@ import { useState } from 'react'
 import { useCartStore } from '@/lib/store'
 import { usePathname, useRouter } from 'next/navigation'
 import LangToggle from '@/components/LangToggle'
-
-const navLinks = [
-  { label: 'Fruits', href: '/shop?category=fruits' },
-  { label: 'Vegetables', href: '/shop?category=vegetables' },
-  { label: 'Organic', href: '/shop?category=organic' },
-  { label: 'Exotic', href: '/shop?category=exotic' },
-  { label: 'All Products', href: '/shop' },
-]
+import { useLang } from '@/lib/use-lang'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -21,6 +14,15 @@ export default function Navbar() {
   const totalItems = useCartStore(state => state.totalItems())
   const pathname = usePathname()
   const router = useRouter()
+  const { lang, tr } = useLang()
+
+  const navLinks = [
+    { label: tr.fruits, href: '/shop?category=fruits' },
+    { label: tr.vegetables, href: '/shop?category=vegetables' },
+    { label: tr.organic, href: '/shop?category=organic' },
+    { label: tr.exotic, href: '/shop?category=exotic' },
+    { label: tr.allProducts, href: '/shop' },
+  ]
 
   function handleSearch(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && searchQuery.trim()) {
@@ -58,7 +60,7 @@ export default function Navbar() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearch}
-                placeholder="Search fruits, vegetables... (press Enter)"
+                placeholder={tr.search}
                 className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-transparent rounded-full text-sm focus:outline-none focus:bg-white focus:border-green-400 transition-all"
               />
             </div>
@@ -68,7 +70,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             {navLinks.slice(0, 4).map(link => (
               <Link
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 className={`nav-link px-3 py-2 ${pathname.startsWith('/shop') ? 'text-green-600' : ''}`}
               >
@@ -81,7 +83,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 flex-shrink-0">
             <Link href="#" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
               <User size={16} />
-              <span>Sign In</span>
+              <span>{tr.signIn}</span>
             </Link>
             <div className="hidden md:block">
               <LangToggle />
@@ -95,7 +97,7 @@ export default function Navbar() {
               }`}
             >
               <ShoppingCart size={16} />
-              <span className="hidden sm:inline">Cart</span>
+              <span className="hidden sm:inline">{tr.cart}</span>
               {totalItems > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">
                   {totalItems > 9 ? '9+' : totalItems}
@@ -127,7 +129,7 @@ export default function Navbar() {
                 value={mobileSearch}
                 onChange={e => setMobileSearch(e.target.value)}
                 onKeyDown={handleMobileSearch}
-                placeholder="Search products... (press Enter)"
+                placeholder={tr.search}
                 className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-base focus:outline-none focus:bg-white focus:border-green-400 border border-transparent transition-all"
               />
             </div>
@@ -135,7 +137,7 @@ export default function Navbar() {
           <div className="border-t border-gray-100 py-2 space-y-1">
             {navLinks.map(link => (
               <Link
-                key={link.label}
+                key={link.href}
                 href={link.href}
                 className={`flex items-center px-3 py-3 min-h-[44px] text-sm font-medium rounded-lg transition-colors ${
                   pathname.startsWith('/shop')
@@ -153,7 +155,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
               >
                 <User size={16} />
-                Sign In
+                {tr.signIn}
               </Link>
             </div>
           </div>
@@ -161,7 +163,7 @@ export default function Navbar() {
           {/* Language toggle in mobile menu */}
           <div className="border-t border-gray-100 pt-3 pb-4 px-1">
             <div className="flex items-center justify-between px-2">
-              <span className="text-sm font-medium text-gray-500">Language</span>
+              <span className="text-sm font-medium text-gray-500">{lang === 'ar' ? 'اللغة' : 'Language'}</span>
               <LangToggle />
             </div>
           </div>

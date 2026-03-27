@@ -8,6 +8,7 @@ import ProductCard from '@/components/ProductCard'
 import { ProductImage } from '@/components/ProductImage'
 import { formatAED, calculateVAT } from '@/lib/utils'
 import StickyProductCTA from '@/components/StickyProductCTA'
+import { ProductNameDisplay } from '@/components/ProductNameDisplay'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -100,10 +101,7 @@ export default async function ProductPage({ params }: Props) {
             </Link>
           )}
 
-          <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-1">{product.name}</h1>
-          {product.nameAr && (
-            <p className="text-base md:text-lg text-gray-500 mb-3 md:mb-4 font-medium" dir="rtl">{product.nameAr}</p>
-          )}
+          <ProductNameDisplay name={product.name} nameAr={product.nameAr} />
 
           <p className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base">{product.description}</p>
 

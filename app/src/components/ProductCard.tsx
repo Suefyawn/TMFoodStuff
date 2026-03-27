@@ -1,13 +1,16 @@
+'use client'
 import Link from 'next/link'
 import { formatAED } from '@/lib/utils'
 import AddToCartButton from './AddToCartButton'
 import { ProductImage } from './ProductImage'
 import { Leaf, MapPin } from 'lucide-react'
+import { useLang } from '@/lib/use-lang'
 
 interface ProductCardProps {
   product: {
     id: string
     name: string
+    nameAr?: string
     slug: string
     priceAED: number
     unit: string
@@ -22,6 +25,10 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const inStock = product.stock > 0
+  const { lang, tr } = useLang()
+
+  const displayName = lang === 'ar' && product.nameAr ? product.nameAr : product.name
+  const perUnit = lang === 'ar' ? `لكل ${product.unit}` : `per ${product.unit}`
 
   return (
     <div className={`bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-300 hover:-translate-y-1 group flex flex-col shadow-sm hover:shadow-xl ${!inStock ? 'opacity-80' : ''}`}>
@@ -44,12 +51,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.isOrganic && (
               <span className="inline-flex items-center gap-0.5 bg-green-500 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
                 <Leaf size={9} />
-                <span className="hidden sm:inline">Organic</span>
+                <span className="hidden sm:inline">{lang === 'ar' ? 'عضوي' : 'Organic'}</span>
               </span>
             )}
             {!inStock && (
               <span className="bg-gray-700 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
-                Out
+                {lang === 'ar' ? 'نفد' : 'Out'}
               </span>
             )}
           </div>
@@ -59,7 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-2.5 md:p-4 flex flex-col flex-1">
         <Link href={`/product/${product.slug}`}>
           <h3 className="font-bold text-gray-900 text-xs md:text-sm mb-0.5 hover:text-green-600 transition-colors line-clamp-2 leading-snug">
-            {product.name}
+            {displayName}
           </h3>
         </Link>
 
@@ -70,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </p>
         )}
 
-        <p className="text-xs text-gray-400 mb-2">per {product.unit}</p>
+        <p className="text-xs text-gray-400 mb-2">{perUnit}</p>
 
         <div className="mt-auto">
           <div className="text-base md:text-xl font-black text-green-600 mb-2 leading-none">
@@ -84,7 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               disabled
               className="w-full text-center text-xs font-bold text-gray-400 py-2.5 rounded-xl bg-gray-50 cursor-not-allowed border border-gray-200"
             >
-              Out of Stock
+              {tr.outOfStock}
             </button>
           )}
         </div>

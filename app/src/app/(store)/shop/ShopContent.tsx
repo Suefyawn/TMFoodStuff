@@ -6,15 +6,9 @@ import { products } from '@/data/products'
 import { categories } from '@/data/categories'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { ReactElement } from 'react'
+import { useLang } from '@/lib/use-lang'
 
 type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'organic-first'
-
-const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'featured', label: 'Featured' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'organic-first', label: 'Organic First' },
-]
 
 const categoryIconMap: Record<string, ReactElement> = {
   fruits: <Apple size={14} />,
@@ -32,6 +26,7 @@ interface ShopContentProps {
 export default function ShopContent({ defaultCategory }: ShopContentProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { lang, tr } = useLang()
 
   const initialCategory = defaultCategory || searchParams.get('category') || ''
   const initialSearch = searchParams.get('q') || ''
@@ -39,6 +34,13 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
   const [activeCategory, setActiveCategory] = useState(initialCategory)
   const [search, setSearch] = useState(initialSearch)
   const [sortBy, setSortBy] = useState<SortOption>('featured')
+
+  const sortOptions = [
+    { value: 'featured' as SortOption, label: lang === 'ar' ? 'مميز' : 'Featured' },
+    { value: 'price-asc' as SortOption, label: lang === 'ar' ? 'السعر: من الأقل' : 'Price: Low to High' },
+    { value: 'price-desc' as SortOption, label: lang === 'ar' ? 'السعر: من الأعلى' : 'Price: High to Low' },
+    { value: 'organic-first' as SortOption, label: lang === 'ar' ? 'العضوي أولاً' : 'Organic First' },
+  ]
 
   // Sync URL params on navigation changes
   useEffect(() => {
@@ -108,8 +110,8 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
       {/* Page header */}
       <div className="bg-white border-b border-gray-100 px-4 py-8 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-black text-gray-900 mb-1">Shop Fresh</h1>
-          <p className="text-gray-500">Farm fresh produce delivered to your door across UAE</p>
+          <h1 className="text-4xl font-black text-gray-900 mb-1">{tr.shopTitle}</h1>
+          <p className="text-gray-500">{tr.shopSubtitle}</p>
         </div>
       </div>
 
@@ -124,7 +126,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                 type="text"
                 value={search}
                 onChange={e => handleSearchChange(e.target.value)}
-                placeholder="Search products..."
+                placeholder={tr.search}
                 className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-full text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors bg-gray-50 focus:bg-white"
               />
               {search && (
@@ -164,7 +166,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                   : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-green-600 bg-white'
               }`}
             >
-              All ({products.filter(p => p.isActive !== false).length})
+              {tr.allItems} ({products.filter(p => p.isActive !== false).length})
             </button>
             {categories.map(cat => {
               const count =
@@ -172,6 +174,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                   ? products.filter(p => p.isOrganic && p.isActive !== false).length
                   : products.filter(p => p.categorySlug === cat.slug && p.isActive !== false).length
               const icon = categoryIconMap[cat.slug] ?? <Leaf size={14} />
+              const catLabel = lang === 'ar' && (cat as any).nameAr ? (cat as any).nameAr : cat.name
               return (
                 <button
                   key={cat.slug}
@@ -183,7 +186,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                   }`}
                 >
                   {icon}
-                  {cat.name} ({count})
+                  {catLabel} ({count})
                 </button>
               )
             })}
@@ -199,13 +202,13 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
             <p className="text-sm text-gray-500 font-medium flex items-center gap-1.5">
               <Package size={14} className="text-gray-400" />
               <span className="text-gray-900 font-black">{filtered.length}</span>{' '}
-              product{filtered.length !== 1 ? 's' : ''} found
+              {tr.productsFound}
             </p>
             {/* Active filter chips */}
             {activeCategoryObj && (
               <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
                 {categoryIconMap[activeCategoryObj.slug] ?? <Leaf size={12} />}
-                {activeCategoryObj.name}
+                {lang === 'ar' && (activeCategoryObj as any).nameAr ? (activeCategoryObj as any).nameAr : activeCategoryObj.name}
                 <button onClick={() => handleCategoryChange('')} className="hover:text-green-600 ml-0.5">
                   <X size={12} />
                 </button>
@@ -235,7 +238,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
               onClick={clearFilters}
               className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1"
             >
-              <X size={12} /> Clear all
+              <X size={12} /> {tr.clearAll}
             </button>
           )}
         </div>
@@ -252,13 +255,13 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search size={32} className="text-gray-300" />
             </div>
-            <p className="font-black text-gray-700 text-xl mb-2">No products found</p>
-            <p className="text-sm text-gray-400 mb-6">Try a different search or category</p>
+            <p className="font-black text-gray-700 text-xl mb-2">{lang === 'ar' ? 'لم يتم العثور على منتجات' : 'No products found'}</p>
+            <p className="text-sm text-gray-400 mb-6">{lang === 'ar' ? 'جرب بحثاً مختلفاً أو فئة أخرى' : 'Try a different search or category'}</p>
             <button
               onClick={clearFilters}
               className="bg-green-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-700 transition-colors text-sm"
             >
-              Clear Filters
+              {lang === 'ar' ? 'مسح الفلاتر' : 'Clear Filters'}
             </button>
           </div>
         )}

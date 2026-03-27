@@ -3,16 +3,18 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, ShoppingBag, ShoppingCart, User } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
+import { useLang } from '@/lib/use-lang'
 
 export default function MobileNav() {
   const pathname = usePathname()
   const totalItems = useCartStore(s => s.totalItems())
+  const { lang, tr } = useLang()
 
   const links = [
-    { href: '/', icon: Home, label: 'Home' },
-    { href: '/shop', icon: ShoppingBag, label: 'Shop' },
-    { href: '/cart', icon: ShoppingCart, label: 'Cart', badge: totalItems },
-    { href: '#', icon: User, label: 'Account' },
+    { href: '/', icon: Home, label: lang === 'ar' ? 'الرئيسية' : 'Home' },
+    { href: '/shop', icon: ShoppingBag, label: lang === 'ar' ? 'تسوق' : 'Shop' },
+    { href: '/cart', icon: ShoppingCart, label: tr.cart, badge: totalItems },
+    { href: '#', icon: User, label: lang === 'ar' ? 'حسابي' : 'Account' },
   ]
 
   return (

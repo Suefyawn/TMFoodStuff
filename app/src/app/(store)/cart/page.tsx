@@ -3,11 +3,13 @@ import Link from 'next/link'
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
+import { useLang } from '@/lib/use-lang'
 
 export default function CartPage() {
   const { items, removeItem, updateQty, clearCart, subtotal } = useCartStore()
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
+  const { lang, tr } = useLang()
 
   if (items.length === 0) {
     return (
@@ -15,11 +17,11 @@ export default function CartPage() {
         <div className="w-32 h-32 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
           <ShoppingCart size={52} className="text-green-300" strokeWidth={1.5} />
         </div>
-        <h1 className="text-3xl font-black text-gray-900 mb-3">Your cart is empty</h1>
-        <p className="text-gray-500 mb-2 text-lg">Looks like you haven&apos;t added anything yet.</p>
-        <p className="text-gray-400 text-sm mb-8">Browse our fresh produce and fill it up!</p>
+        <h1 className="text-3xl font-black text-gray-900 mb-3">{tr.cartEmpty}</h1>
+        <p className="text-gray-500 mb-2 text-lg">{lang === 'ar' ? 'يبدو أنك لم تضف أي شيء بعد.' : "Looks like you haven't added anything yet."}</p>
+        <p className="text-gray-400 text-sm mb-8">{tr.cartEmptySub}</p>
         <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
-          Browse Products <ArrowRight size={16} />
+          {tr.startShopping} <ArrowRight size={16} />
         </Link>
       </div>
     )
@@ -30,14 +32,14 @@ export default function CartPage() {
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-2 md:gap-3">
           <ShoppingCart className="text-green-600" size={24} />
-          Your Cart
-          <span className="text-base md:text-lg font-normal text-gray-400">({items.length} items)</span>
+          {tr.yourCart}
+          <span className="text-base md:text-lg font-normal text-gray-400">({items.length} {lang === 'ar' ? 'عناصر' : 'items'})</span>
         </h1>
         <button
           onClick={clearCart}
           className="text-sm text-red-500 hover:text-red-700 font-medium flex items-center gap-1.5 transition-colors min-h-[44px] px-2"
         >
-          <Trash2 size={15} /> Clear all
+          <Trash2 size={15} /> {tr.clearAll}
         </button>
       </div>
 
@@ -62,7 +64,9 @@ export default function CartPage() {
                 <Link href={`/product/${item.slug}`} className="font-bold text-gray-900 hover:text-green-600 transition-colors line-clamp-1 text-sm md:text-base">
                   {item.name}
                 </Link>
-                <p className="text-xs text-gray-400 mb-2 md:mb-3">per {item.unit}</p>
+                <p className="text-xs text-gray-400 mb-2 md:mb-3">
+                  {lang === 'ar' ? `لكل ${item.unit}` : `per ${item.unit}`}
+                </p>
 
                 <div className="flex items-center justify-between gap-2">
                   {/* Qty controls — bigger touch targets on mobile */}
@@ -97,31 +101,36 @@ export default function CartPage() {
           ))}
         </div>
 
-        {/* Order summary — hidden on mobile (sticky bar handles checkout) */}
+        {/* Order summary */}
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
-            <h2 className="font-black text-gray-900 text-xl mb-4">Order Summary</h2>
+            <h2 className="font-black text-gray-900 text-xl mb-4">{lang === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h2>
             <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex items-center gap-1.5">
-              🎉 <span><span className="font-black">FREE DELIVERY ACTIVE</span> — Grand Launch Offer!</span>
+              🎉 <span>
+                {lang === 'ar'
+                  ? <><span className="font-black">التوصيل مجاني</span> — عرض الإطلاق!</>
+                  : <><span className="font-black">FREE DELIVERY ACTIVE</span> — Grand Launch Offer!</>
+                }
+              </span>
             </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-gray-600">
-                <span>Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)</span>
+                <span>{tr.subtotal} ({items.reduce((s, i) => s + i.quantity, 0)} {lang === 'ar' ? 'عناصر' : 'items'})</span>
                 <span>{formatAED(sub)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>VAT (5%)</span>
+                <span>{tr.vat}</span>
                 <span>{formatAED(vat)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Delivery</span>
-                <span>{deliveryFee === 0 ? <span className="text-green-600 font-semibold">Free</span> : formatAED(deliveryFee)}</span>
+                <span>{tr.delivery}</span>
+                <span>{deliveryFee === 0 ? <span className="text-green-600 font-semibold">{tr.freeDelivery}</span> : formatAED(deliveryFee)}</span>
               </div>
               <div className="mt-2 p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold">
-                🚚 Free delivery on all orders during launch period!
+                🚚 {tr.freeDeliveryNote}
               </div>
               <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
-                <span>Total</span>
+                <span>{tr.total}</span>
                 <span className="text-green-700">{formatAED(total)}</span>
               </div>
             </div>
@@ -129,13 +138,13 @@ export default function CartPage() {
               href="/checkout"
               className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg flex items-center justify-center gap-2"
             >
-              Proceed to Checkout <ArrowRight size={18} />
+              {tr.proceedCheckout} <ArrowRight size={18} />
             </Link>
             <Link href="/shop" className="w-full mt-3 text-center text-sm text-gray-500 hover:text-green-600 transition-colors block">
-              ← Continue Shopping
+              ← {tr.continueShopping}
             </Link>
             <p className="text-xs text-gray-400 text-center mt-4">
-              All prices include 5% UAE VAT
+              {lang === 'ar' ? 'جميع الأسعار تشمل ضريبة القيمة المضافة ٥٪' : 'All prices include 5% UAE VAT'}
             </p>
           </div>
         </div>
@@ -147,7 +156,7 @@ export default function CartPage() {
           href="/checkout"
           className="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-colors"
         >
-          Checkout · {formatAED(total)} <ArrowRight size={18} />
+          {tr.checkout} · {formatAED(total)} <ArrowRight size={18} />
         </Link>
       </div>
       {/* Bottom spacer so content isn't hidden behind sticky bar on mobile */}
