@@ -1,17 +1,26 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { CheckCircle, ShoppingBag, Package } from 'lucide-react'
+import { CheckCircle, ShoppingBag, Package, ShieldCheck } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 
 const EMIRATES = ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
+
+const DELIVERY_SLOTS = [
+  { id: 'morning', label: 'Morning', time: '8:00 AM – 12:00 PM', icon: '🌅' },
+  { id: 'afternoon', label: 'Afternoon', time: '12:00 PM – 5:00 PM', icon: '☀️' },
+  { id: 'evening', label: 'Evening', time: '5:00 PM – 10:00 PM', icon: '🌙' },
+]
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCartStore()
   const [paymentMethod, setPaymentMethod] = useState('telr')
   const [submitted, setSubmitted] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
+  const [promoCode, setPromoCode] = useState('')
+  const [promoApplied, setPromoApplied] = useState(false)
+  const [promoDiscount, setPromoDiscount] = useState(0)
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
@@ -21,13 +30,25 @@ export default function CheckoutPage() {
     building: '',
     makani: '',
     notes: '',
+    deliverySlot: '',
   })
 
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
+  const finalTotal = total - promoDiscount
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  function applyPromo() {
+    if (promoCode.toUpperCase() === 'FRESH10') {
+      const discount = parseFloat((sub * 0.10).toFixed(2))
+      setPromoApplied(true)
+      setPromoDiscount(discount)
+    } else {
+      alert('Invalid promo code')
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -36,7 +57,10 @@ export default function CheckoutPage() {
       alert('Please fill in all required fields')
       return
     }
-    // In production this would POST to /api/orders
+    if (!form.deliverySlot) {
+      alert('Please select a delivery slot')
+      return
+    }
     setOrderNumber(`TM-${Math.random().toString(36).substr(2, 6).toUpperCase()}`)
     clearCart()
     setSubmitted(true)
@@ -193,13 +217,48 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Delivery Slot */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+              <h2 className="font-black text-gray-900 text-xl mb-5">Delivery Slot</h2>
+              <div className="grid grid-cols-3 gap-3">
+                {DELIVERY_SLOTS.map(slot => (
+                  <label
+                    key={slot.id}
+                    className={`flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all text-center ${
+                      form.deliverySlot === slot.id
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="deliverySlot"
+                      value={slot.id}
+                      checked={form.deliverySlot === slot.id}
+                      onChange={e => setForm(f => ({ ...f, deliverySlot: e.target.value }))}
+                      className="sr-only"
+                    />
+                    <span className="text-2xl mb-1">{slot.icon}</span>
+                    <span className="font-bold text-gray-900 text-sm">{slot.label}</span>
+                    <span className="text-xs text-gray-500 mt-0.5">{slot.time}</span>
+                    {form.deliverySlot === slot.id && (
+                      <span className="text-green-600 font-black text-xs mt-1">✓ Selected</span>
+                    )}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 mt-3 text-center">
+                🚚 Free delivery · Same day delivery available
+              </p>
+            </div>
+
             {/* Payment Method */}
             <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
               <h2 className="font-black text-gray-900 text-xl mb-6">Payment Method</h2>
-              <div className="space-y-3">
+              <div className="space-y-3 mb-6">
                 {[
-                  { id: 'telr', label: 'Pay Online', sub: 'Visa, Mastercard, AMEX — secured by Telr', icon: '💳' },
-                  { id: 'cod', label: 'Cash on Delivery', sub: 'Pay in cash when your order arrives', icon: '💵' },
+                  { id: 'telr', label: 'Pay by Card', sub: 'Visa, Mastercard, AMEX — card charged only if COD order not fulfilled', icon: '💳' },
+                  { id: 'cod', label: 'Cash on Delivery', sub: 'Card required as guarantee — charged only if delivery fails', icon: '💵' },
                 ].map(method => (
                   <label
                     key={method.id}
@@ -223,6 +282,59 @@ export default function CheckoutPage() {
                     {paymentMethod === method.id && <span className="text-green-600 font-black text-lg">✓</span>}
                   </label>
                 ))}
+              </div>
+
+              {/* Card Details — shown for both methods */}
+              <div>
+                <h3 className="font-bold text-gray-900 text-base mb-4">Card Details (Required as security guarantee)</h3>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                  <p className="text-sm font-semibold text-amber-800 flex items-center gap-2">
+                    <ShieldCheck size={16} />
+                    {paymentMethod === 'cod'
+                      ? 'Card required as delivery guarantee — only charged if you\'re unavailable at delivery'
+                      : 'Secure card payment via Telr'}
+                  </p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                      Card Number *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="1234 5678 9012 3456"
+                      maxLength={19}
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors font-mono"
+                      onChange={e => {
+                        const v = e.target.value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim()
+                        e.target.value = v
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Expiry Date *</label>
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">CVV *</label>
+                    <input
+                      type="text"
+                      placeholder="123"
+                      maxLength={4}
+                      className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 transition-colors font-mono"
+                    />
+                  </div>
+                </div>
+                {paymentMethod === 'cod' && (
+                  <p className="text-xs text-amber-700 mt-3 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                    ⚠️ For COD orders, your card will only be charged if you are unavailable at delivery time.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -272,18 +384,47 @@ export default function CheckoutPage() {
                     }
                   </span>
                 </div>
-                {deliveryFee > 0 ? (
-                  <div className="p-3 bg-amber-50 rounded-xl border border-amber-100 text-xs text-amber-800 font-semibold">
-                    Add {formatAED(150 - sub)} more for <span className="font-black">free delivery</span> (orders above AED 150)
-                  </div>
-                ) : (
-                  <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-1.5">
-                    🎉 <span>Free delivery applied!</span>
+                <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-1.5">
+                  🎉 <span>Free delivery — Grand Launch Offer!</span>
+                </div>
+
+                {/* Promo Code */}
+                <div className="border-t pt-4 mt-3">
+                  <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Promo Code</label>
+                  {promoApplied ? (
+                    <div className="flex items-center gap-2 text-green-600 font-semibold text-sm">
+                      <CheckCircle size={16} />
+                      FRESH10 applied — AED {promoDiscount.toFixed(2)} off!
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={e => setPromoCode(e.target.value.toUpperCase())}
+                        placeholder="Enter promo code"
+                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyPromo}
+                        className="bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {promoApplied && (
+                  <div className="flex justify-between text-green-600 font-semibold">
+                    <span>Promo (FRESH10)</span>
+                    <span>-{formatAED(promoDiscount)}</span>
                   </div>
                 )}
                 <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                   <span>Total</span>
-                  <span className="text-green-700">{formatAED(total)}</span>
+                  <span className="text-green-700">{formatAED(finalTotal)}</span>
                 </div>
               </div>
 

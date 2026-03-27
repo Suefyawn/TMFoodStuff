@@ -4,6 +4,8 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { ScrollToTop } from '@/components/ScrollToTop'
+import LaunchBanner from '@/components/LaunchBanner'
+import HtmlWrapper from '@/components/HtmlWrapper'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -38,10 +40,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-inter`}>
-        <Navbar />
-        {children}
-        <ScrollToTop />
-        <Footer />
+        <HtmlWrapper>
+          <LaunchBanner />
+          <Navbar />
+          {children}
+          <ScrollToTop />
+          <Footer />
+        </HtmlWrapper>
       </body>
     </html>
   )

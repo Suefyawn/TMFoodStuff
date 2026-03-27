@@ -102,7 +102,7 @@ export default function CartPage() {
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm sticky top-24">
             <h2 className="font-black text-gray-900 text-xl mb-4">Order Summary</h2>
             <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex items-center gap-1.5">
-              🚚 <span>Free delivery on orders above <span className="font-black">AED 150</span></span>
+              🎉 <span><span className="font-black">FREE DELIVERY ACTIVE</span> — Grand Launch Offer!</span>
             </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-gray-600">
@@ -117,20 +117,9 @@ export default function CartPage() {
                 <span>Delivery</span>
                 <span>{deliveryFee === 0 ? <span className="text-green-600 font-semibold">Free</span> : formatAED(deliveryFee)}</span>
               </div>
-              {deliveryFee > 0 && sub < 150 && (
-                <div className="mt-2 p-4 bg-amber-50 rounded-xl border border-amber-100">
-                  <div className="flex justify-between text-xs font-semibold text-amber-800 mb-2">
-                    <span>Add {formatAED(150 - sub)} more for free delivery</span>
-                    <span>{Math.round((sub / 150) * 100)}%</span>
-                  </div>
-                  <div className="w-full bg-amber-200 rounded-full h-2">
-                    <div
-                      className="bg-amber-500 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min((sub / 150) * 100, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
+              <div className="mt-2 p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold">
+                🚚 Free delivery on all orders during launch period!
+              </div>
               <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                 <span>Total</span>
                 <span className="text-green-700">{formatAED(total)}</span>

@@ -4,6 +4,7 @@ import { ShoppingCart, Menu, X, Search, Leaf, User } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store'
 import { usePathname, useRouter } from 'next/navigation'
+import LangToggle from '@/components/LangToggle'
 
 const navLinks = [
   { label: 'Fruits', href: '/shop?category=fruits' },
@@ -82,6 +83,9 @@ export default function Navbar() {
               <User size={16} />
               <span>Sign In</span>
             </Link>
+            <div className="hidden md:block">
+              <LangToggle />
+            </div>
             <Link
               href="/cart"
               className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${
