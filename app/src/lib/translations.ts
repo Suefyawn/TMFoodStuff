@@ -96,7 +96,7 @@ export const t = {
     fruits: 'فواكه',
     vegetables: 'خضروات',
     organic: 'عضوي',
-    exotic: 'غريب',
+    exotic: 'فواكه نادرة',
     allProducts: 'جميع المنتجات',
     cart: 'السلة',
     signIn: 'تسجيل الدخول',

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { MessageCircle, Smartphone, CreditCard, Phone, MapPin, Leaf, Apple, Sprout, Sparkles, Gift, Truck, Mail } from 'lucide-react'
+import { MessageCircle, CreditCard, Phone, MapPin, Leaf, Apple, Sprout, Sparkles, Gift, Truck, Mail, Smartphone } from 'lucide-react'
 import { NewsletterForm } from './NewsletterForm'
 import { useLang } from '@/lib/use-lang'
 
@@ -21,14 +21,15 @@ export default function Footer() {
   ]
 
   const companyLinks = lang === 'ar'
-    ? [['من نحن', '#'], ['سياسة التوصيل', '#'], ['سياسة الخصوصية', '#'], ['الشروط والأحكام', '#'], ['اتصل بنا', '#'], ['وظائف', '#']]
-    : [['About Us', '#'], ['Delivery Policy', '#'], ['Privacy Policy', '#'], ['Terms & Conditions', '#'], ['Contact Us', '#'], ['Careers', '#']]
+    ? [['من نحن', '/about'], ['سياسة التوصيل', '/delivery-policy'], ['سياسة الخصوصية', '/privacy'], ['الشروط والأحكام', '/terms'], ['اتصل بنا', '/contact']]
+    : [['About Us', '/about'], ['Delivery Policy', '/delivery-policy'], ['Privacy Policy', '/privacy'], ['Terms & Conditions', '/terms'], ['Contact Us', '/contact']]
 
   return (
     <>
       {/* WhatsApp floating button — above bottom nav on mobile */}
+      {/* TODO: Replace with real WhatsApp number */}
       <a
-        href="https://wa.me/971500000000"
+        href="https://wa.me/971000000000?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
@@ -68,26 +69,9 @@ export default function Footer() {
                 : 'Premium fresh fruits & vegetables delivered daily across the UAE. Farm to door, always fresh.'}
             </p>
 
-            {/* App download badges */}
-            <div className="flex flex-col gap-2 mb-5">
-              <button className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors w-full">
-                <Smartphone size={22} className="text-gray-300 flex-shrink-0" />
-                <div className="text-left">
-                  <div className="text-xs text-gray-400">{lang === 'ar' ? 'حمّل من' : 'Download on the'}</div>
-                  <div className="font-black text-sm">App Store</div>
-                </div>
-              </button>
-              <button className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors w-full">
-                <Smartphone size={22} className="text-gray-300 flex-shrink-0" />
-                <div className="text-left">
-                  <div className="text-xs text-gray-400">{lang === 'ar' ? 'احصل عليه من' : 'Get it on'}</div>
-                  <div className="font-black text-sm">Google Play</div>
-                </div>
-              </button>
-            </div>
-
+            {/* TODO: Replace with real WhatsApp number */}
             <a
-              href="https://wa.me/971500000000"
+              href="https://wa.me/971000000000?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-green-700 transition-colors"
@@ -142,9 +126,10 @@ export default function Footer() {
 
             {/* Contact */}
             <div className="mt-6 space-y-2">
-              <a href="tel:+971500000000" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+              {/* TODO: Replace with real phone number */}
+              <a href="tel:+971000000000" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
                 <Phone size={14} className="text-green-600 flex-shrink-0" />
-                +971 50 000 0000
+                +971 00 000 0000
               </a>
               <a href="mailto:hello@tmfoodstuff.ae" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
                 <Mail size={14} className="text-green-600 flex-shrink-0" />

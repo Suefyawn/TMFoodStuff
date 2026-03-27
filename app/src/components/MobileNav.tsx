@@ -14,7 +14,7 @@ export default function MobileNav() {
     { href: '/', icon: Home, label: lang === 'ar' ? 'الرئيسية' : 'Home' },
     { href: '/shop', icon: ShoppingBag, label: lang === 'ar' ? 'تسوق' : 'Shop' },
     { href: '/cart', icon: ShoppingCart, label: tr.cart, badge: totalItems },
-    { href: '#', icon: User, label: lang === 'ar' ? 'حسابي' : 'Account' },
+    { href: '/account', icon: User, label: lang === 'ar' ? 'حسابي' : 'Account' },
   ]
 
   return (

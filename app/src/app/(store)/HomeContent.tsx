@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import { products } from '@/data/products'
-import { Truck, ShieldCheck, Clock, MessageCircle, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin, Star } from 'lucide-react'
+import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 const homeCategories = [
@@ -174,25 +174,13 @@ export default function HomeContent() {
                 {tr.heroSubtitle}
               </p>
 
-              {/* Social proof */}
+              {/* Quality guarantee */}
               <div className="flex items-center justify-center lg:justify-start gap-3 mb-8 md:mb-10">
-                <div className="flex -space-x-2">
-                  {[0, 1, 2, 3].map(i => (
-                    <div key={i} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center">
-                      <span className="text-white/60 text-xs font-bold">{String.fromCharCode(65 + i)}</span>
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <div className="flex items-center gap-1 text-amber-400 text-sm font-bold">
-                    {[0,1,2,3,4].map(i => <Star key={i} size={12} fill="currentColor" />)}
-                    <span className="text-white/80 font-normal ml-1">
-                      {lang === 'ar' ? 'موثوق من قِبَل' : 'Trusted by'}
-                    </span>
-                  </div>
-                  <div className="text-white font-black text-sm">
-                    {lang === 'ar' ? '+١٠٬٠٠٠ عائلة إماراتية' : '10,000+ UAE families'}
-                  </div>
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
+                  <BadgeCheck size={16} className="text-amber-400 flex-shrink-0" />
+                  <span className="text-white font-bold text-sm">
+                    {lang === 'ar' ? 'ضمان جودة ١٠٠٪' : '100% Fresh Quality Guarantee'}
+                  </span>
                 </div>
               </div>
 
@@ -235,7 +223,7 @@ export default function HomeContent() {
           {/* Stats row */}
           <div className="mt-12 md:mt-16 grid grid-cols-3 gap-3 md:gap-6 max-w-xs md:max-w-lg mx-auto lg:mx-0">
             {[
-              { num: '90+', label: lang === 'ar' ? 'منتج طازج' : 'Fresh Products' },
+              { num: '150+', label: lang === 'ar' ? 'منتج طازج' : 'Fresh Products' },
               { num: '6', label: lang === 'ar' ? 'إمارات' : 'Emirates' },
               { num: '24/7', label: lang === 'ar' ? 'تجديد طازج' : 'Fresh Restocks' },
             ].map(s => (

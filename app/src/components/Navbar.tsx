@@ -81,7 +81,7 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Link href="#" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
+            <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
               <User size={16} />
               <span>{tr.signIn}</span>
             </Link>
@@ -151,7 +151,7 @@ export default function Navbar() {
             ))}
             <div className="border-t border-gray-100 pt-2 mt-1">
               <Link
-                href="#"
+                href="/account"
                 className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
               >
                 <User size={16} />
