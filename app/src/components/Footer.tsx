@@ -29,7 +29,7 @@ export default function Footer() {
       {/* WhatsApp floating button — above bottom nav on mobile */}
       {/* TODO: Replace with real WhatsApp number */}
       <a
-        href="https://wa.me/971000000000?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
+        href="https://wa.me/971544408411?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
@@ -71,7 +71,7 @@ export default function Footer() {
 
             {/* TODO: Replace with real WhatsApp number */}
             <a
-              href="https://wa.me/971000000000?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
+              href="https://wa.me/971544408411?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-green-700 transition-colors"
@@ -127,9 +127,9 @@ export default function Footer() {
             {/* Contact */}
             <div className="mt-6 space-y-2">
               {/* TODO: Replace with real phone number */}
-              <a href="tel:+971000000000" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+              <a href="tel:+971544408411" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
                 <Phone size={14} className="text-green-600 flex-shrink-0" />
-                +971 00 000 0000
+                +971 54 440 8411
               </a>
               <a href="mailto:hello@tmfoodstuff.ae" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
                 <Mail size={14} className="text-green-600 flex-shrink-0" />
@@ -156,8 +156,19 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between items-center text-xs gap-2">
-          <span className="text-gray-500 text-center md:text-left">© 2025 TMFoodStuff. {tr.allRights} | {tr.vatRegistered}</span>
-          <span className="text-gray-500">{tr.pricesIncludeVAT}</span>
+          <span className="text-gray-500 text-center md:text-left">© 2026 TMFoodStuff. {tr.allRights} | {tr.vatRegistered}</span>
+          <div className="flex flex-col md:flex-row items-center gap-3">
+            <span className="text-gray-500">{tr.pricesIncludeVAT}</span>
+            <span className="text-gray-600 hidden md:inline">·</span>
+            <a
+              href="https://trellee.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-gray-400 transition-colors"
+            >
+              Powered by <span className="font-semibold text-gray-500">Trellee</span>
+            </a>
+          </div>
         </div>
       </footer>
     </>

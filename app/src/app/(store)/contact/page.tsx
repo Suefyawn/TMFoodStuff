@@ -6,7 +6,7 @@ export default function ContactPage() {
       <div className="grid md:grid-cols-2 gap-6 text-left">
         {/* TODO: Replace with real WhatsApp number */}
         <a
-          href="https://wa.me/971000000000?text=Hi%20TMFoodStuff%2C%20I%20need%20help"
+          href="https://wa.me/971544408411?text=Hi%20TMFoodStuff%2C%20I%20need%20help"
           className="flex items-start gap-4 bg-green-50 border border-green-100 rounded-2xl p-6 hover:bg-green-100 transition-colors"
         >
           <span className="text-3xl">📱</span>

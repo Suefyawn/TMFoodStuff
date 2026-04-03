@@ -11,7 +11,7 @@ export default function AccountPage() {
       </p>
       {/* TODO: Replace with real WhatsApp number */}
       <a
-        href="https://wa.me/971000000000?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
+        href="https://wa.me/971544408411?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
         className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-700 transition-colors"
       >
         📱 WhatsApp Support
