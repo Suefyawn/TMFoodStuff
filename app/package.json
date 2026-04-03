@@ -20,6 +20,7 @@
     "autoprefixer": "^10.4.19",
     "clsx": "^2.1.1",
     "lucide-react": "^0.400.0",
+    "mongodb": "^7.1.1",
     "next": "15.2.9",
     "payload": "^3.28.0",
     "postcss": "^8.4.38",

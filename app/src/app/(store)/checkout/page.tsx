@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { CheckCircle, ShoppingBag, Package, ShieldCheck } from 'lucide-react'
+import { CheckCircle, ShoppingBag, Package, MessageCircle } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
@@ -10,12 +10,15 @@ const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-ba
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCartStore()
-  const [paymentMethod, setPaymentMethod] = useState('telr')
+  const [paymentMethod, setPaymentMethod] = useState('cod')
   const [submitted, setSubmitted] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
   const [promoCode, setPromoCode] = useState('')
   const [promoApplied, setPromoApplied] = useState(false)
   const [promoDiscount, setPromoDiscount] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [waMessage, setWaMessage] = useState('')
+  const [waNumber, setWaNumber] = useState('')
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
@@ -58,7 +61,7 @@ export default function CheckoutPage() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.fullName || !form.phone || !form.emirate || !form.area) {
       alert(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields')
@@ -68,9 +71,47 @@ export default function CheckoutPage() {
       alert(lang === 'ar' ? 'يرجى اختيار وقت التوصيل' : 'Please select a delivery slot')
       return
     }
-    setOrderNumber(`TM-${Math.random().toString(36).substr(2, 6).toUpperCase()}`)
-    clearCart()
-    setSubmitted(true)
+
+    setIsSubmitting(true)
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          form,
+          items,
+          subtotal: sub,
+          vat,
+          deliveryFee,
+          total: finalTotal,
+          paymentMethod,
+          promoCode: promoApplied ? promoCode : '',
+          promoDiscount,
+          deliverySlot: form.deliverySlot,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        setOrderNumber(data.orderNumber)
+        clearCart()
+        setSubmitted(true)
+        setWaMessage(data.waMessage)
+        setWaNumber(data.waNumber)
+        // Auto-open WhatsApp after 1.5s
+        setTimeout(() => {
+          window.open(`https://wa.me/${data.waNumber}?text=${data.waMessage}`, '_blank')
+        }, 1500)
+      } else {
+        alert(lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.')
+      }
+    } catch (err) {
+      alert(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (submitted) {
@@ -80,14 +121,32 @@ export default function CheckoutPage() {
           <CheckCircle size={48} className="text-green-600" />
         </div>
         <h1 className="text-3xl font-black text-gray-900 mb-3">{tr.orderPlaced}</h1>
-        <p className="text-gray-500 mb-2 text-lg">{tr.thankYou}, {form.fullName}.</p>
+        <p className="text-gray-500 mb-2 text-lg">{tr.thankYou}, {form.fullName}!</p>
         {orderNumber && (
-          <p className="text-green-700 font-black text-xl mb-2">{lang === 'ar' ? 'طلب رقم' : 'Order'} #{orderNumber}</p>
+          <p className="text-green-700 font-black text-2xl mb-3">#{orderNumber}</p>
         )}
-        <p className="text-gray-500 mb-8">{tr.whatsappConfirm}</p>
-        <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
-          <ShoppingBag size={18} /> {tr.continueShopping}
-        </Link>
+        <p className="text-gray-500 mb-8 text-sm max-w-md mx-auto">
+          {lang === 'ar'
+            ? 'سيتم التواصل معك عبر واتساب لتأكيد طلبك وإعلامك بوقت التوصيل.'
+            : "We'll contact you on WhatsApp to confirm your order and delivery time."}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {waMessage && (
+            <a
+              href={`https://wa.me/${waNumber}?text=${waMessage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-black px-6 py-3 rounded-xl transition-colors"
+            >
+              <MessageCircle size={18} fill="currentColor" />
+              {lang === 'ar' ? 'تأكيد عبر واتساب' : 'Confirm on WhatsApp'}
+            </a>
+          )}
+          <Link href="/shop" className="inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-700 text-white font-bold px-6 py-3 rounded-xl transition-colors">
+            <ShoppingBag size={18} />
+            {tr.continueShopping}
+          </Link>
+        </div>
       </div>
     )
   }
@@ -265,89 +324,27 @@ export default function CheckoutPage() {
               </p>
             </div>
 
-            {/* Payment Method */}
+            {/* Payment Method - simplified */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
-              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5 md:mb-6">{tr.paymentMethod}</h2>
-              <div className="space-y-3 mb-6">
-                {[
-                  { id: 'telr', label: tr.payOnline, sub: tr.payOnlineSub, icon: '💳' },
-                  { id: 'cod', label: tr.cashOnDelivery, sub: tr.cashOnDeliverySub, icon: '💵' },
-                ].map(method => (
-                  <label
-                    key={method.id}
-                    className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === method.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="payment"
-                      value={method.id}
-                      checked={paymentMethod === method.id}
-                      onChange={() => setPaymentMethod(method.id)}
-                      className="sr-only"
-                    />
-                    <span className="text-2xl">{method.icon}</span>
-                    <div className="flex-1">
-                      <div className="font-bold text-gray-900 text-sm md:text-base">{method.label}</div>
-                      <div className="text-xs text-gray-500 mt-0.5">{method.sub}</div>
-                    </div>
-                    {paymentMethod === method.id && <span className="text-green-600 font-black text-lg">✓</span>}
-                  </label>
-                ))}
-              </div>
-
-              {/* Card Details */}
-              <div>
-                <h3 className="font-bold text-gray-900 text-sm md:text-base mb-4">{tr.cardDetails}</h3>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-                  <p className="text-sm font-semibold text-amber-800 flex items-start gap-2">
-                    <ShieldCheck size={16} className="flex-shrink-0 mt-0.5" />
-                    {paymentMethod === 'cod'
-                      ? (lang === 'ar' ? 'البطاقة مطلوبة كضمان توصيل — تُخصم فقط إذا لم تكن متاحاً' : "Card required as delivery guarantee — only charged if you're unavailable at delivery")
-                      : (lang === 'ar' ? 'دفع آمن بالبطاقة عبر Telr' : 'Secure card payment via Telr')}
-                  </p>
+              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5">{tr.paymentMethod}</h2>
+              <div className="space-y-3">
+                <label className="flex items-center gap-4 p-4 border-2 border-green-500 bg-green-50 rounded-xl cursor-pointer">
+                  <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
+                  <span className="text-2xl">💵</span>
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-900">{tr.cashOnDelivery}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{tr.cashOnDeliverySub}</div>
+                  </div>
+                  <span className="text-green-600 font-black text-lg">✓</span>
+                </label>
+                <div className="flex items-center gap-4 p-4 border-2 border-gray-100 bg-gray-50 rounded-xl opacity-60">
+                  <span className="text-2xl">💳</span>
+                  <div className="flex-1">
+                    <div className="font-bold text-gray-500">{tr.payOnline}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">{lang === 'ar' ? 'قريباً - Telr' : 'Coming soon via Telr'}</div>
+                  </div>
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold">{lang === 'ar' ? 'قريباً' : 'Soon'}</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                      {tr.cardNumber} *
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="1234 5678 9012 3456"
-                      maxLength={19}
-                      className={`${inputClass} font-mono`}
-                      onChange={e => {
-                        const v = e.target.value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim()
-                        e.target.value = v
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.expiryDate} *</label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      maxLength={5}
-                      className={`${inputClass} font-mono`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.cvv} *</label>
-                    <input
-                      type="text"
-                      placeholder="123"
-                      maxLength={4}
-                      className={`${inputClass} font-mono`}
-                    />
-                  </div>
-                </div>
-                {paymentMethod === 'cod' && (
-                  <p className="text-xs text-amber-700 mt-3 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-                    {tr.cardNote}
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -443,9 +440,17 @@ export default function CheckoutPage() {
 
               <button
                 type="submit"
-                className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg min-h-[52px]"
+                disabled={isSubmitting}
+                className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg min-h-[52px] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {tr.placeOrder} →
+                {isSubmitting ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    {lang === 'ar' ? 'جاري التأكيد...' : 'Placing order...'}
+                  </>
+                ) : (
+                  <>{tr.placeOrder} →</>
+                )}
               </button>
               <p className="text-xs text-gray-400 text-center mt-4">🔒 {tr.secureNote}</p>
             </div>
