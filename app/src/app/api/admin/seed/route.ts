@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@payload-config'
-import { products } from '@/data/products'
+import { MongoClient, ObjectId } from 'mongodb'
 import { categories } from '@/data/categories'
+import { products } from '@/data/products'
 
 const SEED_SECRET = process.env.SEED_SECRET || 'tmfood-seed-2024-secure'
+const MONGODB_URI = process.env.MONGODB_URI!
+
+export const maxDuration = 60
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get('x-seed-secret')
@@ -12,82 +14,75 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const client = new MongoClient(MONGODB_URI)
+
   try {
-    const payload = await getPayload({ config })
-    const catMap: Record<string, string> = {}
+    await client.connect()
+    const db = client.db()
+    const catCol = db.collection('categories')
+    const prodCol = db.collection('products')
+
+    const catMap: Record<string, ObjectId> = {}
     let catsCreated = 0, prodsCreated = 0, skipped = 0
 
     // Seed categories
     for (const cat of categories) {
-      try {
-        const existing = await payload.find({
-          collection: 'categories',
-          where: { slug: { equals: cat.slug } },
-        })
-        if (existing.docs.length > 0) {
-          catMap[cat.slug] = existing.docs[0].id as string
-          continue
-        }
-        const created = await payload.create({
-          collection: 'categories',
-          data: {
-            name: cat.name,
-            nameAr: cat.nameAr || cat.name,
-            slug: cat.slug,
-            emoji: cat.emoji || '',
-            description: cat.description || '',
-          },
-        })
-        catMap[cat.slug] = created.id as string
-        catsCreated++
-      } catch (e: any) {
-        console.error(`Category error ${cat.name}:`, e.message)
+      const existing = await catCol.findOne({ slug: cat.slug })
+      if (existing) {
+        catMap[cat.slug] = existing._id
+        continue
       }
+      const now = new Date()
+      const result = await catCol.insertOne({
+        name: cat.name,
+        nameAr: cat.nameAr || cat.name,
+        slug: cat.slug,
+        emoji: cat.emoji || '',
+        description: cat.description || '',
+        createdAt: now,
+        updatedAt: now,
+      })
+      catMap[cat.slug] = result.insertedId
+      catsCreated++
     }
 
-    // Seed products
+    // Seed products in batch
     for (const product of products) {
-      try {
-        const existing = await payload.find({
-          collection: 'products',
-          where: { slug: { equals: product.slug } },
-        })
-        if (existing.docs.length > 0) {
-          skipped++
-          continue
-        }
-        const categoryId = catMap[product.categorySlug]
-        if (!categoryId) continue
+      const existing = await prodCol.findOne({ slug: product.slug })
+      if (existing) { skipped++; continue }
 
-        await payload.create({
-          collection: 'products',
-          data: {
-            name: product.name,
-            nameAr: product.nameAr || product.name,
-            slug: product.slug,
-            category: categoryId,
-            description: product.description || '',
-            priceAED: product.priceAED,
-            unit: (product.unit as any) || 'kg',
-            stock: product.stock || 100,
-            isActive: product.isActive !== false,
-            isFeatured: product.isFeatured || false,
-            isOrganic: product.isOrganic || false,
-            origin: product.origin || '',
-            emoji: product.emoji || '',
-          },
-        })
-        prodsCreated++
-      } catch (e: any) {
-        console.error(`Product error ${product.name}:`, e.message)
-      }
+      const categoryId = catMap[product.categorySlug]
+      if (!categoryId) continue
+
+      const now = new Date()
+      await prodCol.insertOne({
+        name: product.name,
+        nameAr: product.nameAr || product.name,
+        slug: product.slug,
+        category: categoryId,
+        description: product.description || `Fresh ${product.name} delivered across UAE.`,
+        priceAED: product.priceAED,
+        unit: product.unit || 'kg',
+        stock: product.stock || 100,
+        isActive: product.isActive !== false,
+        isFeatured: product.isFeatured || false,
+        isOrganic: product.isOrganic || false,
+        origin: product.origin || '',
+        emoji: product.emoji || '',
+        createdAt: now,
+        updatedAt: now,
+      })
+      prodsCreated++
     }
+
+    await client.close()
 
     return NextResponse.json({
       success: true,
-      message: `Seeded ${catsCreated} categories, ${prodsCreated} products (${skipped} already existed)`,
+      message: `✅ ${catsCreated} categories + ${prodsCreated} products seeded (${skipped} skipped)`,
     })
   } catch (error: any) {
+    await client.close().catch(() => {})
     console.error('Seed error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
