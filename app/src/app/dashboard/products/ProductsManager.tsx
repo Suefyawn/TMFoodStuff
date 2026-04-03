@@ -3,29 +3,29 @@ import { useState } from 'react'
 
 export default function ProductsManager({ initialProducts }: { initialProducts: any[] }) {
   const [products, setProducts] = useState(initialProducts)
-  const [editing, setEditing] = useState<string | null>(null)
-  const [saving, setSaving] = useState<string | null>(null)
+  const [editing, setEditing] = useState<number | null>(null)
+  const [saving, setSaving] = useState<number | null>(null)
 
-  async function saveProduct(id: string, updates: any) {
+  async function saveProduct(id: number, updates: any) {
     setSaving(id)
     await fetch('/api/dashboard/products', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, ...updates }),
+      body: JSON.stringify({ id: String(id), ...updates }),
     })
-    setProducts(prev => prev.map(p => String(p._id) === id ? { ...p, ...updates } : p))
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p))
     setEditing(null)
     setSaving(null)
   }
 
-  async function toggleActive(id: string, current: boolean) {
+  async function toggleActive(id: number, current: boolean) {
     setSaving(id)
     await fetch('/api/dashboard/products', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, isActive: !current }),
+      body: JSON.stringify({ id: String(id), is_active: !current }),
     })
-    setProducts(prev => prev.map(p => String(p._id) === id ? { ...p, isActive: !current } : p))
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, is_active: !current } : p))
     setSaving(null)
   }
 
@@ -36,6 +36,7 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
           <thead>
             <tr className="border-b border-gray-800">
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price (AED)</th>
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
               <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
@@ -44,7 +45,7 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
           </thead>
           <tbody className="divide-y divide-gray-800">
             {products.map(product => {
-              const id = String(product._id)
+              const id = product.id
               const isEditing = editing === id
               return (
                 <tr key={id} className={`transition-colors ${isEditing ? 'bg-gray-800/50' : 'hover:bg-gray-800/30'}`}>
@@ -58,39 +59,30 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
                     </div>
                   </td>
                   <td className="px-5 py-3">
+                    <span className="text-gray-400 text-xs">{product.categories?.name || '—'}</span>
+                  </td>
+                  <td className="px-5 py-3">
                     {isEditing ? (
-                      <input
-                        type="number"
-                        defaultValue={product.priceAED}
-                        step="0.5"
-                        id={`price-${id}`}
-                        className="w-24 bg-gray-700 border border-gray-600 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-green-500"
-                      />
+                      <input type="number" defaultValue={product.price_aed} step="0.5" id={`price-${id}`}
+                        className="w-24 bg-gray-700 border border-gray-600 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-green-500" />
                     ) : (
-                      <span className="text-green-400 font-bold text-sm">AED {product.priceAED?.toFixed(2)}</span>
+                      <span className="text-green-400 font-bold text-sm">AED {Number(product.price_aed).toFixed(2)}</span>
                     )}
                   </td>
                   <td className="px-5 py-3">
                     {isEditing ? (
-                      <input
-                        type="number"
-                        defaultValue={product.stock}
-                        id={`stock-${id}`}
-                        className="w-20 bg-gray-700 border border-gray-600 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-green-500"
-                      />
+                      <input type="number" defaultValue={product.stock} id={`stock-${id}`}
+                        className="w-20 bg-gray-700 border border-gray-600 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:border-green-500" />
                     ) : (
                       <span className={`text-sm font-semibold ${product.stock > 10 ? 'text-gray-300' : 'text-red-400'}`}>{product.stock}</span>
                     )}
                   </td>
                   <td className="px-5 py-3">
-                    <button
-                      onClick={() => toggleActive(id, product.isActive)}
-                      disabled={saving === id}
+                    <button onClick={() => toggleActive(id, product.is_active)} disabled={saving === id}
                       className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${
-                        product.isActive ? 'bg-green-500/15 text-green-400 hover:bg-red-500/15 hover:text-red-400' : 'bg-red-500/15 text-red-400 hover:bg-green-500/15 hover:text-green-400'
-                      } disabled:opacity-50`}
-                    >
-                      {product.isActive ? '● Active' : '○ Inactive'}
+                        product.is_active ? 'bg-green-500/15 text-green-400 hover:bg-red-500/15 hover:text-red-400' : 'bg-red-500/15 text-red-400 hover:bg-green-500/15 hover:text-green-400'
+                      } disabled:opacity-50`}>
+                      {product.is_active ? '● Active' : '○ Inactive'}
                     </button>
                   </td>
                   <td className="px-5 py-3">
@@ -100,24 +92,16 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
                           onClick={() => {
                             const price = parseFloat((document.getElementById(`price-${id}`) as HTMLInputElement).value)
                             const stock = parseInt((document.getElementById(`stock-${id}`) as HTMLInputElement).value)
-                            saveProduct(id, { priceAED: price, stock })
+                            saveProduct(id, { price_aed: price, stock })
                           }}
                           disabled={saving === id}
-                          className="text-xs px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
-                        >
+                          className="text-xs px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold transition-colors disabled:opacity-50">
                           {saving === id ? '...' : 'Save'}
                         </button>
-                        <button onClick={() => setEditing(null)} className="text-xs px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors">
-                          Cancel
-                        </button>
+                        <button onClick={() => setEditing(null)} className="text-xs px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors">Cancel</button>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => setEditing(id)}
-                        className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
-                      >
-                        Edit
-                      </button>
+                      <button onClick={() => setEditing(id)} className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">Edit</button>
                     )}
                   </td>
                 </tr>

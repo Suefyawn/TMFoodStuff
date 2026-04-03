@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import config from '@payload-config'
+import { createClient } from '@supabase/supabase-js'
 
 const WHATSAPP_NUMBER = '971544408411'
 
@@ -11,58 +10,45 @@ export async function POST(request: Request) {
 
     const orderNumber = `TM-${Date.now().toString(36).toUpperCase().slice(-6)}`
 
-    // Save via Payload CMS
-    const payload = await getPayload({ config })
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
-    await payload.create({
-      collection: 'orders',
-      data: {
-        orderNumber,
-        status: 'pending',
-        paymentMethod: paymentMethod || 'cod',
-        paymentStatus: 'pending',
-        customer: {
-          fullName: form.fullName,
-          phone: form.phone,
-          email: form.email || '',
-        },
-        delivery: {
-          emirate: form.emirate,
-          area: form.area,
-          building: form.building || '',
-          makani: form.makani || '',
-          slot: deliverySlot,
-          notes: form.notes || '',
-        },
-        items: items.map((item: any) => ({
-          productId: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          priceAED: item.priceAED,
-          subtotal: item.priceAED * item.quantity,
-          unit: item.unit || 'kg',
-        })),
-        pricing: {
-          subtotal,
-          vat,
-          deliveryFee,
-          promoCode: promoCode || '',
-          promoDiscount: promoDiscount || 0,
-          total,
-        },
-        totalAED: total,
-      },
+    const { error } = await supabase.from('orders').insert({
+      order_number: orderNumber,
+      status: 'pending',
+      payment_method: paymentMethod || 'cod',
+      customer_name: form.fullName,
+      customer_phone: form.phone,
+      customer_email: form.email || '',
+      delivery_emirate: form.emirate,
+      delivery_area: form.area,
+      delivery_building: form.building || '',
+      delivery_makani: form.makani || '',
+      delivery_slot: deliverySlot,
+      delivery_notes: form.notes || '',
+      subtotal,
+      vat,
+      delivery_fee: deliveryFee || 0,
+      promo_code: promoCode || '',
+      promo_discount: promoDiscount || 0,
+      total,
+      items: items.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        price_aed: item.priceAED,
+        subtotal: item.priceAED * item.quantity,
+        unit: item.unit || 'kg',
+      })),
     })
 
-    // Build WhatsApp message for admin notification
-    const itemsList = items
-      .map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`)
-      .join('\n')
-    const slotMap: Record<string, string> = {
-      morning: '8AM-12PM',
-      afternoon: '12PM-5PM',
-      evening: '5PM-10PM',
-    }
+    if (error) throw error
+
+    // WhatsApp message
+    const itemsList = items.map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`).join('\n')
+    const slotMap: Record<string, string> = { morning: '8AM-12PM', afternoon: '12PM-5PM', evening: '5PM-10PM' }
 
     const waMessage = encodeURIComponent(
       `🛒 NEW ORDER #${orderNumber}\n` +
@@ -82,12 +68,7 @@ export async function POST(request: Request) {
       (form.notes ? `📝 Notes: ${form.notes}` : '')
     )
 
-    return NextResponse.json({
-      success: true,
-      orderNumber,
-      waMessage,
-      waNumber: WHATSAPP_NUMBER,
-    })
+    return NextResponse.json({ success: true, orderNumber, waMessage, waNumber: WHATSAPP_NUMBER })
   } catch (error: any) {
     console.error('Order error:', error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })

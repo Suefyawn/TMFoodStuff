@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { MongoClient, ObjectId } from 'mongodb'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
 const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
@@ -13,18 +13,18 @@ export async function PATCH(request: Request) {
   if (!await checkAuth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id, ...updates } = await request.json()
-  const client = new MongoClient(process.env.MONGODB_URI!)
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-  try {
-    await client.connect()
-    await client.db().collection('products').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { ...updates, updatedAt: new Date() } }
-    )
-    await client.close()
-    return NextResponse.json({ ok: true })
-  } catch (e: any) {
-    await client.close().catch(() => {})
-    return NextResponse.json({ error: e.message }, { status: 500 })
-  }
+  // Map frontend field names to DB column names
+  const dbUpdates: any = { updated_at: new Date().toISOString() }
+  if (updates.priceAED !== undefined) dbUpdates.price_aed = updates.priceAED
+  if (updates.stock !== undefined) dbUpdates.stock = updates.stock
+  if (updates.isActive !== undefined) dbUpdates.is_active = updates.isActive
+  if (updates.price_aed !== undefined) dbUpdates.price_aed = updates.price_aed
+  if (updates.is_active !== undefined) dbUpdates.is_active = updates.is_active
+
+  const { error } = await supabase.from('products').update(dbUpdates).eq('id', parseInt(id))
+  
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
 }

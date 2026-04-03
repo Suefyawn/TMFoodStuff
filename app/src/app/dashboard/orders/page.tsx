@@ -1,5 +1,7 @@
-import { MongoClient } from 'mongodb'
+import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+
+export const dynamic = 'force-dynamic'
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
@@ -11,17 +13,9 @@ const statusColors: Record<string, string> = {
 }
 
 async function getOrders() {
-  const client = new MongoClient(process.env.MONGODB_URI!)
-  try {
-    await client.connect()
-    const db = client.db()
-    const orders = await db.collection('orders').find({}).sort({ createdAt: -1 }).limit(100).toArray()
-    await client.close()
-    return JSON.parse(JSON.stringify(orders))
-  } catch {
-    await client.close().catch(() => {})
-    return []
-  }
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(200)
+  return data || []
 }
 
 export default async function OrdersPage() {
@@ -58,34 +52,30 @@ export default async function OrdersPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-800">
                   {orders.map((order: any) => {
-                    const customer = order.customer || order.form || {}
-                    const delivery = order.delivery || order.form || {}
-                    const total = order.pricing?.total || order.payment?.total || 0
-                    const phone = customer.phone || ''
-                    const waText = encodeURIComponent(`Hi ${customer.fullName}, your TMFoodStuff order #${order.orderNumber} `)
+                    const waText = encodeURIComponent(`Hi ${order.customer_name}, your TMFoodStuff order #${order.order_number} `)
                     return (
-                      <tr key={String(order._id)} className="hover:bg-gray-800/30 transition-colors">
+                      <tr key={order.id} className="hover:bg-gray-800/30 transition-colors">
                         <td className="px-5 py-4">
-                          <Link href={`/dashboard/orders/${order._id}`} className="text-white font-bold hover:text-green-400 transition-colors text-sm">
-                            {order.orderNumber}
+                          <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-green-400 transition-colors text-sm">
+                            {order.order_number}
                           </Link>
                           <p className="text-gray-600 text-xs mt-0.5">
-                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                            {order.created_at ? new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
                           </p>
                         </td>
                         <td className="px-5 py-4">
-                          <p className="text-white text-sm font-semibold">{customer.fullName || '—'}</p>
-                          <p className="text-gray-500 text-xs">{phone}</p>
+                          <p className="text-white text-sm font-semibold">{order.customer_name || '—'}</p>
+                          <p className="text-gray-500 text-xs">{order.customer_phone}</p>
                         </td>
                         <td className="px-5 py-4">
-                          <p className="text-gray-300 text-sm">{delivery.area || '—'}</p>
-                          <p className="text-gray-500 text-xs">{delivery.emirate}</p>
+                          <p className="text-gray-300 text-sm">{order.delivery_area || '—'}</p>
+                          <p className="text-gray-500 text-xs">{order.delivery_emirate}</p>
                         </td>
                         <td className="px-5 py-4">
-                          <span className="text-gray-400 text-sm capitalize">{delivery.slot || order.form?.deliverySlot || '—'}</span>
+                          <span className="text-gray-400 text-sm capitalize">{order.delivery_slot || '—'}</span>
                         </td>
                         <td className="px-5 py-4">
-                          <span className="text-green-400 font-black text-sm">AED {total.toFixed(2)}</span>
+                          <span className="text-green-400 font-black text-sm">AED {(order.total || 0).toFixed(2)}</span>
                         </td>
                         <td className="px-5 py-4">
                           <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${statusColors[order.status] || 'bg-gray-700 text-gray-400 border-gray-600'}`}>
@@ -94,12 +84,12 @@ export default async function OrdersPage() {
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <Link href={`/dashboard/orders/${order._id}`}
+                            <Link href={`/dashboard/orders/${order.id}`}
                               className="text-xs px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">
                               View
                             </Link>
-                            {phone && (
-                              <a href={`https://wa.me/${phone.replace(/\D/g, '')}?text=${waText}`}
+                            {order.customer_phone && (
+                              <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`}
                                 target="_blank" rel="noopener noreferrer"
                                 className="text-xs px-2.5 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-colors">
                                 WhatsApp
