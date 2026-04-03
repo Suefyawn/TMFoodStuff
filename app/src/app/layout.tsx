@@ -1,12 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import { ScrollToTop } from '@/components/ScrollToTop'
-import LaunchBanner from '@/components/LaunchBanner'
-import HtmlWrapper from '@/components/HtmlWrapper'
-import MobileNav from '@/components/MobileNav'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -37,20 +31,13 @@ export const metadata: Metadata = {
   },
 }
 
+// Minimal root layout — storefront UI lives in (store)/layout.tsx
+// Payload admin uses (payload) group with its own layout
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-inter`}>
-        <HtmlWrapper>
-          <LaunchBanner />
-          <Navbar />
-          <div className="pb-16 md:pb-0">
-            {children}
-          </div>
-          <ScrollToTop />
-          <Footer />
-          <MobileNav />
-        </HtmlWrapper>
+        {children}
       </body>
     </html>
   )
