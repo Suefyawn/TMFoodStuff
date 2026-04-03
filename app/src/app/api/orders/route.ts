@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { MongoClient } from 'mongodb'
+import { getPayload } from 'payload'
+import config from '@payload-config'
 
-const MONGODB_URI = process.env.MONGODB_URI!
 const WHATSAPP_NUMBER = '971544408411'
 
 export async function POST(request: Request) {
@@ -9,58 +9,60 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot } = body
 
-    // Generate order number
     const orderNumber = `TM-${Date.now().toString(36).toUpperCase().slice(-6)}`
-    const createdAt = new Date()
 
-    // Save to MongoDB
-    const client = new MongoClient(MONGODB_URI)
-    await client.connect()
-    const db = client.db('tmfoodstuff')
+    // Save via Payload CMS
+    const payload = await getPayload({ config })
 
-    const order = {
-      orderNumber,
-      createdAt,
-      status: 'pending',
-      customer: {
-        fullName: form.fullName,
-        phone: form.phone,
-        email: form.email || '',
+    await payload.create({
+      collection: 'orders',
+      data: {
+        orderNumber,
+        status: 'pending',
+        paymentMethod: paymentMethod || 'cod',
+        paymentStatus: 'pending',
+        customer: {
+          fullName: form.fullName,
+          phone: form.phone,
+          email: form.email || '',
+        },
+        delivery: {
+          emirate: form.emirate,
+          area: form.area,
+          building: form.building || '',
+          makani: form.makani || '',
+          slot: deliverySlot,
+          notes: form.notes || '',
+        },
+        items: items.map((item: any) => ({
+          productId: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          priceAED: item.priceAED,
+          subtotal: item.priceAED * item.quantity,
+          unit: item.unit || 'kg',
+        })),
+        pricing: {
+          subtotal,
+          vat,
+          deliveryFee,
+          promoCode: promoCode || '',
+          promoDiscount: promoDiscount || 0,
+          total,
+        },
+        totalAED: total,
       },
-      delivery: {
-        emirate: form.emirate,
-        area: form.area,
-        building: form.building || '',
-        makani: form.makani || '',
-        notes: form.notes || '',
-        slot: deliverySlot,
-      },
-      items: items.map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        nameAr: item.nameAr || item.name,
-        quantity: item.quantity,
-        priceAED: item.priceAED,
-        unit: item.unit || 'kg',
-        total: item.priceAED * item.quantity,
-      })),
-      payment: {
-        method: paymentMethod,
-        subtotal,
-        vat,
-        deliveryFee,
-        promoCode: promoCode || '',
-        promoDiscount: promoDiscount || 0,
-        total,
-      },
+    })
+
+    // Build WhatsApp message for admin notification
+    const itemsList = items
+      .map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`)
+      .join('\n')
+    const slotMap: Record<string, string> = {
+      morning: '8AM-12PM',
+      afternoon: '12PM-5PM',
+      evening: '5PM-10PM',
     }
-
-    await db.collection('orders').insertOne(order)
-    await client.close()
-
-    // Build WhatsApp message for admin
-    const itemsList = items.map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`).join('\n')
-    const slotMap: Record<string, string> = { morning: '8AM-12PM', afternoon: '12PM-5PM', evening: '5PM-10PM' }
 
     const waMessage = encodeURIComponent(
       `🛒 NEW ORDER #${orderNumber}\n` +
@@ -76,7 +78,7 @@ export async function POST(request: Request) {
       `VAT (5%): AED ${vat.toFixed(2)}\n` +
       (promoDiscount > 0 ? `Promo (${promoCode}): -AED ${promoDiscount.toFixed(2)}\n` : '') +
       `💰 TOTAL: AED ${total.toFixed(2)}\n` +
-      `💳 Payment: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Card'}\n` +
+      `💳 ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Card'}\n` +
       (form.notes ? `📝 Notes: ${form.notes}` : '')
     )
 

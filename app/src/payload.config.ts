@@ -1,6 +1,7 @@
 import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { Users } from './collections/Users'
 import { Products } from './collections/Products'
 import { Categories } from './collections/Categories'
 import { Orders } from './collections/Orders'
@@ -10,10 +11,10 @@ import { Media } from './collections/Media'
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
   admin: {
-    user: 'customers',
+    user: 'users',
   },
   editor: lexicalEditor({}),
-  collections: [Products, Categories, Orders, Customers, Media],
+  collections: [Users, Products, Categories, Orders, Customers, Media],
   db: mongooseAdapter({
     url: process.env.MONGODB_URI || '',
   }),
