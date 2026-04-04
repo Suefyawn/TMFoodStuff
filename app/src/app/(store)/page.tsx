@@ -1,5 +1,9 @@
 import HomeContent from './HomeContent'
+import { getFeaturedProducts } from '@/lib/products-api'
 
-export default function HomePage() {
-  return <HomeContent />
+export const revalidate = 60 // Revalidate every 60 seconds
+
+export default async function HomePage() {
+  const featured = await getFeaturedProducts(10)
+  return <HomeContent featuredProducts={featured} />
 }

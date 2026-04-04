@@ -2,8 +2,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Search, X, SlidersHorizontal, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, Package } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
-import { products } from '@/data/products'
-import { categories } from '@/data/categories'
+import type { Product, Category } from '@/lib/products-api'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { ReactElement } from 'react'
 import { useLang } from '@/lib/use-lang'
@@ -21,12 +20,17 @@ const categoryIconMap: Record<string, ReactElement> = {
 
 interface ShopContentProps {
   defaultCategory?: string
+  initialProducts: Product[]
+  initialCategories: Category[]
 }
 
-export default function ShopContent({ defaultCategory }: ShopContentProps) {
+export default function ShopContent({ defaultCategory, initialProducts, initialCategories }: ShopContentProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { lang, tr } = useLang()
+
+  const products = initialProducts
+  const categories = initialCategories
 
   const initialCategory = defaultCategory || searchParams.get('category') || ''
   const initialSearch = searchParams.get('q') || ''
@@ -42,7 +46,6 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
     { value: 'organic-first' as SortOption, label: lang === 'ar' ? 'العضوي أولاً' : 'Organic First' },
   ]
 
-  // Sync URL params on navigation changes
   useEffect(() => {
     const q = searchParams.get('q') || ''
     const cat = searchParams.get('category') || defaultCategory || ''
@@ -50,15 +53,11 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
     setActiveCategory(cat)
   }, [searchParams, defaultCategory])
 
-  // Sync search input → URL param
   function handleSearchChange(value: string) {
     setSearch(value)
     const params = new URLSearchParams(searchParams.toString())
-    if (value) {
-      params.set('q', value)
-    } else {
-      params.delete('q')
-    }
+    if (value) params.set('q', value)
+    else params.delete('q')
     router.replace(`/shop?${params.toString()}`, { scroll: false })
   }
 
@@ -77,8 +76,9 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
         p.categorySlug === activeCategory ||
         (activeCategory === 'organic' && p.isOrganic)
       const matchSearch =
-        !search || p.name.toLowerCase().includes(search.toLowerCase())
-      return matchCategory && matchSearch && p.isActive !== false
+        !search || p.name.toLowerCase().includes(search.toLowerCase()) ||
+        (p.nameAr && p.nameAr.includes(search))
+      return matchCategory && matchSearch
     })
 
     if (sortBy === 'price-asc') {
@@ -92,7 +92,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
     }
 
     return result
-  }, [activeCategory, search, sortBy])
+  }, [products, activeCategory, search, sortBy])
 
   const activeCategoryObj = categories.find(c => c.slug === activeCategory)
 
@@ -118,7 +118,6 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
       {/* Sticky filter bar */}
       <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Search + Sort row */}
           <div className="flex gap-3 items-center py-3">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
@@ -130,16 +129,11 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                 className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-full text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors bg-gray-50 focus:bg-white"
               />
               {search && (
-                <button
-                  onClick={() => handleSearchChange('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
+                <button onClick={() => handleSearchChange('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   <X size={14} />
                 </button>
               )}
             </div>
-
-            {/* Sort dropdown */}
             <div className="flex items-center gap-2">
               <SlidersHorizontal size={16} className="text-gray-400 hidden sm:block" />
               <select
@@ -148,15 +142,12 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                 className="text-sm font-semibold text-gray-700 border-2 border-gray-200 rounded-full py-2.5 px-4 focus:outline-none focus:border-green-500 bg-gray-50 focus:bg-white transition-colors cursor-pointer"
               >
                 {sortOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Category filter pills — horizontal scroll */}
           <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
             <button
               onClick={() => handleCategoryChange('')}
@@ -166,15 +157,15 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
                   : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-green-600 bg-white'
               }`}
             >
-              {tr.allItems} ({products.filter(p => p.isActive !== false).length})
+              {tr.allItems} ({products.length})
             </button>
             {categories.map(cat => {
               const count =
                 cat.slug === 'organic'
-                  ? products.filter(p => p.isOrganic && p.isActive !== false).length
-                  : products.filter(p => p.categorySlug === cat.slug && p.isActive !== false).length
+                  ? products.filter(p => p.isOrganic).length
+                  : products.filter(p => p.categorySlug === cat.slug).length
               const icon = categoryIconMap[cat.slug] ?? <Leaf size={14} />
-              const catLabel = lang === 'ar' && (cat as any).nameAr ? (cat as any).nameAr : cat.name
+              const catLabel = lang === 'ar' && cat.nameAr ? cat.nameAr : cat.name
               return (
                 <button
                   key={cat.slug}
@@ -194,60 +185,39 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
         </div>
       </div>
 
-      {/* Results area */}
+      {/* Results */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Active filter pills + count */}
         <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm text-gray-500 font-medium flex items-center gap-1.5">
               <Package size={14} className="text-gray-400" />
-              <span className="text-gray-900 font-black">{filtered.length}</span>{' '}
-              {tr.productsFound}
+              <span className="text-gray-900 font-black">{filtered.length}</span> {tr.productsFound}
             </p>
-            {/* Active filter chips */}
             {activeCategoryObj && (
               <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
                 {categoryIconMap[activeCategoryObj.slug] ?? <Leaf size={12} />}
-                {lang === 'ar' && (activeCategoryObj as any).nameAr ? (activeCategoryObj as any).nameAr : activeCategoryObj.name}
-                <button onClick={() => handleCategoryChange('')} className="hover:text-green-600 ml-0.5">
-                  <X size={12} />
-                </button>
+                {lang === 'ar' && activeCategoryObj.nameAr ? activeCategoryObj.nameAr : activeCategoryObj.name}
+                <button onClick={() => handleCategoryChange('')} className="hover:text-green-600 ml-0.5"><X size={12} /></button>
               </span>
             )}
             {search && (
               <span className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1.5 rounded-full">
-                <Search size={11} />
-                &quot;{search}&quot;
-                <button onClick={() => handleSearchChange('')} className="hover:text-blue-600 ml-0.5">
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            {sortBy !== 'featured' && (
-              <span className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">
-                <SlidersHorizontal size={11} />
-                {sortOptions.find(s => s.value === sortBy)?.label}
-                <button onClick={() => setSortBy('featured')} className="hover:text-amber-600 ml-0.5">
-                  <X size={12} />
-                </button>
+                <Search size={11} /> &quot;{search}&quot;
+                <button onClick={() => handleSearchChange('')} className="hover:text-blue-600 ml-0.5"><X size={12} /></button>
               </span>
             )}
           </div>
           {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1"
-            >
+            <button onClick={clearFilters} className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1">
               <X size={12} /> {tr.clearAll}
             </button>
           )}
         </div>
 
-        {/* Product grid */}
         {filtered.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 transition-all duration-300">
             {filtered.map(product => (
-              <ProductCard key={product.id} product={product as any} />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
@@ -257,10 +227,7 @@ export default function ShopContent({ defaultCategory }: ShopContentProps) {
             </div>
             <p className="font-black text-gray-700 text-xl mb-2">{lang === 'ar' ? 'لم يتم العثور على منتجات' : 'No products found'}</p>
             <p className="text-sm text-gray-400 mb-6">{lang === 'ar' ? 'جرب بحثاً مختلفاً أو فئة أخرى' : 'Try a different search or category'}</p>
-            <button
-              onClick={clearFilters}
-              className="bg-green-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-700 transition-colors text-sm"
-            >
+            <button onClick={clearFilters} className="bg-green-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-700 transition-colors text-sm">
               {lang === 'ar' ? 'مسح الفلاتر' : 'Clear Filters'}
             </button>
           </div>

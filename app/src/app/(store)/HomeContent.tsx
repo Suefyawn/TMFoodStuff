@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
-import { products } from '@/data/products'
+import type { Product } from '@/lib/products-api'
 import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
@@ -62,9 +62,13 @@ const homeCategories = [
   },
 ]
 
-export default function HomeContent() {
+interface HomeContentProps {
+  featuredProducts: Product[]
+}
+
+export default function HomeContent({ featuredProducts }: HomeContentProps) {
   const { lang, tr } = useLang()
-  const featured = products.filter(p => p.isFeatured).slice(0, 10)
+  const featured = featuredProducts
 
   const trustItems = [
     { icon: Truck, text: tr.farmFresh, sub: lang === 'ar' ? 'يُجلب كل صباح' : 'Sourced every morning' },
