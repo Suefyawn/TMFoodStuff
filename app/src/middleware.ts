@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -10,10 +8,16 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/dashboard') && 
       !pathname.startsWith('/dashboard/login') && 
       !pathname.startsWith('/dashboard/logout')) {
-    
-    const auth = request.cookies.get('dashboard_auth')
-    
-    if (auth?.value !== DASHBOARD_PASSWORD) {
+
+    const hasSbToken =
+      request.cookies.has('sb-access-token') ||
+      request.cookies.has('sb-refresh-token') ||
+      request.cookies.has('sb_dashboard_access_token') ||
+      request.cookies.has('sb_dashboard_refresh_token') ||
+      // Back-compat: old static password cookie
+      request.cookies.has('dashboard_auth')
+
+    if (!hasSbToken) {
       return NextResponse.redirect(new URL('/dashboard/login', request.url))
     }
   }

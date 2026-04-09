@@ -1,13 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
-
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
-
-async function checkAuth() {
-  const cookieStore = await cookies()
-  return cookieStore.get('dashboard_auth')?.value === DASHBOARD_PASSWORD
-}
+import { requireDashboardAuth } from '@/lib/dashboard-auth'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -47,7 +40,8 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  if (!await checkAuth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireDashboardAuth()
+  if (!auth.ok) return auth.response
 
   const { settings, promoCodes } = await request.json()
   const supabase = getSupabase()

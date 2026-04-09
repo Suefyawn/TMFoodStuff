@@ -1,13 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
-
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
-
-async function checkAuth() {
-  const cookieStore = await cookies()
-  return cookieStore.get('dashboard_auth')?.value === DASHBOARD_PASSWORD
-}
+import { requireDashboardStaff } from '@/lib/dashboard-auth'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -15,7 +8,8 @@ function getSupabase() {
 
 // UPDATE product
 export async function PATCH(request: Request) {
-  if (!await checkAuth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireDashboardStaff()
+  if (!auth.ok) return auth.response
   const { id, ...updates } = await request.json()
   const supabase = getSupabase()
 
@@ -44,7 +38,8 @@ export async function PATCH(request: Request) {
 
 // CREATE product
 export async function POST(request: Request) {
-  if (!await checkAuth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireDashboardStaff()
+  if (!auth.ok) return auth.response
   const body = await request.json()
   const supabase = getSupabase()
 
@@ -71,7 +66,8 @@ export async function POST(request: Request) {
 
 // DELETE product(s)
 export async function DELETE(request: Request) {
-  if (!await checkAuth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const auth = await requireDashboardStaff()
+  if (!auth.ok) return auth.response
   const { ids } = await request.json()
   const supabase = getSupabase()
 
