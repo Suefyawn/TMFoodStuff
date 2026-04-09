@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 
-type DashboardRole = 'admin' | 'staff'
+type DashboardRole = 'owner' | 'manager' | 'admin' | 'staff'
 
 const ACCESS_COOKIE = 'sb-access-token'
 const REFRESH_COOKIE = 'sb-refresh-token'
@@ -25,6 +25,17 @@ async function getDashboardSession() {
   if (error || !data.user) return null
 
   const admin = createServerSupabaseAdmin()
+  const { data: profile, error: profileError } = await admin
+    .from('profiles')
+    .select('role,is_active')
+    .eq('id', data.user.id)
+    .maybeSingle()
+
+  if (!profileError && profile?.is_active) {
+    return { user: data.user, role: profile.role as DashboardRole }
+  }
+
+  // Backward-compatible fallback during transition window.
   const { data: adminUser, error: adminError } = await admin
     .from('admin_users')
     .select('role,is_active')
@@ -41,7 +52,8 @@ async function requireDashboardAuthWithRole(requiredRole?: DashboardRole) {
     return { ok: false as const, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   }
 
-  if (requiredRole === 'admin' && session.role !== 'admin') {
+  const isAdmin = session.role === 'owner' || session.role === 'manager' || session.role === 'admin'
+  if (requiredRole === 'admin' && !isAdmin) {
     return { ok: false as const, response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
 
