@@ -84,7 +84,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
               </thead>
               <tbody className="divide-y divide-gray-800">
                 {filtered.map((order: any) => {
-                  const items = order.items || []
+                  const itemsCount = Number(order.item_count ?? (order.items ? order.items.length : 0)) || 0
                   const waText = encodeURIComponent(`Hi ${order.customer_name}, your TMFoodStuff order #${order.order_number} `)
                   return (
                     <tr key={order.id} className="hover:bg-gray-800/30 transition-colors">
@@ -103,7 +103,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                         <p className="text-gray-500 text-xs">{order.delivery_emirate}</p>
                       </td>
                       <td className="px-5 py-4 text-gray-400 text-sm capitalize">{order.delivery_slot || '—'}</td>
-                      <td className="px-5 py-4 text-gray-400 text-sm">{items.length} items</td>
+                      <td className="px-5 py-4 text-gray-400 text-sm">{itemsCount} items</td>
                       <td className="px-5 py-4 text-green-400 font-black text-sm">AED {(order.total || 0).toFixed(2)}</td>
                       <td className="px-5 py-4">
                         <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${statusColors[order.status] || 'bg-gray-700 text-gray-400 border-gray-600'}`}>

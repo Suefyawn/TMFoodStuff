@@ -30,8 +30,9 @@ async function getStats() {
     supabase.from('products').select('id, name, stock, emoji').eq('is_active', true).lt('stock', 10).order('stock').limit(10),
   ])
 
-  const todayRevenue = (todayOrderDocs || []).reduce((sum: number, o: any) => sum + (o.total || 0), 0)
-  const weekRevenue = (weeklyOrders || []).reduce((sum: number, o: any) => sum + (o.total || 0), 0)
+  const normalizeTotal = (o: any) => Number(o.total_aed ?? o.total ?? 0)
+  const todayRevenue = (todayOrderDocs || []).reduce((sum: number, o: any) => sum + normalizeTotal(o), 0)
+  const weekRevenue = (weeklyOrders || []).reduce((sum: number, o: any) => sum + normalizeTotal(o), 0)
 
   // Daily revenue chart data
   const dailyRevenue = []
@@ -44,7 +45,7 @@ async function getStats() {
     })
     dailyRevenue.push({
       day: d.toLocaleDateString('en', { weekday: 'short' }),
-      revenue: dayOrders.reduce((s: number, o: any) => s + (o.total || 0), 0),
+      revenue: dayOrders.reduce((s: number, o: any) => s + normalizeTotal(o), 0),
       orders: dayOrders.length,
     })
   }
@@ -62,7 +63,11 @@ async function getStats() {
     totalProducts: totalProducts || 0,
     todayRevenue,
     weekRevenue,
-    recentOrders: recentOrders || [],
+    recentOrders: (recentOrders || []).map((o: any) => ({
+      ...o,
+      customer_name: o.customer_full_name || o.customer_name,
+      total: o.total_aed ?? o.total,
+    })),
     dailyRevenue,
     statusCounts,
     lowStock: lowStock || [],

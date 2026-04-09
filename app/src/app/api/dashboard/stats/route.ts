@@ -13,7 +13,6 @@ export async function GET() {
   const now = new Date()
   const today = new Date(now); today.setHours(0,0,0,0)
   const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
-  const monthAgo = new Date(now); monthAgo.setDate(monthAgo.getDate() - 30)
 
   const [
     { count: totalProducts },
@@ -23,6 +22,7 @@ export async function GET() {
     { data: recentOrders },
     { data: lowStockProducts },
     { data: weeklyOrders },
+    { data: recentOrderItems },
   ] = await Promise.all([
     supabase.from('products').select('*', { count: 'exact', head: true }),
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true),
@@ -30,14 +30,15 @@ export async function GET() {
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(5),
     supabase.from('products').select('id, name, stock, emoji').eq('is_active', true).lt('stock', 10).order('stock'),
-    supabase.from('orders').select('total, status, created_at').gte('created_at', weekAgo.toISOString()),
+    supabase.from('orders').select('id, total, total_aed, status, created_at').gte('created_at', weekAgo.toISOString()),
+    supabase.from('order_items').select('order_id, product_id, product_name, quantity, unit_price_aed, subtotal_aed'),
   ])
 
   // Revenue calculations
-  const totalRevenue = (weeklyOrders || []).reduce((sum, o) => sum + (o.total || 0), 0)
+  const totalRevenue = (weeklyOrders || []).reduce((sum, o: any) => sum + (Number(o.total_aed ?? o.total) || 0), 0)
   const todayRevenue = (weeklyOrders || [])
     .filter(o => new Date(o.created_at) >= today)
-    .reduce((sum, o) => sum + (o.total || 0), 0)
+    .reduce((sum, o: any) => sum + (Number(o.total_aed ?? o.total) || 0), 0)
 
   // Daily revenue for chart (last 7 days)
   const dailyRevenue = []
@@ -51,7 +52,7 @@ export async function GET() {
     dailyRevenue.push({
       date: d.toISOString().split('T')[0],
       day: d.toLocaleDateString('en', { weekday: 'short' }),
-      revenue: dayOrders.reduce((s, o) => s + (o.total || 0), 0),
+      revenue: dayOrders.reduce((s, o: any) => s + (Number(o.total_aed ?? o.total) || 0), 0),
       orders: dayOrders.length,
     })
   }
@@ -62,17 +63,27 @@ export async function GET() {
     statusCounts[o.status || 'pending'] = (statusCounts[o.status || 'pending'] || 0) + 1
   }
 
-  // Top selling (from recent orders items)
+  // Top selling (prefer normalized order_items; fallback to legacy orders.items)
   const productSales: Record<string, { name: string, qty: number, revenue: number }> = {}
-  for (const order of (recentOrders || [])) {
-    for (const item of (order.items || [])) {
-      const key = item.name || item.id
-      if (!productSales[key]) productSales[key] = { name: item.name, qty: 0, revenue: 0 }
-      productSales[key].qty += item.quantity || 1
-      productSales[key].revenue += (item.price_aed || item.priceAED || 0) * (item.quantity || 1)
-    }
+
+  const items = (recentOrderItems || []).length
+    ? (recentOrderItems as any[])
+    : (recentOrders || []).flatMap((o: any) => Array.isArray(o.items) ? o.items.map((it: any) => ({ ...it, order_id: o.id })) : [])
+
+  for (const item of items) {
+    const name = item.product_name || item.name || 'Unknown'
+    const key = String(item.product_id || item.productId || name)
+    if (!productSales[key]) productSales[key] = { name, qty: 0, revenue: 0 }
+    const qty = Number(item.quantity) || 1
+    const unitPrice = Number(item.unit_price_aed ?? item.price_aed ?? item.priceAED) || 0
+    const subtotal = Number(item.subtotal_aed ?? item.subtotal) || (unitPrice * qty)
+    productSales[key].qty += qty
+    productSales[key].revenue += subtotal
   }
-  const topSelling = Object.values(productSales).sort((a, b) => b.revenue - a.revenue).slice(0, 5)
+
+  const topSelling = Object.values(productSales)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5)
 
   return NextResponse.json({
     totalProducts: totalProducts || 0,
