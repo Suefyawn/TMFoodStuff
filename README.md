@@ -39,3 +39,10 @@ npm run dev
 - **Delivery:** Dubai, Abu Dhabi, Sharjah, Ajman, RAK, Fujairah
 - **Payments:** Telr (UAE-licensed)
 - **Address:** Makani number support
+
+## Supabase Custom Admin Migration
+
+If you are moving away from Payload to a custom admin backed by Supabase:
+
+- Schema + RLS policies: `docs/SUPABASE_SCHEMA.sql`
+- Migration and cutover guide: `docs/PAYLOAD_TO_SUPABASE_CUTOVER.md`
