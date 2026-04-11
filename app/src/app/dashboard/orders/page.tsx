@@ -1,10 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
 import OrdersClient from './OrdersClient'
+import { getDashboardSupabase } from '@/lib/dashboard-server-supabase'
 
 export const dynamic = 'force-dynamic'
 
 async function getOrders() {
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const supabase = await getDashboardSupabase()
   const { data: orders } = await supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(500)
   const list = orders || []
 

@@ -1,11 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import OrderStatusUpdater from './OrderStatusUpdater'
+import { getDashboardSupabase } from '@/lib/dashboard-server-supabase'
 
 export const dynamic = 'force-dynamic'
 
 async function getOrder(id: string) {
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const supabase = await getDashboardSupabase()
   const orderId = parseInt(id)
 
   const [{ data: order }, { data: items }] = await Promise.all([

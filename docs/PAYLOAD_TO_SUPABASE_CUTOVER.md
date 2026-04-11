@@ -187,11 +187,11 @@ Replace this with Supabase Auth JWT/session checks before go-live:
 
 ## 7) Decommission checklist (Payload removal)
 
-- [ ] Remove `src/payload.config.ts` usage
+- [x] Remove `src/payload.config.ts` usage (removed from repo)
 - [ ] Remove `src/collections/*` once fully migrated
-- [ ] Remove `(payload)` routes (`/admin`, `/api/[...slug]`)
+- [x] Remove `(payload)` routes (`/admin`, `/api/[...slug]`) (removed from repo)
 - [ ] Remove Payload dependencies from `package.json`
-- [ ] Remove MongoDB env vars and docs references
+- [x] Remove MongoDB env vars from app `.env.example` (legacy docs flagged in SETUP/DEPLOYMENT)
 - [ ] Update setup/deployment docs to Supabase-only
 
 When all checks pass, Payload can be removed safely.

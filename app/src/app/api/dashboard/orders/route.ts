@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseAdmin, requireDashboardRole } from '@/lib/dashboard-auth'
+import { createServerSupabaseForUser, requireDashboardRole } from '@/lib/dashboard-auth'
 
 export async function PATCH(request: Request) {
   const auth = await requireDashboardRole()
   if (!auth.ok) return auth.response
 
   const { id, status } = await request.json()
-  const supabase = createServerSupabaseAdmin()
+  const supabase = createServerSupabaseForUser(auth.session.accessToken)
   const orderId = parseInt(id)
 
   const { data: existing, error: fetchError } = await supabase

@@ -1,10 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { getDashboardSupabase } from '@/lib/dashboard-server-supabase'
 
 export const dynamic = 'force-dynamic'
 
 async function getStats() {
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const supabase = await getDashboardSupabase()
 
   const now = new Date()
   const today = new Date(now); today.setHours(0, 0, 0, 0)

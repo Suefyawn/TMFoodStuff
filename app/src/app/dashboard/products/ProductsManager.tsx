@@ -50,7 +50,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const filtered = useMemo(() => {
-    let result = products.filter(p => {
+    const result = products.filter(p => {
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !(p.name_ar || '').includes(search)) return false
       if (filterCat && p.categories?.slug !== filterCat) return false
       if (filterStatus === 'active' && !p.is_active) return false
@@ -300,7 +300,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                   <td className="px-4 py-3">
                     <input type="checkbox" checked={selected.has(product.id)} onChange={() => {
                       const s = new Set(selected)
-                      s.has(product.id) ? s.delete(product.id) : s.add(product.id)
+                      if (s.has(product.id)) s.delete(product.id)
+                      else s.add(product.id)
                       setSelected(s)
                     }} className="rounded" />
                   </td>

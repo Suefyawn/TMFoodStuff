@@ -1,48 +1,55 @@
-# 🥦 TMFoodStuff
+# TMFoodStuff
 
-> Fresh Fruits & Vegetables delivered to your door across the UAE.
+Fresh fruits and vegetables delivered across the UAE.
 
 ## Stack
 
 | Layer | Tech | Purpose |
 |-------|------|---------|
-| Storefront | Next.js 14 | Customer UI |
-| Admin CMS | Payload CMS 2.x | Product & order management |
-| Database | MongoDB Atlas | All data |
-| Payments | Telr | UAE-native payment gateway |
-| Hosting | Vercel | Frontend + API |
+| Storefront | Next.js 15 | Customer UI |
+| Admin | Custom dashboard (`/dashboard`) | Products, orders, settings |
+| Database | Supabase (Postgres) | Data + RLS |
+| Hosting | Vercel | Frontend + API routes |
 
-## Project Structure
+Legacy Payload CMS and MongoDB have been removed from this app; use Supabase and the custom admin only.
+
+## Project structure
 
 ```
 TMFoodStuff/
-├── app/          # Next.js 14 + Payload CMS (unified)
-└── docs/         # Setup & deployment guides
+├── app/                 # Next.js app (storefront + dashboard + APIs)
+└── docs/                # SQL migrations, RPCs, cutover notes
 ```
 
-## Quick Start
+## Quick start
 
 ```bash
 cd app
 npm install
 cp .env.example .env
-# Fill in MONGODB_URI and PAYLOAD_SECRET
+# Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 npm run dev
-# Storefront → http://localhost:3000
-# Admin panel → http://localhost:3000/admin
 ```
 
-## UAE Market
+- Storefront: http://localhost:3000  
+- Dashboard: http://localhost:3000/dashboard (Supabase Auth; staff users need `profiles` or `admin_users` as in the schema docs)
 
-- **Currency:** AED
-- **VAT:** 5% (Federal Tax Authority compliant)
-- **Delivery:** Dubai, Abu Dhabi, Sharjah, Ajman, RAK, Fujairah
-- **Payments:** Telr (UAE-licensed)
-- **Address:** Makani number support
+## Database
 
-## Supabase Custom Admin Migration
+- Target schema and RLS: `docs/SUPABASE_SCHEMA.sql`
+- Incremental compat migration: `docs/SUPABASE_COMPAT_MIGRATION.sql`
+- Checkout RPC: `docs/SUPABASE_RPC_CREATE_CHECKOUT_ORDER.sql`
+- Optional: drop legacy `orders.items` after validation: `docs/SUPABASE_DROP_LEGACY_ORDER_ITEMS.sql`
 
-If you are moving away from Payload to a custom admin backed by Supabase:
+## Seeding catalog data
 
-- Schema + RLS policies: `docs/SUPABASE_SCHEMA.sql`
-- Migration and cutover guide: `docs/PAYLOAD_TO_SUPABASE_CUTOVER.md`
+```bash
+cd app
+npm run seed
+```
+
+Uses `SUPABASE_SERVICE_ROLE_KEY` to upsert categories and products from `src/data/*`.
+
+## Supabase migration notes
+
+See `docs/PAYLOAD_TO_SUPABASE_CUTOVER.md` for field mapping and decommissioning checklist.

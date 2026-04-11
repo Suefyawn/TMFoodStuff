@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 type DashboardRole = 'owner' | 'manager' | 'admin' | 'staff'
 
@@ -15,7 +15,23 @@ export function createServerSupabaseAdmin() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
-async function getDashboardSession() {
+/** Supabase client scoped to the dashboard user's JWT (respects RLS as that user). */
+export function createServerSupabaseForUser(accessToken: string): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  return createClient(url, anon, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  })
+}
+
+export type DashboardSession = {
+  user: { id: string; email?: string }
+  role: DashboardRole
+  accessToken: string
+}
+
+async function getDashboardSession(): Promise<DashboardSession | null> {
   const cookieStore = await cookies()
   const accessToken = cookieStore.get(ACCESS_COOKIE)?.value
   if (!accessToken) return null
@@ -32,7 +48,7 @@ async function getDashboardSession() {
     .maybeSingle()
 
   if (!profileError && profile?.is_active) {
-    return { user: data.user, role: profile.role as DashboardRole }
+    return { user: data.user, role: profile.role as DashboardRole, accessToken }
   }
 
   // Backward-compatible fallback during transition window.
@@ -43,7 +59,7 @@ async function getDashboardSession() {
     .maybeSingle()
 
   if (adminError || !adminUser || !adminUser.is_active) return null
-  return { user: data.user, role: adminUser.role as DashboardRole }
+  return { user: data.user, role: adminUser.role as DashboardRole, accessToken }
 }
 
 async function requireDashboardAuthWithRole(requiredRole?: DashboardRole) {
