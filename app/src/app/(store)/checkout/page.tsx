@@ -120,9 +120,9 @@ export default function CheckoutPage() {
       } else {
         const err = typeof data?.error === 'string' ? data.error : ''
         const friendly =
-          err.includes('insufficient stock')
+          err.includes('insufficient_stock')
             ? (lang === 'ar' ? 'نفد المخزون لأحد المنتجات. يرجى تحديث السلة والمحاولة مرة أخرى.' : 'One item is out of stock. Please refresh your cart and try again.')
-            : err.includes('price mismatch')
+            : err.includes('price_mismatch')
               ? (lang === 'ar' ? 'تغيرت أسعار المنتجات. يرجى تحديث الصفحة والمحاولة مرة أخرى.' : 'Prices changed. Please refresh and try again.')
               : err.includes('promo')
                 ? (lang === 'ar' ? 'كود الخصم غير صالح أو انتهى.' : 'Promo code is invalid or expired.')
