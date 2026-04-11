@@ -1,5 +1,5 @@
--- Atomic checkout order creation (orders + order_items)
--- Validates subtotal/VAT/delivery/total and unit prices against public.products
+-- Atomic checkout: orders + order_items + stock decrement
+-- Validates unit prices against products.price_aed, validates totals, validates promo against promo_codes
 -- Does NOT write legacy orders.items JSON
 
 create or replace function public.create_checkout_order(p_order jsonb, p_items jsonb)
@@ -26,6 +26,7 @@ declare
 
   v_promo_code text;
   v_promo_discount numeric := 0;
+  v_promo_percent integer;
 
   v_payment_method text;
 
@@ -33,6 +34,7 @@ declare
   v_qty integer;
   v_unit_price numeric;
   v_db_price numeric;
+  v_stock integer;
 
   v_expected_promo_discount numeric := 0;
 begin
@@ -57,6 +59,7 @@ begin
     raise exception 'invalid payment_method';
   end if;
 
+  -- Pass 1: lock products + validate prices + compute subtotal + ensure stock
   for v_item in select * from jsonb_array_elements(p_items)
   loop
     v_pid := case
@@ -73,14 +76,19 @@ begin
       raise exception 'invalid product id';
     end if;
 
-    select p.price_aed into v_db_price
+    select p.price_aed, coalesce(p.stock, 0)
+      into v_db_price, v_stock
     from public.products p
     where p.id = v_pid
       and coalesce(p.is_active, true) = true
-    limit 1;
+    for update;
 
     if v_db_price is null then
       raise exception 'unknown or inactive product: %', v_pid;
+    end if;
+
+    if v_stock < v_qty then
+      raise exception 'insufficient stock for product %', v_pid;
     end if;
 
     v_unit_price := coalesce(
@@ -100,11 +108,19 @@ begin
   v_delivery_fee := 0;
 
   if v_promo_code <> '' then
-    if upper(v_promo_code) <> 'FRESH10' then
+    select pc.discount_percent
+      into v_promo_percent
+    from public.promo_codes pc
+    where upper(pc.code) = upper(v_promo_code)
+      and pc.is_active = true
+      and (pc.expires_at is null or pc.expires_at > timezone('utc', now()))
+    limit 1;
+
+    if v_promo_percent is null then
       raise exception 'invalid promo code';
     end if;
 
-    v_expected_promo_discount := round(v_subtotal * 0.10, 2);
+    v_expected_promo_discount := round(v_subtotal * (v_promo_percent::numeric / 100.0), 2);
     if abs(v_client_promo_discount - v_expected_promo_discount) > 0.02 then
       raise exception 'promo discount mismatch';
     end if;
@@ -188,6 +204,7 @@ begin
   )
   returning public.orders.id, public.orders.order_number into v_order_id, v_order_number;
 
+  -- Pass 2: insert line items + decrement stock (products already locked)
   for v_item in select * from jsonb_array_elements(p_items)
   loop
     v_pid := case
@@ -204,7 +221,7 @@ begin
     from public.products p
     where p.id = v_pid
       and coalesce(p.is_active, true) = true
-    limit 1;
+    for update;
 
     insert into public.order_items (
       order_id,
@@ -224,6 +241,11 @@ begin
       v_db_price,
       round(v_db_price * v_qty, 2)
     );
+
+    update public.products
+    set stock = coalesce(stock, 0) - v_qty,
+        updated_at = timezone('utc', now())
+    where id = v_pid;
   end loop;
 
   return query select v_order_id, v_order_number;
