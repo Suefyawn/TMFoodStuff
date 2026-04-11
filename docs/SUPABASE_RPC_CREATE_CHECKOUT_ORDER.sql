@@ -1,4 +1,5 @@
 -- Atomic checkout: orders + order_items + stock decrement
+-- Aggregates duplicate cart lines per product_id before locking rows
 -- Validates unit prices against products.price_aed, validates totals, validates promo against promo_codes
 -- Does NOT write legacy orders.items JSON
 
@@ -37,6 +38,8 @@ declare
   v_stock integer;
 
   v_expected_promo_discount numeric := 0;
+
+  r record;
 begin
   if p_order is null then
     raise exception 'p_order is required';
@@ -56,25 +59,55 @@ begin
   v_payment_method := lower(coalesce((p_order->>'payment_method')::text, 'cod'));
 
   if v_payment_method not in ('cod', 'telr') then
-    raise exception 'invalid payment_method';
+    raise exception 'invalid_payment_method';
   end if;
 
-  -- Pass 1: lock products + validate prices + compute subtotal + ensure stock
-  for v_item in select * from jsonb_array_elements(p_items)
+  create temporary table tmp_cart_lines (
+    product_id integer not null,
+    qty integer not null,
+    product_name text not null,
+    unit text not null,
+    unit_price_client numeric not null
+  ) on commit drop;
+
+  insert into tmp_cart_lines (product_id, qty, product_name, unit, unit_price_client)
+  select
+    x.product_id,
+    sum(x.qty)::integer,
+    max(x.product_name)::text,
+    max(x.unit)::text,
+    max(x.unit_price_client)::numeric
+  from (
+    select
+      case
+        when (v_item ? 'product_id') and (v_item->>'product_id') is not null and (v_item->>'product_id') <> ''
+          then (v_item->>'product_id')::integer
+        when (v_item ? 'id') and (v_item->>'id') is not null and (v_item->>'id') <> '' and (v_item->>'id') ~ '^[0-9]+$'
+          then (v_item->>'id')::integer
+        else null
+      end as product_id,
+      greatest(coalesce((v_item->>'quantity')::integer, 1), 1) as qty,
+      coalesce((v_item->>'product_name')::text, (v_item->>'name')::text, 'Unknown item') as product_name,
+      coalesce((v_item->>'unit')::text, 'kg') as unit,
+      coalesce(
+        (v_item->>'unit_price_aed')::numeric,
+        (v_item->>'price_aed')::numeric,
+        (v_item->>'priceAED')::numeric,
+        0
+      ) as unit_price_client
+    from jsonb_array_elements(p_items) v_item
+  ) x
+  where x.product_id is not null
+  group by x.product_id;
+
+  if not exists (select 1 from tmp_cart_lines) then
+    raise exception 'invalid_product_id';
+  end if;
+
+  for r in select * from tmp_cart_lines order by product_id
   loop
-    v_pid := case
-      when (v_item ? 'product_id') and (v_item->>'product_id') is not null and (v_item->>'product_id') <> ''
-        then (v_item->>'product_id')::integer
-      when (v_item ? 'id') and (v_item->>'id') is not null and (v_item->>'id') <> '' and (v_item->>'id') ~ '^[0-9]+$'
-        then (v_item->>'id')::integer
-      else null
-    end;
-
-    v_qty := greatest(coalesce((v_item->>'quantity')::integer, 1), 1);
-
-    if v_pid is null then
-      raise exception 'invalid product id';
-    end if;
+    v_pid := r.product_id;
+    v_qty := r.qty;
 
     select p.price_aed, coalesce(p.stock, 0)
       into v_db_price, v_stock
@@ -84,21 +117,16 @@ begin
     for update;
 
     if v_db_price is null then
-      raise exception 'unknown or inactive product: %', v_pid;
+      raise exception 'unknown_or_inactive_product:%', v_pid;
     end if;
 
     if v_stock < v_qty then
-      raise exception 'insufficient stock for product %', v_pid;
+      raise exception 'insufficient_stock:%', v_pid;
     end if;
 
-    v_unit_price := coalesce(
-      (v_item->>'unit_price_aed')::numeric,
-      (v_item->>'price_aed')::numeric,
-      (v_item->>'priceAED')::numeric
-    );
-
+    v_unit_price := r.unit_price_client;
     if abs(v_unit_price - v_db_price) > 0.02 then
-      raise exception 'price mismatch for product %', v_pid;
+      raise exception 'price_mismatch:%', v_pid;
     end if;
 
     v_subtotal := v_subtotal + (v_db_price * v_qty);
@@ -117,18 +145,18 @@ begin
     limit 1;
 
     if v_promo_percent is null then
-      raise exception 'invalid promo code';
+      raise exception 'invalid_promo_code';
     end if;
 
     v_expected_promo_discount := round(v_subtotal * (v_promo_percent::numeric / 100.0), 2);
     if abs(v_client_promo_discount - v_expected_promo_discount) > 0.02 then
-      raise exception 'promo discount mismatch';
+      raise exception 'promo_discount_mismatch';
     end if;
 
     v_promo_discount := v_expected_promo_discount;
   else
     if v_client_promo_discount <> 0 then
-      raise exception 'promo discount without promo code';
+      raise exception 'promo_discount_without_code';
     end if;
     v_promo_discount := 0;
   end if;
@@ -136,16 +164,16 @@ begin
   v_total := round(v_subtotal + v_vat + v_delivery_fee - v_promo_discount, 2);
 
   if abs(v_client_subtotal - v_subtotal) > 0.02 then
-    raise exception 'subtotal mismatch';
+    raise exception 'subtotal_mismatch';
   end if;
   if abs(v_client_vat - v_vat) > 0.02 then
-    raise exception 'vat mismatch';
+    raise exception 'vat_mismatch';
   end if;
   if abs(v_client_delivery_fee - v_delivery_fee) > 0.02 then
-    raise exception 'delivery fee mismatch';
+    raise exception 'delivery_fee_mismatch';
   end if;
   if abs(v_client_total - v_total) > 0.02 then
-    raise exception 'total mismatch';
+    raise exception 'total_mismatch';
   end if;
 
   insert into public.orders (
@@ -204,18 +232,10 @@ begin
   )
   returning public.orders.id, public.orders.order_number into v_order_id, v_order_number;
 
-  -- Pass 2: insert line items + decrement stock (products already locked)
-  for v_item in select * from jsonb_array_elements(p_items)
+  for r in select * from tmp_cart_lines order by product_id
   loop
-    v_pid := case
-      when (v_item ? 'product_id') and (v_item->>'product_id') is not null and (v_item->>'product_id') <> ''
-        then (v_item->>'product_id')::integer
-      when (v_item ? 'id') and (v_item->>'id') is not null and (v_item->>'id') <> '' and (v_item->>'id') ~ '^[0-9]+$'
-        then (v_item->>'id')::integer
-      else null
-    end;
-
-    v_qty := greatest(coalesce((v_item->>'quantity')::integer, 1), 1);
+    v_pid := r.product_id;
+    v_qty := r.qty;
 
     select p.price_aed into v_db_price
     from public.products p
@@ -235,9 +255,9 @@ begin
     values (
       v_order_id,
       v_pid,
-      coalesce((v_item->>'product_name')::text, (v_item->>'name')::text, 'Unknown item'),
+      r.product_name,
       v_qty,
-      coalesce((v_item->>'unit')::text, 'kg'),
+      r.unit,
       v_db_price,
       round(v_db_price * v_qty, 2)
     );
