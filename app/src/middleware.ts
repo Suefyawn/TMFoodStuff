@@ -33,8 +33,6 @@ export async function middleware(request: NextRequest) {
     !pathname.startsWith('/dashboard/login') &&
     !pathname.startsWith('/dashboard/logout')
 
-  const isDashboardApi = pathname.startsWith('/api/dashboard/') && !pathname.startsWith('/api/dashboard/auth')
-
   if (isDashboardPage) {
     const hasLegacy = request.cookies.has('dashboard_auth')
     if (!user && !hasLegacy) {
@@ -42,10 +40,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Refresh session cookies on dashboard API requests (browser fetch + RLS)
-  if (isDashboardApi) {
-    await supabase.auth.getSession()
-  }
+  // Session refresh is handled by getUser() above (do not use getSession() here — it does not
+  // revalidate the JWT and can leave cookies stale vs server expectations).
 
   return response
 }

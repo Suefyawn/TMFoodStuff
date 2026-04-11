@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Trash2 } from 'lucide-react'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 interface Category {
   id: number
@@ -21,18 +22,19 @@ export default function CategoriesPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [newCat, setNewCat] = useState({ name: '', name_ar: '', slug: '', emoji: '', description: '' })
   const [saving, setSaving] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/categories', { credentials: 'same-origin' })
-      .then(r => r.json())
-      .then(data => {
-        setCategories(Array.isArray(data) ? data : [])
-        setLoading(false)
-      })
-      .catch(() => {
+    setLoadError(null)
+    dashboardFetch<Category[]>('/api/dashboard/categories').then(r => {
+      if (r.ok === false) {
+        setLoadError(r.error)
         setCategories([])
-        setLoading(false)
-      })
+      } else {
+        setCategories(Array.isArray(r.data) ? r.data : [])
+      }
+      setLoading(false)
+    })
   }, [])
 
   async function addCategory() {
@@ -83,6 +85,11 @@ export default function CategoriesPage() {
 
   return (
     <div className="p-6 space-y-4">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load categories: {loadError}
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-white">Categories</h1>

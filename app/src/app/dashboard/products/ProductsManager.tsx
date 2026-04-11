@@ -2,6 +2,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Plus, Trash2, X, Check } from 'lucide-react'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 interface Product {
   id: number
@@ -44,15 +45,19 @@ export default function ProductsManager({
   const router = useRouter()
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [categories, setCategories] = useState<Category[]>(initialCategories)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/products', { credentials: 'same-origin' })
-      .then(r => r.json())
-      .then(data => {
-        if (data?.products && Array.isArray(data.products)) setProducts(data.products)
-        if (data?.categories && Array.isArray(data.categories)) setCategories(data.categories)
-      })
-      .catch(() => {})
+    setLoadError(null)
+    dashboardFetch<{ products?: Product[]; categories?: Category[] }>('/api/dashboard/products').then(r => {
+      if (r.ok === false) {
+        setLoadError(r.error)
+        return
+      }
+      const data = r.data
+      if (data?.products && Array.isArray(data.products)) setProducts(data.products)
+      if (data?.categories && Array.isArray(data.categories)) setCategories(data.categories)
+    })
   }, [])
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
@@ -172,6 +177,14 @@ export default function ProductsManager({
 
   return (
     <div className="p-6 space-y-4">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load catalog: {loadError}
+          {loadError.toLowerCase().includes('unauthorized') && (
+            <span className="block mt-1 text-red-400/90">Try signing out and signing in again.</span>
+          )}
+        </div>
+      )}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Products</h1>

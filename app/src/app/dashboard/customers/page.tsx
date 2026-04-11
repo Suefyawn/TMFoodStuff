@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, ChevronDown, ChevronUp } from 'lucide-react'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 const statusColors: Record<string, string> = {
   pending: 'text-yellow-400',
@@ -15,20 +16,21 @@ const statusColors: Record<string, string> = {
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/customers', { credentials: 'same-origin' })
-      .then(r => r.json())
-      .then(data => {
-        setCustomers(Array.isArray(data) ? data : [])
-        setLoading(false)
-      })
-      .catch(() => {
+    setLoadError(null)
+    dashboardFetch<any[]>('/api/dashboard/customers').then(r => {
+      if (r.ok === false) {
+        setLoadError(r.error)
         setCustomers([])
-        setLoading(false)
-      })
+      } else {
+        setCustomers(Array.isArray(r.data) ? r.data : [])
+      }
+      setLoading(false)
+    })
   }, [])
 
   const filtered = customers.filter(c => {
@@ -48,6 +50,11 @@ export default function CustomersPage() {
 
   return (
     <div className="p-6 space-y-4">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load customers: {loadError}
+        </div>
+      )}
       <div>
         <h1 className="text-2xl font-black text-white">Customers</h1>
         <p className="text-gray-500 text-sm">{customers.length} unique customers</p>

@@ -2,23 +2,24 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import OrderStatusUpdater from './OrderStatusUpdater'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 export default function OrderDetailClient({ orderId }: { orderId: string }) {
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch(`/api/dashboard/orders/${orderId}`, { credentials: 'same-origin' })
-      .then(r => r.json())
-      .then(data => {
-        if (data?.error) setOrder(null)
-        else setOrder(data)
-        setLoading(false)
-      })
-      .catch(() => {
+    setLoadError(null)
+    dashboardFetch<any>(`/api/dashboard/orders/${orderId}`).then(r => {
+      if (r.ok === false || !r.data || (typeof r.data === 'object' && r.data !== null && 'error' in r.data)) {
+        setLoadError(r.ok === false ? r.error : String((r.data as { error?: string })?.error || 'Not found'))
         setOrder(null)
-        setLoading(false)
-      })
+      } else {
+        setOrder(r.data)
+      }
+      setLoading(false)
+    })
   }, [orderId])
 
   if (loading) {
@@ -31,8 +32,11 @@ export default function OrderDetailClient({ orderId }: { orderId: string }) {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-gray-500">Order not found</div>
+      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-3 px-6">
+        <div className="text-gray-400 text-center">{loadError || 'Order not found'}</div>
+        <Link href="/dashboard/orders" className="text-green-400 text-sm font-semibold hover:underline">
+          Back to orders
+        </Link>
       </div>
     )
   }

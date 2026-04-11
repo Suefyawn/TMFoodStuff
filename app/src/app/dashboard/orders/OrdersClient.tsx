@@ -2,6 +2,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, X } from 'lucide-react'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
@@ -22,20 +23,14 @@ export default function OrdersClient({ initialOrders = [] }: { initialOrders?: a
 
   useEffect(() => {
     setLoadError(null)
-    fetch('/api/dashboard/orders', { credentials: 'same-origin' })
-      .then(async r => {
-        const data = await r.json()
-        if (!r.ok) {
-          setLoadError(typeof data?.error === 'string' ? data.error : `Error ${r.status}`)
-          setOrders([])
-          return
-        }
-        setOrders(Array.isArray(data) ? data : [])
-      })
-      .catch(() => {
-        setLoadError('Network error')
+    dashboardFetch<any[]>('/api/dashboard/orders').then(r => {
+      if (r.ok === false) {
+        setLoadError(r.error)
         setOrders([])
-      })
+        return
+      }
+      setOrders(Array.isArray(r.data) ? r.data : [])
+    })
   }, [])
 
   const filtered = useMemo(() => {

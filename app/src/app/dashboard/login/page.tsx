@@ -1,13 +1,11 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function DashboardLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -22,8 +20,9 @@ export default function DashboardLogin() {
     })
     
     if (res.ok) {
-      // Full navigation so Set-Cookie from the login response is applied before /dashboard loads
-      window.location.assign('/dashboard')
+      // Full navigation so Set-Cookie from the login response is applied before /dashboard loads.
+      // Cache-bust avoids Next.js prefetch hitting /dashboard before the browser stores new cookies.
+      window.location.assign(`/dashboard?signedIn=${Date.now()}`)
     } else {
       const data = await res.json().catch(() => ({}))
       setError(data?.error || 'Login failed')
