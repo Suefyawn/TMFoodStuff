@@ -1,27 +1,17 @@
 import { NextResponse } from 'next/server'
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { createDashboardSupabaseServer } from '@/lib/dashboard-supabase-server'
+import { createServerSupabaseAdmin } from '@/lib/supabase-service-role'
 
 type DashboardRole = 'owner' | 'manager' | 'admin' | 'staff'
 
-export function createServerSupabaseAdmin() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
-
-/** Supabase client scoped to the dashboard user's JWT (respects RLS as that user). */
-export function createServerSupabaseForUser(accessToken: string): SupabaseClient {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  return createClient(url, anon, {
-    global: { headers: { Authorization: `Bearer ${accessToken}` } },
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-  })
-}
+export { createServerSupabaseAdmin } from '@/lib/supabase-service-role'
 
 export type DashboardSession = {
   user: { id: string; email?: string }
   role: DashboardRole
-  accessToken: string
+  /** Cookie-backed client; use this for dashboard reads/writes under RLS. */
+  supabase: SupabaseClient
 }
 
 async function getDashboardSession(): Promise<DashboardSession | null> {
@@ -32,12 +22,6 @@ async function getDashboardSession(): Promise<DashboardSession | null> {
   } = await supabase.auth.getUser()
   if (userError || !user) return null
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const accessToken = session?.access_token
-  if (!accessToken) return null
-
   const admin = createServerSupabaseAdmin()
   const { data: profile, error: profileError } = await admin
     .from('profiles')
@@ -46,7 +30,7 @@ async function getDashboardSession(): Promise<DashboardSession | null> {
     .maybeSingle()
 
   if (!profileError && profile?.is_active) {
-    return { user, role: profile.role as DashboardRole, accessToken }
+    return { user, role: profile.role as DashboardRole, supabase }
   }
 
   const { data: adminUser, error: adminError } = await admin
@@ -56,7 +40,7 @@ async function getDashboardSession(): Promise<DashboardSession | null> {
     .maybeSingle()
 
   if (adminError || !adminUser || !adminUser.is_active) return null
-  return { user, role: adminUser.role as DashboardRole, accessToken }
+  return { user, role: adminUser.role as DashboardRole, supabase }
 }
 
 async function requireDashboardAuthWithRole(requiredRole?: DashboardRole) {
@@ -89,7 +73,7 @@ export async function requireDashboardStaff() {
   return requireDashboardRole('staff')
 }
 
-/** @deprecated Use createDashboardSupabaseServer() — cookie names are project-scoped. */
+/** @deprecated Legacy cookie names — use createDashboardSupabaseServer(). */
 export const dashboardCookieNames = {
   access: 'sb-access-token',
   refresh: 'sb-refresh-token',

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseForUser, requireDashboardStaff } from '@/lib/dashboard-auth'
+import { requireDashboardStaff } from '@/lib/dashboard-auth'
 
 export async function GET() {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
   const { data, error } = await supabase.from('categories').select('*').order('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const body = await request.json()
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   const { data, error } = await supabase.from('categories').insert({
     name: body.name,
@@ -32,7 +32,7 @@ export async function PUT(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { id, ...updates } = await request.json()
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   const { error } = await supabase.from('categories').update(updates).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -43,7 +43,7 @@ export async function DELETE(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { id } = await request.json()
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   const { error } = await supabase.from('categories').delete().eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

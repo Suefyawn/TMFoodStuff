@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseForUser, requireDashboardStaff } from '@/lib/dashboard-auth'
+import { requireDashboardStaff } from '@/lib/dashboard-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -7,7 +7,7 @@ export async function GET() {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
 
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   const now = new Date()
   const today = new Date(now); today.setHours(0,0,0,0)

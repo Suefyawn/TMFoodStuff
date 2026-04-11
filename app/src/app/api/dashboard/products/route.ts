@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createServerSupabaseForUser, requireDashboardStaff } from '@/lib/dashboard-auth'
+import { requireDashboardStaff } from '@/lib/dashboard-auth'
 
 async function syncPrimaryProductImage(supabase: SupabaseClient, productId: number, imageUrl: string | null | undefined) {
   if (!imageUrl) return
@@ -13,7 +13,7 @@ export async function PATCH(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { id, ...updates } = await request.json()
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   const dbUpdates: any = { updated_at: new Date().toISOString() }
   if (updates.priceAED !== undefined) dbUpdates.price_aed = updates.priceAED
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const body = await request.json()
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   const { data, error } = await supabase.from('products').insert({
     name: body.name,
@@ -78,7 +78,7 @@ export async function DELETE(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { ids } = await request.json()
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   const idList = Array.isArray(ids) ? ids : [ids]
   const { error } = await supabase.from('products').delete().in('id', idList.map(Number))

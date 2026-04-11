@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerSupabaseForUser, requireDashboardAuth } from '@/lib/dashboard-auth'
+import { requireDashboardAuth } from '@/lib/dashboard-auth'
 
 // Default settings
 const DEFAULTS: Record<string, string> = {
@@ -15,7 +15,7 @@ const DEFAULTS: Record<string, string> = {
 export async function GET() {
   const auth = await requireDashboardAuth()
   if (!auth.ok) return auth.response
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   // Try to read from settings table; fall back to defaults
   const { data, error } = await supabase.from('settings').select('*')
@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
   if (!auth.ok) return auth.response
 
   const { settings, promoCodes } = await request.json()
-  const supabase = createServerSupabaseForUser(auth.session.accessToken)
+  const supabase = auth.session.supabase
 
   // Upsert settings
   if (settings) {
