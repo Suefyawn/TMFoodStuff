@@ -32,8 +32,9 @@ export default function Footer() {
         href="https://wa.me/971544408411?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        className="fixed z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 focus-ring end-4 bottom-[var(--fab-bottom-mobile)] md:bottom-[var(--fab-bottom-desktop)] md:end-6"
         title={tr.whatsappUs}
+        aria-label={tr.whatsappUs}
       >
         <MessageCircle size={26} fill="currentColor" />
       </a>
@@ -144,10 +145,13 @@ export default function Footer() {
                 <span className="bg-blue-600 text-white text-xs font-black px-3 py-1.5 rounded-lg">VISA</span>
                 <span className="bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-lg">MC</span>
                 <span className="inline-flex items-center gap-1 bg-gray-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
-                  <CreditCard size={12} /> COD
+                  <CreditCard size={12} /> {tr.codLabel}
                 </span>
-                <span className="inline-flex items-center gap-1 bg-green-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
-                  <Smartphone size={12} /> Pay
+                <span className="inline-flex items-center gap-1 bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg" title={tr.payWithCard}>
+                  <CreditCard size={12} /> {tr.payWithCard}
+                </span>
+                <span className="inline-flex items-center gap-1 bg-black text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+                  <Smartphone size={12} /> {tr.applePayLabel}
                 </span>
               </div>
             </div>

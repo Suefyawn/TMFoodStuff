@@ -13,6 +13,9 @@ export const t = {
     search: 'Search products...',
     // Hero
     heroTag: 'Free delivery on first order · Use code: FRESH10',
+    homePromoMobile: 'Free delivery · Code: FRESH10',
+    homePromoDesktop:
+      'Free delivery on your first order with FRESH10 · Same-day delivery in most UAE areas (2–4 hours where available)',
     heroTitle1: 'Farm Fresh',
     heroTitle2: 'To Your Door',
     heroSubtitle: 'Premium fruits & vegetables sourced daily from the world\'s best farms. Delivered fresh across all UAE emirates.',
@@ -20,7 +23,8 @@ export const t = {
     browseFruits: 'Browse Fruits',
     // Trust
     farmFresh: 'Farm Fresh Daily',
-    fastDelivery: '2-4 Hour Delivery',
+    fastDelivery: 'Same-day delivery',
+    fastDeliverySub: '2–4 hours in major metros, where routes allow',
     secureCheckout: 'Secure Checkout',
     whatsappUpdates: 'WhatsApp Updates',
     // Shop
@@ -30,6 +34,8 @@ export const t = {
     productsFound: 'products found',
     outOfStock: 'Out of Stock',
     addToCart: 'Add to Cart',
+    addShort: 'Add',
+    addedToCart: 'added to cart',
     // Cart
     yourCart: 'Your Cart',
     cartEmpty: 'Your cart is empty',
@@ -44,6 +50,10 @@ export const t = {
     proceedCheckout: 'Proceed to Checkout',
     continueShopping: 'Continue Shopping',
     freeDeliveryNote: 'Free delivery on all orders during our launch period!',
+    orderSummary: 'Order Summary',
+    launchOfferTitle: 'Launch offer',
+    launchOfferBody: 'Free delivery site-wide · Extra savings on your first order with FRESH10',
+    itemsWord: 'items',
     // Checkout
     checkout: 'Checkout',
     deliveryDetails: 'Delivery Details',
@@ -68,7 +78,6 @@ export const t = {
     expiryDate: 'Expiry Date',
     cvv: 'CVV',
     cardNote: '⚠️ For COD orders, your card will only be charged if you are unavailable at delivery time.',
-    orderSummary: 'Order Summary',
     placeOrder: 'Place Order',
     secureNote: 'Secure checkout · All prices include 5% UAE VAT',
     promoCode: 'Promo Code',
@@ -90,6 +99,28 @@ export const t = {
     subscribe: 'Subscribe',
     subscribed: 'You\'re subscribed!',
     whatsappUs: 'WhatsApp Us',
+    toggleMenu: 'Toggle menu',
+    searchSubmit: 'Search',
+    backToShop: 'Back to Shop',
+    breadcrumb: 'Breadcrumb',
+    breadcrumbHome: 'Home',
+    breadcrumbShop: 'Shop',
+    perUnit: 'per',
+    priceIncludesVat: 'Price includes 5% UAE VAT',
+    inStock: 'In stock',
+    onlyLeft: 'Only {n} left',
+    originLabel: 'Origin:',
+    certifiedOrganic: 'Certified organic',
+    soldPer: 'Sold per',
+    deliveryWindowProduct: 'Same-day delivery in most UAE areas (2–4 hours where available)',
+    moreInCategory: 'More in {category}',
+    organicBadge: '🌱 Organic',
+    featuredBadge: '⭐ Featured',
+    payWithCard: 'Visa & Mastercard',
+    codLabel: 'Cash on delivery',
+    applePayLabel: 'Apple Pay',
+    whyFastDelivery:
+      'Same-day delivery across the UAE where routes allow; typical window 2–4 hours in major metros.',
   },
   ar: {
     // Nav
@@ -103,6 +134,9 @@ export const t = {
     search: 'ابحث عن المنتجات...',
     // Hero
     heroTag: 'توصيل مجاني على أول طلب · استخدم كود: FRESH10',
+    homePromoMobile: 'توصيل مجاني · كود: FRESH10',
+    homePromoDesktop:
+      'توصيل مجاني على أول طلب مع FRESH10 · توصيل في نفس اليوم في معظم مناطق الإمارات (٢–٤ ساعات حيث يتوفر)',
     heroTitle1: 'طازج من المزرعة',
     heroTitle2: 'إلى بابك',
     heroSubtitle: 'فواكه وخضروات فاخرة يتم جلبها يومياً من أفضل المزارع حول العالم. توصيل طازج في جميع أنحاء الإمارات.',
@@ -110,7 +144,8 @@ export const t = {
     browseFruits: 'تصفح الفواكه',
     // Trust
     farmFresh: 'طازج من المزرعة يومياً',
-    fastDelivery: 'توصيل خلال ٢-٤ ساعات',
+    fastDelivery: 'توصيل في نفس اليوم',
+    fastDeliverySub: '٢–٤ ساعات في المدن الرئيسية حيث يتوفر المسار',
     secureCheckout: 'دفع آمن',
     whatsappUpdates: 'تحديثات واتساب',
     // Shop
@@ -120,6 +155,8 @@ export const t = {
     productsFound: 'منتج',
     outOfStock: 'نفد المخزون',
     addToCart: 'أضف للسلة',
+    addShort: 'أضف',
+    addedToCart: 'تمت الإضافة للسلة',
     // Cart
     yourCart: 'سلة التسوق',
     cartEmpty: 'سلة التسوق فارغة',
@@ -134,6 +171,10 @@ export const t = {
     proceedCheckout: 'متابعة للدفع',
     continueShopping: 'مواصلة التسوق',
     freeDeliveryNote: 'توصيل مجاني على جميع الطلبات خلال فترة الإطلاق!',
+    orderSummary: 'ملخص الطلب',
+    launchOfferTitle: 'عرض الإطلاق',
+    launchOfferBody: 'توصيل مجاني على الموقع · وفّر أكثر على أول طلب مع FRESH10',
+    itemsWord: 'عناصر',
     // Checkout
     checkout: 'الدفع',
     deliveryDetails: 'تفاصيل التوصيل',
@@ -158,7 +199,6 @@ export const t = {
     expiryDate: 'تاريخ الانتهاء',
     cvv: 'الرمز الأمني',
     cardNote: '⚠️ لطلبات الدفع عند الاستلام، ستُخصم البطاقة فقط إذا لم تكن متاحاً عند التوصيل.',
-    orderSummary: 'ملخص الطلب',
     placeOrder: 'تأكيد الطلب',
     secureNote: 'دفع آمن · جميع الأسعار تشمل ضريبة القيمة المضافة ٥٪',
     promoCode: 'كود الخصم',
@@ -180,5 +220,27 @@ export const t = {
     subscribe: 'اشترك',
     subscribed: 'تم الاشتراك!',
     whatsappUs: 'واتساب',
+    toggleMenu: 'فتح القائمة',
+    searchSubmit: 'بحث',
+    backToShop: 'العودة للتسوق',
+    breadcrumb: 'مسار التنقل',
+    breadcrumbHome: 'الرئيسية',
+    breadcrumbShop: 'المتجر',
+    perUnit: 'لكل',
+    priceIncludesVat: 'السعر يشمل ضريبة القيمة المضافة ٥٪',
+    inStock: 'متوفر',
+    onlyLeft: 'تبقى {n} فقط',
+    originLabel: 'المنشأ:',
+    certifiedOrganic: 'عضوي معتمد',
+    soldPer: 'يُباع لكل',
+    deliveryWindowProduct: 'توصيل في نفس اليوم في معظم مناطق الإمارات (٢–٤ ساعات حيث يتوفر)',
+    moreInCategory: 'المزيد من {category}',
+    organicBadge: '🌱 عضوي',
+    featuredBadge: '⭐ مميز',
+    payWithCard: 'فيزا وماستركارد',
+    codLabel: 'الدفع عند الاستلام',
+    applePayLabel: 'Apple Pay',
+    whyFastDelivery:
+      'توصيل في نفس اليوم في الإمارات حيث يتوفر المسار؛ عادةً خلال ٢–٤ ساعات في المدن الرئيسية.',
   }
 }

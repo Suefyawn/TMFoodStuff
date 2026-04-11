@@ -21,7 +21,12 @@ export default function MobileNav() {
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-lg z-50 safe-area-pb">
       <div className="grid grid-cols-4 h-16">
         {links.map(({ href, icon: Icon, label, badge }) => {
-          const isActive = pathname === href || (href !== '/' && href !== '#' && pathname.startsWith(href))
+          const isActive =
+            href === '/'
+              ? pathname === '/'
+              : href === '/shop'
+                ? pathname === '/shop' || pathname.startsWith('/shop')
+                : pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <Link
               key={href}
