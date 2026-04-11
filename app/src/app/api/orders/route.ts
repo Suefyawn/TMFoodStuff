@@ -6,9 +6,11 @@ const WHATSAPP_NUMBER = '971544408411'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot } = body
+    const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot, idempotencyKey } = body
 
     const orderNumber = `TM-${Date.now().toString(36).toUpperCase().slice(-6)}`
+    const idemHeader = request.headers.get('x-idempotency-key') || request.headers.get('Idempotency-Key')
+    const idem = (typeof idempotencyKey === 'string' && idempotencyKey.trim()) || (idemHeader && idemHeader.trim()) || null
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -60,17 +62,21 @@ export async function POST(request: Request) {
     const { data: createdRows, error: rpcError } = await supabase.rpc('create_checkout_order', {
       p_order: orderPayload,
       p_items: itemsPayload,
+      p_idempotency_key: idem,
     })
 
     if (rpcError) throw rpcError
     if (!createdRows?.length) throw new Error('Failed to create order')
+
+    const created = createdRows[0] as any
+    const finalOrderNumber = created?.order_number || orderNumber
 
     // WhatsApp message
     const itemsList = items.map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`).join('\n')
     const slotMap: Record<string, string> = { morning: '8AM-12PM', afternoon: '12PM-5PM', evening: '5PM-10PM' }
 
     const waMessage = encodeURIComponent(
-      `🛒 NEW ORDER #${orderNumber}\n` +
+      `🛒 NEW ORDER #${finalOrderNumber}\n` +
       `━━━━━━━━━━━━━━━\n` +
       `👤 ${form.fullName}\n` +
       `📞 ${form.phone}\n` +
@@ -87,7 +93,7 @@ export async function POST(request: Request) {
       (form.notes ? `📝 Notes: ${form.notes}` : '')
     )
 
-    return NextResponse.json({ success: true, orderNumber, waMessage, waNumber: WHATSAPP_NUMBER })
+    return NextResponse.json({ success: true, orderNumber: finalOrderNumber, waMessage, waNumber: WHATSAPP_NUMBER })
   } catch (error: any) {
     console.error('Order error:', error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })

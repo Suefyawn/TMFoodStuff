@@ -1,9 +1,10 @@
--- Atomic checkout: orders + order_items + stock decrement
+-- Atomic checkout: orders + order_items + stock decrement + optional idempotency
 -- Aggregates duplicate cart lines per product_id before locking rows
 -- Validates unit prices against products.price_aed, validates totals, validates promo against promo_codes
+-- Tracks inventory movement flags on orders for safe cancel restocking
 -- Does NOT write legacy orders.items JSON
 
-create or replace function public.create_checkout_order(p_order jsonb, p_items jsonb)
+create or replace function public.create_checkout_order(p_order jsonb, p_items jsonb, p_idempotency_key text default null)
 returns table (id integer, order_number text)
 language plpgsql
 security definer
@@ -40,7 +41,26 @@ declare
   v_expected_promo_discount numeric := 0;
 
   r record;
+
+  v_existing_order_id integer;
 begin
+  if p_idempotency_key is not null and length(trim(p_idempotency_key)) > 0 then
+    select oik.order_id into v_existing_order_id
+    from public.order_idempotency_keys oik
+    where oik.idempotency_key = trim(p_idempotency_key)
+    limit 1;
+
+    if v_existing_order_id is not null then
+      select o.id, o.order_number into v_order_id, v_order_number
+      from public.orders o
+      where o.id = v_existing_order_id
+      limit 1;
+
+      return query select v_order_id, v_order_number;
+      return;
+    end if;
+  end if;
+
   if p_order is null then
     raise exception 'p_order is required';
   end if;
@@ -201,7 +221,9 @@ begin
     promo_discount_aed,
     total,
     total_aed,
-    placed_at
+    placed_at,
+    inventory_decremented,
+    inventory_restocked
   )
   values (
     (p_order->>'order_number')::text,
@@ -228,7 +250,9 @@ begin
     v_promo_discount,
     v_total,
     v_total,
-    coalesce((p_order->>'placed_at')::timestamptz, timezone('utc', now()))
+    coalesce((p_order->>'placed_at')::timestamptz, timezone('utc', now())),
+    false,
+    false
   )
   returning public.orders.id, public.orders.order_number into v_order_id, v_order_number;
 
@@ -268,8 +292,32 @@ begin
     where id = v_pid;
   end loop;
 
+  update public.orders
+  set inventory_decremented = true,
+      updated_at = timezone('utc', now())
+  where id = v_order_id;
+
+  if p_idempotency_key is not null and length(trim(p_idempotency_key)) > 0 then
+    insert into public.order_idempotency_keys (idempotency_key, order_id)
+    values (trim(p_idempotency_key), v_order_id)
+    on conflict (idempotency_key) do nothing;
+  end if;
+
   return query select v_order_id, v_order_number;
 end;
+$$;
+
+revoke all on function public.create_checkout_order(jsonb, jsonb, text) from public;
+grant execute on function public.create_checkout_order(jsonb, jsonb, text) to service_role;
+
+-- Backwards-compatible wrapper (older callers)
+create or replace function public.create_checkout_order(p_order jsonb, p_items jsonb)
+returns table (id integer, order_number text)
+language sql
+security definer
+set search_path = public
+as $$
+  select * from public.create_checkout_order(p_order, p_items, null::text);
 $$;
 
 revoke all on function public.create_checkout_order(jsonb, jsonb) from public;

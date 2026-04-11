@@ -88,9 +88,17 @@ export default function CheckoutPage() {
     setIsSubmitting(true)
 
     try {
+      const idempotencyKey =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `idem_${Date.now()}_${Math.random().toString(16).slice(2)}`
+
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': idempotencyKey,
+        },
         body: JSON.stringify({
           form,
           items,
