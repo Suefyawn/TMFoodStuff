@@ -15,15 +15,6 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const legacyItems = items.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      price_aed: item.priceAED,
-      subtotal: item.priceAED * item.quantity,
-      unit: item.unit || 'kg',
-    }))
-
     const orderPayload = {
       order_number: orderNumber,
       status: 'pending',
@@ -50,7 +41,6 @@ export async function POST(request: Request) {
       total,
       total_aed: total,
       placed_at: new Date().toISOString(),
-      items: legacyItems,
     }
 
     const itemsPayload = items.map((item: any) => ({

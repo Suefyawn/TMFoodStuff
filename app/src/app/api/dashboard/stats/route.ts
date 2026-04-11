@@ -22,7 +22,6 @@ export async function GET() {
     { data: recentOrders },
     { data: lowStockProducts },
     { data: weeklyOrders },
-    { data: recentOrderItems },
   ] = await Promise.all([
     supabase.from('products').select('*', { count: 'exact', head: true }),
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true),
@@ -31,7 +30,6 @@ export async function GET() {
     supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(5),
     supabase.from('products').select('id, name, stock, emoji').eq('is_active', true).lt('stock', 10).order('stock'),
     supabase.from('orders').select('id, total, total_aed, status, created_at').gte('created_at', weekAgo.toISOString()),
-    supabase.from('order_items').select('order_id, product_id, product_name, quantity, unit_price_aed, subtotal_aed'),
   ])
 
   // Revenue calculations
@@ -63,12 +61,18 @@ export async function GET() {
     statusCounts[o.status || 'pending'] = (statusCounts[o.status || 'pending'] || 0) + 1
   }
 
-  // Top selling (prefer normalized order_items; fallback to legacy orders.items)
+  // Top selling from normalized order_items for recent orders
   const productSales: Record<string, { name: string, qty: number, revenue: number }> = {}
 
-  const items = (recentOrderItems || []).length
-    ? (recentOrderItems as any[])
-    : (recentOrders || []).flatMap((o: any) => Array.isArray(o.items) ? o.items.map((it: any) => ({ ...it, order_id: o.id })) : [])
+  const weeklyIds = (weeklyOrders || []).map((o: any) => o.id).filter(Boolean)
+  const { data: weeklyOrderItems } = weeklyIds.length
+    ? await supabase
+      .from('order_items')
+      .select('order_id, product_id, product_name, quantity, unit_price_aed, subtotal_aed')
+      .in('order_id', weeklyIds)
+    : { data: [] as any[] }
+
+  const items = (weeklyOrderItems || []) as any[]
 
   for (const item of items) {
     const name = item.product_name || item.name || 'Unknown'

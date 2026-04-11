@@ -11,7 +11,6 @@ async function getOrders() {
   const ids = list.map((o: any) => o.id).filter(Boolean)
   if (ids.length === 0) return list
 
-  // Prefer normalized order_items, fallback to legacy orders.items array if empty.
   const { data: orderItems } = await supabase
     .from('order_items')
     .select('order_id, quantity')
@@ -25,7 +24,6 @@ async function getOrders() {
 
   return list.map((o: any) => {
     const countFromItems = counts.get(Number(o.id))
-    const legacyCount = Array.isArray(o.items) ? o.items.length : 0
     return {
       ...o,
       customer_name: o.customer_full_name || o.customer_name,
@@ -34,7 +32,7 @@ async function getOrders() {
       vat: o.vat_aed ?? o.vat,
       promo_discount: o.promo_discount_aed ?? o.promo_discount,
       delivery_fee: o.delivery_fee_aed ?? o.delivery_fee,
-      item_count: countFromItems ?? legacyCount,
+      item_count: countFromItems ?? 0,
     }
   })
 }

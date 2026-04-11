@@ -84,7 +84,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
               </thead>
               <tbody className="divide-y divide-gray-800">
                 {filtered.map((order: any) => {
-                  const itemsCount = Number(order.item_count ?? (order.items ? order.items.length : 0)) || 0
+                  const itemsCount = Number(order.item_count ?? 0) || 0
                   const waText = encodeURIComponent(`Hi ${order.customer_name}, your TMFoodStuff order #${order.order_number} `)
                   return (
                     <tr key={order.id} className="hover:bg-gray-800/30 transition-colors">

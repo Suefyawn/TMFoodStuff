@@ -1,5 +1,6 @@
 -- Atomic checkout order creation (orders + order_items)
--- Applied to Supabase as migration: create_checkout_order_rpc
+-- Validates subtotal/VAT/delivery/total and unit prices against public.products
+-- Does NOT write legacy orders.items JSON
 
 create or replace function public.create_checkout_order(p_order jsonb, p_items jsonb)
 returns table (id integer, order_number text)
@@ -11,6 +12,29 @@ declare
   v_order_id integer;
   v_order_number text;
   v_item jsonb;
+
+  v_subtotal numeric := 0;
+  v_vat numeric := 0;
+  v_delivery_fee numeric := 0;
+  v_total numeric := 0;
+
+  v_client_subtotal numeric;
+  v_client_vat numeric;
+  v_client_delivery_fee numeric;
+  v_client_promo_discount numeric;
+  v_client_total numeric;
+
+  v_promo_code text;
+  v_promo_discount numeric := 0;
+
+  v_payment_method text;
+
+  v_pid integer;
+  v_qty integer;
+  v_unit_price numeric;
+  v_db_price numeric;
+
+  v_expected_promo_discount numeric := 0;
 begin
   if p_order is null then
     raise exception 'p_order is required';
@@ -18,6 +42,94 @@ begin
 
   if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
     raise exception 'p_items must be a non-empty json array';
+  end if;
+
+  v_client_subtotal := (p_order->>'subtotal')::numeric;
+  v_client_vat := (p_order->>'vat')::numeric;
+  v_client_delivery_fee := (p_order->>'delivery_fee')::numeric;
+  v_client_promo_discount := coalesce((p_order->>'promo_discount')::numeric, 0);
+  v_client_total := (p_order->>'total')::numeric;
+
+  v_promo_code := coalesce(nullif(trim((p_order->>'promo_code')::text), ''), '');
+  v_payment_method := lower(coalesce((p_order->>'payment_method')::text, 'cod'));
+
+  if v_payment_method not in ('cod', 'telr') then
+    raise exception 'invalid payment_method';
+  end if;
+
+  for v_item in select * from jsonb_array_elements(p_items)
+  loop
+    v_pid := case
+      when (v_item ? 'product_id') and (v_item->>'product_id') is not null and (v_item->>'product_id') <> ''
+        then (v_item->>'product_id')::integer
+      when (v_item ? 'id') and (v_item->>'id') is not null and (v_item->>'id') <> '' and (v_item->>'id') ~ '^[0-9]+$'
+        then (v_item->>'id')::integer
+      else null
+    end;
+
+    v_qty := greatest(coalesce((v_item->>'quantity')::integer, 1), 1);
+
+    if v_pid is null then
+      raise exception 'invalid product id';
+    end if;
+
+    select p.price_aed into v_db_price
+    from public.products p
+    where p.id = v_pid
+      and coalesce(p.is_active, true) = true
+    limit 1;
+
+    if v_db_price is null then
+      raise exception 'unknown or inactive product: %', v_pid;
+    end if;
+
+    v_unit_price := coalesce(
+      (v_item->>'unit_price_aed')::numeric,
+      (v_item->>'price_aed')::numeric,
+      (v_item->>'priceAED')::numeric
+    );
+
+    if abs(v_unit_price - v_db_price) > 0.02 then
+      raise exception 'price mismatch for product %', v_pid;
+    end if;
+
+    v_subtotal := v_subtotal + (v_db_price * v_qty);
+  end loop;
+
+  v_vat := round(v_subtotal * 0.05, 2);
+  v_delivery_fee := 0;
+
+  if v_promo_code <> '' then
+    if upper(v_promo_code) <> 'FRESH10' then
+      raise exception 'invalid promo code';
+    end if;
+
+    v_expected_promo_discount := round(v_subtotal * 0.10, 2);
+    if abs(v_client_promo_discount - v_expected_promo_discount) > 0.02 then
+      raise exception 'promo discount mismatch';
+    end if;
+
+    v_promo_discount := v_expected_promo_discount;
+  else
+    if v_client_promo_discount <> 0 then
+      raise exception 'promo discount without promo code';
+    end if;
+    v_promo_discount := 0;
+  end if;
+
+  v_total := round(v_subtotal + v_vat + v_delivery_fee - v_promo_discount, 2);
+
+  if abs(v_client_subtotal - v_subtotal) > 0.02 then
+    raise exception 'subtotal mismatch';
+  end if;
+  if abs(v_client_vat - v_vat) > 0.02 then
+    raise exception 'vat mismatch';
+  end if;
+  if abs(v_client_delivery_fee - v_delivery_fee) > 0.02 then
+    raise exception 'delivery fee mismatch';
+  end if;
+  if abs(v_client_total - v_total) > 0.02 then
+    raise exception 'total mismatch';
   end if;
 
   insert into public.orders (
@@ -45,13 +157,12 @@ begin
     promo_discount_aed,
     total,
     total_aed,
-    placed_at,
-    items
+    placed_at
   )
   values (
     (p_order->>'order_number')::text,
     coalesce((p_order->>'status')::text, 'pending'),
-    coalesce((p_order->>'payment_method')::text, 'cod'),
+    v_payment_method,
     (p_order->>'customer_name')::text,
     (p_order->>'customer_full_name')::text,
     (p_order->>'customer_phone')::text,
@@ -62,24 +173,39 @@ begin
     coalesce((p_order->>'delivery_makani')::text, ''),
     (p_order->>'delivery_slot')::text,
     coalesce((p_order->>'delivery_notes')::text, ''),
-    (p_order->>'subtotal')::numeric,
-    (p_order->>'subtotal_aed')::numeric,
-    (p_order->>'vat')::numeric,
-    (p_order->>'vat_aed')::numeric,
-    (p_order->>'delivery_fee')::numeric,
-    (p_order->>'delivery_fee_aed')::numeric,
-    coalesce((p_order->>'promo_code')::text, ''),
-    (p_order->>'promo_discount')::numeric,
-    (p_order->>'promo_discount_aed')::numeric,
-    (p_order->>'total')::numeric,
-    (p_order->>'total_aed')::numeric,
-    coalesce((p_order->>'placed_at')::timestamptz, timezone('utc', now())),
-    p_order->'items'
+    v_subtotal,
+    v_subtotal,
+    v_vat,
+    v_vat,
+    v_delivery_fee,
+    v_delivery_fee,
+    v_promo_code,
+    v_promo_discount,
+    v_promo_discount,
+    v_total,
+    v_total,
+    coalesce((p_order->>'placed_at')::timestamptz, timezone('utc', now()))
   )
   returning public.orders.id, public.orders.order_number into v_order_id, v_order_number;
 
   for v_item in select * from jsonb_array_elements(p_items)
   loop
+    v_pid := case
+      when (v_item ? 'product_id') and (v_item->>'product_id') is not null and (v_item->>'product_id') <> ''
+        then (v_item->>'product_id')::integer
+      when (v_item ? 'id') and (v_item->>'id') is not null and (v_item->>'id') <> '' and (v_item->>'id') ~ '^[0-9]+$'
+        then (v_item->>'id')::integer
+      else null
+    end;
+
+    v_qty := greatest(coalesce((v_item->>'quantity')::integer, 1), 1);
+
+    select p.price_aed into v_db_price
+    from public.products p
+    where p.id = v_pid
+      and coalesce(p.is_active, true) = true
+    limit 1;
+
     insert into public.order_items (
       order_id,
       product_id,
@@ -91,23 +217,12 @@ begin
     )
     values (
       v_order_id,
-      case
-        when (v_item ? 'product_id') and (v_item->>'product_id') is not null and (v_item->>'product_id') <> ''
-          then (v_item->>'product_id')::integer
-        when (v_item ? 'id') and (v_item->>'id') is not null and (v_item->>'id') <> '' and (v_item->>'id') ~ '^[0-9]+$'
-          then (v_item->>'id')::integer
-        else null
-      end,
+      v_pid,
       coalesce((v_item->>'product_name')::text, (v_item->>'name')::text, 'Unknown item'),
-      greatest(coalesce((v_item->>'quantity')::integer, 1), 1),
+      v_qty,
       coalesce((v_item->>'unit')::text, 'kg'),
-      coalesce((v_item->>'unit_price_aed')::numeric, (v_item->>'price_aed')::numeric, (v_item->>'priceAED')::numeric, 0),
-      coalesce(
-        (v_item->>'subtotal_aed')::numeric,
-        (v_item->>'subtotal')::numeric,
-        coalesce((v_item->>'unit_price_aed')::numeric, (v_item->>'price_aed')::numeric, (v_item->>'priceAED')::numeric, 0)
-          * greatest(coalesce((v_item->>'quantity')::integer, 1), 1)
-      )
+      v_db_price,
+      round(v_db_price * v_qty, 2)
     );
   end loop;
 

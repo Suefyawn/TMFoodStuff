@@ -33,7 +33,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const waMsg = encodeURIComponent(
     `Hi ${(order.customer_full_name || order.customer_name) || ''}! Your TMFoodStuff order #${order.order_number} has been confirmed. We'll deliver during your ${order.delivery_slot || 'selected'} slot. Thank you! 🥦`
   )
-  const items = (order as any)._items?.length ? (order as any)._items : (order.items || [])
+  const items = (order as any)._items || []
 
   return (
     <div className="min-h-screen bg-gray-950">
