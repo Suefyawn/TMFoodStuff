@@ -24,60 +24,56 @@ export async function POST(request: Request) {
       unit: item.unit || 'kg',
     }))
 
-    // Write canonical order row with normalized *_aed columns.
-    // Keep legacy columns/items populated temporarily for compatibility.
-    const { data: createdOrder, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        order_number: orderNumber,
-        status: 'pending',
-        payment_method: paymentMethod || 'cod',
-        customer_name: form.fullName,
-        customer_full_name: form.fullName,
-        customer_phone: form.phone,
-        customer_email: form.email || '',
-        delivery_emirate: form.emirate,
-        delivery_area: form.area,
-        delivery_building: form.building || '',
-        delivery_makani: form.makani || '',
-        delivery_slot: deliverySlot,
-        delivery_notes: form.notes || '',
-        subtotal,
-        subtotal_aed: subtotal,
-        vat,
-        vat_aed: vat,
-        delivery_fee: deliveryFee || 0,
-        delivery_fee_aed: deliveryFee || 0,
-        promo_code: promoCode || '',
-        promo_discount: promoDiscount || 0,
-        promo_discount_aed: promoDiscount || 0,
-        total,
-        total_aed: total,
-        placed_at: new Date().toISOString(),
-        items: legacyItems,
-      })
-      .select('id')
-      .single()
+    const orderPayload = {
+      order_number: orderNumber,
+      status: 'pending',
+      payment_method: paymentMethod || 'cod',
+      customer_name: form.fullName,
+      customer_full_name: form.fullName,
+      customer_phone: form.phone,
+      customer_email: form.email || '',
+      delivery_emirate: form.emirate,
+      delivery_area: form.area,
+      delivery_building: form.building || '',
+      delivery_makani: form.makani || '',
+      delivery_slot: deliverySlot,
+      delivery_notes: form.notes || '',
+      subtotal,
+      subtotal_aed: subtotal,
+      vat,
+      vat_aed: vat,
+      delivery_fee: deliveryFee || 0,
+      delivery_fee_aed: deliveryFee || 0,
+      promo_code: promoCode || '',
+      promo_discount: promoDiscount || 0,
+      promo_discount_aed: promoDiscount || 0,
+      total,
+      total_aed: total,
+      placed_at: new Date().toISOString(),
+      items: legacyItems,
+    }
 
-    if (orderError || !createdOrder) throw orderError || new Error('Failed to create order')
-
-    const orderId = Number(createdOrder.id)
-    const orderItemsPayload = items.map((item: any) => ({
-      order_id: orderId,
+    const itemsPayload = items.map((item: any) => ({
+      id: item.id,
       product_id: Number.isFinite(Number(item.id)) ? Number(item.id) : null,
       product_name: item.name,
+      name: item.name,
       quantity: Number(item.quantity) || 1,
       unit: item.unit || 'kg',
       unit_price_aed: Number(item.priceAED) || 0,
+      price_aed: Number(item.priceAED) || 0,
+      priceAED: Number(item.priceAED) || 0,
       subtotal_aed: (Number(item.priceAED) || 0) * (Number(item.quantity) || 1),
+      subtotal: (Number(item.priceAED) || 0) * (Number(item.quantity) || 1),
     }))
 
-    const { error: itemError } = await supabase.from('order_items').insert(orderItemsPayload)
-    if (itemError) {
-      // Best-effort rollback to avoid orphaned orders when items insert fails.
-      await supabase.from('orders').delete().eq('id', orderId)
-      throw itemError
-    }
+    const { data: createdRows, error: rpcError } = await supabase.rpc('create_checkout_order', {
+      p_order: orderPayload,
+      p_items: itemsPayload,
+    })
+
+    if (rpcError) throw rpcError
+    if (!createdRows?.length) throw new Error('Failed to create order')
 
     // WhatsApp message
     const itemsList = items.map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`).join('\n')
