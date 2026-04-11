@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, X } from 'lucide-react'
 
@@ -14,12 +14,22 @@ const statusColors: Record<string, string> = {
 
 const statuses = ['', 'pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 
-export default function OrdersClient({ initialOrders }: { initialOrders: any[] }) {
+export default function OrdersClient({ initialOrders = [] }: { initialOrders?: any[] }) {
+  const [orders, setOrders] = useState<any[]>(initialOrders)
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
 
+  useEffect(() => {
+    fetch('/api/dashboard/orders', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        setOrders(Array.isArray(data) ? data : [])
+      })
+      .catch(() => setOrders([]))
+  }, [])
+
   const filtered = useMemo(() => {
-    return initialOrders.filter(o => {
+    return orders.filter(o => {
       if (filterStatus && o.status !== filterStatus) return false
       if (search) {
         const q = search.toLowerCase()
@@ -31,7 +41,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       }
       return true
     })
-  }, [initialOrders, search, filterStatus])
+  }, [orders, search, filterStatus])
 
   // Revenue summary
   const totalRevenue = filtered.reduce((s, o) => s + (o.total || 0), 0)
@@ -42,7 +52,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Orders</h1>
-          <p className="text-gray-500 text-sm">{filtered.length} of {initialOrders.length} orders · Revenue: AED {totalRevenue.toFixed(2)}</p>
+          <p className="text-gray-500 text-sm">{filtered.length} of {orders.length} orders · Revenue: AED {totalRevenue.toFixed(2)}</p>
         </div>
       </div>
 

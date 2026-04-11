@@ -8,6 +8,24 @@ async function syncPrimaryProductImage(supabase: SupabaseClient, productId: numb
   await supabase.from('product_images').insert({ product_id: productId, image_url: imageUrl, sort_order: 0 })
 }
 
+export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  const auth = await requireDashboardStaff()
+  if (!auth.ok) return auth.response
+
+  const supabase = auth.session.supabase
+  const [{ data: products }, { data: categories }] = await Promise.all([
+    supabase.from('products').select('*, categories(name, slug)').order('name'),
+    supabase.from('categories').select('*').order('id'),
+  ])
+
+  return NextResponse.json({
+    products: products || [],
+    categories: categories || [],
+  })
+}
+
 // UPDATE product
 export async function PATCH(request: Request) {
   const auth = await requireDashboardStaff()

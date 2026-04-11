@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Plus, Trash2, X, Check } from 'lucide-react'
 
@@ -34,9 +34,26 @@ const emptyProduct = {
   is_organic: false, origin: '', emoji: '', image_url: '',
 }
 
-export default function ProductsManager({ initialProducts, categories }: { initialProducts: Product[]; categories: Category[] }) {
+export default function ProductsManager({
+  initialProducts = [],
+  categories: initialCategories = [],
+}: {
+  initialProducts?: Product[]
+  categories?: Category[]
+}) {
   const router = useRouter()
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [categories, setCategories] = useState<Category[]>(initialCategories)
+
+  useEffect(() => {
+    fetch('/api/dashboard/products', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.products && Array.isArray(data.products)) setProducts(data.products)
+        if (data?.categories && Array.isArray(data.categories)) setCategories(data.categories)
+      })
+      .catch(() => {})
+  }, [])
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
   const [filterStatus, setFilterStatus] = useState<'' | 'active' | 'inactive'>('')

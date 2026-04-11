@@ -1,10 +1,14 @@
 import Link from 'next/link'
-import { getDashboardSupabase } from '@/lib/dashboard-server-supabase'
+import { redirect } from 'next/navigation'
+import { getDashboardSession } from '@/lib/dashboard-session'
 
 export const dynamic = 'force-dynamic'
 
 async function getStats() {
-  const supabase = await getDashboardSupabase()
+  const session = await getDashboardSession()
+  if (!session) redirect('/dashboard/login')
+
+  const supabase = session.supabase
 
   const now = new Date()
   const today = new Date(now); today.setHours(0, 0, 0, 0)
