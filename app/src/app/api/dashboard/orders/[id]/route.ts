@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireDashboardStaff } from '@/lib/dashboard-auth'
+import { getDashboardDb } from '@/lib/dashboard-db'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +14,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: 'Invalid order id' }, { status: 400 })
   }
 
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
   const [{ data: order }, { data: items }] = await Promise.all([
     supabase.from('orders').select('*').eq('id', orderId).single(),
     supabase.from('order_items').select('*').eq('order_id', orderId).order('id'),

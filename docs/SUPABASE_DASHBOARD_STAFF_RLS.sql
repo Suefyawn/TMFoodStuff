@@ -50,3 +50,31 @@ create policy "products staff delete"
 on public.products for delete
 to authenticated
 using (public.is_staff());
+
+-- order_items: enable RLS + staff policies (prevents anon reads of line items)
+alter table public.order_items enable row level security;
+
+drop policy if exists "order_items staff select" on public.order_items;
+create policy "order_items staff select"
+on public.order_items for select
+to authenticated
+using (public.is_staff());
+
+drop policy if exists "order_items staff insert" on public.order_items;
+create policy "order_items staff insert"
+on public.order_items for insert
+to authenticated
+with check (public.is_staff());
+
+drop policy if exists "order_items staff update" on public.order_items;
+create policy "order_items staff update"
+on public.order_items for update
+to authenticated
+using (public.is_staff())
+with check (public.is_staff());
+
+drop policy if exists "order_items staff delete" on public.order_items;
+create policy "order_items staff delete"
+on public.order_items for delete
+to authenticated
+using (public.is_staff());

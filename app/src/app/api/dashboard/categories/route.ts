@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { requireDashboardStaff } from '@/lib/dashboard-auth'
+import { getDashboardDb } from '@/lib/dashboard-db'
 
 export async function GET() {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
   const { data, error } = await supabase.from('categories').select('*').order('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const body = await request.json()
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
 
   const { data, error } = await supabase.from('categories').insert({
     name: body.name,
@@ -32,7 +33,7 @@ export async function PUT(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { id, ...updates } = await request.json()
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
 
   const { error } = await supabase.from('categories').update(updates).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -43,7 +44,7 @@ export async function DELETE(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { id } = await request.json()
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
 
   const { error } = await supabase.from('categories').delete().eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

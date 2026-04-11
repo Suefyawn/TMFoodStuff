@@ -16,16 +16,26 @@ const statuses = ['', 'pending', 'confirmed', 'processing', 'out_for_delivery', 
 
 export default function OrdersClient({ initialOrders = [] }: { initialOrders?: any[] }) {
   const [orders, setOrders] = useState<any[]>(initialOrders)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
 
   useEffect(() => {
+    setLoadError(null)
     fetch('/api/dashboard/orders', { credentials: 'same-origin' })
-      .then(r => r.json())
-      .then(data => {
+      .then(async r => {
+        const data = await r.json()
+        if (!r.ok) {
+          setLoadError(typeof data?.error === 'string' ? data.error : `Error ${r.status}`)
+          setOrders([])
+          return
+        }
         setOrders(Array.isArray(data) ? data : [])
       })
-      .catch(() => setOrders([]))
+      .catch(() => {
+        setLoadError('Network error')
+        setOrders([])
+      })
   }, [])
 
   const filtered = useMemo(() => {
@@ -49,6 +59,14 @@ export default function OrdersClient({ initialOrders = [] }: { initialOrders?: a
 
   return (
     <div className="p-6 space-y-4">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load orders: {loadError}
+          {loadError.toLowerCase().includes('unauthorized') && (
+            <span className="block mt-1 text-red-400/90">Try signing out and signing in again.</span>
+          )}
+        </div>
+      )}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Orders</h1>

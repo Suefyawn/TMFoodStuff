@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireDashboardRole, requireDashboardStaff } from '@/lib/dashboard-auth'
+import { getDashboardDb } from '@/lib/dashboard-db'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +9,7 @@ export async function GET() {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
 
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
   const { data: orders } = await supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(500)
   const list = orders || []
 
@@ -61,7 +62,7 @@ export async function PATCH(request: Request) {
   if (!auth.ok) return auth.response
 
   const { id, status } = await request.json()
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
   const orderId = parseInt(id)
 
   const { data: existing, error: fetchError } = await supabase

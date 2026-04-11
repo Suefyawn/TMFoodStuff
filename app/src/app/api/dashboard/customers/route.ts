@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireDashboardUser } from '@/lib/dashboard-auth'
+import { getDashboardDb } from '@/lib/dashboard-db'
 
 export const dynamic = 'force-dynamic'
 
@@ -7,7 +8,7 @@ export async function GET() {
   const auth = await requireDashboardUser()
   if (!auth.ok) return auth.response
 
-  const supabase = auth.session.supabase
+  const supabase = getDashboardDb()
 
   const { data: orders } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
 

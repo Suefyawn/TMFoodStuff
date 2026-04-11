@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getDashboardSession } from '@/lib/dashboard-session'
+import { getDashboardDb } from '@/lib/dashboard-db'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +9,7 @@ async function getStats() {
   const session = await getDashboardSession()
   if (!session) redirect('/dashboard/login')
 
-  const supabase = session.supabase
+  const supabase = getDashboardDb()
 
   const now = new Date()
   const today = new Date(now); today.setHours(0, 0, 0, 0)
