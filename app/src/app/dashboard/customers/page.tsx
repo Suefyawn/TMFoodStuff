@@ -19,18 +19,30 @@ export default function CustomersPage() {
   const [expanded, setExpanded] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/customers').then(r => r.json()).then(data => {
-      setCustomers(data)
-      setLoading(false)
-    })
+    fetch('/api/dashboard/customers', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        setCustomers(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch(() => {
+        setCustomers([])
+        setLoading(false)
+      })
   }, [])
 
-  const filtered = customers.filter(c =>
-    !search ||
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.phone.includes(search) ||
-    c.email.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = customers.filter(c => {
+    if (!c || typeof c !== 'object') return false
+    const name = String(c.name ?? '')
+    const phone = String(c.phone ?? '')
+    const email = String(c.email ?? '')
+    return (
+      !search ||
+      name.toLowerCase().includes(search.toLowerCase()) ||
+      phone.includes(search) ||
+      email.toLowerCase().includes(search.toLowerCase())
+    )
+  })
 
   if (loading) return <div className="p-6 text-gray-500">Loading customers...</div>
 
@@ -52,24 +64,30 @@ export default function CustomersPage() {
         ) : (
           <div className="divide-y divide-gray-800">
             {filtered.map((customer, i) => {
-              const key = customer.phone || customer.email || customer.name
+              const name = String(customer?.name ?? '—')
+              const phone = String(customer?.phone ?? '')
+              const email = String(customer?.email ?? '')
+              const key = phone || email || name
               const isExpanded = expanded === key
+              const orders = Array.isArray(customer?.orders) ? customer.orders : []
+              const totalSpent = Number(customer?.totalSpent ?? 0)
+              const totalOrders = Number(customer?.totalOrders ?? 0)
               return (
                 <div key={i}>
                   <div className="flex items-center justify-between px-5 py-4 hover:bg-gray-800/30 cursor-pointer transition-colors" onClick={() => setExpanded(isExpanded ? null : key)}>
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-lg font-black text-gray-500">
-                        {customer.name.charAt(0).toUpperCase()}
+                        {name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-white font-semibold text-sm">{customer.name}</p>
-                        <p className="text-gray-500 text-xs">{customer.phone} {customer.email && `· ${customer.email}`}</p>
+                        <p className="text-white font-semibold text-sm">{name}</p>
+                        <p className="text-gray-500 text-xs">{phone} {email && `· ${email}`}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="text-right">
-                        <p className="text-green-400 font-bold text-sm">AED {customer.totalSpent.toFixed(2)}</p>
-                        <p className="text-gray-600 text-xs">{customer.totalOrders} orders</p>
+                        <p className="text-green-400 font-bold text-sm">AED {totalSpent.toFixed(2)}</p>
+                        <p className="text-gray-600 text-xs">{totalOrders} orders</p>
                       </div>
                       {isExpanded ? <ChevronUp size={16} className="text-gray-500" /> : <ChevronDown size={16} className="text-gray-500" />}
                     </div>
@@ -78,7 +96,7 @@ export default function CustomersPage() {
                     <div className="px-5 pb-4 bg-gray-800/20">
                       <p className="text-xs text-gray-500 font-semibold uppercase mb-2">Order History</p>
                       <div className="space-y-1">
-                        {customer.orders.map((o: any) => (
+                        {orders.map((o: any) => (
                           <Link key={o.id} href={`/dashboard/orders/${o.id}`} className="flex items-center justify-between py-2 px-3 bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
                             <div>
                               <span className="text-white text-sm font-medium">{o.order_number}</span>

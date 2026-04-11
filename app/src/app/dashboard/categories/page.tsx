@@ -23,17 +23,25 @@ export default function CategoriesPage() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    fetch('/api/dashboard/categories').then(r => r.json()).then(data => {
-      setCategories(data)
-      setLoading(false)
-    })
+    fetch('/api/dashboard/categories', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        setCategories(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch(() => {
+        setCategories([])
+        setLoading(false)
+      })
   }, [])
 
   async function addCategory() {
     if (!newCat.name || !newCat.slug) return
     setSaving(true)
     const res = await fetch('/api/dashboard/categories', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newCat),
     })
     const data = await res.json()
@@ -49,7 +57,9 @@ export default function CategoriesPage() {
     if (!editData || editing === null) return
     setSaving(true)
     await fetch('/api/dashboard/categories', {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: editing, ...editData }),
     })
     setCategories(prev => prev.map(c => c.id === editing ? { ...c, ...editData } : c))
@@ -61,7 +71,9 @@ export default function CategoriesPage() {
   async function deleteCategory(id: number) {
     if (!confirm('Delete this category? Products in it won\'t be deleted but will become uncategorized.')) return
     await fetch('/api/dashboard/categories', {
-      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+      method: 'DELETE',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     })
     setCategories(prev => prev.filter(c => c.id !== id))

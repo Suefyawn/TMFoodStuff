@@ -28,20 +28,28 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
+  const isDashboardPage =
     pathname.startsWith('/dashboard') &&
     !pathname.startsWith('/dashboard/login') &&
     !pathname.startsWith('/dashboard/logout')
-  ) {
+
+  const isDashboardApi = pathname.startsWith('/api/dashboard/') && !pathname.startsWith('/api/dashboard/auth')
+
+  if (isDashboardPage) {
     const hasLegacy = request.cookies.has('dashboard_auth')
     if (!user && !hasLegacy) {
       return NextResponse.redirect(new URL('/dashboard/login', request.url))
     }
   }
 
+  // Refresh session cookies on dashboard API requests (browser fetch + RLS)
+  if (isDashboardApi) {
+    await supabase.auth.getSession()
+  }
+
   return response
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/api/dashboard/:path*'],
 }

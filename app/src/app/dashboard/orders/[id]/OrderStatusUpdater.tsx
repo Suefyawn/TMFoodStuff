@@ -20,6 +20,7 @@ export default function OrderStatusUpdater({ orderId, currentStatus }: { orderId
     setSaving(true)
     await fetch('/api/dashboard/orders', {
       method: 'PATCH',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, status: newStatus }),
     })

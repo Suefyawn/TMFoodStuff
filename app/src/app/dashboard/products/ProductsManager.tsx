@@ -79,6 +79,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     setSaving(true)
     await fetch('/api/dashboard/products', {
       method: 'PATCH',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: editing, ...editData }),
     })
@@ -93,6 +94,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     setSaving(true)
     const res = await fetch('/api/dashboard/products', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProduct),
     })
@@ -111,6 +113,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     setSaving(true)
     await fetch('/api/dashboard/products', {
       method: 'DELETE',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: Array.from(selected) }),
     })
@@ -122,6 +125,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   async function toggleActive(id: number, current: boolean) {
     await fetch('/api/dashboard/products', {
       method: 'PATCH',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: String(id), is_active: !current }),
     })
@@ -134,6 +138,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     for (const id of Array.from(selected)) {
       await fetch('/api/dashboard/products', {
         method: 'PATCH',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: String(id), is_active: action === 'activate' }),
       })
