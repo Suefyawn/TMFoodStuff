@@ -1,12 +1,15 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createServerSupabaseForUser, dashboardCookieNames } from '@/lib/dashboard-auth'
+import { createDashboardSupabaseServer } from '@/lib/dashboard-supabase-server'
+import { createServerSupabaseForUser } from '@/lib/dashboard-auth'
 
-/** Supabase client for dashboard RSC — uses staff JWT from cookie (RLS applies). */
+/** Supabase client for dashboard RSC — session from SSR cookies (RLS applies). */
 export async function getDashboardSupabase(): Promise<SupabaseClient> {
-  const cookieStore = await cookies()
-  const token = cookieStore.get(dashboardCookieNames.access)?.value
+  const supabase = await createDashboardSupabaseServer()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+  const token = session?.access_token
   if (!token) redirect('/dashboard/login')
   return createServerSupabaseForUser(token)
 }

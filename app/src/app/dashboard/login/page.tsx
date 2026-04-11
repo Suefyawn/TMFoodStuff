@@ -18,11 +18,12 @@ export default function DashboardLogin() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      credentials: 'same-origin',
     })
     
     if (res.ok) {
-      router.push('/dashboard')
-      router.refresh()
+      // Full navigation so Set-Cookie from the login response is applied before /dashboard loads
+      window.location.assign('/dashboard')
     } else {
       const data = await res.json().catch(() => ({}))
       setError(data?.error || 'Login failed')
