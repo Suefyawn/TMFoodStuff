@@ -1,79 +1,24 @@
-import { getPayload } from 'payload'
-import config from '@payload-config'
-import { products } from '../data/products'
-import { categories } from '../data/categories'
+import { createClient } from '@supabase/supabase-js'
+import { seedCatalogToSupabase } from '../lib/seed-catalog'
 
-async function seed() {
-  const payload = await getPayload({ config })
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  console.log('🌱 Seeding categories...')
-  const catMap: Record<string, string> = {}
-
-  for (const cat of categories) {
-    try {
-      const existing = await payload.find({ collection: 'categories', where: { slug: { equals: cat.slug } } })
-      if (existing.docs.length > 0) {
-        catMap[cat.slug] = existing.docs[0].id as string
-        console.log(`  ↩ Category exists: ${cat.name}`)
-        continue
-      }
-      const created = await payload.create({
-        collection: 'categories',
-        data: {
-          name: cat.name,
-          nameAr: cat.nameAr,
-          slug: cat.slug,
-          emoji: cat.emoji || '',
-        },
-      })
-      catMap[cat.slug] = created.id as string
-      console.log(`  ✓ Created category: ${cat.name}`)
-    } catch (e: any) {
-      console.error(`  ✗ Category error ${cat.name}: ${e.message}`)
-    }
+async function main() {
+  if (!url || !key) {
+    console.error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
+    process.exit(1)
   }
 
-  console.log('\n🌱 Seeding products...')
-  let created = 0, skipped = 0
-
-  for (const product of products) {
-    try {
-      const existing = await payload.find({ collection: 'products', where: { slug: { equals: product.slug } } })
-      if (existing.docs.length > 0) { skipped++; continue }
-
-      const categoryId = catMap[product.categorySlug]
-      if (!categoryId) {
-        console.log(`  ⚠ No category for ${product.name} (${product.categorySlug})`)
-        continue
-      }
-
-      await payload.create({
-        collection: 'products',
-        data: {
-          name: product.name,
-          nameAr: product.nameAr,
-          slug: product.slug,
-          category: categoryId,
-          description: product.description || '',
-          priceAED: product.priceAED,
-          unit: product.unit as any,
-          stock: product.stock || 0,
-          isOrganic: product.isOrganic || false,
-          isFeatured: product.isFeatured || false,
-          origin: product.origin || '',
-          emoji: product.emoji || '',
-          isActive: product.isActive !== false,
-        },
-      })
-      created++
-      if (created % 10 === 0) console.log(`  ✓ ${created} products seeded...`)
-    } catch (e: any) {
-      console.error(`  ✗ Product error ${product.name}: ${e.message}`)
-    }
-  }
-
-  console.log(`\n✅ Done! ${created} products created, ${skipped} skipped`)
-  process.exit(0)
+  const supabase = createClient(url, key)
+  console.log('🌱 Seeding Supabase catalog from static data...')
+  const r = await seedCatalogToSupabase(supabase)
+  console.log(
+    `✅ Categories: +${r.categoriesCreated} (skipped ${r.categoriesSkipped}) · Products: +${r.productsCreated} (skipped ${r.productsSkipped})`
+  )
 }
 
-seed().catch(e => { console.error(e); process.exit(1) })
+main().catch(e => {
+  console.error(e)
+  process.exit(1)
+})

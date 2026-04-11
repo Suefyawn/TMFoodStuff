@@ -1,5 +1,7 @@
 # 🚀 Vercel Deployment Guide
 
+> **Note (2026):** Deploy with **Supabase** env vars (`NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`) as documented in the root [README.md](../README.md). The MongoDB / Payload steps below are **legacy**.
+
 This guide covers deploying TMFoodStuff to Vercel with a production MongoDB Atlas cluster.
 
 ---

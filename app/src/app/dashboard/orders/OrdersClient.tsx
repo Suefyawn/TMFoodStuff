@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, X } from 'lucide-react'
 
@@ -14,12 +14,32 @@ const statusColors: Record<string, string> = {
 
 const statuses = ['', 'pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 
-export default function OrdersClient({ initialOrders }: { initialOrders: any[] }) {
+export default function OrdersClient({ initialOrders = [] }: { initialOrders?: any[] }) {
+  const [orders, setOrders] = useState<any[]>(initialOrders)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
 
+  useEffect(() => {
+    setLoadError(null)
+    fetch('/api/dashboard/orders', { credentials: 'same-origin' })
+      .then(async r => {
+        const data = await r.json()
+        if (!r.ok) {
+          setLoadError(typeof data?.error === 'string' ? data.error : `Error ${r.status}`)
+          setOrders([])
+          return
+        }
+        setOrders(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {
+        setLoadError('Network error')
+        setOrders([])
+      })
+  }, [])
+
   const filtered = useMemo(() => {
-    return initialOrders.filter(o => {
+    return orders.filter(o => {
       if (filterStatus && o.status !== filterStatus) return false
       if (search) {
         const q = search.toLowerCase()
@@ -31,7 +51,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       }
       return true
     })
-  }, [initialOrders, search, filterStatus])
+  }, [orders, search, filterStatus])
 
   // Revenue summary
   const totalRevenue = filtered.reduce((s, o) => s + (o.total || 0), 0)
@@ -39,10 +59,18 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
 
   return (
     <div className="p-6 space-y-4">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load orders: {loadError}
+          {loadError.toLowerCase().includes('unauthorized') && (
+            <span className="block mt-1 text-red-400/90">Try signing out and signing in again.</span>
+          )}
+        </div>
+      )}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Orders</h1>
-          <p className="text-gray-500 text-sm">{filtered.length} of {initialOrders.length} orders · Revenue: AED {totalRevenue.toFixed(2)}</p>
+          <p className="text-gray-500 text-sm">{filtered.length} of {orders.length} orders · Revenue: AED {totalRevenue.toFixed(2)}</p>
         </div>
       </div>
 

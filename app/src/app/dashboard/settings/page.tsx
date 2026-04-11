@@ -19,18 +19,34 @@ export default function SettingsPage() {
   const [newPromo, setNewPromo] = useState({ code: '', discount_percent: 10, expires_at: '' })
 
   useEffect(() => {
-    fetch('/api/dashboard/settings').then(r => r.json()).then(data => {
-      if (data.settings) setSettings(data.settings)
-      else setSettings(data) // fallback if no wrapper
-      if (data.promoCodes) setPromoCodes(data.promoCodes)
-      setLoading(false)
-    })
+    fetch('/api/dashboard/settings', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.error) {
+          setSettings({})
+          setPromoCodes([])
+        } else if (data?.settings) {
+          setSettings(data.settings)
+          setPromoCodes(Array.isArray(data.promoCodes) ? data.promoCodes : [])
+        } else {
+          setSettings(typeof data === 'object' && data && !Array.isArray(data) ? data : {})
+          setPromoCodes([])
+        }
+        setLoading(false)
+      })
+      .catch(() => {
+        setSettings({})
+        setPromoCodes([])
+        setLoading(false)
+      })
   }, [])
 
   async function saveSettings() {
     setSaving(true)
     await fetch('/api/dashboard/settings', {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings, promoCodes }),
     })
     setSaving(false)

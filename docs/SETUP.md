@@ -1,5 +1,7 @@
 # 🛠️ Local Development Setup Guide
 
+> **Note (2026):** The production app uses **Supabase (Postgres)** and the **custom `/dashboard` admin**, not Payload or MongoDB. For current env vars and commands, start with the root [README.md](../README.md). The sections below are **legacy** and kept only for historical reference.
+
 This guide walks you through setting up TMFoodStuff on your local machine from scratch. Follow each step carefully.
 
 ---
