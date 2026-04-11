@@ -7,10 +7,41 @@
     scroll-behavior: smooth;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   body {
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: contain;
+  }
+
+  :root {
+    --store-banner-offset: 0px;
+    --mobile-nav-height: 4rem;
+    --fab-bottom-mobile: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px) + 1rem);
+    --fab-bottom-desktop: calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
+    --sticky-cta-bottom-mobile: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+    --cart-sticky-bottom-mobile: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  html[data-launch-banner='visible'] {
+    --store-banner-offset: 2.75rem;
+    --fab-bottom-mobile: calc(var(--store-banner-offset) + var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px) + 1rem);
+    --sticky-cta-bottom-mobile: calc(var(--store-banner-offset) + var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+    --cart-sticky-bottom-mobile: calc(var(--store-banner-offset) + var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -30,6 +61,10 @@
 
   .btn-primary {
     @apply bg-green-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-700 active:scale-[0.98] transition-all duration-150 shadow-sm;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
 
   .card-hover {

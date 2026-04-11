@@ -1,7 +1,8 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Plus, Trash2, X, Check } from 'lucide-react'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 interface Product {
   id: number
@@ -34,9 +35,30 @@ const emptyProduct = {
   is_organic: false, origin: '', emoji: '', image_url: '',
 }
 
-export default function ProductsManager({ initialProducts, categories }: { initialProducts: Product[]; categories: Category[] }) {
+export default function ProductsManager({
+  initialProducts = [],
+  categories: initialCategories = [],
+}: {
+  initialProducts?: Product[]
+  categories?: Category[]
+}) {
   const router = useRouter()
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [categories, setCategories] = useState<Category[]>(initialCategories)
+  const [loadError, setLoadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setLoadError(null)
+    dashboardFetch<{ products?: Product[]; categories?: Category[] }>('/api/dashboard/products').then(r => {
+      if (r.ok === false) {
+        setLoadError(r.error)
+        return
+      }
+      const data = r.data
+      if (data?.products && Array.isArray(data.products)) setProducts(data.products)
+      if (data?.categories && Array.isArray(data.categories)) setCategories(data.categories)
+    })
+  }, [])
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
   const [filterStatus, setFilterStatus] = useState<'' | 'active' | 'inactive'>('')
@@ -50,7 +72,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const filtered = useMemo(() => {
-    let result = products.filter(p => {
+    const result = products.filter(p => {
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !(p.name_ar || '').includes(search)) return false
       if (filterCat && p.categories?.slug !== filterCat) return false
       if (filterStatus === 'active' && !p.is_active) return false
@@ -79,6 +101,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     setSaving(true)
     await fetch('/api/dashboard/products', {
       method: 'PATCH',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: editing, ...editData }),
     })
@@ -93,6 +116,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     setSaving(true)
     const res = await fetch('/api/dashboard/products', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProduct),
     })
@@ -111,6 +135,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     setSaving(true)
     await fetch('/api/dashboard/products', {
       method: 'DELETE',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: Array.from(selected) }),
     })
@@ -122,6 +147,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   async function toggleActive(id: number, current: boolean) {
     await fetch('/api/dashboard/products', {
       method: 'PATCH',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: String(id), is_active: !current }),
     })
@@ -134,6 +160,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     for (const id of Array.from(selected)) {
       await fetch('/api/dashboard/products', {
         method: 'PATCH',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: String(id), is_active: action === 'activate' }),
       })
@@ -150,6 +177,14 @@ export default function ProductsManager({ initialProducts, categories }: { initi
 
   return (
     <div className="p-6 space-y-4">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load catalog: {loadError}
+          {loadError.toLowerCase().includes('unauthorized') && (
+            <span className="block mt-1 text-red-400/90">Try signing out and signing in again.</span>
+          )}
+        </div>
+      )}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Products</h1>
@@ -300,7 +335,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                   <td className="px-4 py-3">
                     <input type="checkbox" checked={selected.has(product.id)} onChange={() => {
                       const s = new Set(selected)
-                      s.has(product.id) ? s.delete(product.id) : s.add(product.id)
+                      if (s.has(product.id)) s.delete(product.id)
+                      else s.add(product.id)
                       setSelected(s)
                     }} className="rounded" />
                   </td>

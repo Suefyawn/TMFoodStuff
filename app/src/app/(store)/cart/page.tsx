@@ -33,7 +33,7 @@ export default function CartPage() {
         <h1 className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-2 md:gap-3">
           <ShoppingCart className="text-green-600" size={24} />
           {tr.yourCart}
-          <span className="text-base md:text-lg font-normal text-gray-400">({items.length} {lang === 'ar' ? 'عناصر' : 'items'})</span>
+          <span className="text-base md:text-lg font-normal text-gray-400">({items.length} {tr.itemsWord})</span>
         </h1>
         <button
           onClick={clearCart}
@@ -104,18 +104,17 @@ export default function CartPage() {
         {/* Order summary */}
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
-            <h2 className="font-black text-gray-900 text-xl mb-4">{lang === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h2>
-            <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex items-center gap-1.5">
-              🎉 <span>
-                {lang === 'ar'
-                  ? <><span className="font-black">التوصيل مجاني</span> — عرض الإطلاق!</>
-                  : <><span className="font-black">FREE DELIVERY ACTIVE</span> — Grand Launch Offer!</>
-                }
+            <h2 className="font-black text-gray-900 text-xl mb-4">{tr.orderSummary}</h2>
+            <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex flex-col gap-1">
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden="true">🎉</span>
+                <span className="font-black">{tr.launchOfferTitle}</span>
               </span>
+              <span>{tr.launchOfferBody}</span>
             </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-gray-600">
-                <span>{tr.subtotal} ({items.reduce((s, i) => s + i.quantity, 0)} {lang === 'ar' ? 'عناصر' : 'items'})</span>
+                <span>{tr.subtotal} ({items.reduce((s, i) => s + i.quantity, 0)} {tr.itemsWord})</span>
                 <span>{formatAED(sub)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
@@ -151,7 +150,7 @@ export default function CartPage() {
       </div>
 
       {/* Sticky checkout button on mobile */}
-      <div className="fixed bottom-16 left-0 right-0 p-3 bg-white border-t border-gray-100 shadow-lg md:hidden z-40">
+      <div className="fixed start-0 end-0 p-3 bg-white border-t border-gray-100 shadow-lg md:hidden z-40 bottom-[var(--cart-sticky-bottom-mobile)]">
         <Link
           href="/checkout"
           className="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-colors"

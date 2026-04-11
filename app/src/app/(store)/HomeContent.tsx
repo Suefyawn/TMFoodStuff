@@ -72,7 +72,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
 
   const trustItems = [
     { icon: Truck, text: tr.farmFresh, sub: lang === 'ar' ? 'يُجلب كل صباح' : 'Sourced every morning' },
-    { icon: Zap, text: tr.fastDelivery, sub: lang === 'ar' ? 'في جميع أنحاء الإمارات' : 'Across all UAE' },
+    { icon: Zap, text: tr.fastDelivery, sub: tr.fastDeliverySub },
     { icon: ShieldCheck, text: tr.secureCheckout, sub: lang === 'ar' ? 'مشفر وآمن' : 'Encrypted & safe' },
     { icon: MessageCircle, text: tr.whatsappUpdates, sub: lang === 'ar' ? 'تتبع في الوقت الفعلي' : 'Real-time tracking' },
   ]
@@ -90,9 +90,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
     {
       icon: Zap,
       title: lang === 'ar' ? 'توصيل سريع' : 'Fast Delivery',
-      desc: lang === 'ar'
-        ? 'توصيل في نفس اليوم في دبي وأبوظبي والشارقة وعجمان ورأس الخيمة والفجيرة.'
-        : 'Same-day delivery across Dubai, Abu Dhabi, Sharjah, Ajman, RAK, and Fujairah.',
+      desc: tr.whyFastDelivery,
       color: 'text-amber-400',
       bg: 'bg-amber-400/10',
     },
@@ -112,28 +110,28 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
     : ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
 
   return (
-    <main className="scroll-mt-20">
+    <div role="main" className="scroll-mt-20">
       {/* Promo banner strip */}
       <div className="bg-green-600 text-white text-center py-2.5 px-4 text-sm font-semibold">
         <span className="md:hidden">
-          {lang === 'ar'
-            ? <>توصيل مجاني · كود: <span className="bg-white/20 px-2 py-0.5 rounded font-black">FRESH10</span></>
-            : <>Free delivery · Code: <span className="bg-white/20 px-2 py-0.5 rounded font-black">FRESH10</span></>
-          }
+          {tr.homePromoMobile.split('FRESH10').map((part, i, arr) => (
+            <span key={i}>
+              {part}
+              {i < arr.length - 1 && (
+                <span className="bg-white/20 px-2 py-0.5 rounded font-black">FRESH10</span>
+              )}
+            </span>
+          ))}
         </span>
         <span className="hidden md:inline">
-          {lang === 'ar'
-            ? <>توصيل مجاني على أول طلب · استخدم كود:{' '}
-                <span className="bg-white/20 px-2 py-0.5 rounded font-black ml-1">FRESH10</span>
-                <span className="mx-3 opacity-50">·</span>
-                <span className="opacity-80">توصيل في نفس اليوم في جميع أنحاء الإمارات</span>
-              </>
-            : <>Free delivery on first order · Use code:{' '}
-                <span className="bg-white/20 px-2 py-0.5 rounded font-black ml-1">FRESH10</span>
-                <span className="mx-3 opacity-50">·</span>
-                <span className="opacity-80">Same-day delivery across UAE</span>
-              </>
-          }
+          {tr.homePromoDesktop.split('FRESH10').map((part, i, arr) => (
+            <span key={i}>
+              {part}
+              {i < arr.length - 1 && (
+                <span className="bg-white/20 px-2 py-0.5 rounded font-black mx-1">FRESH10</span>
+              )}
+            </span>
+          ))}
         </span>
       </div>
 
@@ -161,9 +159,14 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
             {/* Text content — centered on mobile */}
             <div className="text-white text-center lg:text-left">
               {/* Delivery badge */}
-              <div className="inline-flex items-center gap-2 bg-amber-400/20 backdrop-blur-sm text-amber-300 border border-amber-400/30 text-xs md:text-sm font-bold px-4 md:px-5 py-2 md:py-2.5 rounded-full mb-6 md:mb-8">
-                <Zap size={12} className="text-amber-400" />
-                {lang === 'ar' ? 'توصيل خلال ٢-٤ ساعات · جميع إمارات الإمارات' : '2-4 Hour Delivery · All UAE Emirates'}
+              <div className="inline-flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 bg-amber-400/20 backdrop-blur-sm text-amber-300 border border-amber-400/30 text-xs md:text-sm font-bold px-4 md:px-5 py-2 md:py-2.5 rounded-full mb-6 md:mb-8 text-start sm:text-center">
+                <span className="inline-flex items-center gap-2">
+                  <Zap size={12} className="text-amber-400 flex-shrink-0" />
+                  {tr.fastDelivery}
+                </span>
+                <span className="text-amber-200/90 font-semibold text-[11px] md:text-xs sm:border-s sm:border-amber-400/30 sm:ps-2">
+                  {tr.fastDeliverySub}
+                </span>
               </div>
 
               <h1 className="font-playfair text-5xl md:text-6xl lg:text-7xl font-black mb-5 md:mb-6 leading-[0.95] tracking-tight">
@@ -369,6 +372,6 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   )
 }

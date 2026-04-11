@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ShoppingCart, Menu, X, Search, Leaf, User } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import LangToggle from '@/components/LangToggle'
 import { useLang } from '@/lib/use-lang'
 
@@ -13,8 +13,17 @@ export default function Navbar() {
   const [mobileSearch, setMobileSearch] = useState('')
   const totalItems = useCartStore(state => state.totalItems())
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const router = useRouter()
   const { lang, tr } = useLang()
+
+  function shopLinkActive(href: string) {
+    if (!pathname.startsWith('/shop')) return false
+    const cat = searchParams.get('category')
+    if (href === '/shop') return !cat
+    const expected = href.split('category=')[1]
+    return cat === expected
+  }
 
   const navLinks = [
     { label: tr.fruits, href: '/shop?category=fruits' },
@@ -44,7 +53,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-1.5 group flex-shrink-0">
+          <Link href="/" className="flex items-center gap-1.5 group flex-shrink-0 focus-ring rounded-lg">
             <Leaf size={20} className="text-green-700 group-hover:text-green-600 transition-colors" />
             <span className="tracking-tight font-black text-green-700 text-lg md:text-xl">
               TM FoodStuff
@@ -56,12 +65,14 @@ export default function Navbar() {
             <div className="relative w-full">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input
-                type="text"
+                type="search"
+                enterKeyHint="search"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearch}
                 placeholder={tr.search}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-transparent rounded-full text-sm focus:outline-none focus:bg-white focus:border-green-400 transition-all"
+                aria-label={tr.search}
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-transparent rounded-full text-sm focus:outline-none focus:bg-white focus:border-green-400 focus:ring-2 focus:ring-green-500/30 transition-all"
               />
             </div>
           </div>
@@ -72,7 +83,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`nav-link px-3 py-2 ${pathname.startsWith('/shop') ? 'text-green-600' : ''}`}
+                className={`nav-link px-3 py-2 focus-ring rounded-lg ${shopLinkActive(link.href) ? 'text-green-600' : ''}`}
               >
                 {link.label}
               </Link>
@@ -81,7 +92,7 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
+            <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2 focus-ring rounded-lg">
               <User size={16} />
               <span>{tr.signIn}</span>
             </Link>
@@ -90,7 +101,7 @@ export default function Navbar() {
             </div>
             <Link
               href="/cart"
-              className={`relative flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${
+              className={`relative flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm focus-ring ${
                 pathname === '/cart'
                   ? 'bg-green-700 text-white'
                   : 'bg-green-600 text-white hover:bg-green-700'
@@ -105,9 +116,12 @@ export default function Navbar() {
               )}
             </Link>
             <button
-              className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-600 hover:text-gray-900 rounded-lg"
+              type="button"
+              className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-600 hover:text-gray-900 rounded-lg focus-ring"
               onClick={() => setOpen(!open)}
-              aria-label="Toggle menu"
+              aria-expanded={open}
+              aria-controls="store-mobile-menu"
+              aria-label={tr.toggleMenu}
             >
               {open ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -116,6 +130,7 @@ export default function Navbar() {
 
         {/* Mobile menu with slide-down animation */}
         <div
+          id="store-mobile-menu"
           className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
             open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
           }`}
@@ -125,12 +140,14 @@ export default function Navbar() {
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input
-                type="text"
+                type="search"
+                enterKeyHint="search"
                 value={mobileSearch}
                 onChange={e => setMobileSearch(e.target.value)}
                 onKeyDown={handleMobileSearch}
                 placeholder={tr.search}
-                className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-base focus:outline-none focus:bg-white focus:border-green-400 border border-transparent transition-all"
+                aria-label={tr.search}
+                className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-base focus:outline-none focus:bg-white focus:border-green-400 border border-transparent focus:ring-2 focus:ring-green-500/30 transition-all"
               />
             </div>
           </div>
@@ -139,8 +156,8 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center px-3 py-3 min-h-[44px] text-sm font-medium rounded-lg transition-colors ${
-                  pathname.startsWith('/shop')
+                className={`flex items-center px-3 py-3 min-h-[44px] text-sm font-medium rounded-lg transition-colors focus-ring ${
+                  shopLinkActive(link.href)
                     ? 'text-green-600 bg-green-50'
                     : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
                 }`}

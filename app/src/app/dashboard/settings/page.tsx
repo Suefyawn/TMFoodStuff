@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Save, Plus, Trash2, X } from 'lucide-react'
+import { Save, Plus, Trash2 } from 'lucide-react'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 interface PromoCode {
   id?: number
@@ -17,25 +18,54 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [newPromo, setNewPromo] = useState({ code: '', discount_percent: 10, expires_at: '' })
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/settings').then(r => r.json()).then(data => {
-      if (data.settings) setSettings(data.settings)
-      else setSettings(data) // fallback if no wrapper
-      if (data.promoCodes) setPromoCodes(data.promoCodes)
+    setLoadError(null)
+    dashboardFetch<{
+      settings?: Record<string, string>
+      promoCodes?: PromoCode[]
+      error?: string
+    }>('/api/dashboard/settings').then(r => {
+      if (r.ok === false) {
+        setLoadError(r.error)
+        setSettings({})
+        setPromoCodes([])
+        setLoading(false)
+        return
+      }
+      const data = r.data
+      if (data?.error) {
+        setLoadError(String(data.error))
+        setSettings({})
+        setPromoCodes([])
+      } else if (data?.settings) {
+        setSettings(data.settings)
+        setPromoCodes(Array.isArray(data.promoCodes) ? data.promoCodes : [])
+      } else {
+        setSettings(typeof data === 'object' && data && !Array.isArray(data) ? (data as Record<string, string>) : {})
+        setPromoCodes([])
+      }
       setLoading(false)
     })
   }, [])
 
   async function saveSettings() {
     setSaving(true)
-    await fetch('/api/dashboard/settings', {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    setSaveError(null)
+    const r = await dashboardFetch<{ ok?: boolean; error?: string }>('/api/dashboard/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings, promoCodes }),
     })
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    if (r.ok === true) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } else {
+      setSaveError(r.error)
+    }
   }
 
   function addPromo() {
@@ -52,6 +82,16 @@ export default function SettingsPage() {
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load settings: {loadError}
+        </div>
+      )}
+      {saveError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Save failed: {saveError}
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-white">Settings</h1>

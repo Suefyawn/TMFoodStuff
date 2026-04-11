@@ -1,15 +1,30 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireDashboardStaff } from '@/lib/dashboard-auth'
+import { getDashboardDb } from '@/lib/dashboard-db'
 
-function getSupabase() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-}
-
-async function syncPrimaryProductImage(supabase: ReturnType<typeof getSupabase>, productId: number, imageUrl: string | null | undefined) {
+async function syncPrimaryProductImage(supabase: SupabaseClient, productId: number, imageUrl: string | null | undefined) {
   if (!imageUrl) return
   await supabase.from('product_images').delete().eq('product_id', productId).eq('sort_order', 0)
   await supabase.from('product_images').insert({ product_id: productId, image_url: imageUrl, sort_order: 0 })
+}
+
+export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  const auth = await requireDashboardStaff()
+  if (!auth.ok) return auth.response
+
+  const supabase = getDashboardDb()
+  const [{ data: products }, { data: categories }] = await Promise.all([
+    supabase.from('products').select('*, categories(name, slug)').order('name'),
+    supabase.from('categories').select('*').order('id'),
+  ])
+
+  return NextResponse.json({
+    products: products || [],
+    categories: categories || [],
+  })
 }
 
 // UPDATE product
@@ -17,7 +32,7 @@ export async function PATCH(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { id, ...updates } = await request.json()
-  const supabase = getSupabase()
+  const supabase = getDashboardDb()
 
   const dbUpdates: any = { updated_at: new Date().toISOString() }
   if (updates.priceAED !== undefined) dbUpdates.price_aed = updates.priceAED
@@ -52,7 +67,7 @@ export async function POST(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const body = await request.json()
-  const supabase = getSupabase()
+  const supabase = getDashboardDb()
 
   const { data, error } = await supabase.from('products').insert({
     name: body.name,
@@ -82,7 +97,7 @@ export async function DELETE(request: Request) {
   const auth = await requireDashboardStaff()
   if (!auth.ok) return auth.response
   const { ids } = await request.json()
-  const supabase = getSupabase()
+  const supabase = getDashboardDb()
 
   const idList = Array.isArray(ids) ? ids : [ids]
   const { error } = await supabase.from('products').delete().in('id', idList.map(Number))

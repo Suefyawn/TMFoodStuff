@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { requireDashboardUser } from '@/lib/dashboard-auth'
+import { getDashboardDb } from '@/lib/dashboard-db'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +8,7 @@ export async function GET() {
   const auth = await requireDashboardUser()
   if (!auth.ok) return auth.response
 
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const supabase = getDashboardDb()
 
   const { data: orders } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
 
@@ -28,11 +28,11 @@ export async function GET() {
       }
     }
     customers[key].totalOrders++
-    customers[key].totalSpent += order.total || 0
+    customers[key].totalSpent += Number(order.total_aed ?? order.total ?? 0)
     customers[key].orders.push({
       id: order.id,
       order_number: order.order_number,
-      total: order.total,
+      total: order.total_aed ?? order.total,
       status: order.status,
       created_at: order.created_at,
     })

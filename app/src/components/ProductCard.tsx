@@ -37,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.imageUrl ? (
             <ProductImage
               src={product.imageUrl}
-              alt={product.name}
+              alt={displayName}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
               emoji={product.emoji}
             />

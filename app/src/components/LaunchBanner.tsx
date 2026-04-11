@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
 import { X, Truck } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
+import { useLaunchBannerStore } from '@/lib/launch-banner-store'
 
 export default function LaunchBanner() {
-  const [dismissed, setDismissed] = useState(false)
+  const dismissed = useLaunchBannerStore(s => s.dismissed)
+  const setDismissed = useLaunchBannerStore(s => s.setDismissed)
   const { lang } = useLang()
 
   if (dismissed) return null
@@ -27,7 +28,7 @@ export default function LaunchBanner() {
       <button
         onClick={() => setDismissed(true)}
         className="absolute right-3 top-1/2 -translate-y-1/2 hover:bg-white/20 rounded p-1 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-        aria-label="Dismiss banner"
+        aria-label={lang === 'ar' ? 'إغلاق الشريط' : 'Dismiss banner'}
       >
         <X size={14} />
       </button>

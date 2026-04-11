@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Trash2 } from 'lucide-react'
+import { dashboardFetch } from '@/lib/dashboard-fetch'
 
 interface Category {
   id: number
@@ -21,10 +22,17 @@ export default function CategoriesPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [newCat, setNewCat] = useState({ name: '', name_ar: '', slug: '', emoji: '', description: '' })
   const [saving, setSaving] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/categories').then(r => r.json()).then(data => {
-      setCategories(data)
+    setLoadError(null)
+    dashboardFetch<Category[]>('/api/dashboard/categories').then(r => {
+      if (r.ok === false) {
+        setLoadError(r.error)
+        setCategories([])
+      } else {
+        setCategories(Array.isArray(r.data) ? r.data : [])
+      }
       setLoading(false)
     })
   }, [])
@@ -33,7 +41,9 @@ export default function CategoriesPage() {
     if (!newCat.name || !newCat.slug) return
     setSaving(true)
     const res = await fetch('/api/dashboard/categories', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newCat),
     })
     const data = await res.json()
@@ -49,7 +59,9 @@ export default function CategoriesPage() {
     if (!editData || editing === null) return
     setSaving(true)
     await fetch('/api/dashboard/categories', {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: editing, ...editData }),
     })
     setCategories(prev => prev.map(c => c.id === editing ? { ...c, ...editData } : c))
@@ -61,7 +73,9 @@ export default function CategoriesPage() {
   async function deleteCategory(id: number) {
     if (!confirm('Delete this category? Products in it won\'t be deleted but will become uncategorized.')) return
     await fetch('/api/dashboard/categories', {
-      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+      method: 'DELETE',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     })
     setCategories(prev => prev.filter(c => c.id !== id))
@@ -71,6 +85,11 @@ export default function CategoriesPage() {
 
   return (
     <div className="p-6 space-y-4">
+      {loadError && (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          Could not load categories: {loadError}
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-white">Categories</h1>
