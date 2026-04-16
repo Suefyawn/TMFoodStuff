@@ -1,13 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
-
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
-
-async function checkAuth() {
-  const cookieStore = await cookies()
-  return cookieStore.get('dashboard_auth')?.value === DASHBOARD_PASSWORD
-}
+import { isAdminAuthed } from '@/lib/admin-auth'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -25,6 +18,8 @@ const DEFAULTS: Record<string, string> = {
 }
 
 export async function GET() {
+  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const supabase = getSupabase()
 
   // Try to read from settings table; fall back to defaults
@@ -32,7 +27,7 @@ export async function GET() {
 
   if (error) {
     // Table might not exist — return defaults
-    return NextResponse.json(DEFAULTS)
+    return NextResponse.json({ settings: { ...DEFAULTS }, promoCodes: [] })
   }
 
   const settings: Record<string, string> = { ...DEFAULTS }
@@ -47,7 +42,7 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  if (!await checkAuth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { settings, promoCodes } = await request.json()
   const supabase = getSupabase()

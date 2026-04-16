@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const WHATSAPP_NUMBER = '971544408411'
+const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot } = body
+
+    if (!form || !items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ success: false, error: 'Invalid order payload' }, { status: 400 })
+    }
 
     const orderNumber = `TM-${Date.now().toString(36).toUpperCase().slice(-6)}`
 
@@ -15,11 +19,22 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const { error } = await supabase.from('orders').insert({
+    // Fetch store settings for pricing/whatsapp consistency.
+    const { data: settingsRows } = await supabase.from('settings').select('key, value')
+    const settings: Record<string, string> = {}
+    for (const row of (settingsRows || [])) settings[row.key] = row.value
+    const whatsappNumber = (settings.whatsapp_number || DEFAULT_WHATSAPP_NUMBER).replace(/\D/g, '') || DEFAULT_WHATSAPP_NUMBER
+
+    // Write to both the legacy columns (subtotal/vat/total) and the canonical
+    // `_aed` columns so dashboards and reporting tools keep working regardless
+    // of which schema they were authored against.
+    const payload: Record<string, unknown> = {
       order_number: orderNumber,
       status: 'pending',
       payment_method: paymentMethod || 'cod',
+      payment_status: 'pending',
       customer_name: form.fullName,
+      customer_full_name: form.fullName,
       customer_phone: form.phone,
       customer_email: form.email || '',
       delivery_emirate: form.emirate,
@@ -29,11 +44,16 @@ export async function POST(request: Request) {
       delivery_slot: deliverySlot,
       delivery_notes: form.notes || '',
       subtotal,
+      subtotal_aed: subtotal,
       vat,
+      vat_aed: vat,
       delivery_fee: deliveryFee || 0,
+      delivery_fee_aed: deliveryFee || 0,
       promo_code: promoCode || '',
       promo_discount: promoDiscount || 0,
+      promo_discount_aed: promoDiscount || 0,
       total,
+      total_aed: total,
       items: items.map((item: any) => ({
         id: item.id,
         name: item.name,
@@ -42,7 +62,9 @@ export async function POST(request: Request) {
         subtotal: item.priceAED * item.quantity,
         unit: item.unit || 'kg',
       })),
-    })
+    }
+
+    const { error } = await supabase.from('orders').insert(payload)
 
     if (error) throw error
 
@@ -68,7 +90,7 @@ export async function POST(request: Request) {
       (form.notes ? `📝 Notes: ${form.notes}` : '')
     )
 
-    return NextResponse.json({ success: true, orderNumber, waMessage, waNumber: WHATSAPP_NUMBER })
+    return NextResponse.json({ success: true, orderNumber, waMessage, waNumber: whatsappNumber })
   } catch (error: any) {
     console.error('Order error:', error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })
