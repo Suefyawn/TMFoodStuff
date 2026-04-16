@@ -1,6 +1,11 @@
 # 🛠️ Local Development Setup Guide
 
-This guide walks you through setting up TMFoodStuff on your local machine from scratch. Follow each step carefully.
+This guide walks you through setting up TMFoodStuff on your local machine from scratch.
+
+> **Heads up.** The live storefront and admin (`/dashboard`) are powered by
+> **Supabase** (Postgres). The legacy Payload CMS admin at `/admin` still
+> ships in the codebase but is **optional** and only activates when
+> `MONGODB_URI` is configured. For day-to-day operations use `/dashboard`.
 
 ---
 
@@ -8,120 +13,85 @@ This guide walks you through setting up TMFoodStuff on your local machine from s
 
 ### 1. Node.js (v18 or higher)
 
-TMFoodStuff requires Node.js 18+. To check your current version:
-
 ```bash
 node --version
 ```
 
-If you're below v18 or don't have Node installed, download it from [https://nodejs.org](https://nodejs.org). Choose the **LTS** version. On Windows, run the installer. On macOS/Linux, use `nvm` (Node Version Manager) for easier version management:
+If you don't have Node 18+ installed, grab the LTS build from
+[nodejs.org](https://nodejs.org) or use `nvm`:
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-nvm install 18
-nvm use 18
+nvm install 20
+nvm use 20
 ```
 
 ### 2. Git
-
-Make sure Git is installed. Check with:
 
 ```bash
 git --version
 ```
 
-Download from [https://git-scm.com](https://git-scm.com) if needed.
+### 3. Supabase project (free tier works)
 
-### 3. MongoDB Atlas Account (Free Tier)
+1. Sign up at [supabase.com](https://supabase.com) and create a new project.
+2. Pick a region close to your users (e.g. `ap-southeast-1` for the Gulf).
+3. Once the project is ready, grab these values from **Project Settings →
+   API**:
+   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+   - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY` (server-only — keep
+     it out of the browser bundle).
 
-TMFoodStuff uses MongoDB Atlas as its database. Here's how to set it up:
-
-**Step 1:** Go to [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas) and click **Try Free**.
-
-**Step 2:** Create your account with email/Google. Verify your email.
-
-**Step 3:** Once logged in, click **Build a Database**.
-
-**Step 4:** Choose **M0 (Free)** tier. Select your preferred cloud provider (AWS recommended) and a region close to you (e.g., `eu-west-1` for UAE/Middle East).
-
-**Step 5:** Give your cluster a name (e.g., `tmfoodstuff-cluster`) and click **Create Cluster**. This takes 1–3 minutes.
-
-**Step 6:** You'll be prompted to create a **database user**:
-- Username: `tmfoodstuff`
-- Password: Generate a secure password and **save it** — you'll need it in your `.env`
-- Click **Create User**
-
-**Step 7:** Under **Where would you like to connect from?**, select **My Local Environment**. Add your current IP address by clicking **Add My Current IP Address**, then click **Finish and Close**.
-
-**Step 8:** On the cluster overview page, click **Connect** → **Drivers** → select **Node.js** as the driver.
-
-**Step 9:** Copy the connection string. It will look like:
-```
-mongodb+srv://tmfoodstuff:<password>@tmfoodstuff-cluster.xxxxx.mongodb.net/?retryWrites=true&w=majority
-```
-
-Replace `<password>` with your actual password and add the database name before `?`:
-```
-mongodb+srv://tmfoodstuff:yourpassword@tmfoodstuff-cluster.xxxxx.mongodb.net/tmfoodstuff?retryWrites=true&w=majority
-```
-
-This is your `MONGODB_URI`.
+You'll also need to create the schema (tables + RLS policies). The authoritative
+schema is maintained via Supabase migrations; if you're cloning a fresh
+project, apply the migrations in the `supabase/` directory of the project (or
+run them manually in the SQL editor).
 
 ---
 
 ## Installation
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Suefyawn/TMFoodStuff.git
 cd TMFoodStuff
 ```
 
-### 2. Install Dependencies
-
-Navigate to the `app` directory and install all packages:
+### 2. Install dependencies
 
 ```bash
 cd app
 npm install
 ```
 
-This installs Next.js 14, Payload CMS 2.x, Tailwind CSS, and all other dependencies. It may take 2–5 minutes.
-
 ---
 
-## Environment Configuration
-
-### 1. Copy the Example .env File
+## Environment configuration
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-### 2. Edit Your .env File
-
-Open `.env` in your editor and fill in the values:
+Fill in your Supabase credentials plus an admin password:
 
 ```env
-MONGODB_URI=mongodb+srv://tmfoodstuff:yourpassword@cluster.mongodb.net/tmfoodstuff?retryWrites=true&w=majority
-PAYLOAD_SECRET=your-super-secret-key-here
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-or-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+DASHBOARD_PASSWORD=pick-a-long-random-string
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 ```
 
-### 3. Generate a Secure PAYLOAD_SECRET
-
-The `PAYLOAD_SECRET` must be at least 32 characters. Generate one using Node.js:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-Copy the output and use it as your `PAYLOAD_SECRET`. This key is used to sign JWTs and encrypt sensitive data — **never commit it to Git** and **never share it**.
+`MONGODB_URI` and `PAYLOAD_SECRET` can stay empty. When they're blank, the
+optional Payload admin at `/admin` renders a friendly explainer page
+pointing at `/dashboard` and the Payload REST endpoints under `/api/*`
+return `503` instead of crashing.
 
 ---
 
-## Running the Development Server
+## Running the development server
 
 From the `app` directory:
 
@@ -129,101 +99,55 @@ From the `app` directory:
 npm run dev
 ```
 
-You should see output like:
-
-```
-▲ Next.js 14.2.5
-- Local: http://localhost:3000
-- Network: http://192.168.x.x:3000
-✓ Ready in 3.2s
-```
-
-Open your browser and visit:
+Once it says `✓ Ready`, visit:
 
 - **Storefront:** [http://localhost:3000](http://localhost:3000)
-- **Admin Panel:** [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Admin dashboard (Supabase):** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
+  - Log in with the `DASHBOARD_PASSWORD` from your `.env.local`.
+- **Payload admin (optional):** [http://localhost:3000/admin](http://localhost:3000/admin)
+  - Only functional if you also set `MONGODB_URI` and `PAYLOAD_SECRET`.
 
 ---
 
-## Setting Up the Admin Panel
+## Managing products and orders
 
-### 1. Create Your First Admin User
+All product, category, order and settings data lives in the Supabase
+project. The easiest way to manage it is through the built-in dashboard:
 
-Navigate to [http://localhost:3000/admin](http://localhost:3000/admin).
+1. Go to `/dashboard/login` and sign in with `DASHBOARD_PASSWORD`.
+2. Use the sidebar to edit products, orders, categories, customers, promo
+   codes and store settings.
 
-On first visit, Payload CMS will prompt you to create the first admin user (this is a Customers collection user with admin access):
-
-- **Email:** your@email.com
-- **Password:** choose a strong password
-- **Name:** Your Name
-
-Click **Create** and you'll be taken to the admin dashboard.
-
-### 2. Explore the Admin Dashboard
-
-The left sidebar shows all your collections:
-- **Products** — where you manage your product catalog
-- **Categories** — product categories (Fruits, Vegetables, etc.)
-- **Orders** — customer orders
-- **Customers** — registered customer accounts
-- **Media** — uploaded images
+Under the hood the dashboard talks to JSON APIs under `/api/dashboard/*`
+that are authenticated via an opaque session cookie derived from
+`DASHBOARD_PASSWORD`. The API routes all require the cookie — unauthenticated
+requests return `401`.
 
 ---
 
-## Adding Your First Category
+## Common issues
 
-1. In the admin panel, click **Categories** in the sidebar
-2. Click **Create New**
-3. Fill in:
-   - **Name:** Fruits
-   - **Name (Arabic):** فواكه
-   - **Slug:** fruits
-   - **Emoji:** 🍎
-4. Click **Save**
+**Port 3000 already in use**
 
-Repeat for other categories: Vegetables (🥦), Organic (🌱), Exotic (🥭), Juices (🧃), Gift Baskets (🧺).
-
----
-
-## Adding Your First Product
-
-1. In the admin panel, click **Products** in the sidebar
-2. Click **Create New**
-3. Fill in:
-   - **Name:** Red Apple
-   - **Slug:** red-apple
-   - **Category:** Select "Fruits" from the dropdown
-   - **Price (AED):** 12
-   - **Unit:** kg
-   - **Stock:** 100
-   - **Is Active:** ✓ checked
-4. Optionally upload an image via the **Images** array field
-5. Click **Save**
-
-The product will now appear in your storefront's shop page once you wire up the API calls from Payload to your Next.js pages.
-
----
-
-## Common Issues
-
-**Port 3000 already in use:**
 ```bash
-# Find what's using port 3000
 npx kill-port 3000
 npm run dev
 ```
 
-**MongoDB connection error:**
-- Double-check your `MONGODB_URI` in `.env`
-- Ensure your IP is whitelisted in Atlas Network Access
-- Make sure the Atlas cluster is running (not paused)
+**`Invalid scheme, expected connection string to start with "mongodb://"`**
 
-**Payload admin not loading:**
-- Clear your browser cache
-- Check that `PAYLOAD_SECRET` is set and at least 32 chars
-- Check terminal logs for specific errors
+You hit `/admin` without configuring Payload. Either set `MONGODB_URI` and
+`PAYLOAD_SECRET`, or just use `/dashboard` — Payload is optional.
 
-**Module not found errors:**
+**Supabase reads return empty arrays**
+
+Double-check that `SUPABASE_SERVICE_ROLE_KEY` is set on the server. The
+storefront uses the anon key and relies on the `products`, `categories`
+and `product_images` tables having public `SELECT` RLS policies; everything
+else is locked down and must be fetched via the service role.
+
+**Module not found errors**
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
