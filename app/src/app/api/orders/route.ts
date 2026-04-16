@@ -6,20 +6,23 @@ const WHATSAPP_NUMBER = '971544408411'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot } = body
+    const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot, idempotencyKey } = body
 
     const orderNumber = `TM-${Date.now().toString(36).toUpperCase().slice(-6)}`
+    const idemHeader = request.headers.get('x-idempotency-key') || request.headers.get('Idempotency-Key')
+    const idem = (typeof idempotencyKey === 'string' && idempotencyKey.trim()) || (idemHeader && idemHeader.trim()) || null
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const { error } = await supabase.from('orders').insert({
+    const orderPayload = {
       order_number: orderNumber,
       status: 'pending',
       payment_method: paymentMethod || 'cod',
       customer_name: form.fullName,
+      customer_full_name: form.fullName,
       customer_phone: form.phone,
       customer_email: form.email || '',
       delivery_emirate: form.emirate,
@@ -29,29 +32,51 @@ export async function POST(request: Request) {
       delivery_slot: deliverySlot,
       delivery_notes: form.notes || '',
       subtotal,
+      subtotal_aed: subtotal,
       vat,
+      vat_aed: vat,
       delivery_fee: deliveryFee || 0,
+      delivery_fee_aed: deliveryFee || 0,
       promo_code: promoCode || '',
       promo_discount: promoDiscount || 0,
+      promo_discount_aed: promoDiscount || 0,
       total,
-      items: items.map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        price_aed: item.priceAED,
-        subtotal: item.priceAED * item.quantity,
-        unit: item.unit || 'kg',
-      })),
+      total_aed: total,
+      placed_at: new Date().toISOString(),
+    }
+
+    const itemsPayload = items.map((item: any) => ({
+      id: item.id,
+      product_id: Number.isFinite(Number(item.id)) ? Number(item.id) : null,
+      product_name: item.name,
+      name: item.name,
+      quantity: Number(item.quantity) || 1,
+      unit: item.unit || 'kg',
+      unit_price_aed: Number(item.priceAED) || 0,
+      price_aed: Number(item.priceAED) || 0,
+      priceAED: Number(item.priceAED) || 0,
+      subtotal_aed: (Number(item.priceAED) || 0) * (Number(item.quantity) || 1),
+      subtotal: (Number(item.priceAED) || 0) * (Number(item.quantity) || 1),
+    }))
+
+    const { data: createdRows, error: rpcError } = await supabase.rpc('create_checkout_order', {
+      p_order: orderPayload,
+      p_items: itemsPayload,
+      p_idempotency_key: idem,
     })
 
-    if (error) throw error
+    if (rpcError) throw rpcError
+    if (!createdRows?.length) throw new Error('Failed to create order')
+
+    const created = createdRows[0] as any
+    const finalOrderNumber = created?.order_number || orderNumber
 
     // WhatsApp message
     const itemsList = items.map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`).join('\n')
     const slotMap: Record<string, string> = { morning: '8AM-12PM', afternoon: '12PM-5PM', evening: '5PM-10PM' }
 
     const waMessage = encodeURIComponent(
-      `🛒 NEW ORDER #${orderNumber}\n` +
+      `🛒 NEW ORDER #${finalOrderNumber}\n` +
       `━━━━━━━━━━━━━━━\n` +
       `👤 ${form.fullName}\n` +
       `📞 ${form.phone}\n` +
@@ -68,7 +93,7 @@ export async function POST(request: Request) {
       (form.notes ? `📝 Notes: ${form.notes}` : '')
     )
 
-    return NextResponse.json({ success: true, orderNumber, waMessage, waNumber: WHATSAPP_NUMBER })
+    return NextResponse.json({ success: true, orderNumber: finalOrderNumber, waMessage, waNumber: WHATSAPP_NUMBER })
   } catch (error: any) {
     console.error('Order error:', error)
     return NextResponse.json({ success: false, error: error.message }, { status: 500 })

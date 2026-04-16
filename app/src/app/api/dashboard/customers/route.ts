@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireDashboardUser } from '@/lib/dashboard-auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
+  const auth = await requireDashboardUser()
+  if (!auth.ok) return auth.response
+
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const { data: orders } = await supabase.from('orders').select('*').order('created_at', { ascending: false })

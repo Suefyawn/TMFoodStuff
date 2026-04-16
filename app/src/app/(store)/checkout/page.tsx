@@ -51,13 +51,26 @@ export default function CheckoutPage() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function applyPromo() {
-    if (promoCode.toUpperCase() === 'FRESH10') {
-      const discount = parseFloat((sub * 0.10).toFixed(2))
+  async function applyPromo() {
+    try {
+      const res = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoCode, subtotal: sub }),
+      })
+      const data = await res.json()
+      if (!data?.ok) {
+        const msg =
+          data?.error === 'invalid_code'
+            ? (lang === 'ar' ? 'كود خصم غير صالح' : 'Invalid promo code')
+            : (lang === 'ar' ? 'تعذر التحقق من كود الخصم' : 'Could not validate promo code')
+        alert(msg)
+        return
+      }
       setPromoApplied(true)
-      setPromoDiscount(discount)
-    } else {
-      alert(lang === 'ar' ? 'كود خصم غير صالح' : 'Invalid promo code')
+      setPromoDiscount(Number(data.discount_aed) || 0)
+    } catch {
+      alert(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')
     }
   }
 
@@ -75,9 +88,17 @@ export default function CheckoutPage() {
     setIsSubmitting(true)
 
     try {
+      const idempotencyKey =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `idem_${Date.now()}_${Math.random().toString(16).slice(2)}`
+
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': idempotencyKey,
+        },
         body: JSON.stringify({
           form,
           items,
@@ -105,7 +126,16 @@ export default function CheckoutPage() {
           window.open(`https://wa.me/${data.waNumber}?text=${data.waMessage}`, '_blank')
         }, 1500)
       } else {
-        alert(lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.')
+        const err = typeof data?.error === 'string' ? data.error : ''
+        const friendly =
+          err.includes('insufficient_stock')
+            ? (lang === 'ar' ? 'نفد المخزون لأحد المنتجات. يرجى تحديث السلة والمحاولة مرة أخرى.' : 'One item is out of stock. Please refresh your cart and try again.')
+            : err.includes('price_mismatch')
+              ? (lang === 'ar' ? 'تغيرت أسعار المنتجات. يرجى تحديث الصفحة والمحاولة مرة أخرى.' : 'Prices changed. Please refresh and try again.')
+              : err.includes('promo')
+                ? (lang === 'ar' ? 'كود الخصم غير صالح أو انتهى.' : 'Promo code is invalid or expired.')
+                : (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.')
+        alert(friendly)
       }
     } catch (err) {
       alert(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')

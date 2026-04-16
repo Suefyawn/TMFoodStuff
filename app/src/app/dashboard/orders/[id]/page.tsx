@@ -6,8 +6,17 @@ export const dynamic = 'force-dynamic'
 
 async function getOrder(id: string) {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-  const { data } = await supabase.from('orders').select('*').eq('id', parseInt(id)).single()
-  return data
+  const orderId = parseInt(id)
+
+  const [{ data: order }, { data: items }] = await Promise.all([
+    supabase.from('orders').select('*').eq('id', orderId).single(),
+    supabase.from('order_items').select('*').eq('order_id', orderId).order('id'),
+  ])
+
+  return {
+    ...(order || null),
+    _items: items || [],
+  }
 }
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,9 +31,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   const phone = order.customer_phone || ''
   const waMsg = encodeURIComponent(
-    `Hi ${order.customer_name}! Your TMFoodStuff order #${order.order_number} has been confirmed. We'll deliver during your ${order.delivery_slot || 'selected'} slot. Thank you! 🥦`
+    `Hi ${(order.customer_full_name || order.customer_name) || ''}! Your TMFoodStuff order #${order.order_number} has been confirmed. We'll deliver during your ${order.delivery_slot || 'selected'} slot. Thank you! 🥦`
   )
-  const items = order.items || []
+  const items = (order as any)._items || []
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -50,7 +59,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
             <h3 className="text-white font-black mb-4">👤 Customer</h3>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-gray-500">Name</span><span className="text-white font-semibold">{order.customer_name || '—'}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Name</span><span className="text-white font-semibold">{order.customer_full_name || order.customer_name || '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Phone</span><span className="text-white">{phone || '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Email</span><span className="text-gray-300">{order.customer_email || '—'}</span></div>
             </div>
@@ -75,18 +84,18 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             {items.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between px-5 py-3">
                 <div>
-                  <p className="text-white font-semibold text-sm">{item.name}</p>
+                  <p className="text-white font-semibold text-sm">{item.product_name || item.name}</p>
                   <p className="text-gray-500 text-xs">x{item.quantity} {item.unit}</p>
                 </div>
-                <span className="text-green-400 font-bold text-sm">AED {((item.price_aed || item.priceAED || 0) * item.quantity).toFixed(2)}</span>
+                <span className="text-green-400 font-bold text-sm">AED {((item.unit_price_aed || item.price_aed || item.priceAED || 0) * item.quantity).toFixed(2)}</span>
               </div>
             ))}
           </div>
           <div className="p-5 border-t border-gray-800 space-y-2 text-sm">
-            <div className="flex justify-between text-gray-400"><span>Subtotal</span><span>AED {(order.subtotal || 0).toFixed(2)}</span></div>
-            <div className="flex justify-between text-gray-400"><span>VAT 5%</span><span>AED {(order.vat || 0).toFixed(2)}</span></div>
-            {(order.promo_discount || 0) > 0 && <div className="flex justify-between text-green-400"><span>Promo ({order.promo_code})</span><span>-AED {(order.promo_discount || 0).toFixed(2)}</span></div>}
-            <div className="flex justify-between text-white font-black text-base border-t border-gray-700 pt-2"><span>Total</span><span className="text-green-400">AED {(order.total || 0).toFixed(2)}</span></div>
+            <div className="flex justify-between text-gray-400"><span>Subtotal</span><span>AED {Number(order.subtotal_aed ?? order.subtotal ?? 0).toFixed(2)}</span></div>
+            <div className="flex justify-between text-gray-400"><span>VAT 5%</span><span>AED {Number(order.vat_aed ?? order.vat ?? 0).toFixed(2)}</span></div>
+            {Number(order.promo_discount_aed ?? order.promo_discount ?? 0) > 0 && <div className="flex justify-between text-green-400"><span>Promo ({order.promo_code})</span><span>-AED {Number(order.promo_discount_aed ?? order.promo_discount ?? 0).toFixed(2)}</span></div>}
+            <div className="flex justify-between text-white font-black text-base border-t border-gray-700 pt-2"><span>Total</span><span className="text-green-400">AED {Number(order.total_aed ?? order.total ?? 0).toFixed(2)}</span></div>
           </div>
         </div>
       </main>
