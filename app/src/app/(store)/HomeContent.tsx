@@ -227,7 +227,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
           {/* Stats row */}
           <div className="mt-12 md:mt-16 grid grid-cols-3 gap-3 md:gap-6 max-w-xs md:max-w-lg mx-auto lg:mx-0">
             {[
-              { num: '150+', label: lang === 'ar' ? 'منتج طازج' : 'Fresh Products' },
+              { num: '190+', label: lang === 'ar' ? 'منتج طازج' : 'Fresh Products' },
               { num: '6', label: lang === 'ar' ? 'إمارات' : 'Emirates' },
               { num: '24/7', label: lang === 'ar' ? 'تجديد طازج' : 'Fresh Restocks' },
             ].map(s => (
