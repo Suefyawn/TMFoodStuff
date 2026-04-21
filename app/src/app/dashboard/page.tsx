@@ -105,7 +105,7 @@ export default async function DashboardPage() {
           { label: 'Today Revenue', value: `AED ${stats.todayRevenue.toFixed(2)}`, sub: `${stats.todayOrders} orders today`, color: 'text-green-400' },
           { label: 'Week Revenue', value: `AED ${stats.weekRevenue.toFixed(2)}`, sub: 'Last 7 days', color: 'text-blue-400' },
           { label: 'Pending Orders', value: String(stats.pendingOrders), sub: `${stats.totalOrders} total`, color: stats.pendingOrders > 0 ? 'text-yellow-400' : 'text-gray-400' },
-          { label: 'Active Products', value: String(stats.totalProducts), sub: '150 total catalog', color: 'text-purple-400' },
+          { label: 'Active Products', value: String(stats.totalProducts), sub: 'in catalog', color: 'text-purple-400' },
         ].map(card => (
           <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">{card.label}</p>
