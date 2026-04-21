@@ -17,6 +17,18 @@ async function expectedSessionToken(): Promise<string> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Redirect the Payload-backed /admin route to the Supabase-backed /dashboard.
+  // We bail out here at the edge before the /admin page module (which imports
+  // Payload's config and the MongoDB adapter) is ever loaded. In production
+  // MONGODB_URI is empty so the Payload bootstrap would otherwise hang the
+  // serverless function until Vercel returns a 504.
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    url.search = ''
+    return NextResponse.redirect(url, 308)
+  }
+
   if (
     pathname.startsWith('/dashboard') &&
     !pathname.startsWith('/dashboard/login') &&
@@ -36,5 +48,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/admin/:path*', '/admin'],
 }
