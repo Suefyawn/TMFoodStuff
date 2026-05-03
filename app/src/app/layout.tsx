@@ -31,8 +31,6 @@ export const metadata: Metadata = {
   },
 }
 
-// Minimal root layout — storefront UI lives in (store)/layout.tsx
-// Payload admin uses (payload) group with its own layout
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

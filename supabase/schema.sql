@@ -115,6 +115,18 @@ create trigger orders_updated_at
   for each row execute procedure update_updated_at();
 
 -- ─────────────────────────────────────────
+-- PROMO CODES
+-- ─────────────────────────────────────────
+create table if not exists promo_codes (
+  id               bigint generated always as identity primary key,
+  code             text        not null unique,
+  discount_percent numeric(5,2) not null default 0,
+  is_active        boolean     not null default true,
+  expires_at       timestamptz,
+  created_at       timestamptz not null default now()
+);
+
+-- ─────────────────────────────────────────
 -- SETTINGS  (key-value store)
 -- ─────────────────────────────────────────
 create table if not exists settings (
@@ -156,6 +168,11 @@ create policy "service manage orders" on orders for all using (auth.role() = 'se
 -- Customers: no public access, service-role only
 alter table customers enable row level security;
 create policy "service manage customers" on customers for all using (auth.role() = 'service_role');
+
+-- Promo codes: public read active codes (needed for checkout validation), service-role write
+alter table promo_codes enable row level security;
+create policy "public read active promos" on promo_codes for select using (is_active = true);
+create policy "service write promos"      on promo_codes for all using (auth.role() = 'service_role');
 
 -- Settings: public read, service-role write
 alter table settings enable row level security;

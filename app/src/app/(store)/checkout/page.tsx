@@ -16,6 +16,7 @@ export default function CheckoutPage() {
   const [promoCode, setPromoCode] = useState('')
   const [promoApplied, setPromoApplied] = useState(false)
   const [promoDiscount, setPromoDiscount] = useState(0)
+  const [promoLoading, setPromoLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [waMessage, setWaMessage] = useState('')
   const [waNumber, setWaNumber] = useState('')
@@ -51,13 +52,27 @@ export default function CheckoutPage() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function applyPromo() {
-    if (promoCode.toUpperCase() === 'FRESH10') {
-      const discount = parseFloat((sub * 0.10).toFixed(2))
-      setPromoApplied(true)
-      setPromoDiscount(discount)
-    } else {
-      alert(lang === 'ar' ? 'كود خصم غير صالح' : 'Invalid promo code')
+  async function applyPromo() {
+    if (!promoCode.trim()) return
+    setPromoLoading(true)
+    try {
+      const res = await fetch('/api/promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoCode.trim() }),
+      })
+      const data = await res.json()
+      if (data.valid) {
+        const discount = parseFloat((sub * (data.discountPercent / 100)).toFixed(2))
+        setPromoApplied(true)
+        setPromoDiscount(discount)
+      } else {
+        alert(data.error || (lang === 'ar' ? 'كود خصم غير صالح' : 'Invalid promo code'))
+      }
+    } catch {
+      alert(lang === 'ar' ? 'تعذر التحقق من الكود' : 'Could not validate promo code')
+    } finally {
+      setPromoLoading(false)
     }
   }
 
@@ -418,9 +433,10 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         onClick={applyPromo}
-                        className="bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors min-h-[44px]"
+                        disabled={promoLoading}
+                        className="bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors min-h-[44px] disabled:opacity-60"
                       >
-                        {tr.apply}
+                        {promoLoading ? '...' : tr.apply}
                       </button>
                     </div>
                   )}

@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD!
 
-// Derive an opaque session token from the password so the raw secret is
-// never written to the cookie.
 function sessionToken(): string {
   return crypto.createHash('sha256').update(DASHBOARD_PASSWORD).digest('hex')
 }

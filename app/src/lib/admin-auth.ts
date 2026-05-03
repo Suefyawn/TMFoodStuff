@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
 
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD!
 
 export function getExpectedSessionToken(): string {
   return crypto.createHash('sha256').update(DASHBOARD_PASSWORD).digest('hex')
@@ -15,10 +15,9 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export async function isAdminAuthed(): Promise<boolean> {
+  if (!DASHBOARD_PASSWORD) return false
   const cookieStore = await cookies()
   const token = cookieStore.get('dashboard_auth')?.value
   if (!token) return false
-  // Accept the derived session token or the legacy raw-password cookie
-  // (issued by older versions of this app) to avoid signing out active sessions.
-  return safeEqual(token, getExpectedSessionToken()) || safeEqual(token, DASHBOARD_PASSWORD)
+  return safeEqual(token, getExpectedSessionToken())
 }
