@@ -46,6 +46,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [showAdd, setShowAdd] = useState(false)
   const [newProduct, setNewProduct] = useState(emptyProduct)
   const [saving, setSaving] = useState(false)
+  const [apiError, setApiError] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'category'>('name')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
@@ -77,70 +78,101 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   async function saveEdit() {
     if (!editData || editing === null) return
     setSaving(true)
-    await fetch('/api/dashboard/products', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: editing, ...editData }),
-    })
-    setProducts(prev => prev.map(p => p.id === editing ? { ...p, ...editData } : p))
-    setEditing(null)
-    setEditData(null)
-    setSaving(false)
+    setApiError('')
+    try {
+      const res = await fetch('/api/dashboard/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editing, ...editData }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setApiError(data.error || 'Save failed'); return }
+      setProducts(prev => prev.map(p => p.id === editing ? { ...p, ...editData } : p))
+      setEditing(null)
+      setEditData(null)
+    } catch {
+      setApiError('Network error — please try again')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function addProduct() {
     if (!newProduct.name || !newProduct.slug) return
+    if (newProduct.price_aed < 0) { setApiError('Price cannot be negative'); return }
+    if (newProduct.stock < 0) { setApiError('Stock cannot be negative'); return }
     setSaving(true)
-    const res = await fetch('/api/dashboard/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProduct),
-    })
-    const data = await res.json()
-    if (data.ok) {
+    setApiError('')
+    try {
+      const res = await fetch('/api/dashboard/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProduct),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.ok) { setApiError(data.error || 'Failed to add product'); return }
       setShowAdd(false)
       setNewProduct(emptyProduct)
       router.refresh()
+    } catch {
+      setApiError('Network error — please try again')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   async function deleteSelected() {
     if (selected.size === 0) return
-    if (!confirm(`Delete ${selected.size} product(s)?`)) return
+    if (!confirm(`Delete ${selected.size} product(s)? This cannot be undone.`)) return
     setSaving(true)
-    await fetch('/api/dashboard/products', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: Array.from(selected) }),
-    })
-    setProducts(prev => prev.filter(p => !selected.has(p.id)))
-    setSelected(new Set())
-    setSaving(false)
+    setApiError('')
+    try {
+      const res = await fetch('/api/dashboard/products', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: Array.from(selected) }),
+      })
+      if (!res.ok) { const d = await res.json(); setApiError(d.error || 'Delete failed'); return }
+      setProducts(prev => prev.filter(p => !selected.has(p.id)))
+      setSelected(new Set())
+    } catch {
+      setApiError('Network error — please try again')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function toggleActive(id: number, current: boolean) {
-    await fetch('/api/dashboard/products', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: String(id), is_active: !current }),
-    })
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, is_active: !current } : p))
+    try {
+      const res = await fetch('/api/dashboard/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: String(id), is_active: !current }),
+      })
+      if (!res.ok) return
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, is_active: !current } : p))
+    } catch { /* silent — user can retry */ }
   }
 
   async function bulkAction(action: 'activate' | 'deactivate') {
     if (selected.size === 0) return
     setSaving(true)
-    for (const id of Array.from(selected)) {
-      await fetch('/api/dashboard/products', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: String(id), is_active: action === 'activate' }),
-      })
+    setApiError('')
+    try {
+      await Promise.all(Array.from(selected).map(id =>
+        fetch('/api/dashboard/products', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: String(id), is_active: action === 'activate' }),
+        })
+      ))
+      setProducts(prev => prev.map(p => selected.has(p.id) ? { ...p, is_active: action === 'activate' } : p))
+      setSelected(new Set())
+    } catch {
+      setApiError('Network error — some items may not have updated')
+    } finally {
+      setSaving(false)
     }
-    setProducts(prev => prev.map(p => selected.has(p.id) ? { ...p, is_active: action === 'activate' } : p))
-    setSelected(new Set())
-    setSaving(false)
   }
 
   const toggleSelectAll = () => {
@@ -150,6 +182,12 @@ export default function ProductsManager({ initialProducts, categories }: { initi
 
   return (
     <div className="p-6 space-y-4">
+      {apiError && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl flex items-center justify-between">
+          <span>{apiError}</span>
+          <button onClick={() => setApiError('')} className="text-red-400 hover:text-red-300 ml-4 font-bold">✕</button>
+        </div>
+      )}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Products</h1>

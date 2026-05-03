@@ -15,24 +15,30 @@ const statusColors: Record<string, string> = {
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState('')
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/dashboard/customers').then(r => r.json()).then(data => {
-      setCustomers(data)
-      setLoading(false)
-    })
+    fetch('/api/dashboard/customers')
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) { setFetchError(data.error); return }
+        setCustomers(Array.isArray(data) ? data : [])
+      })
+      .catch(() => setFetchError('Failed to load customers'))
+      .finally(() => setLoading(false))
   }, [])
 
   const filtered = customers.filter(c =>
     !search ||
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.phone.includes(search) ||
-    c.email.toLowerCase().includes(search.toLowerCase())
+    (c.name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (c.phone || '').includes(search) ||
+    (c.email || '').toLowerCase().includes(search.toLowerCase())
   )
 
   if (loading) return <div className="p-6 text-gray-500">Loading customers...</div>
+  if (fetchError) return <div className="p-6 text-red-400">Error: {fetchError}</div>
 
   return (
     <div className="p-6 space-y-4">

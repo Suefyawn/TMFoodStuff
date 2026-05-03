@@ -1,8 +1,10 @@
+'use client'
 import Link from 'next/link'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store } from 'lucide-react'
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
@@ -10,7 +12,39 @@ const navItems = [
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
+function NavLink({ item, pathname }: { item: typeof navItems[number]; pathname: string }) {
+  const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+  return (
+    <Link
+      href={item.href}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+        active
+          ? 'bg-green-600/20 text-green-400 border border-green-600/30'
+          : 'text-gray-400 hover:text-white hover:bg-gray-800 border border-transparent'
+      }`}
+    >
+      <item.icon size={18} />
+      {item.label}
+    </Link>
+  )
+}
+
+function MobileNavLink({ item, pathname }: { item: typeof navItems[number]; pathname: string }) {
+  const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+  return (
+    <Link
+      href={item.href}
+      title={item.label}
+      className={`p-2 rounded-lg transition-colors ${active ? 'text-green-400 bg-green-600/10' : 'text-gray-400 hover:text-white'}`}
+    >
+      <item.icon size={18} />
+    </Link>
+  )
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 flex">
       {/* Sidebar */}
@@ -24,23 +58,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           {navItems.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-            >
-              <item.icon size={18} />
-              {item.label}
-            </Link>
+            <NavLink key={item.href} item={item} pathname={pathname} />
           ))}
         </nav>
-        <div className="px-3 py-4 border-t border-gray-800">
-          <Link href="/dashboard/logout" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
+        <div className="px-3 py-4 border-t border-gray-800 space-y-1">
+          <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors border border-transparent">
+            <Store size={18} />
+            View Store
+          </Link>
+          <Link href="/dashboard/logout" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors border border-transparent">
             <LogOut size={18} />
             Logout
-          </Link>
-          <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-400 transition-colors mt-1">
-            ← Back to Store
           </Link>
         </div>
       </aside>
@@ -52,11 +80,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="text-lg">🥬</span>
             <span className="font-black text-white">TMFoodStuff</span>
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             {navItems.map(item => (
-              <Link key={item.href} href={item.href} className="p-2 text-gray-400 hover:text-white transition-colors" title={item.label}>
-                <item.icon size={18} />
-              </Link>
+              <MobileNavLink key={item.href} item={item} pathname={pathname} />
             ))}
           </div>
         </div>

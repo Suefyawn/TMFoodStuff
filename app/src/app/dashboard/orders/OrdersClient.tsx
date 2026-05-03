@@ -85,7 +85,14 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
               <tbody className="divide-y divide-gray-800">
                 {filtered.map((order: any) => {
                   const items = order.items || []
-                  const waText = encodeURIComponent(`Hi ${order.customer_name}, your TMFoodStuff order #${order.order_number} `)
+                  const slotMap: Record<string, string> = { morning: '8AM–12PM', afternoon: '12PM–5PM', evening: '5PM–10PM' }
+                  const waText = encodeURIComponent(
+                    `Hi ${order.customer_name || 'there'}! 👋\n` +
+                    `Your TMFoodStuff order *#${order.order_number}* has been received.\n` +
+                    `📦 ${items.length} item${items.length !== 1 ? 's' : ''} · AED ${(order.total || 0).toFixed(2)}\n` +
+                    `🕐 Delivery slot: ${slotMap[order.delivery_slot] || order.delivery_slot || '—'}\n` +
+                    `We'll be in touch shortly. Thank you! 🥦`
+                  )
                   return (
                     <tr key={order.id} className="hover:bg-gray-800/30 transition-colors">
                       <td className="px-5 py-4">

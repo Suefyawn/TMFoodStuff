@@ -15,8 +15,8 @@ export async function POST(request: Request) {
     response.cookies.set('dashboard_auth', sessionToken(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 8, // 8 hours
       path: '/',
     })
     return response

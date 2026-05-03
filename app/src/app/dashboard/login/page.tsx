@@ -13,17 +13,21 @@ export default function DashboardLogin() {
     setLoading(true)
     setError('')
     
-    const res = await fetch('/api/dashboard/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    })
-    
-    if (res.ok) {
-      router.push('/dashboard')
-      router.refresh()
-    } else {
-      setError('Wrong password')
+    try {
+      const res = await fetch('/api/dashboard/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      if (res.ok) {
+        router.push('/dashboard')
+        router.refresh()
+      } else {
+        setError('Wrong password')
+        setLoading(false)
+      }
+    } catch {
+      setError('Network error — please try again')
       setLoading(false)
     }
   }
