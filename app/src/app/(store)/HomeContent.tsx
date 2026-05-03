@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import type { Product } from '@/lib/products-api'
-import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
+import { Truck, ShieldCheck, MessageCircle, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 const homeCategories = [
@@ -206,20 +206,35 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
               </div>
             </div>
 
-            {/* Right: Hero visual (desktop only) */}
-            <div className="hidden lg:flex items-center justify-center">
-              <div className="relative aspect-square w-96 rounded-3xl bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl">
-                <Leaf size={120} className="text-white/30" />
-                <div className="absolute top-4 left-4 w-3 h-3 rounded-full bg-amber-400/60" />
-                <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-white/40" />
-                <div className="absolute bottom-4 right-4 w-4 h-4 rounded-full bg-emerald-400/50" />
-                <div className="absolute bottom-4 left-4 w-2 h-2 rounded-full bg-amber-300/40" />
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-green-700 text-xs font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
-                  <Apple size={12} /> {lang === 'ar' ? 'فواكه طازجة' : 'Fresh Fruits'}
-                </div>
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-amber-400 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
-                  <Truck size={12} /> {lang === 'ar' ? 'توصيل في نفس اليوم' : 'Same Day Delivery'}
-                </div>
+            {/* Right: Product grid visual (desktop only) */}
+            <div className="hidden lg:block">
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { emoji: '🍓', name: lang === 'ar' ? 'فراولة' : 'Strawberry', price: '12.00' },
+                  { emoji: '🥑', name: lang === 'ar' ? 'أفوكادو' : 'Avocado', price: '8.50' },
+                  { emoji: '🍇', name: lang === 'ar' ? 'عنب' : 'Grapes', price: '15.00' },
+                  { emoji: '🥦', name: lang === 'ar' ? 'بروكلي' : 'Broccoli', price: '6.00' },
+                  { emoji: '🍊', name: lang === 'ar' ? 'برتقال' : 'Orange', price: '9.00' },
+                  { emoji: '🫐', name: lang === 'ar' ? 'توت أزرق' : 'Blueberry', price: '18.00' },
+                  { emoji: '🍋', name: lang === 'ar' ? 'ليمون' : 'Lemon', price: '4.50' },
+                  { emoji: '🥕', name: lang === 'ar' ? 'جزر' : 'Carrot', price: '5.00' },
+                  { emoji: '🍒', name: lang === 'ar' ? 'كرز' : 'Cherry', price: '22.00' },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-3 text-center hover:bg-white/20 transition-all hover:-translate-y-0.5 cursor-default"
+                  >
+                    <div className="text-4xl mb-1.5">{item.emoji}</div>
+                    <div className="text-white text-xs font-bold truncate">{item.name}</div>
+                    <div className="text-amber-300 text-xs font-black mt-0.5">AED {item.price}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-4 py-3">
+                <Truck size={16} className="text-amber-400 flex-shrink-0" />
+                <span className="text-white text-sm font-bold">
+                  {lang === 'ar' ? 'شحن مجاني على الطلبات فوق ١٥٠ درهم' : 'Free delivery on orders above AED 150'}
+                </span>
               </div>
             </div>
           </div>

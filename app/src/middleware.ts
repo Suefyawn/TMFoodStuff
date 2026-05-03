@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'tmfood2024admin'
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD!
 
 async function expectedSessionToken(): Promise<string> {
   const data = new TextEncoder().encode(DASHBOARD_PASSWORD)
@@ -17,11 +17,7 @@ async function expectedSessionToken(): Promise<string> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Redirect the Payload-backed /admin route to the Supabase-backed /dashboard.
-  // We bail out here at the edge before the /admin page module (which imports
-  // Payload's config and the MongoDB adapter) is ever loaded. In production
-  // MONGODB_URI is empty so the Payload bootstrap would otherwise hang the
-  // serverless function until Vercel returns a 504.
+  // /admin → /dashboard redirect kept for any bookmarks
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
@@ -35,11 +31,9 @@ export async function middleware(request: NextRequest) {
     !pathname.startsWith('/dashboard/logout')
   ) {
     const auth = request.cookies.get('dashboard_auth')?.value
+    if (!DASHBOARD_PASSWORD) return NextResponse.next()
     const expected = await expectedSessionToken()
-
-    // Also accept the legacy cookie value (raw password) so existing sessions
-    // from before the hashed-token change stay signed in without a forced logout.
-    if (auth !== expected && auth !== DASHBOARD_PASSWORD) {
+    if (auth !== expected) {
       return NextResponse.redirect(new URL('/dashboard/login', request.url))
     }
   }
