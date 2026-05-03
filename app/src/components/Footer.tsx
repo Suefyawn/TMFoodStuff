@@ -27,9 +27,8 @@ export default function Footer() {
   return (
     <>
       {/* WhatsApp floating button — above bottom nav on mobile */}
-      {/* TODO: Replace with real WhatsApp number */}
       <a
-        href="https://wa.me/971544408411?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
+        href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order`}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
@@ -69,9 +68,8 @@ export default function Footer() {
                 : 'Premium fresh fruits & vegetables delivered daily across the UAE. Farm to door, always fresh.'}
             </p>
 
-            {/* TODO: Replace with real WhatsApp number */}
             <a
-              href="https://wa.me/971544408411?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order"
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-green-700 transition-colors"
@@ -126,14 +124,13 @@ export default function Footer() {
 
             {/* Contact */}
             <div className="mt-6 space-y-2">
-              {/* TODO: Replace with real phone number */}
-              <a href="tel:+971544408411" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+              <a href={`tel:+${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
                 <Phone size={14} className="text-green-600 flex-shrink-0" />
-                +971 54 440 8411
+                +{(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411').replace(/(\d{3})(\d{2})(\d{3})(\d{4})/, '$1 $2 $3 $4')}
               </a>
-              <a href="mailto:hello@tmfoodstuff.ae" className="flex items-center gap-2 text-sm hover:text-white transition-colors">
+              <a href={`mailto:${process.env.NEXT_PUBLIC_STORE_EMAIL || 'hello@tmfoodstuff.ae'}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
                 <Mail size={14} className="text-green-600 flex-shrink-0" />
-                hello@tmfoodstuff.ae
+                {process.env.NEXT_PUBLIC_STORE_EMAIL || 'hello@tmfoodstuff.ae'}
               </a>
             </div>
 

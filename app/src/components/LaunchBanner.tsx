@@ -9,13 +9,15 @@ export default function LaunchBanner() {
 
   if (dismissed) return null
 
+  const promoCode = process.env.NEXT_PUBLIC_PROMO_CODE || 'FRESH10'
+
   const bannerTextMobile = lang === 'ar'
-    ? <>🎉 توصيل مجاني + استخدم <span className="font-mono font-black bg-white/20 px-1 rounded">FRESH10</span> لخصم 10٪</>
-    : <>🎉 FREE DELIVERY + use <span className="font-mono font-black bg-white/20 px-1 rounded">FRESH10</span> for 10% off</>
+    ? <>🎉 توصيل مجاني + استخدم <span className="font-mono font-black bg-white/20 px-1 rounded">{promoCode}</span> لخصم 10٪</>
+    : <>🎉 FREE DELIVERY + use <span className="font-mono font-black bg-white/20 px-1 rounded">{promoCode}</span> for 10% off</>
 
   const bannerTextDesktop = lang === 'ar'
-    ? <>🎉 عرض الإطلاق الكبير — <strong>توصيل مجاني</strong> على جميع الطلبات! استخدم كود <span className="bg-white/20 px-2 py-0.5 rounded font-mono font-black">FRESH10</span> لخصم 10٪</>
-    : <>🎉 Grand Launch Offer — <strong>FREE DELIVERY</strong> on all orders! Use code <span className="bg-white/20 px-2 py-0.5 rounded font-mono font-black">FRESH10</span> for 10% off too</>
+    ? <>🎉 عرض الإطلاق الكبير — <strong>توصيل مجاني</strong> على جميع الطلبات! استخدم كود <span className="bg-white/20 px-2 py-0.5 rounded font-mono font-black">{promoCode}</span> لخصم 10٪</>
+    : <>🎉 Grand Launch Offer — <strong>FREE DELIVERY</strong> on all orders! Use code <span className="bg-white/20 px-2 py-0.5 rounded font-mono font-black">{promoCode}</span> for 10% off too</>
 
   return (
     <div className="bg-green-700 text-white py-2.5 px-4 text-center text-sm font-semibold relative">

@@ -39,6 +39,22 @@ export async function PATCH(request: Request) {
 export async function POST(request: Request) {
   if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await request.json()
+
+  if (!body.name || typeof body.name !== 'string' || !body.name.trim()) {
+    return NextResponse.json({ error: 'Product name is required' }, { status: 400 })
+  }
+  if (!body.slug || typeof body.slug !== 'string' || !body.slug.trim()) {
+    return NextResponse.json({ error: 'Product slug is required' }, { status: 400 })
+  }
+  const price = parseFloat(body.price_aed)
+  if (isNaN(price) || price < 0) {
+    return NextResponse.json({ error: 'Price must be 0 or greater' }, { status: 400 })
+  }
+  const stock = parseInt(body.stock ?? '0', 10)
+  if (isNaN(stock) || stock < 0) {
+    return NextResponse.json({ error: 'Stock must be 0 or greater' }, { status: 400 })
+  }
+
   const supabase = getSupabase()
 
   const { data, error } = await supabase.from('products').insert({

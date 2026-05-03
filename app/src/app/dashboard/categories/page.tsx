@@ -16,6 +16,8 @@ export default function CategoriesPage() {
   const router = useRouter()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState('')
+  const [apiError, setApiError] = useState('')
   const [editing, setEditing] = useState<number | null>(null)
   const [editData, setEditData] = useState<any>(null)
   const [showAdd, setShowAdd] = useState(false)
@@ -23,51 +25,76 @@ export default function CategoriesPage() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    fetch('/api/dashboard/categories').then(r => r.json()).then(data => {
-      setCategories(data)
-      setLoading(false)
-    })
+    fetch('/api/dashboard/categories')
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) { setFetchError(data.error); return }
+        setCategories(Array.isArray(data) ? data : [])
+      })
+      .catch(() => setFetchError('Failed to load categories'))
+      .finally(() => setLoading(false))
   }, [])
 
   async function addCategory() {
     if (!newCat.name || !newCat.slug) return
     setSaving(true)
-    const res = await fetch('/api/dashboard/categories', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newCat),
-    })
-    const data = await res.json()
-    if (data.ok) {
+    setApiError('')
+    try {
+      const res = await fetch('/api/dashboard/categories', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCat),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.ok) { setApiError(data.error || 'Failed to add category'); return }
       setCategories(prev => [...prev, data.category])
       setShowAdd(false)
       setNewCat({ name: '', name_ar: '', slug: '', emoji: '', description: '' })
+    } catch {
+      setApiError('Network error — please try again')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   async function saveEdit() {
     if (!editData || editing === null) return
     setSaving(true)
-    await fetch('/api/dashboard/categories', {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: editing, ...editData }),
-    })
-    setCategories(prev => prev.map(c => c.id === editing ? { ...c, ...editData } : c))
-    setEditing(null)
-    setEditData(null)
-    setSaving(false)
+    setApiError('')
+    try {
+      const res = await fetch('/api/dashboard/categories', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editing, ...editData }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.ok) { setApiError(data.error || 'Failed to save'); return }
+      setCategories(prev => prev.map(c => c.id === editing ? { ...c, ...editData } : c))
+      setEditing(null)
+      setEditData(null)
+    } catch {
+      setApiError('Network error — please try again')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function deleteCategory(id: number) {
     if (!confirm('Delete this category? Products in it won\'t be deleted but will become uncategorized.')) return
-    await fetch('/api/dashboard/categories', {
-      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
-    setCategories(prev => prev.filter(c => c.id !== id))
+    setApiError('')
+    try {
+      const res = await fetch('/api/dashboard/categories', {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.ok) { setApiError(data.error || 'Failed to delete'); return }
+      setCategories(prev => prev.filter(c => c.id !== id))
+    } catch {
+      setApiError('Network error — please try again')
+    }
   }
 
   if (loading) return <div className="p-6 text-gray-500">Loading categories...</div>
+  if (fetchError) return <div className="p-6 text-red-400">Error: {fetchError}</div>
 
   return (
     <div className="p-6 space-y-4">
@@ -76,10 +103,16 @@ export default function CategoriesPage() {
           <h1 className="text-2xl font-black text-white">Categories</h1>
           <p className="text-gray-500 text-sm">{categories.length} categories</p>
         </div>
-        <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
+        <button onClick={() => { setShowAdd(true); setApiError('') }} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
           <Plus size={16} /> Add Category
         </button>
       </div>
+
+      {apiError && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
+          {apiError}
+        </div>
+      )}
 
       {/* Add Modal */}
       {showAdd && (

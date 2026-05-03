@@ -188,3 +188,17 @@ create index if not exists idx_products_slug      on products(slug);
 create index if not exists idx_orders_status      on orders(status);
 create index if not exists idx_orders_created_at  on orders(created_at desc);
 create index if not exists idx_orders_order_number on orders(order_number);
+
+-- ─────────────────────────────────────────
+-- EMAIL SUBSCRIBERS
+-- ─────────────────────────────────────────
+create table if not exists email_subscribers (
+  id         bigint generated always as identity primary key,
+  email      text        not null unique,
+  created_at timestamptz not null default now()
+);
+
+alter table email_subscribers enable row level security;
+create policy "service manage subscribers" on email_subscribers for all using (auth.role() = 'service_role');
+
+create index if not exists idx_subscribers_email on email_subscribers(email);
