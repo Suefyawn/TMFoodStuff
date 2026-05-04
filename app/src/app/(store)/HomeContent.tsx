@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import type { Product } from '@/lib/products-api'
-import { Truck, ShieldCheck, MessageCircle, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
+import { Truck, ShieldCheck, MessageCircle, Apple, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 const homeCategories = [
