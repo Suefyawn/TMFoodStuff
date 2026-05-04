@@ -1,7 +1,8 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Trash2, X, Check } from 'lucide-react'
+import { Search, Plus, Trash2, X } from 'lucide-react'
+import ImageUploader from '@/components/ImageUploader'
 
 interface Product {
   id: number
@@ -19,6 +20,7 @@ interface Product {
   origin: string
   emoji: string
   image_url: string | null
+  image_urls: string[]
   categories?: { name: string; slug: string }
 }
 
@@ -31,7 +33,7 @@ interface Category {
 const emptyProduct = {
   name: '', name_ar: '', slug: '', category_id: 0, description: '',
   price_aed: 0, unit: 'kg', stock: 0, is_active: true, is_featured: false,
-  is_organic: false, origin: '', emoji: '', image_url: '',
+  is_organic: false, origin: '', emoji: '', image_urls: [] as string[],
 }
 
 export default function ProductsManager({ initialProducts, categories }: { initialProducts: Product[]; categories: Category[] }) {
@@ -87,7 +89,11 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       })
       const data = await res.json()
       if (!res.ok) { setApiError(data.error || 'Save failed'); return }
-      setProducts(prev => prev.map(p => p.id === editing ? { ...p, ...editData } : p))
+      setProducts(prev => prev.map(p => p.id === editing ? {
+        ...p,
+        ...editData,
+        image_url: editData.image_urls?.[0] ?? editData.image_url ?? p.image_url,
+      } : p))
       setEditing(null)
       setEditData(null)
     } catch {
@@ -180,6 +186,13 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     else setSelected(new Set(filtered.map(p => p.id)))
   }
 
+  // Normalise product images to a string[]
+  function getProductImages(p: Product): string[] {
+    if (Array.isArray(p.image_urls) && p.image_urls.length > 0) return p.image_urls
+    if (p.image_url) return [p.image_url]
+    return []
+  }
+
   return (
     <div className="p-6 space-y-4">
       {apiError && (
@@ -225,16 +238,16 @@ export default function ProductsManager({ initialProducts, categories }: { initi
 
       {/* Add Product Modal */}
       {showAdd && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-black text-white">Add New Product</h2>
               <button onClick={() => setShowAdd(false)} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input label="Name" value={newProduct.name} onChange={v => setNewProduct({...newProduct, name: v, slug: v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/,'')})} />
+              <Input label="Name *" value={newProduct.name} onChange={v => setNewProduct({...newProduct, name: v, slug: v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/,'')})} />
               <Input label="Arabic Name" value={newProduct.name_ar} onChange={v => setNewProduct({...newProduct, name_ar: v})} />
-              <Input label="Slug" value={newProduct.slug} onChange={v => setNewProduct({...newProduct, slug: v})} />
+              <Input label="Slug *" value={newProduct.slug} onChange={v => setNewProduct({...newProduct, slug: v})} />
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Category</label>
                 <select value={newProduct.category_id} onChange={e => setNewProduct({...newProduct, category_id: Number(e.target.value)})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500">
@@ -242,20 +255,26 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
-              <Input label="Price (AED)" value={String(newProduct.price_aed)} onChange={v => setNewProduct({...newProduct, price_aed: Number(v)})} type="number" />
+              <Input label="Price (AED) *" value={String(newProduct.price_aed)} onChange={v => setNewProduct({...newProduct, price_aed: Number(v)})} type="number" />
               <Input label="Unit" value={newProduct.unit} onChange={v => setNewProduct({...newProduct, unit: v})} />
               <Input label="Stock" value={String(newProduct.stock)} onChange={v => setNewProduct({...newProduct, stock: Number(v)})} type="number" />
               <Input label="Origin" value={newProduct.origin} onChange={v => setNewProduct({...newProduct, origin: v})} />
               <Input label="Emoji" value={newProduct.emoji} onChange={v => setNewProduct({...newProduct, emoji: v})} />
-              <Input label="Image URL" value={newProduct.image_url} onChange={v => setNewProduct({...newProduct, image_url: v})} />
               <div className="col-span-2">
                 <label className="text-xs text-gray-500 mb-1 block">Description</label>
                 <textarea value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
               </div>
+              <div className="col-span-2">
+                <label className="text-xs text-gray-500 mb-2 block">Product Images</label>
+                <ImageUploader
+                  images={newProduct.image_urls}
+                  onChange={urls => setNewProduct({...newProduct, image_urls: urls})}
+                />
+              </div>
               <Toggle label="Organic" checked={newProduct.is_organic} onChange={v => setNewProduct({...newProduct, is_organic: v})} />
               <Toggle label="Featured" checked={newProduct.is_featured} onChange={v => setNewProduct({...newProduct, is_featured: v})} />
             </div>
-            <div className="flex justify-end gap-3 mt-4">
+            <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => setShowAdd(false)} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
               <button onClick={addProduct} disabled={saving || !newProduct.name} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">
                 {saving ? 'Saving...' : 'Add Product'}
@@ -267,9 +286,9 @@ export default function ProductsManager({ initialProducts, categories }: { initi
 
       {/* Edit Product Modal */}
       {editing !== null && editData && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => { setEditing(null); setEditData(null) }}>
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => { setEditing(null); setEditData(null) }}>
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-black text-white">Edit Product</h2>
               <button onClick={() => { setEditing(null); setEditData(null) }} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
@@ -288,16 +307,22 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Stock" value={String(editData.stock || 0)} onChange={v => setEditData({...editData, stock: Number(v)})} type="number" />
               <Input label="Origin" value={editData.origin || ''} onChange={v => setEditData({...editData, origin: v})} />
               <Input label="Emoji" value={editData.emoji || ''} onChange={v => setEditData({...editData, emoji: v})} />
-              <Input label="Image URL" value={editData.image_url || ''} onChange={v => setEditData({...editData, image_url: v})} />
               <div className="col-span-2">
                 <label className="text-xs text-gray-500 mb-1 block">Description</label>
                 <textarea value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
+              </div>
+              <div className="col-span-2">
+                <label className="text-xs text-gray-500 mb-2 block">Product Images</label>
+                <ImageUploader
+                  images={editData.image_urls || []}
+                  onChange={urls => setEditData({...editData, image_urls: urls})}
+                />
               </div>
               <Toggle label="Organic" checked={editData.is_organic || false} onChange={v => setEditData({...editData, is_organic: v})} />
               <Toggle label="Featured" checked={editData.is_featured || false} onChange={v => setEditData({...editData, is_featured: v})} />
               <Toggle label="Active" checked={editData.is_active !== false} onChange={v => setEditData({...editData, is_active: v})} />
             </div>
-            <div className="flex justify-end gap-3 mt-4">
+            <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => { setEditing(null); setEditData(null) }} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
               <button onClick={saveEdit} disabled={saving} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">
                 {saving ? 'Saving...' : 'Save Changes'}
@@ -333,41 +358,66 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
-              {filtered.map(product => (
-                <tr key={product.id} className={`transition-colors hover:bg-gray-800/30 ${selected.has(product.id) ? 'bg-gray-800/20' : ''}`}>
-                  <td className="px-4 py-3">
-                    <input type="checkbox" checked={selected.has(product.id)} onChange={() => {
-                      const s = new Set(selected)
-                      s.has(product.id) ? s.delete(product.id) : s.add(product.id)
-                      setSelected(s)
-                    }} className="rounded" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      {product.emoji && <span className="text-lg">{product.emoji}</span>}
-                      <div>
-                        <p className="text-white font-semibold text-sm">{product.name}</p>
-                        <p className="text-gray-600 text-xs">{product.name_ar} · {product.unit}</p>
+              {filtered.map(product => {
+                const imgs = getProductImages(product)
+                return (
+                  <tr key={product.id} className={`transition-colors hover:bg-gray-800/30 ${selected.has(product.id) ? 'bg-gray-800/20' : ''}`}>
+                    <td className="px-4 py-3">
+                      <input type="checkbox" checked={selected.has(product.id)} onChange={() => {
+                        const s = new Set(selected)
+                        s.has(product.id) ? s.delete(product.id) : s.add(product.id)
+                        setSelected(s)
+                      }} className="rounded" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        {/* Thumbnail */}
+                        <div className="w-9 h-9 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 flex items-center justify-center">
+                          {imgs[0] ? (
+                            <img src={imgs[0]} alt={product.name} className="w-full h-full object-cover" />
+                          ) : product.emoji ? (
+                            <span className="text-lg">{product.emoji}</span>
+                          ) : (
+                            <span className="text-gray-600 text-xs">—</span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-white font-semibold text-sm">{product.name}</p>
+                          <p className="text-gray-600 text-xs">
+                            {product.name_ar && <span>{product.name_ar} · </span>}
+                            {product.unit}
+                            {imgs.length > 1 && <span className="ml-1 text-gray-500">· {imgs.length} imgs</span>}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">{product.categories?.name || '—'}</td>
-                  <td className="px-4 py-3 text-green-400 font-bold text-sm">AED {Number(product.price_aed).toFixed(2)}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-sm font-semibold ${product.stock > 10 ? 'text-gray-300' : product.stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>{product.stock}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${product.is_active ? 'bg-green-500/15 text-green-400 hover:bg-red-500/15 hover:text-red-400' : 'bg-red-500/15 text-red-400 hover:bg-green-500/15 hover:text-green-400'}`}>
-                      {product.is_active ? '● Active' : '○ Inactive'}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => { setEditing(product.id); setEditData({...product}) }} className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">{product.categories?.name || '—'}</td>
+                    <td className="px-4 py-3 text-green-400 font-bold text-sm">AED {Number(product.price_aed).toFixed(2)}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-sm font-semibold ${product.stock > 10 ? 'text-gray-300' : product.stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>{product.stock}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${product.is_active ? 'bg-green-500/15 text-green-400 hover:bg-red-500/15 hover:text-red-400' : 'bg-red-500/15 text-red-400 hover:bg-green-500/15 hover:text-green-400'}`}>
+                        {product.is_active ? '● Active' : '○ Inactive'}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => {
+                          setEditing(product.id)
+                          setEditData({
+                            ...product,
+                            image_urls: getProductImages(product),
+                          })
+                        }}
+                        className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

@@ -22,6 +22,7 @@ export interface Product {
   origin: string
   emoji: string
   imageUrl?: string
+  imageUrls: string[]
   isActive: boolean
 }
 
@@ -51,6 +52,7 @@ function mapProduct(row: any): Product {
     origin: row.origin || '',
     emoji: row.emoji || '',
     imageUrl: row.image_url || undefined,
+    imageUrls: Array.isArray(row.image_urls) ? row.image_urls.filter(Boolean) : (row.image_url ? [row.image_url] : []),
     isActive: row.is_active ?? true,
   }
 }

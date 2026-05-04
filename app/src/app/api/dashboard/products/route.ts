@@ -26,9 +26,16 @@ export async function PATCH(request: Request) {
   if (updates.unit !== undefined) dbUpdates.unit = updates.unit
   if (updates.origin !== undefined) dbUpdates.origin = updates.origin
   if (updates.emoji !== undefined) dbUpdates.emoji = updates.emoji
-  if (updates.image_url !== undefined) dbUpdates.image_url = updates.image_url
   if (updates.is_organic !== undefined) dbUpdates.is_organic = updates.is_organic
   if (updates.is_featured !== undefined) dbUpdates.is_featured = updates.is_featured
+  // image_urls is the canonical multi-image column; keep image_url in sync as the primary
+  if (updates.image_urls !== undefined) {
+    const urls = Array.isArray(updates.image_urls) ? updates.image_urls : []
+    dbUpdates.image_urls = urls
+    dbUpdates.image_url = urls[0] ?? null
+  } else if (updates.image_url !== undefined) {
+    dbUpdates.image_url = updates.image_url
+  }
 
   const { error } = await supabase.from('products').update(dbUpdates).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -71,7 +78,8 @@ export async function POST(request: Request) {
     is_active: body.is_active !== false,
     origin: body.origin || '',
     emoji: body.emoji || '',
-    image_url: body.image_url || null,
+    image_urls: Array.isArray(body.image_urls) ? body.image_urls : (body.image_url ? [body.image_url] : []),
+    image_url: (Array.isArray(body.image_urls) ? body.image_urls[0] : body.image_url) || null,
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

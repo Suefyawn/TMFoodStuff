@@ -32,6 +32,7 @@ create table if not exists products (
   origin      text        not null default '',
   emoji       text        not null default '',
   image_url   text,
+  image_urls  text[]      not null default '{}',
   category_id bigint references categories(id) on delete set null,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()

@@ -4,10 +4,10 @@ import { ArrowLeft } from 'lucide-react'
 import { getProductBySlug, getProducts, getCategories, getAllProductSlugs } from '@/lib/products-api'
 import AddToCartButton from '@/components/AddToCartButton'
 import ProductCard from '@/components/ProductCard'
-import { ProductImage } from '@/components/ProductImage'
 import { formatAED, calculateVAT } from '@/lib/utils'
 import StickyProductCTA from '@/components/StickyProductCTA'
 import { ProductNameDisplay } from '@/components/ProductNameDisplay'
+import ProductImageGallery from '@/components/ProductImageGallery'
 
 export const revalidate = 60
 
@@ -71,25 +71,14 @@ export default async function ProductPage({ params }: Props) {
       </nav>
 
       <div className="grid md:grid-cols-2 gap-6 md:gap-10 mb-12 md:mb-16">
-        <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative w-full">
-          {product.imageUrl ? (
-            <ProductImage
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              emoji={product.emoji}
-            />
-          ) : (
-            <span className="text-[80px] md:text-[120px]">{product.emoji}</span>
-          )}
-          <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-2">
-            {product.isOrganic && (
-              <span className="bg-green-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow">🌱 Organic</span>
-            )}
-            {product.isFeatured && (
-              <span className="bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1.5 rounded-full shadow">⭐ Featured</span>
-            )}
-          </div>
+        <div>
+          <ProductImageGallery
+            images={product.imageUrls}
+            emoji={product.emoji}
+            name={product.name}
+            isOrganic={product.isOrganic}
+            isFeatured={product.isFeatured}
+          />
         </div>
 
         <div className="flex flex-col justify-start md:justify-center">
