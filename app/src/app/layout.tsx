@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
+import { Suspense } from 'react'
+import { PostHogProvider } from '@/components/PostHogProvider'
 import './globals.css'
 
 const inter = Inter({
@@ -24,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_AE',
-    url: 'https://tm-food-stuff.vercel.app',
+    url: 'https://tmfoodstuff.ae',
     siteName: 'TMFoodStuff',
     title: 'TMFoodStuff — Fresh Fruits & Vegetables UAE',
     description: 'Premium fresh fruits & vegetables delivered across UAE. Same-day delivery.',
@@ -35,7 +37,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-inter`}>
-        {children}
+        <Suspense fallback={null}>
+          <PostHogProvider>
+            {children}
+          </PostHogProvider>
+        </Suspense>
       </body>
     </html>
   )
