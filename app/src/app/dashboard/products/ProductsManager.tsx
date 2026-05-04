@@ -194,7 +194,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 sm:p-6 space-y-4">
       {apiError && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl flex items-center justify-between">
           <span>{apiError}</span>

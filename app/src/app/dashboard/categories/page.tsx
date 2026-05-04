@@ -97,7 +97,7 @@ export default function CategoriesPage() {
   if (fetchError) return <div className="p-6 text-red-400">Error: {fetchError}</div>
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-white">Categories</h1>
@@ -156,41 +156,66 @@ export default function CategoriesPage() {
         </div>
       )}
 
-      {/* Categories Table */}
+      {/* Categories list */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-800">
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Category</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Slug</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Description</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800">
-            {categories.map(cat => (
-              <tr key={cat.id} className="hover:bg-gray-800/30 transition-colors">
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{cat.emoji}</span>
-                    <div>
-                      <p className="text-white font-semibold text-sm">{cat.name}</p>
-                      <p className="text-gray-600 text-xs">{cat.name_ar}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-5 py-3 text-gray-400 text-sm font-mono">{cat.slug}</td>
-                <td className="px-5 py-3 text-gray-500 text-xs max-w-[200px] truncate">{cat.description}</td>
-                <td className="px-5 py-3">
-                  <div className="flex gap-2">
-                    <button onClick={() => { setEditing(cat.id); setEditData({...cat}) }} className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">Edit</button>
-                    <button onClick={() => deleteCategory(cat.id)} className="text-xs px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"><Trash2 size={12} /></button>
-                  </div>
-                </td>
+
+        {/* Mobile card view */}
+        <div className="sm:hidden divide-y divide-gray-800">
+          {categories.length === 0 ? (
+            <p className="p-8 text-center text-gray-600">No categories yet</p>
+          ) : categories.map(cat => (
+            <div key={cat.id} className="flex items-center justify-between px-4 py-3 gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="text-2xl shrink-0">{cat.emoji}</span>
+                <div className="min-w-0">
+                  <p className="text-white font-semibold text-sm truncate">{cat.name}</p>
+                  <p className="text-gray-500 text-xs font-mono truncate">{cat.slug}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button onClick={() => { setEditing(cat.id); setEditData({...cat}) }} className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">Edit</button>
+                <button onClick={() => deleteCategory(cat.id)} className="text-xs px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"><Trash2 size={12} /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-800">
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Category</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Slug</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Description</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {categories.map(cat => (
+                <tr key={cat.id} className="hover:bg-gray-800/30 transition-colors">
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{cat.emoji}</span>
+                      <div>
+                        <p className="text-white font-semibold text-sm">{cat.name}</p>
+                        <p className="text-gray-600 text-xs">{cat.name_ar}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3 text-gray-400 text-sm font-mono">{cat.slug}</td>
+                  <td className="px-5 py-3 text-gray-500 text-xs max-w-[200px] truncate">{cat.description}</td>
+                  <td className="px-5 py-3">
+                    <div className="flex gap-2">
+                      <button onClick={() => { setEditing(cat.id); setEditData({...cat}) }} className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">Edit</button>
+                      <button onClick={() => deleteCategory(cat.id)} className="text-xs px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"><Trash2 size={12} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )

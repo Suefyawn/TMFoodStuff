@@ -41,7 +41,7 @@ export default function CustomersPage() {
   if (fetchError) return <div className="p-6 text-red-400">Error: {fetchError}</div>
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 sm:p-6 space-y-4">
       <div>
         <h1 className="text-2xl font-black text-white">Customers</h1>
         <p className="text-gray-500 text-sm">{customers.length} unique customers</p>
@@ -63,16 +63,16 @@ export default function CustomersPage() {
               return (
                 <div key={i}>
                   <div className="flex items-center justify-between px-5 py-4 hover:bg-gray-800/30 cursor-pointer transition-colors" onClick={() => setExpanded(isExpanded ? null : key)}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-lg font-black text-gray-500">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center text-base font-black text-gray-500 shrink-0">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <p className="text-white font-semibold text-sm">{customer.name}</p>
-                        <p className="text-gray-500 text-xs">{customer.phone} {customer.email && `· ${customer.email}`}</p>
+                      <div className="min-w-0">
+                        <p className="text-white font-semibold text-sm truncate">{customer.name}</p>
+                        <p className="text-gray-500 text-xs truncate">{customer.phone}{customer.email && ` · ${customer.email}`}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3 sm:gap-6 shrink-0">
                       <div className="text-right">
                         <p className="text-green-400 font-bold text-sm">AED {customer.totalSpent.toFixed(2)}</p>
                         <p className="text-gray-600 text-xs">{customer.totalOrders} orders</p>

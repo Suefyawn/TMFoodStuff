@@ -28,22 +28,22 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="min-h-screen bg-gray-950">
-      <header className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard/orders" className="text-gray-500 hover:text-white text-sm transition-colors">← Orders</Link>
+      <header className="bg-gray-900 border-b border-gray-800 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link href="/dashboard/orders" className="text-gray-500 hover:text-white text-sm transition-colors shrink-0">← Orders</Link>
           <span className="text-gray-700">/</span>
-          <h1 className="text-white font-black">{order.order_number}</h1>
+          <h1 className="text-white font-black truncate">{order.order_number}</h1>
         </div>
         {phone && (
           <a href={`https://wa.me/${phone.replace(/\D/g, '')}?text=${waMsg}`}
             target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors">
-            💬 WhatsApp Customer
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-xl transition-colors shrink-0">
+            💬 <span className="hidden sm:inline">WhatsApp Customer</span><span className="sm:hidden">WhatsApp</span>
           </a>
         )}
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-5">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
 
         <div className="grid md:grid-cols-2 gap-5">
