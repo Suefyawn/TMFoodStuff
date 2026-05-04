@@ -1,12 +1,10 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function DashboardLogin() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -20,8 +18,9 @@ export default function DashboardLogin() {
         body: JSON.stringify({ password }),
       })
       if (res.ok) {
-        router.push('/dashboard')
-        router.refresh()
+        // Hard redirect so the auth cookie is included in the next request
+        // and middleware validates it correctly before rendering the dashboard.
+        window.location.href = '/dashboard'
       } else {
         setError('Wrong password')
         setLoading(false)

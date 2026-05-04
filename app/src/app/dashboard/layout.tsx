@@ -45,6 +45,11 @@ function MobileNavLink({ item, pathname }: { item: typeof navItems[number]; path
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
+  // Login and logout pages render without the sidebar shell
+  if (pathname === '/dashboard/login' || pathname === '/dashboard/logout') {
+    return <>{children}</>
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 flex">
       {/* Sidebar */}
