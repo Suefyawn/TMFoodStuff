@@ -84,16 +84,16 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Dashboard</h1>
           <p className="text-gray-500 text-sm">TMFoodStuff Admin Overview</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 shrink-0">
           <Link href="/dashboard/products" className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
             + Add Product
           </Link>
-          <Link href="/dashboard/orders" className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-xl transition-colors">
+          <Link href="/dashboard/orders" className="hidden sm:block px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-xl transition-colors">
             View Orders
           </Link>
         </div>
@@ -169,38 +169,59 @@ export default async function DashboardPage() {
         {stats.recentOrders.length === 0 ? (
           <p className="p-8 text-center text-gray-600">No orders yet</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Order</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Customer</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800">
-                {stats.recentOrders.map((o: any) => (
-                  <tr key={o.id} className="hover:bg-gray-800/30 transition-colors">
-                    <td className="px-5 py-3">
+          <>
+            {/* Mobile card view */}
+            <div className="sm:hidden divide-y divide-gray-800">
+              {stats.recentOrders.map((o: any) => (
+                <div key={o.id} className="px-4 py-3 flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
                       <Link href={`/dashboard/orders/${o.id}`} className="text-white font-bold hover:text-green-400 text-sm">{o.order_number}</Link>
-                    </td>
-                    <td className="px-5 py-3 text-gray-400 text-sm">{o.customer_name || '—'}</td>
-                    <td className="px-5 py-3 text-green-400 font-bold text-sm">AED {(o.total || 0).toFixed(2)}</td>
-                    <td className="px-5 py-3">
-                      <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${statusColors[o.status] || 'bg-gray-700 text-gray-400'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${statusColors[o.status] || 'bg-gray-700 text-gray-400'}`}>
                         {o.status || 'pending'}
                       </span>
-                    </td>
-                    <td className="px-5 py-3 text-gray-600 text-xs">
-                      {o.created_at ? new Date(o.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
-                    </td>
+                    </div>
+                    <p className="text-gray-500 text-xs mt-0.5 truncate">{o.customer_name || '—'} · {o.created_at ? new Date(o.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ''}</p>
+                  </div>
+                  <span className="text-green-400 font-bold text-sm shrink-0">AED {(o.total || 0).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-800">
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Order</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Customer</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {stats.recentOrders.map((o: any) => (
+                    <tr key={o.id} className="hover:bg-gray-800/30 transition-colors">
+                      <td className="px-5 py-3">
+                        <Link href={`/dashboard/orders/${o.id}`} className="text-white font-bold hover:text-green-400 text-sm">{o.order_number}</Link>
+                      </td>
+                      <td className="px-5 py-3 text-gray-400 text-sm">{o.customer_name || '—'}</td>
+                      <td className="px-5 py-3 text-green-400 font-bold text-sm">AED {(o.total || 0).toFixed(2)}</td>
+                      <td className="px-5 py-3">
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${statusColors[o.status] || 'bg-gray-700 text-gray-400'}`}>
+                          {o.status || 'pending'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-gray-600 text-xs">
+                        {o.created_at ? new Date(o.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

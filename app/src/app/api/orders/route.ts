@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendOrderConfirmation, sendAdminOrderAlert, type OrderEmailData } from '@/lib/email'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 
@@ -67,6 +68,36 @@ export async function POST(request: Request) {
     const { error } = await supabase.from('orders').insert(payload)
 
     if (error) throw error
+
+    // Send emails (graceful no-ops if RESEND_API_KEY is not set)
+    const emailData: OrderEmailData = {
+      order_number: orderNumber,
+      customer_name: form.fullName,
+      customer_phone: form.phone,
+      customer_email: form.email || undefined,
+      delivery_area: form.area,
+      delivery_emirate: form.emirate,
+      delivery_building: form.building || undefined,
+      delivery_slot: deliverySlot,
+      delivery_notes: form.notes || undefined,
+      delivery_fee: deliveryFee || 0,
+      subtotal,
+      vat,
+      promo_code: promoCode || undefined,
+      promo_discount: promoDiscount || 0,
+      total,
+      items: items.map((item: any) => ({
+        name: item.name,
+        emoji: item.emoji,
+        quantity: item.quantity,
+        price_aed: item.priceAED,
+      })),
+      whatsapp_number: whatsappNumber,
+    }
+    await Promise.all([
+      sendOrderConfirmation(emailData),
+      sendAdminOrderAlert(emailData),
+    ])
 
     // WhatsApp message
     const itemsList = items.map((i: any) => `• ${i.name} x${i.quantity} = AED ${(i.priceAED * i.quantity).toFixed(2)}`).join('\n')

@@ -68,69 +68,118 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
         {filtered.length === 0 ? (
           <p className="p-16 text-center text-gray-600">No orders found</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Order</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Customer</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Location</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Slot</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Items</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800">
-                {filtered.map((order: any) => {
-                  const items = order.items || []
-                  const slotMap: Record<string, string> = { morning: '8AM–12PM', afternoon: '12PM–5PM', evening: '5PM–10PM' }
-                  const waText = encodeURIComponent(
-                    `Hi ${order.customer_name || 'there'}! 👋\n` +
-                    `Your TMFoodStuff order *#${order.order_number}* has been received.\n` +
-                    `📦 ${items.length} item${items.length !== 1 ? 's' : ''} · AED ${(order.total || 0).toFixed(2)}\n` +
-                    `🕐 Delivery slot: ${slotMap[order.delivery_slot] || order.delivery_slot || '—'}\n` +
-                    `We'll be in touch shortly. Thank you! 🥦`
-                  )
-                  return (
-                    <tr key={order.id} className="hover:bg-gray-800/30 transition-colors">
-                      <td className="px-5 py-4">
+          <>
+            {/* Mobile card view */}
+            <div className="sm:hidden divide-y divide-gray-800">
+              {filtered.map((order: any) => {
+                const items = order.items || []
+                const slotMap: Record<string, string> = { morning: '8AM–12PM', afternoon: '12PM–5PM', evening: '5PM–10PM' }
+                const waText = encodeURIComponent(
+                  `Hi ${order.customer_name || 'there'}! 👋\n` +
+                  `Your TMFoodStuff order *#${order.order_number}* has been received.\n` +
+                  `📦 ${items.length} item${items.length !== 1 ? 's' : ''} · AED ${(order.total || 0).toFixed(2)}\n` +
+                  `🕐 Delivery slot: ${slotMap[order.delivery_slot] || order.delivery_slot || '—'}\n` +
+                  `We'll be in touch shortly. Thank you! 🥦`
+                )
+                return (
+                  <div key={order.id} className="p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
                         <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-green-400 text-sm">{order.order_number}</Link>
                         <p className="text-gray-600 text-xs mt-0.5">
                           {order.created_at ? new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
                         </p>
-                      </td>
-                      <td className="px-5 py-4">
+                      </div>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border shrink-0 ${statusColors[order.status] || 'bg-gray-700 text-gray-400 border-gray-600'}`}>
+                        {(order.status || 'pending').replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
                         <p className="text-white text-sm font-semibold">{order.customer_name || '—'}</p>
                         <p className="text-gray-500 text-xs">{order.customer_phone}</p>
-                      </td>
-                      <td className="px-5 py-4">
-                        <p className="text-gray-300 text-sm">{order.delivery_area || '—'}</p>
-                        <p className="text-gray-500 text-xs">{order.delivery_emirate}</p>
-                      </td>
-                      <td className="px-5 py-4 text-gray-400 text-sm capitalize">{order.delivery_slot || '—'}</td>
-                      <td className="px-5 py-4 text-gray-400 text-sm">{items.length} items</td>
-                      <td className="px-5 py-4 text-green-400 font-black text-sm">AED {(order.total || 0).toFixed(2)}</td>
-                      <td className="px-5 py-4">
-                        <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${statusColors[order.status] || 'bg-gray-700 text-gray-400 border-gray-600'}`}>
-                          {(order.status || 'pending').replace(/_/g, ' ')}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-2">
-                          <Link href={`/dashboard/orders/${order.id}`} className="text-xs px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">View</Link>
-                          {order.customer_phone && (
-                            <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-colors">WA</a>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                      <span className="text-green-400 font-black text-sm">AED {(order.total || 0).toFixed(2)}</span>
+                    </div>
+                    <p className="text-gray-500 text-xs">
+                      {order.delivery_area || '—'}, {order.delivery_emirate} · {slotMap[order.delivery_slot] || order.delivery_slot || '—'} · {items.length} items
+                    </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <Link href={`/dashboard/orders/${order.id}`} className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">View</Link>
+                      {order.customer_phone && (
+                        <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="text-xs px-3 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-colors">WhatsApp</a>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-800">
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Order</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Customer</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Location</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Slot</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Items</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {filtered.map((order: any) => {
+                    const items = order.items || []
+                    const slotMap: Record<string, string> = { morning: '8AM–12PM', afternoon: '12PM–5PM', evening: '5PM–10PM' }
+                    const waText = encodeURIComponent(
+                      `Hi ${order.customer_name || 'there'}! 👋\n` +
+                      `Your TMFoodStuff order *#${order.order_number}* has been received.\n` +
+                      `📦 ${items.length} item${items.length !== 1 ? 's' : ''} · AED ${(order.total || 0).toFixed(2)}\n` +
+                      `🕐 Delivery slot: ${slotMap[order.delivery_slot] || order.delivery_slot || '—'}\n` +
+                      `We'll be in touch shortly. Thank you! 🥦`
+                    )
+                    return (
+                      <tr key={order.id} className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-5 py-4">
+                          <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-green-400 text-sm">{order.order_number}</Link>
+                          <p className="text-gray-600 text-xs mt-0.5">
+                            {order.created_at ? new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                          </p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="text-white text-sm font-semibold">{order.customer_name || '—'}</p>
+                          <p className="text-gray-500 text-xs">{order.customer_phone}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="text-gray-300 text-sm">{order.delivery_area || '—'}</p>
+                          <p className="text-gray-500 text-xs">{order.delivery_emirate}</p>
+                        </td>
+                        <td className="px-5 py-4 text-gray-400 text-sm capitalize">{order.delivery_slot || '—'}</td>
+                        <td className="px-5 py-4 text-gray-400 text-sm">{items.length} items</td>
+                        <td className="px-5 py-4 text-green-400 font-black text-sm">AED {(order.total || 0).toFixed(2)}</td>
+                        <td className="px-5 py-4">
+                          <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${statusColors[order.status] || 'bg-gray-700 text-gray-400 border-gray-600'}`}>
+                            {(order.status || 'pending').replace(/_/g, ' ')}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-2">
+                            <Link href={`/dashboard/orders/${order.id}`} className="text-xs px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">View</Link>
+                            {order.customer_phone && (
+                              <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-colors">WA</a>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

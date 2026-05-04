@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
@@ -10,6 +10,7 @@ const navItems = [
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+  { href: '/dashboard/integrations', label: 'Integrations', icon: Plug },
 ]
 
 function NavLink({ item, pathname }: { item: typeof navItems[number]; pathname: string }) {
@@ -45,7 +46,6 @@ function MobileNavLink({ item, pathname }: { item: typeof navItems[number]; path
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  // Login and logout pages render without the sidebar shell
   if (pathname === '/dashboard/login' || pathname === '/dashboard/logout') {
     return <>{children}</>
   }
@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="text-lg">🥬</span>
             <span className="font-black text-white">TMFoodStuff</span>
           </Link>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center overflow-x-auto gap-0.5 max-w-[calc(100vw-160px)] scrollbar-none">
             {navItems.map(item => (
               <MobileNavLink key={item.href} item={item} pathname={pathname} />
             ))}
