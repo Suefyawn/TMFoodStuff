@@ -444,7 +444,7 @@ export default function CheckoutPage() {
 
                 {promoApplied && (
                   <div className="flex justify-between text-green-600 font-semibold">
-                    <span>Promo (FRESH10)</span>
+                    <span>Promo ({promoCode})</span>
                     <span>-{formatAED(promoDiscount)}</span>
                   </div>
                 )}
