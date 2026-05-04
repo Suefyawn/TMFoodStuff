@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="text-lg">🥬</span>
             <span className="font-black text-white">TMFoodStuff</span>
           </Link>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center overflow-x-auto gap-0.5 max-w-[calc(100vw-160px)] scrollbar-none">
             {navItems.map(item => (
               <MobileNavLink key={item.href} item={item} pathname={pathname} />
             ))}

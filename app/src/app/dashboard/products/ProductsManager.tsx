@@ -231,7 +231,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <h2 className="text-lg font-black text-white">Add New Product</h2>
               <button onClick={() => setShowAdd(false)} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input label="Name" value={newProduct.name} onChange={v => setNewProduct({...newProduct, name: v, slug: v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/,'')})} />
               <Input label="Arabic Name" value={newProduct.name_ar} onChange={v => setNewProduct({...newProduct, name_ar: v})} />
               <Input label="Slug" value={newProduct.slug} onChange={v => setNewProduct({...newProduct, slug: v})} />
@@ -248,7 +248,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Origin" value={newProduct.origin} onChange={v => setNewProduct({...newProduct, origin: v})} />
               <Input label="Emoji" value={newProduct.emoji} onChange={v => setNewProduct({...newProduct, emoji: v})} />
               <Input label="Image URL" value={newProduct.image_url} onChange={v => setNewProduct({...newProduct, image_url: v})} />
-              <div className="col-span-2">
+              <div className="col-span-1 sm:col-span-2">
                 <label className="text-xs text-gray-500 mb-1 block">Description</label>
                 <textarea value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
               </div>
@@ -273,7 +273,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <h2 className="text-lg font-black text-white">Edit Product</h2>
               <button onClick={() => { setEditing(null); setEditData(null) }} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input label="Name" value={editData.name || ''} onChange={v => setEditData({...editData, name: v})} />
               <Input label="Arabic Name" value={editData.name_ar || ''} onChange={v => setEditData({...editData, name_ar: v})} />
               <Input label="Slug" value={editData.slug || ''} onChange={v => setEditData({...editData, slug: v})} />
@@ -289,7 +289,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Origin" value={editData.origin || ''} onChange={v => setEditData({...editData, origin: v})} />
               <Input label="Emoji" value={editData.emoji || ''} onChange={v => setEditData({...editData, emoji: v})} />
               <Input label="Image URL" value={editData.image_url || ''} onChange={v => setEditData({...editData, image_url: v})} />
-              <div className="col-span-2">
+              <div className="col-span-1 sm:col-span-2">
                 <label className="text-xs text-gray-500 mb-1 block">Description</label>
                 <textarea value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
               </div>
@@ -309,7 +309,43 @@ export default function ProductsManager({ initialProducts, categories }: { initi
 
       {/* Products Table */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
+
+        {/* Mobile card view */}
+        <div className="sm:hidden divide-y divide-gray-800">
+          {filtered.length === 0 ? (
+            <p className="p-12 text-center text-gray-600">No products found</p>
+          ) : filtered.map(product => (
+            <div key={product.id} className={`p-4 space-y-2 transition-colors ${selected.has(product.id) ? 'bg-gray-800/30' : ''}`}>
+              <div className="flex items-center gap-3">
+                <input type="checkbox" checked={selected.has(product.id)} onChange={() => {
+                  const s = new Set(selected); s.has(product.id) ? s.delete(product.id) : s.add(product.id); setSelected(s)
+                }} className="rounded shrink-0" />
+                {product.emoji && <span className="text-2xl shrink-0">{product.emoji}</span>}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold text-sm truncate">{product.name}</p>
+                  <p className="text-gray-500 text-xs">{product.categories?.name || '—'} · {product.unit}</p>
+                </div>
+                <span className="text-green-400 font-bold text-sm shrink-0">AED {Number(product.price_aed).toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between pl-10">
+                <span className={`text-xs font-semibold ${product.stock > 10 ? 'text-gray-400' : product.stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>
+                  {product.stock} in stock
+                </span>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all ${product.is_active ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'}`}>
+                    {product.is_active ? '● Active' : '○ Inactive'}
+                  </button>
+                  <button onClick={() => { setEditing(product.id); setEditData({...product}) }} className="text-xs px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-800">
