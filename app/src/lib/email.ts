@@ -220,6 +220,15 @@ export interface OrderEmailData {
   whatsapp_number: string
 }
 
+export interface StatusUpdateEmailData {
+  order_number: string
+  customer_name: string
+  customer_email: string
+  delivery_slot: string
+  total: number
+  whatsapp_number: string
+}
+
 // ─── Send functions ───────────────────────────────────────────────────────────
 
 export async function sendOrderConfirmation(order: OrderEmailData): Promise<void> {
@@ -235,6 +244,130 @@ export async function sendOrderConfirmation(order: OrderEmailData): Promise<void
     })
   } catch (err) {
     console.error('[Resend] Failed to send order confirmation:', err)
+  }
+}
+
+export async function sendOutForDeliveryEmail(order: StatusUpdateEmailData): Promise<void> {
+  const resend = getResend()
+  if (!resend) return
+
+  const slotLabels: Record<string, string> = {
+    morning: 'Morning (8:00 AM – 12:00 PM)',
+    afternoon: 'Afternoon (12:00 PM – 5:00 PM)',
+    evening: 'Evening (5:00 PM – 10:00 PM)',
+  }
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+        <tr><td style="background:#ea580c;border-radius:16px 16px 0 0;padding:28px 32px;text-align:center">
+          <div style="font-size:36px;margin-bottom:4px">🚚</div>
+          <div style="color:#ffffff;font-size:22px;font-weight:900">TM FoodStuff</div>
+          <div style="color:#fed7aa;font-size:13px;margin-top:4px">Your order is on the way!</div>
+        </td></tr>
+        <tr><td style="background:#ffffff;padding:32px">
+          <h1 style="margin:0 0 8px;font-size:22px;font-weight:900;color:#111827;text-align:center">Out for Delivery 🚚</h1>
+          <p style="margin:0 0 24px;font-size:15px;color:#6b7280;text-align:center">Hi ${order.customer_name}, your fresh produce is on its way to you!</p>
+          <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:16px 20px;text-align:center;margin-bottom:24px">
+            <div style="font-size:12px;color:#ea580c;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Order</div>
+            <div style="font-size:24px;font-weight:900;color:#c2410c">#${order.order_number}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px;font-size:14px;color:#374151;line-height:1.8">
+            <div>🕐 Expected delivery slot: <strong>${slotLabels[order.delivery_slot] || order.delivery_slot}</strong></div>
+            <div>💰 Total: <strong>AED ${Number(order.total).toFixed(2)}</strong> (Cash on Delivery)</div>
+          </div>
+          <div style="text-align:center;margin-bottom:24px">
+            <a href="${SITE_URL}/track" style="display:inline-block;background:#ea580c;color:#ffffff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:12px;text-decoration:none;margin-bottom:12px">
+              📦 Track Your Order
+            </a>
+            <br>
+            <a href="https://wa.me/${order.whatsapp_number}" style="display:inline-block;margin-top:10px;background:#25D366;color:#ffffff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:12px;text-decoration:none">
+              💬 Contact Us on WhatsApp
+            </a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9fafb;border-radius:0 0 16px 16px;padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;font-size:12px;color:#9ca3af">© 2026 TMFoodStuff · <a href="${SITE_URL}" style="color:#16a34a;text-decoration:none">${SITE_URL.replace('https://', '')}</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  try {
+    await resend.emails.send({
+      from: `TM FoodStuff <${FROM_EMAIL}>`,
+      to: order.customer_email,
+      subject: `🚚 Your order #${order.order_number} is out for delivery!`,
+      html,
+    })
+  } catch (err) {
+    console.error('[Resend] Failed to send out-for-delivery email:', err)
+  }
+}
+
+export async function sendDeliveredEmail(order: StatusUpdateEmailData): Promise<void> {
+  const resend = getResend()
+  if (!resend) return
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+        <tr><td style="background:#16a34a;border-radius:16px 16px 0 0;padding:28px 32px;text-align:center">
+          <div style="font-size:36px;margin-bottom:4px">🥬</div>
+          <div style="color:#ffffff;font-size:22px;font-weight:900">TM FoodStuff</div>
+          <div style="color:#bbf7d0;font-size:13px;margin-top:4px">Delivered — Enjoy your fresh produce!</div>
+        </td></tr>
+        <tr><td style="background:#ffffff;padding:32px">
+          <div style="text-align:center;margin-bottom:28px">
+            <div style="display:inline-block;background:#f0fdf4;border:2px solid #86efac;border-radius:50%;width:64px;height:64px;line-height:64px;font-size:32px;text-align:center">✓</div>
+            <h1 style="margin:16px 0 6px;font-size:22px;font-weight:900;color:#111827">Order Delivered!</h1>
+            <p style="margin:0;font-size:15px;color:#6b7280">Hi ${order.customer_name}, your fresh produce has arrived. Enjoy!</p>
+          </div>
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:16px 20px;text-align:center;margin-bottom:24px">
+            <div style="font-size:12px;color:#16a34a;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Order</div>
+            <div style="font-size:24px;font-weight:900;color:#15803d">#${order.order_number}</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:14px;color:#374151;text-align:center;line-height:1.8">
+            We hope you love everything you received. Fresh produce, delivered with care. 🌿
+          </div>
+          <div style="text-align:center;margin-bottom:24px">
+            <a href="${SITE_URL}/shop" style="display:inline-block;background:#16a34a;color:#ffffff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:12px;text-decoration:none;margin-bottom:10px">
+              🛒 Shop Again
+            </a>
+            <br>
+            <a href="https://wa.me/${order.whatsapp_number}" style="display:inline-block;margin-top:10px;background:#25D366;color:#ffffff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:12px;text-decoration:none">
+              💬 Leave Feedback on WhatsApp
+            </a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9fafb;border-radius:0 0 16px 16px;padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;font-size:12px;color:#9ca3af">© 2026 TMFoodStuff · <a href="${SITE_URL}" style="color:#16a34a;text-decoration:none">${SITE_URL.replace('https://', '')}</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  try {
+    await resend.emails.send({
+      from: `TM FoodStuff <${FROM_EMAIL}>`,
+      to: order.customer_email,
+      subject: `✅ Delivered! Your order #${order.order_number} has arrived`,
+      html,
+    })
+  } catch (err) {
+    console.error('[Resend] Failed to send delivered email:', err)
   }
 }
 
