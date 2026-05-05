@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CheckCircle, ShoppingBag, Package, MessageCircle } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
+import posthog from 'posthog-js'
 
 const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors"
 
@@ -33,6 +34,16 @@ export default function CheckoutPage() {
   })
 
   const { lang, tr } = useLang()
+
+  useEffect(() => {
+    if (items.length > 0) {
+      posthog.capture('checkout_started', {
+        item_count: items.reduce((s, i) => s + i.quantity, 0),
+        subtotal_aed: subtotal(),
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const EMIRATES = lang === 'ar'
     ? ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
@@ -110,6 +121,15 @@ export default function CheckoutPage() {
       const data = await res.json()
 
       if (data.success) {
+        posthog.capture('order_placed', {
+          order_number: data.orderNumber,
+          item_count: items.reduce((s, i) => s + i.quantity, 0),
+          total_aed: finalTotal,
+          payment_method: paymentMethod,
+          delivery_slot: form.deliverySlot,
+          emirate: form.emirate,
+          promo_code: promoApplied ? promoCode : undefined,
+        })
         setOrderNumber(data.orderNumber)
         clearCart()
         setSubmitted(true)

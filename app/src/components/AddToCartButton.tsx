@@ -5,6 +5,7 @@ import { useCartStore } from '@/lib/store'
 import { formatAED } from '@/lib/utils'
 import { Toast } from './Toast'
 import { useLang } from '@/lib/use-lang'
+import posthog from 'posthog-js'
 
 interface Props {
   product: {
@@ -32,6 +33,12 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
   function handleAdd() {
     addItem(product, 1)
     setShowToast(true)
+    posthog.capture('add_to_cart', {
+      product_id: product.id,
+      product_name: product.name,
+      price_aed: product.priceAED,
+      quantity: 1,
+    })
   }
 
   // Prevent hydration mismatch: render neutral button until client store is loaded
