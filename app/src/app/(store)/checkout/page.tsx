@@ -31,6 +31,7 @@ export default function CheckoutPage() {
     makani: '',
     notes: '',
     deliverySlot: '',
+    deliveryDate: '',
   })
 
   const { lang, tr } = useLang()
@@ -48,6 +49,17 @@ export default function CheckoutPage() {
   const EMIRATES = lang === 'ar'
     ? ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
     : ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
+
+  // Generate next 3 delivery dates in UAE timezone
+  const DELIVERY_DATES = Array.from({ length: 3 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() + i)
+    const iso = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' }) // YYYY-MM-DD
+    const label = i === 0 ? (lang === 'ar' ? 'اليوم' : 'Today')
+      : i === 1 ? (lang === 'ar' ? 'غداً' : 'Tomorrow')
+      : d.toLocaleDateString(lang === 'ar' ? 'ar-AE' : 'en-AE', { timeZone: 'Asia/Dubai', weekday: 'short', month: 'short', day: 'numeric' })
+    return { iso, label }
+  })
 
   const DELIVERY_SLOTS = [
     { id: 'morning', label: lang === 'ar' ? 'صباحاً' : 'Morning', time: lang === 'ar' ? '٨ص - ١٢م' : '8:00 AM – 12:00 PM', icon: '🌅' },
@@ -93,6 +105,10 @@ export default function CheckoutPage() {
       alert(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields')
       return
     }
+    if (!form.deliveryDate) {
+      alert(lang === 'ar' ? 'يرجى اختيار تاريخ التوصيل' : 'Please select a delivery date')
+      return
+    }
     if (!form.deliverySlot) {
       alert(lang === 'ar' ? 'يرجى اختيار وقت التوصيل' : 'Please select a delivery slot')
       return
@@ -115,6 +131,7 @@ export default function CheckoutPage() {
           promoCode: promoApplied ? promoCode : '',
           promoDiscount,
           deliverySlot: form.deliverySlot,
+          deliveryDate: form.deliveryDate,
         }),
       })
 
@@ -322,11 +339,30 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Delivery Slot */}
+            {/* Delivery Date + Slot */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
               <h2 className="font-black text-gray-900 text-lg md:text-xl mb-4 md:mb-5">
-                {lang === 'ar' ? 'وقت التوصيل' : 'Delivery Slot'}
+                {lang === 'ar' ? 'موعد التوصيل' : 'Delivery Date & Slot'}
               </h2>
+
+              {/* Date picker */}
+              <p className="text-sm font-semibold text-gray-700 mb-2">{lang === 'ar' ? 'اختر اليوم' : 'Choose a date'}</p>
+              <div className="grid grid-cols-3 gap-2 md:gap-3 mb-5">
+                {DELIVERY_DATES.map(({ iso, label }) => (
+                  <label key={iso} className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
+                    form.deliveryDate === iso ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                  }`}>
+                    <input type="radio" name="deliveryDate" value={iso} checked={form.deliveryDate === iso}
+                      onChange={() => setForm(f => ({ ...f, deliveryDate: iso }))} className="sr-only" />
+                    <span className="font-bold text-gray-900 text-xs md:text-sm">{label}</span>
+                    <span className="text-xs text-gray-400 mt-0.5">{new Date(iso + 'T00:00:00').toLocaleDateString(lang === 'ar' ? 'ar-AE' : 'en-AE', { day: 'numeric', month: 'short' })}</span>
+                    {form.deliveryDate === iso && <span className="text-green-600 font-black text-xs mt-1">✓</span>}
+                  </label>
+                ))}
+              </div>
+
+              {/* Slot picker */}
+              <p className="text-sm font-semibold text-gray-700 mb-2">{lang === 'ar' ? 'اختر الوقت' : 'Choose a time slot'}</p>
               <div className="grid grid-cols-3 gap-2 md:gap-3">
                 {DELIVERY_SLOTS.map(slot => (
                   <label

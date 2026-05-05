@@ -7,7 +7,7 @@ const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot } = body
+    const { form, items, subtotal, vat, deliveryFee, total, paymentMethod, promoCode, promoDiscount, deliverySlot, deliveryDate } = body
 
     if (!form || !items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ success: false, error: 'Invalid order payload' }, { status: 400 })
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
       delivery_building: form.building || '',
       delivery_makani: form.makani || '',
       delivery_slot: deliverySlot,
+      delivery_date: deliveryDate || null,
       delivery_notes: form.notes || '',
       subtotal,
       subtotal_aed: subtotal,

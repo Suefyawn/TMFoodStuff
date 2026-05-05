@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
-import { Search, Package, CheckCircle, Truck, Clock, XCircle, MapPin, Calendar } from 'lucide-react'
+import { Search, Package, CheckCircle, Truck, Clock, XCircle, MapPin, Calendar, ShoppingCart } from 'lucide-react'
+import { useCartStore } from '@/lib/store'
+import Link from 'next/link'
 
 const STATUS_STEPS = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered']
 
@@ -51,9 +53,27 @@ export default function TrackPage() {
     }
   }
 
+  const { addItem } = useCartStore()
+  const [reordered, setReordered] = useState(false)
+
   const currentStepIndex = order ? STATUS_STEPS.indexOf(order.status) : -1
   const isCancelled = order?.status === 'cancelled'
   const meta = order ? (STATUS_META[order.status] || STATUS_META.pending) : null
+
+  function handleReorder() {
+    if (!order?.items) return
+    for (const item of order.items) {
+      addItem({
+        id: String(item.id || item.name),
+        name: item.name,
+        slug: item.slug || item.name?.toLowerCase().replace(/\s+/g, '-'),
+        priceAED: item.price_aed || item.priceAED || 0,
+        unit: item.unit || 'kg',
+        emoji: item.emoji,
+      }, item.quantity)
+    }
+    setReordered(true)
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-16">
@@ -194,7 +214,7 @@ export default function TrackPage() {
           )}
 
           {/* Total */}
-          <div className="px-6 py-4">
+          <div className="px-6 py-4 border-b border-gray-100">
             {order.promo_code && order.promo_discount > 0 && (
               <div className="flex justify-between text-sm text-green-600 font-semibold mb-1">
                 <span>Promo ({order.promo_code})</span>
@@ -205,6 +225,25 @@ export default function TrackPage() {
               <span className="font-black text-gray-900">Total</span>
               <span className="text-lg font-black text-green-700">AED {Number(order.total).toFixed(2)}</span>
             </div>
+          </div>
+
+          {/* Reorder */}
+          <div className="px-6 py-4">
+            {reordered ? (
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-green-600 font-semibold text-sm">✓ Items added to cart!</span>
+                <Link href="/cart" className="text-sm font-bold text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl transition-colors">
+                  Go to Cart →
+                </Link>
+              </div>
+            ) : (
+              <button
+                onClick={handleReorder}
+                className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-colors text-sm"
+              >
+                <ShoppingCart size={16} /> Order Again
+              </button>
+            )}
           </div>
         </div>
       )}

@@ -13,6 +13,7 @@ interface ProductCardProps {
     nameAr?: string
     slug: string
     priceAED: number
+    compareAtPrice?: number
     unit: string
     isOrganic?: boolean
     isFeatured?: boolean
@@ -60,6 +61,14 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
+          {/* Sale badge top-right */}
+          {product.compareAtPrice && product.compareAtPrice > product.priceAED && (
+            <div className="absolute top-2 right-2">
+              <span className="bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
+                -{Math.round((1 - product.priceAED / product.compareAtPrice) * 100)}%
+              </span>
+            </div>
+          )}
         </div>
       </Link>
 
@@ -80,9 +89,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs text-gray-400 mb-2">{perUnit}</p>
 
         <div className="mt-auto">
-          <div className="text-base md:text-xl font-black text-green-600 mb-2 leading-none">
-            {formatAED(product.priceAED)}
+          <div className="mb-2 leading-none">
+            <span className="text-base md:text-xl font-black text-green-600">
+              {formatAED(product.priceAED)}
+            </span>
             <span className="text-xs text-gray-400 font-normal ml-0.5">/{product.unit}</span>
+            {product.compareAtPrice && product.compareAtPrice > product.priceAED && (
+              <span className="text-xs text-gray-400 line-through ml-2">{formatAED(product.compareAtPrice)}</span>
+            )}
           </div>
           {inStock ? (
             <AddToCartButton product={product} size="sm" />

@@ -8,6 +8,7 @@ import { formatAED, calculateVAT } from '@/lib/utils'
 import StickyProductCTA from '@/components/StickyProductCTA'
 import { ProductNameDisplay } from '@/components/ProductNameDisplay'
 import ProductImageGallery from '@/components/ProductImageGallery'
+import StockNotifyForm from '@/components/StockNotifyForm'
 
 export const revalidate = 60
 
@@ -46,7 +47,33 @@ export default async function ProductPage({ params }: Props) {
     emoji: product.emoji,
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.imageUrls[0] || undefined,
+    sku: product.slug,
+    brand: { '@type': 'Brand', name: 'TM FoodStuff' },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'AED',
+      price: product.priceAED.toFixed(2),
+      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: `https://tmfoodstuff.ae/product/${product.slug}`,
+      ...(product.compareAtPrice && product.compareAtPrice > product.priceAED ? {
+        priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+      } : {}),
+    },
+  }
+
+  const discountPct = product.compareAtPrice && product.compareAtPrice > product.priceAED
+    ? Math.round((1 - product.priceAED / product.compareAtPrice) * 100)
+    : 0
+
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 scroll-mt-20">
       <Link
         href="/shop"
@@ -93,8 +120,14 @@ export default async function ProductPage({ params }: Props) {
           <p className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base">{product.description}</p>
 
           <div className="bg-gray-50 rounded-2xl p-4 md:p-5 mb-5 md:mb-6">
-            <div className="flex items-baseline gap-3 mb-2">
+            <div className="flex items-baseline gap-3 mb-2 flex-wrap">
               <span className="text-3xl md:text-4xl font-black text-green-700">{formatAED(product.priceAED)}</span>
+              {product.compareAtPrice && product.compareAtPrice > product.priceAED && (
+                <>
+                  <span className="text-lg text-gray-400 line-through">{formatAED(product.compareAtPrice)}</span>
+                  <span className="bg-red-500 text-white text-sm font-black px-2.5 py-0.5 rounded-full">-{discountPct}%</span>
+                </>
+              )}
               <span className="text-gray-500 text-sm">per {product.unit}</span>
             </div>
             <div className="text-xs text-gray-400 space-y-1">
@@ -112,7 +145,11 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           <div className="hidden md:block">
-            <AddToCartButton product={productForCart} size="lg" />
+            {product.stock > 0 ? (
+              <AddToCartButton product={productForCart} size="lg" />
+            ) : (
+              <StockNotifyForm productId={product.id} productName={product.name} />
+            )}
           </div>
 
           <div className="mt-5 md:mt-6 grid grid-cols-2 gap-2 md:gap-3 text-sm">
@@ -153,5 +190,6 @@ export default async function ProductPage({ params }: Props) {
 
       <StickyProductCTA product={productForCart} inStock={product.stock > 0} />
     </div>
+    </>
   )
 }

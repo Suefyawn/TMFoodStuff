@@ -12,6 +12,7 @@ interface Product {
   category_id: number
   description: string
   price_aed: number
+  compare_at_price_aed: number | null
   unit: string
   stock: number
   is_active: boolean
@@ -32,7 +33,7 @@ interface Category {
 
 const emptyProduct = {
   name: '', name_ar: '', slug: '', category_id: 0, description: '',
-  price_aed: 0, unit: 'kg', stock: 0, is_active: true, is_featured: false,
+  price_aed: 0, compare_at_price_aed: '' as string | number, unit: 'kg', stock: 0, is_active: true, is_featured: false,
   is_organic: false, origin: '', emoji: '', image_urls: [] as string[],
 }
 
@@ -413,6 +414,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                 </select>
               </div>
               <Input label="Price (AED) *" value={String(newProduct.price_aed)} onChange={v => setNewProduct({...newProduct, price_aed: Number(v)})} type="number" />
+              <Input label="Compare-at Price (AED)" value={String(newProduct.compare_at_price_aed ?? '')} onChange={v => setNewProduct({...newProduct, compare_at_price_aed: v === '' ? '' : Number(v)})} type="number" />
               <Input label="Unit" value={newProduct.unit} onChange={v => setNewProduct({...newProduct, unit: v})} />
               <Input label="Stock" value={String(newProduct.stock)} onChange={v => setNewProduct({...newProduct, stock: Number(v)})} type="number" />
               <Input label="Origin" value={newProduct.origin} onChange={v => setNewProduct({...newProduct, origin: v})} />
@@ -460,6 +462,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                 </select>
               </div>
               <Input label="Price (AED)" value={String(editData.price_aed || 0)} onChange={v => setEditData({...editData, price_aed: Number(v)})} type="number" />
+              <Input label="Compare-at Price (AED)" value={String(editData.compare_at_price_aed ?? '')} onChange={v => setEditData({...editData, compare_at_price_aed: v === '' ? null : Number(v)})} type="number" />
               <Input label="Unit" value={editData.unit || ''} onChange={v => setEditData({...editData, unit: v})} />
               <Input label="Stock" value={String(editData.stock || 0)} onChange={v => setEditData({...editData, stock: Number(v)})} type="number" />
               <Input label="Origin" value={editData.origin || ''} onChange={v => setEditData({...editData, origin: v})} />

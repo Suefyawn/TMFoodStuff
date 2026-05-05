@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   },
   description: 'Order fresh fruits and vegetables online. Same-day delivery across Dubai, Abu Dhabi, Sharjah, Ajman and all UAE emirates. Premium quality, farm fresh daily.',
   keywords: ['fresh fruits UAE', 'vegetables delivery Dubai', 'grocery delivery UAE', 'organic fruits Dubai'],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'TM FoodStuff',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_AE',
@@ -36,6 +42,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#16a34a" />
+        <link rel="apple-touch-icon" href="/icons/icon.svg" />
+      </head>
       <body className={`${inter.variable} ${playfair.variable} font-inter`}>
         <Suspense fallback={null}>
           <PostHogProvider>

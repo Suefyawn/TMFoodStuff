@@ -59,6 +59,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
             <h3 className="text-white font-black mb-4">📍 Delivery</h3>
             <div className="space-y-2 text-sm">
+              {order.delivery_date && <div className="flex justify-between"><span className="text-gray-500">Date</span><span className="text-white font-semibold">{new Date(order.delivery_date + 'T00:00:00').toLocaleDateString('en-AE', { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>}
               <div className="flex justify-between"><span className="text-gray-500">Slot</span><span className="text-white font-semibold capitalize">{order.delivery_slot || '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Area</span><span className="text-white">{order.delivery_area || '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Emirate</span><span className="text-white">{order.delivery_emirate || '—'}</span></div>

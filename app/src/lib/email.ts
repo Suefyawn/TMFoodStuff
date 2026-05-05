@@ -247,6 +247,52 @@ export async function sendOrderConfirmation(order: OrderEmailData): Promise<void
   }
 }
 
+export async function sendBackInStockEmail(to: string, productName: string, productSlug: string): Promise<void> {
+  const resend = getResend()
+  if (!resend) return
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+        <tr><td style="background:#16a34a;border-radius:16px 16px 0 0;padding:28px 32px;text-align:center">
+          <div style="font-size:36px;margin-bottom:4px">🥬</div>
+          <div style="color:#ffffff;font-size:22px;font-weight:900">TM FoodStuff</div>
+          <div style="color:#bbf7d0;font-size:13px;margin-top:4px">Back in stock!</div>
+        </td></tr>
+        <tr><td style="background:#ffffff;padding:32px;text-align:center">
+          <div style="font-size:48px;margin-bottom:16px">🎉</div>
+          <h1 style="margin:0 0 8px;font-size:22px;font-weight:900;color:#111827">Good news!</h1>
+          <p style="margin:0 0 24px;font-size:15px;color:#6b7280"><strong>${productName}</strong> is back in stock and ready to order.</p>
+          <a href="${SITE_URL}/product/${productSlug}" style="display:inline-block;background:#16a34a;color:#ffffff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:12px;text-decoration:none">
+            Shop Now →
+          </a>
+          <p style="margin:20px 0 0;font-size:12px;color:#9ca3af">Hurry — stock is limited and may sell out quickly.</p>
+        </td></tr>
+        <tr><td style="background:#f9fafb;border-radius:0 0 16px 16px;padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;font-size:12px;color:#9ca3af">© 2026 TMFoodStuff · <a href="${SITE_URL}" style="color:#16a34a;text-decoration:none">${SITE_URL.replace('https://', '')}</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  try {
+    await resend.emails.send({
+      from: `TM FoodStuff <${FROM_EMAIL}>`,
+      to,
+      subject: `✅ ${productName} is back in stock!`,
+      html,
+    })
+  } catch (err) {
+    console.error('[Resend] Failed to send back-in-stock email:', err)
+  }
+}
+
 export async function sendOutForDeliveryEmail(order: StatusUpdateEmailData): Promise<void> {
   const resend = getResend()
   if (!resend) return

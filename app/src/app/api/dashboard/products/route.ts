@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
+import { sendBackInStockEmail } from '@/lib/email'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -28,6 +29,7 @@ export async function PATCH(request: Request) {
   if (updates.emoji !== undefined) dbUpdates.emoji = updates.emoji
   if (updates.is_organic !== undefined) dbUpdates.is_organic = updates.is_organic
   if (updates.is_featured !== undefined) dbUpdates.is_featured = updates.is_featured
+  if (updates.compare_at_price_aed !== undefined) dbUpdates.compare_at_price_aed = updates.compare_at_price_aed || null
   // image_urls is the canonical multi-image column; keep image_url in sync as the primary
   if (updates.image_urls !== undefined) {
     const urls = Array.isArray(updates.image_urls) ? updates.image_urls : []
@@ -35,6 +37,32 @@ export async function PATCH(request: Request) {
     dbUpdates.image_url = urls[0] ?? null
   } else if (updates.image_url !== undefined) {
     dbUpdates.image_url = updates.image_url
+  }
+
+  // Check current stock before updating (for back-in-stock notifications)
+  const stockIsBeingRestored = dbUpdates.stock !== undefined && Number(dbUpdates.stock) > 0
+  let previousStock = 1 // assume in-stock unless we find otherwise
+  if (stockIsBeingRestored) {
+    const { data: current } = await supabase.from('products').select('stock, name, slug').eq('id', parseInt(id)).single()
+    previousStock = current?.stock ?? 1
+    // Fire back-in-stock emails if stock was 0 before
+    if (current && previousStock === 0) {
+      const { data: notifications } = await supabase
+        .from('stock_notifications')
+        .select('email')
+        .eq('product_id', parseInt(id))
+        .is('notified_at', null)
+      if (notifications && notifications.length > 0) {
+        const now = new Date().toISOString()
+        for (const n of notifications) {
+          sendBackInStockEmail(n.email, current.name, current.slug).catch(console.error)
+        }
+        await supabase.from('stock_notifications')
+          .update({ notified_at: now })
+          .eq('product_id', parseInt(id))
+          .is('notified_at', null)
+      }
+    }
   }
 
   const { error } = await supabase.from('products').update(dbUpdates).eq('id', parseInt(id))
@@ -73,6 +101,7 @@ export async function POST(request: Request) {
     price_aed: body.price_aed,
     unit: body.unit || 'kg',
     stock: body.stock || 0,
+    compare_at_price_aed: body.compare_at_price_aed || null,
     is_organic: body.is_organic || false,
     is_featured: body.is_featured || false,
     is_active: body.is_active !== false,

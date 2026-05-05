@@ -15,6 +15,7 @@ export interface Product {
   categorySlug: string
   description: string
   priceAED: number
+  compareAtPrice?: number
   unit: string
   stock: number
   isOrganic: boolean
@@ -45,6 +46,7 @@ function mapProduct(row: any): Product {
     categorySlug: row.categories?.slug || row.category_slug || '',
     description: row.description || '',
     priceAED: Number(row.price_aed),
+    compareAtPrice: row.compare_at_price_aed ? Number(row.compare_at_price_aed) : undefined,
     unit: row.unit || 'kg',
     stock: row.stock ?? 0,
     isOrganic: row.is_organic ?? false,
