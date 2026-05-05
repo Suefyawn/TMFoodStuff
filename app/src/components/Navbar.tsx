@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { ShoppingCart, Menu, X, Search, Leaf, User } from 'lucide-react'
+import { ShoppingCart, Menu, X, Search, Leaf, User, Package } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store'
 import { usePathname, useRouter } from 'next/navigation'
@@ -81,6 +81,10 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            <Link href="/track" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
+              <Package size={16} />
+              <span>Track Order</span>
+            </Link>
             <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
               <User size={16} />
               <span>{tr.signIn}</span>
@@ -150,6 +154,14 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="border-t border-gray-100 pt-2 mt-1">
+              <Link
+                href="/track"
+                className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <Package size={16} />
+                Track Order
+              </Link>
               <Link
                 href="/account"
                 className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"

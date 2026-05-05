@@ -9,6 +9,7 @@ async function getStats() {
   const now = new Date()
   const today = new Date(now); today.setHours(0, 0, 0, 0)
   const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
+  const monthAgo = new Date(now); monthAgo.setDate(monthAgo.getDate() - 29)
 
   const [
     { count: totalOrders },
@@ -17,7 +18,7 @@ async function getStats() {
     { count: totalProducts },
     { data: recentOrders },
     { data: todayOrderDocs },
-    { data: weeklyOrders },
+    { data: monthlyOrders },
     { data: lowStock },
   ] = await Promise.all([
     supabase.from('orders').select('*', { count: 'exact', head: true }),
@@ -26,24 +27,26 @@ async function getStats() {
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true),
     supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(10),
     supabase.from('orders').select('total').gte('created_at', today.toISOString()),
-    supabase.from('orders').select('total, status, created_at').gte('created_at', weekAgo.toISOString()),
+    supabase.from('orders').select('total, status, created_at').gte('created_at', monthAgo.toISOString()),
     supabase.from('products').select('id, name, stock, emoji').eq('is_active', true).lt('stock', 10).order('stock').limit(10),
   ])
 
   const todayRevenue = (todayOrderDocs || []).reduce((sum: number, o: any) => sum + (o.total || 0), 0)
-  const weekRevenue = (weeklyOrders || []).reduce((sum: number, o: any) => sum + (o.total || 0), 0)
+  const weekRevenue = (monthlyOrders || [])
+    .filter((o: any) => new Date(o.created_at) >= weekAgo)
+    .reduce((sum: number, o: any) => sum + (o.total || 0), 0)
 
-  // Daily revenue chart data
+  // Daily revenue chart data — last 30 days
   const dailyRevenue = []
-  for (let i = 6; i >= 0; i--) {
+  for (let i = 29; i >= 0; i--) {
     const d = new Date(now); d.setDate(d.getDate() - i); d.setHours(0, 0, 0, 0)
     const nextD = new Date(d); nextD.setDate(nextD.getDate() + 1)
-    const dayOrders = (weeklyOrders || []).filter((o: any) => {
+    const dayOrders = (monthlyOrders || []).filter((o: any) => {
       const t = new Date(o.created_at)
       return t >= d && t < nextD
     })
     dailyRevenue.push({
-      day: d.toLocaleDateString('en', { weekday: 'short' }),
+      day: d.toLocaleDateString('en', { day: 'numeric', month: 'short' }),
       revenue: dayOrders.reduce((s: number, o: any) => s + (o.total || 0), 0),
       orders: dayOrders.length,
     })
@@ -118,22 +121,23 @@ export default async function DashboardPage() {
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Revenue chart */}
         <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h3 className="text-white font-black mb-4">📊 Revenue (Last 7 Days)</h3>
-          <div className="flex items-end gap-2 h-40">
+          <h3 className="text-white font-black mb-4">📊 Revenue (Last 30 Days)</h3>
+          <div className="flex items-end gap-0.5 h-40">
             {stats.dailyRevenue.map((d, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-xs text-gray-500">{d.revenue > 0 ? `${d.revenue.toFixed(0)}` : ''}</span>
+              <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
                 <div
-                  className="w-full bg-green-600/30 rounded-t-lg transition-all hover:bg-green-600/50 relative group"
-                  style={{ height: `${Math.max((d.revenue / maxRevenue) * 100, 4)}%` }}
-                >
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    AED {d.revenue.toFixed(2)} · {d.orders} orders
-                  </div>
+                  className="w-full bg-green-600/30 rounded-t transition-all hover:bg-green-600/60"
+                  style={{ height: `${Math.max((d.revenue / maxRevenue) * 100, 2)}%` }}
+                />
+                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                  {d.day} · AED {d.revenue.toFixed(0)} · {d.orders} order{d.orders !== 1 ? 's' : ''}
                 </div>
-                <span className="text-xs text-gray-600 font-medium">{d.day}</span>
               </div>
             ))}
+          </div>
+          <div className="flex justify-between mt-1">
+            <span className="text-xs text-gray-600">{stats.dailyRevenue[0]?.day}</span>
+            <span className="text-xs text-gray-600">Today</span>
           </div>
         </div>
 
