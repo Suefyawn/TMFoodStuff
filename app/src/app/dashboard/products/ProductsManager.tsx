@@ -1,7 +1,7 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Trash2, X } from 'lucide-react'
+import { Search, Plus, Trash2, X, Download, Upload } from 'lucide-react'
 import ImageUploader from '@/components/ImageUploader'
 
 interface Product {
@@ -51,6 +51,10 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [apiError, setApiError] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'category'>('name')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [importRows, setImportRows] = useState<any[] | null>(null)
+  const [importResult, setImportResult] = useState<{ imported: number; updated: number; errors: string[] } | null>(null)
+  const [importing, setImporting] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const filtered = useMemo(() => {
     let result = products.filter(p => {
@@ -186,6 +190,87 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     else setSelected(new Set(filtered.map(p => p.id)))
   }
 
+  function exportCSV() {
+    const headers = ['name', 'name_ar', 'slug', 'category_slug', 'description', 'price_aed', 'unit', 'stock', 'is_active', 'is_featured', 'is_organic', 'origin', 'emoji']
+    const escape = (v: any) => {
+      const s = String(v ?? '')
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s
+    }
+    const rows = products.map(p => [
+      p.name, p.name_ar, p.slug, p.categories?.slug ?? '',
+      p.description, p.price_aed, p.unit, p.stock,
+      p.is_active, p.is_featured, p.is_organic, p.origin, p.emoji,
+    ].map(escape).join(','))
+    const csv = [headers.join(','), ...rows].join('\n')
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+    a.download = `tmfoodstuff-products-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+  }
+
+  function downloadTemplate() {
+    const headers = 'name,name_ar,slug,category_slug,description,price_aed,unit,stock,is_active,is_featured,is_organic,origin,emoji'
+    const example = 'Apple,تفاح,apple,fruits,Fresh red apples,8.50,kg,100,true,false,false,UAE,🍎'
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([headers + '\n' + example], { type: 'text/csv' }))
+    a.download = 'tmfoodstuff-products-template.csv'
+    a.click()
+  }
+
+  function parseCSV(text: string): any[] {
+    const lines = text.trim().split('\n').filter(Boolean)
+    if (lines.length < 2) return []
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''))
+    return lines.slice(1).map(line => {
+      const vals: string[] = []
+      let cur = '', inQuote = false
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i]
+        if (ch === '"') { inQuote = !inQuote }
+        else if (ch === ',' && !inQuote) { vals.push(cur); cur = '' }
+        else { cur += ch }
+      }
+      vals.push(cur)
+      const obj: any = {}
+      headers.forEach((h, i) => { obj[h] = (vals[i] ?? '').replace(/^"|"$/g, '').trim() })
+      return obj
+    })
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const rows = parseCSV(ev.target?.result as string)
+      setImportRows(rows)
+      setImportResult(null)
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
+  async function runImport() {
+    if (!importRows) return
+    setImporting(true)
+    try {
+      const res = await fetch('/api/dashboard/products/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rows: importRows }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setApiError(data.error || 'Import failed'); setImportRows(null); return }
+      setImportResult(data)
+      setImportRows(null)
+      router.refresh()
+    } catch {
+      setApiError('Network error — please try again')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   // Normalise product images to a string[]
   function getProductImages(p: Product): string[] {
     if (Array.isArray(p.image_urls) && p.image_urls.length > 0) return p.image_urls
@@ -206,9 +291,21 @@ export default function ProductsManager({ initialProducts, categories }: { initi
           <h1 className="text-2xl font-black text-white">Products</h1>
           <p className="text-gray-500 text-sm">{products.length} total · {filtered.length} shown</p>
         </div>
-        <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
-          <Plus size={16} /> Add Product
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button onClick={downloadTemplate} className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-semibold rounded-xl transition-colors" title="Download CSV template">
+            <Download size={14} /> Template
+          </button>
+          <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-semibold rounded-xl transition-colors">
+            <Download size={14} /> Export
+          </button>
+          <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-semibold rounded-xl transition-colors">
+            <Upload size={14} /> Import
+          </button>
+          <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileChange} />
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
+            <Plus size={16} /> Add Product
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -235,6 +332,66 @@ export default function ProductsManager({ initialProducts, categories }: { initi
           </div>
         )}
       </div>
+
+      {/* Import preview modal */}
+      {importRows && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md">
+            <h2 className="text-lg font-black text-white mb-2">Import Products</h2>
+            <p className="text-gray-400 text-sm mb-4">
+              Found <span className="text-white font-bold">{importRows.length}</span> row{importRows.length !== 1 ? 's' : ''}.
+              Existing slugs will be updated; new slugs will be created.
+            </p>
+            <div className="bg-gray-800 rounded-xl max-h-48 overflow-y-auto divide-y divide-gray-700 mb-5">
+              {importRows.slice(0, 20).map((r, i) => (
+                <div key={i} className="px-4 py-2 flex items-center justify-between gap-3">
+                  <span className="text-sm text-white truncate">{r.emoji} {r.name || <span className="text-red-400 italic">missing name</span>}</span>
+                  <span className="text-xs text-gray-500 shrink-0">AED {r.price_aed} · {r.unit}</span>
+                </div>
+              ))}
+              {importRows.length > 20 && (
+                <div className="px-4 py-2 text-xs text-gray-500">+ {importRows.length - 20} more rows</div>
+              )}
+            </div>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setImportRows(null)} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
+              <button onClick={runImport} disabled={importing} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50 flex items-center gap-2">
+                <Upload size={14} /> {importing ? 'Importing...' : `Import ${importRows.length} rows`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import result modal */}
+      {importResult && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md">
+            <h2 className="text-lg font-black text-white mb-4">Import Complete</h2>
+            <div className="space-y-2 mb-5">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Created</span>
+                <span className="text-green-400 font-bold">{importResult.imported} product{importResult.imported !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Updated</span>
+                <span className="text-blue-400 font-bold">{importResult.updated} product{importResult.updated !== 1 ? 's' : ''}</span>
+              </div>
+              {importResult.errors.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs text-red-400 font-semibold mb-2">{importResult.errors.length} error{importResult.errors.length !== 1 ? 's' : ''}:</p>
+                  <div className="bg-gray-800 rounded-xl max-h-32 overflow-y-auto divide-y divide-gray-700">
+                    {importResult.errors.map((e, i) => (
+                      <p key={i} className="px-3 py-1.5 text-xs text-red-400">{e}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <button onClick={() => setImportResult(null)} className="w-full px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500">Done</button>
+          </div>
+        </div>
+      )}
 
       {/* Add Product Modal */}
       {showAdd && (
