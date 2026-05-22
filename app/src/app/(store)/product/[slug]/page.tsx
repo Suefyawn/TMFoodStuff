@@ -9,6 +9,7 @@ import StickyProductCTA from '@/components/StickyProductCTA'
 import { ProductNameDisplay } from '@/components/ProductNameDisplay'
 import ProductImageGallery from '@/components/ProductImageGallery'
 import StockNotifyForm from '@/components/StockNotifyForm'
+import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 60
 
@@ -60,7 +61,7 @@ export default async function ProductPage({ params }: Props) {
       priceCurrency: 'AED',
       price: product.priceAED.toFixed(2),
       availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      url: `https://tmfoodstuff.ae/product/${product.slug}`,
+      url: `${SITE_URL}/product/${product.slug}`,
       ...(product.compareAtPrice && product.compareAtPrice > product.priceAED ? {
         priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
       } : {}),

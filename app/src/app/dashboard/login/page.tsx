@@ -1,7 +1,9 @@
 'use client'
 import { useState } from 'react'
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 export default function DashboardLogin() {
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -10,21 +12,21 @@ export default function DashboardLogin() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
     try {
-      const res = await fetch('/api/dashboard/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+      const supabase = createSupabaseBrowserClient()
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
       })
-      if (res.ok) {
-        // Hard redirect so the auth cookie is included in the next request
-        // and middleware validates it correctly before rendering the dashboard.
-        window.location.href = '/dashboard'
-      } else {
-        setError('Wrong password')
+      if (signInError) {
+        setError('Invalid email or password')
         setLoading(false)
+        return
       }
+      // Hard redirect so the refreshed auth cookies are sent on the next request
+      // and middleware lets the dashboard render.
+      window.location.href = '/dashboard'
     } catch {
       setError('Network error — please try again')
       setLoading(false)
@@ -39,13 +41,23 @@ export default function DashboardLogin() {
         </div>
         <h1 className="text-xl font-black text-white text-center mb-2">Admin Dashboard</h1>
         <p className="text-gray-500 text-sm text-center mb-8">TMFoodStuff</p>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="Email"
+            autoComplete="email"
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-green-500"
+            required
+          />
           <input
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            placeholder="Enter password"
+            placeholder="Password"
+            autoComplete="current-password"
             className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-green-500"
             required
           />

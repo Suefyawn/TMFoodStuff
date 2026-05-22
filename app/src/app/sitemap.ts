@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
-
-const BASE = 'https://tmfoodstuff.ae'
+import { SITE_URL as BASE } from '@/lib/site'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {

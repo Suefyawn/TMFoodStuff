@@ -1,15 +1,6 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createHash } from 'crypto'
 import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe } from 'lucide-react'
-
-async function isAdmin() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('dashboard_auth')?.value
-  if (!token) return false
-  const expected = createHash('sha256').update(process.env.DASHBOARD_PASSWORD || '').digest('hex')
-  return token === expected
-}
+import { isAdminAuthed } from '@/lib/admin-auth'
 
 interface Integration {
   id: string
@@ -85,7 +76,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
 }
 
 export default async function IntegrationsPage() {
-  if (!(await isAdmin())) redirect('/dashboard/login')
+  if (!(await isAdminAuthed())) redirect('/dashboard/login')
 
   const integrations: Integration[] = [
     {

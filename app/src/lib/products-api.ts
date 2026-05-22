@@ -59,6 +59,18 @@ function mapProduct(row: any): Product {
   }
 }
 
+// Normalises legacy static-data rows (data/products.ts) to the Product shape.
+// The static fallback is missing `imageUrls`, so callers that read it (e.g.
+// the product page JSON-LD) would crash without this.
+function fromStaticData(p: any): Product {
+  return {
+    ...p,
+    nameAr: p.nameAr || '',
+    imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : p.imageUrl ? [p.imageUrl] : [],
+    isActive: p.isActive ?? true,
+  }
+}
+
 function mapCategory(row: any): Category {
   return {
     id: row.id,
@@ -82,7 +94,7 @@ export async function getProducts(): Promise<Product[]> {
     console.error('Failed to fetch products:', error.message)
     // Fallback to static data
     const { products } = await import('@/data/products')
-    return products.filter(p => p.isActive !== false) as Product[]
+    return products.filter(p => p.isActive !== false).map(fromStaticData)
   }
 
   return (data || []).map(mapProduct)
@@ -101,7 +113,7 @@ export async function getFeaturedProducts(limit = 10): Promise<Product[]> {
   if (error) {
     console.error('Failed to fetch featured products:', error.message)
     const { products } = await import('@/data/products')
-    return products.filter(p => p.isFeatured).slice(0, limit) as Product[]
+    return products.filter(p => p.isFeatured).slice(0, limit).map(fromStaticData)
   }
 
   return (data || []).map(mapProduct)
@@ -120,7 +132,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     // Fallback to static data
     const { products } = await import('@/data/products')
     const p = products.find(p => p.slug === slug)
-    return p ? (p as Product) : null
+    return p ? fromStaticData(p) : null
   }
 
   return mapProduct(data)

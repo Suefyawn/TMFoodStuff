@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
@@ -49,9 +50,9 @@ export default function CartPage() {
           {items.map(item => (
             <div key={item.id} className="bg-white rounded-2xl border border-gray-100 p-4 md:p-5 flex gap-3 md:gap-4 shadow-sm">
               {/* Image */}
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center">
+              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center">
                 {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                  <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
                 ) : item.emoji ? (
                   <span className="text-3xl md:text-4xl">{item.emoji}</span>
                 ) : (

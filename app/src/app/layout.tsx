@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { Suspense } from 'react'
 import { PostHogProvider } from '@/components/PostHogProvider'
+import { SITE_URL } from '@/lib/site'
 import './globals.css'
 
 const inter = Inter({
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
   },
   description: 'Order fresh fruits and vegetables online. Same-day delivery across Dubai, Abu Dhabi, Sharjah, Ajman and all UAE emirates. Premium quality, farm fresh daily.',
   keywords: ['fresh fruits UAE', 'vegetables delivery Dubai', 'grocery delivery UAE', 'organic fruits Dubai'],
+  metadataBase: new URL(SITE_URL),
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_AE',
-    url: 'https://tmfoodstuff.ae',
+    url: SITE_URL,
     siteName: 'TMFoodStuff',
     title: 'TMFoodStuff — Fresh Fruits & Vegetables UAE',
     description: 'Premium fresh fruits & vegetables delivered across UAE. Same-day delivery.',

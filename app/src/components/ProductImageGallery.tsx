@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Props {
@@ -29,10 +30,13 @@ export default function ProductImageGallery({ images, emoji, name, isOrganic, is
     <div className="space-y-3">
       {/* Main image */}
       <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 relative w-full group">
-        <img
+        <Image
           src={images[active]}
           alt={name}
-          className="w-full h-full object-cover transition-opacity duration-200"
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          priority
+          className="object-cover transition-opacity duration-200"
           key={images[active]}
         />
         <Badges isOrganic={isOrganic} isFeatured={isFeatured} />
@@ -77,11 +81,11 @@ export default function ProductImageGallery({ images, emoji, name, isOrganic, is
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
+              className={`relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
                 i === active ? 'border-green-500 shadow-md' : 'border-gray-200 hover:border-gray-400'
               }`}
             >
-              <img src={url} alt={`${name} ${i + 1}`} className="w-full h-full object-cover" />
+              <Image src={url} alt={`${name} ${i + 1}`} fill sizes="64px" className="object-cover" />
             </button>
           ))}
         </div>
