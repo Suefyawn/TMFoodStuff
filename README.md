@@ -7,10 +7,9 @@
 | Layer | Tech | Purpose |
 |-------|------|---------|
 | Storefront | Next.js 15 (App Router) | Customer UI (EN / AR) |
-| Admin dashboard | Next.js server routes | `/dashboard` — product, order & settings management |
+| Admin dashboard | Next.js + Supabase Auth | `/dashboard` — product, order & settings management |
 | Database | Supabase (Postgres + RLS) | Products, orders, customers, settings, promo codes |
-| Legacy CMS (optional) | Payload CMS 3.x | `/admin` — only enabled when `MONGODB_URI` is set |
-| Payments | Cash on delivery (Telr card flow coming soon) | UAE-native payment gateway |
+| Payments | Cash on delivery + Stripe (card) | COD plus online card payments |
 | Hosting | Vercel | Frontend + API |
 
 ## Project Structure
@@ -27,8 +26,9 @@ TMFoodStuff/
 cd app
 npm install
 cp .env.example .env.local
-# Fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
-# SUPABASE_SERVICE_ROLE_KEY and DASHBOARD_PASSWORD.
+# Fill in your Supabase keys (NEXT_PUBLIC_SUPABASE_URL,
+# NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY).
+# See .env.example for the full annotated list.
 npm run dev
 # Storefront → http://localhost:3000
 # Admin dashboard → http://localhost:3000/dashboard
@@ -42,5 +42,5 @@ Supabase project setup.
 - **Currency:** AED
 - **VAT:** 5% (Federal Tax Authority compliant)
 - **Delivery:** Dubai, Abu Dhabi, Sharjah, Ajman, RAK, Fujairah, Umm Al Quwain
-- **Payments:** Cash on Delivery (Telr card support coming soon)
+- **Payments:** Cash on Delivery and online card payment via Stripe (AED)
 - **Address:** Makani number support

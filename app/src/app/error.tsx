@@ -15,6 +15,8 @@ export default function Error({ reset }: { error: Error & { digest?: string }; r
         >
           Try Again
         </button>
+        {/* Full reload (not next/link) so navigation recovers from the broken state */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/"
           className="bg-gray-900 text-white font-bold px-8 py-3.5 rounded-2xl hover:bg-gray-700 transition-colors text-base"
