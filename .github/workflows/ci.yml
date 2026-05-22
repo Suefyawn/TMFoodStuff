@@ -6,6 +6,20 @@ on:
   pull_request:
 
 jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan tracked files for committed secrets
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar -xz gitleaks
+          # Scan the tracked tree only (a clean export) — never .git history or
+          # node_modules — so the gate fails on newly committed secrets without
+          # tripping over pre-existing findings in old history.
+          mkdir -p /tmp/treescan
+          git archive HEAD | tar -x -C /tmp/treescan
+          ./gitleaks dir /tmp/treescan --no-banner --redact --exit-code 1
+
   build:
     runs-on: ubuntu-latest
     defaults:
