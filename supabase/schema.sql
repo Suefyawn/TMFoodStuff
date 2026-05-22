@@ -76,6 +76,7 @@ create table if not exists orders (
                         check (status in ('pending','confirmed','processing','out_for_delivery','delivered','cancelled')),
   payment_method      text        not null default 'cod',
   payment_status      text        not null default 'pending',
+  locale              text        not null default 'en',
 
   -- customer snapshot (duplicated so orders survive customer edits/deletes)
   customer_name       text        not null default '',
@@ -156,6 +157,7 @@ create table if not exists stock_notifications (
   id          bigint generated always as identity primary key,
   product_id  bigint      not null references products(id) on delete cascade,
   email       text        not null,
+  locale      text        not null default 'en',
   notified_at timestamptz,
   created_at  timestamptz not null default now(),
   unique (product_id, email)

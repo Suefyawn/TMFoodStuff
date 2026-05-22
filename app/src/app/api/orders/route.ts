@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendOrderConfirmation, sendAdminOrderAlert, type OrderEmailData } from '@/lib/email'
+import { sendOrderConfirmation, sendAdminOrderAlert, toLocale, type OrderEmailData } from '@/lib/email'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { computeOrderTotals, subtotalOf, round2 } from '@/lib/pricing'
 
@@ -34,11 +34,13 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate } = body
+    const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate, lang } = body
 
     if (!form || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ success: false, error: 'Invalid order payload' }, { status: 400 })
     }
+
+    const locale = toLocale(lang)
 
     // ── Validate customer details ──────────────────────────────────────────
     const fullName = String(form.fullName || '').trim()
@@ -178,6 +180,7 @@ export async function POST(request: Request) {
       status: 'pending',
       payment_method: paymentMethod === 'card' ? 'card' : 'cod',
       payment_status: 'pending',
+      locale,
       customer_name: fullName,
       customer_full_name: fullName,
       customer_phone: phone,
@@ -251,6 +254,7 @@ export async function POST(request: Request) {
         price_aed: i.price_aed,
       })),
       whatsapp_number: whatsappNumber,
+      locale,
     }
     await Promise.all([sendOrderConfirmation(emailData), sendAdminOrderAlert(emailData)])
 

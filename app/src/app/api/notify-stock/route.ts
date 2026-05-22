@@ -8,10 +8,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Too many requests. Please try again shortly.' }, { status: 429 })
     }
 
-    const { product_id, email } = await request.json()
+    const { product_id, email, lang } = await request.json()
     if (!product_id || !email || typeof email !== 'string' || !email.includes('@')) {
       return NextResponse.json({ error: 'Valid product_id and email are required' }, { status: 400 })
     }
+    const locale = lang === 'ar' ? 'ar' : 'en'
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
     )
 
     const { error } = await supabase.from('stock_notifications').upsert(
-      { product_id: Number(product_id), email: email.trim().toLowerCase() },
+      { product_id: Number(product_id), email: email.trim().toLowerCase(), locale },
       { onConflict: 'product_id,email', ignoreDuplicates: true }
     )
 

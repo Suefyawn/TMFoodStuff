@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
-import { sendOutForDeliveryEmail, sendDeliveredEmail } from '@/lib/email'
+import { sendOutForDeliveryEmail, sendDeliveredEmail, toLocale } from '@/lib/email'
 
 const VALID_STATUSES = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
@@ -18,7 +18,7 @@ export async function PATCH(request: Request) {
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, order_number, customer_name, customer_email, delivery_slot, total, status')
+    .select('id, order_number, customer_name, customer_email, delivery_slot, total, status, locale')
     .eq('id', parseInt(id))
     .maybeSingle()
 
@@ -41,6 +41,7 @@ export async function PATCH(request: Request) {
       delivery_slot: order.delivery_slot,
       total: order.total,
       whatsapp_number: whatsappNumber,
+      locale: toLocale(order.locale),
     }
 
     if (status === 'out_for_delivery') sendOutForDeliveryEmail(emailData).catch(console.error)

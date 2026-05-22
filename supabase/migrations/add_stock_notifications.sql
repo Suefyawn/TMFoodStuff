@@ -8,6 +8,7 @@ create table if not exists stock_notifications (
   id          bigint generated always as identity primary key,
   product_id  bigint      not null references products(id) on delete cascade,
   email       text        not null,
+  locale      text        not null default 'en',
   notified_at timestamptz,
   created_at  timestamptz not null default now(),
   unique (product_id, email)

@@ -1,10 +1,12 @@
 'use client'
 import { useState } from 'react'
 import { Bell } from 'lucide-react'
+import { useLang } from '@/lib/use-lang'
 
 export default function StockNotifyForm({ productId, productName }: { productId: string; productName: string }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const { lang } = useLang()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -14,7 +16,7 @@ export default function StockNotifyForm({ productId, productName }: { productId:
       const res = await fetch('/api/notify-stock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_id: productId, email }),
+        body: JSON.stringify({ product_id: productId, email, lang }),
       })
       setStatus(res.ok ? 'done' : 'error')
     } catch {

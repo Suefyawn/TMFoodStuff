@@ -137,6 +137,7 @@ export default function CheckoutPage() {
           promoDiscount,
           deliverySlot: form.deliverySlot,
           deliveryDate: form.deliveryDate,
+          lang,
         }),
       })
 

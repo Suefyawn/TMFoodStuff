@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
-import { sendBackInStockEmail } from '@/lib/email'
+import { sendBackInStockEmail, toLocale } from '@/lib/email'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -49,13 +49,13 @@ export async function PATCH(request: Request) {
     if (current && previousStock === 0) {
       const { data: notifications } = await supabase
         .from('stock_notifications')
-        .select('email')
+        .select('email, locale')
         .eq('product_id', parseInt(id))
         .is('notified_at', null)
       if (notifications && notifications.length > 0) {
         const now = new Date().toISOString()
         for (const n of notifications) {
-          sendBackInStockEmail(n.email, current.name, current.slug).catch(console.error)
+          sendBackInStockEmail(n.email, current.name, current.slug, toLocale(n.locale)).catch(console.error)
         }
         await supabase.from('stock_notifications')
           .update({ notified_at: now })
