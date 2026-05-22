@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { sendOrderConfirmation, sendAdminOrderAlert, toLocale, type OrderEmailData } from './email'
+import { notifyOrderPlaced } from './notify'
 
 // Fulfills a placed order: decrements product stock and sends the customer
 // confirmation + admin alert emails. Shared by the COD path in /api/orders and
@@ -50,5 +51,9 @@ export async function fulfillOrder(
     locale: toLocale(order.locale),
   }
 
-  await Promise.all([sendOrderConfirmation(emailData), sendAdminOrderAlert(emailData)])
+  await Promise.all([
+    sendOrderConfirmation(emailData),
+    sendAdminOrderAlert(emailData),
+    notifyOrderPlaced(order, whatsappNumber),
+  ])
 }

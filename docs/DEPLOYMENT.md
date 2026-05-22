@@ -67,6 +67,7 @@ In **Settings → Environment Variables**, add the following (see
 - **Error tracking (Sentry):** `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`
 - **Analytics (PostHog):** `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`
 - **Payments (Stripe):** `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+- **Notifications (Twilio):** `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_SMS_FROM`, `TWILIO_WHATSAPP_FROM` — SMS works as soon as the keys are set; production WhatsApp also needs Meta-approved message templates
 - **Store / delivery:** `NEXT_PUBLIC_WHATSAPP_NUMBER`, `NEXT_PUBLIC_STORE_EMAIL`,
   `NEXT_PUBLIC_PROMO_CODE`, `NEXT_PUBLIC_LAUNCH_FREE_DELIVERY`,
   `NEXT_PUBLIC_FREE_DELIVERY_THRESHOLD`, `NEXT_PUBLIC_DELIVERY_FEE`

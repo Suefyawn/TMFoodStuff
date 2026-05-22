@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import { sendOutForDeliveryEmail, sendDeliveredEmail, toLocale } from '@/lib/email'
+import { notifyOutForDelivery, notifyDelivered } from '@/lib/notify'
 
 const VALID_STATUSES = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
@@ -18,7 +19,7 @@ export async function PATCH(request: Request) {
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, order_number, customer_name, customer_email, delivery_slot, total, status, locale')
+    .select('id, order_number, customer_name, customer_phone, customer_email, delivery_slot, total, status, locale')
     .eq('id', parseInt(id))
     .maybeSingle()
 
@@ -44,8 +45,12 @@ export async function PATCH(request: Request) {
       locale: toLocale(order.locale),
     }
 
-    if (status === 'out_for_delivery') sendOutForDeliveryEmail(emailData).catch(console.error)
-    if (status === 'delivered') sendDeliveredEmail(emailData).catch(console.error)
+    // Awaited so the sends complete before the serverless function returns.
+    if (status === 'out_for_delivery') {
+      await Promise.all([sendOutForDeliveryEmail(emailData), notifyOutForDelivery(order)])
+    } else if (status === 'delivered') {
+      await Promise.all([sendDeliveredEmail(emailData), notifyDelivered(order)])
+    }
   }
 
   return NextResponse.json({ ok: true })

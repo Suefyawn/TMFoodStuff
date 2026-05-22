@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe, CreditCard } from 'lucide-react'
+import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe, CreditCard, MessageSquare } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
 
 interface Integration {
@@ -147,6 +147,21 @@ export default async function IntegrationsPage() {
         { key: 'STRIPE_WEBHOOK_SECRET', label: 'Webhook Secret', secret: true },
       ],
       configured: !!process.env.STRIPE_SECRET_KEY,
+    },
+    {
+      id: 'twilio',
+      name: 'Twilio',
+      description: 'SMS & WhatsApp order notifications',
+      docsUrl: 'https://www.twilio.com/docs',
+      icon: MessageSquare,
+      iconColor: 'bg-rose-900/40 text-rose-400',
+      envVars: [
+        { key: 'TWILIO_ACCOUNT_SID', label: 'Account SID', secret: true },
+        { key: 'TWILIO_AUTH_TOKEN', label: 'Auth Token', secret: true },
+        { key: 'TWILIO_SMS_FROM', label: 'SMS Sender' },
+        { key: 'TWILIO_WHATSAPP_FROM', label: 'WhatsApp Sender' },
+      ],
+      configured: !!process.env.TWILIO_ACCOUNT_SID,
     },
     {
       id: 'domain',
