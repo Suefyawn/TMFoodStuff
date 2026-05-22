@@ -157,7 +157,7 @@ export default function CheckoutPage() {
           window.open(`https://wa.me/${data.waNumber}?text=${data.waMessage}`, '_blank')
         }, 1500)
       } else {
-        alert(lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.')
+        alert(data.error || (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'))
       }
     } catch (err) {
       alert(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')

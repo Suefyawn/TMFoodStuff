@@ -24,6 +24,7 @@ create table if not exists products (
   slug        text        not null unique,
   description text        not null default '',
   price_aed   numeric(10,2) not null default 0,
+  compare_at_price_aed numeric(10,2),
   unit        text        not null default 'kg',
   stock       int         not null default 0,
   is_active   boolean     not null default true,
@@ -149,6 +150,52 @@ insert into settings (key, value) values
 on conflict (key) do nothing;
 
 -- ─────────────────────────────────────────
+-- STOCK NOTIFICATIONS  (back-in-stock signups)
+-- ─────────────────────────────────────────
+create table if not exists stock_notifications (
+  id          bigint generated always as identity primary key,
+  product_id  bigint      not null references products(id) on delete cascade,
+  email       text        not null,
+  notified_at timestamptz,
+  created_at  timestamptz not null default now(),
+  unique (product_id, email)
+);
+
+-- ─────────────────────────────────────────
+-- ADMIN USERS  (allowlist for the /dashboard, paired with Supabase Auth)
+-- ─────────────────────────────────────────
+create table if not exists admin_users (
+  email      text primary key,
+  created_at timestamptz not null default now()
+);
+
+-- Seed the first admin. Replace with your owner email before running, then
+-- create a matching user in Supabase Auth with the same address.
+insert into admin_users (email) values ('jetnine.inc@gmail.com')
+on conflict (email) do nothing;
+
+-- ─────────────────────────────────────────
+-- FUNCTIONS
+-- ─────────────────────────────────────────
+
+-- Atomic stock decrement used by /api/orders. The conditional WHERE prevents
+-- concurrent orders from overselling / driving stock negative.
+create or replace function decrement_stock(p_id bigint, p_qty int)
+returns boolean
+language plpgsql
+as $$
+declare
+  updated int;
+begin
+  update products
+    set stock = stock - p_qty
+    where id = p_id and stock >= p_qty;
+  get diagnostics updated = row_count;
+  return updated > 0;
+end;
+$$;
+
+-- ─────────────────────────────────────────
 -- ROW LEVEL SECURITY
 -- ─────────────────────────────────────────
 
@@ -180,6 +227,14 @@ alter table settings enable row level security;
 create policy "public read settings"   on settings for select using (true);
 create policy "service write settings" on settings for all using (auth.role() = 'service_role');
 
+-- Stock notifications: no public access, service-role only
+alter table stock_notifications enable row level security;
+create policy "service manage stock_notifications" on stock_notifications for all using (auth.role() = 'service_role');
+
+-- Admin users: no public access, service-role only
+alter table admin_users enable row level security;
+create policy "service manage admin_users" on admin_users for all using (auth.role() = 'service_role');
+
 -- ─────────────────────────────────────────
 -- INDEXES
 -- ─────────────────────────────────────────
@@ -189,6 +244,7 @@ create index if not exists idx_products_slug      on products(slug);
 create index if not exists idx_orders_status      on orders(status);
 create index if not exists idx_orders_created_at  on orders(created_at desc);
 create index if not exists idx_orders_order_number on orders(order_number);
+create index if not exists idx_stock_notifications_product on stock_notifications(product_id);
 
 -- ─────────────────────────────────────────
 -- EMAIL SUBSCRIBERS

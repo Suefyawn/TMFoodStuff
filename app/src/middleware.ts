@@ -1,23 +1,11 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD!
-
-async function expectedSessionToken(): Promise<string> {
-  const data = new TextEncoder().encode(DASHBOARD_PASSWORD)
-  const digest = await crypto.subtle.digest('SHA-256', data)
-  const bytes = new Uint8Array(digest)
-  let hex = ''
-  for (let i = 0; i < bytes.length; i++) {
-    hex += bytes[i].toString(16).padStart(2, '0')
-  }
-  return hex
-}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // /admin → /dashboard redirect kept for any bookmarks
+  // /admin → /dashboard redirect kept for any old bookmarks
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
@@ -25,20 +13,45 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308)
   }
 
-  if (
+  let response = NextResponse.next({ request })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          )
+        },
+      },
+    },
+  )
+
+  // Refreshes the session if needed and tells us whether the visitor is signed in.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const isProtected =
     pathname.startsWith('/dashboard') &&
     !pathname.startsWith('/dashboard/login') &&
     !pathname.startsWith('/dashboard/logout')
-  ) {
-    const auth = request.cookies.get('dashboard_auth')?.value
-    if (!DASHBOARD_PASSWORD) return NextResponse.next()
-    const expected = await expectedSessionToken()
-    if (auth !== expected) {
-      return NextResponse.redirect(new URL('/dashboard/login', request.url))
-    }
+
+  if (isProtected && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard/login'
+    url.search = ''
+    return NextResponse.redirect(url)
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {

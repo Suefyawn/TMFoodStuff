@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
+  if (!rateLimit(`promo:${getClientIp(request)}`, 20, 60_000)) {
+    return NextResponse.json({ valid: false, error: 'Too many attempts. Please try again shortly.' }, { status: 429 })
+  }
+
   const { code } = await request.json()
   if (!code) return NextResponse.json({ valid: false, error: 'No code provided' }, { status: 400 })
 

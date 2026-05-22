@@ -74,15 +74,17 @@ npm install
 cp .env.example .env.local
 ```
 
-Fill in your Supabase credentials plus an admin password:
+Fill in your Supabase credentials:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-or-publishable-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-DASHBOARD_PASSWORD=pick-a-long-random-string
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
 ```
+
+See `.env.example` for the full list, including the optional Resend (email),
+Sentry (errors) and PostHog (analytics) keys.
 
 `MONGODB_URI` and `PAYLOAD_SECRET` can stay empty. When they're blank, the
 optional Payload admin at `/admin` renders a friendly explainer page
@@ -103,25 +105,40 @@ Once it says `✓ Ready`, visit:
 
 - **Storefront:** [http://localhost:3000](http://localhost:3000)
 - **Admin dashboard (Supabase):** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
-  - Log in with the `DASHBOARD_PASSWORD` from your `.env.local`.
+  - Log in with a Supabase Auth account (see _Dashboard access_ below).
 - **Payload admin (optional):** [http://localhost:3000/admin](http://localhost:3000/admin)
   - Only functional if you also set `MONGODB_URI` and `PAYLOAD_SECRET`.
 
 ---
+
+## Dashboard access
+
+The `/dashboard` admin uses **Supabase Auth** — each staff member gets their
+own email/password login. To set it up:
+
+1. In the Supabase dashboard, go to **Authentication → Providers → Email** and
+   turn **off** "Allow new users to sign up" (only you create accounts).
+2. Go to **Authentication → Users → Add user** and create an account for each
+   staff member.
+3. Add the same email address(es) to the `admin_users` table (the dashboard
+   allowlist). The `add_admin_users.sql` migration seeds the first one — edit
+   it to your owner email before running, or insert rows later.
+
+Only emails present in `admin_users` can reach `/dashboard`; a logged-in user
+who is not on the list sees an "Access denied" screen.
 
 ## Managing products and orders
 
 All product, category, order and settings data lives in the Supabase
 project. The easiest way to manage it is through the built-in dashboard:
 
-1. Go to `/dashboard/login` and sign in with `DASHBOARD_PASSWORD`.
+1. Go to `/dashboard/login` and sign in with your Supabase Auth account.
 2. Use the sidebar to edit products, orders, categories, customers, promo
    codes and store settings.
 
-Under the hood the dashboard talks to JSON APIs under `/api/dashboard/*`
-that are authenticated via an opaque session cookie derived from
-`DASHBOARD_PASSWORD`. The API routes all require the cookie — unauthenticated
-requests return `401`.
+Under the hood the dashboard talks to JSON APIs under `/api/dashboard/*` that
+require a valid Supabase Auth session whose email is in `admin_users` —
+unauthenticated requests return `401`.
 
 ---
 

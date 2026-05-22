@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export async function POST(request: Request) {
   try {
+    if (!rateLimit(`newsletter:${getClientIp(request)}`, 5, 60_000)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again shortly.' }, { status: 429 })
+    }
+
     const { email } = await request.json()
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
