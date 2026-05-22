@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendOrderConfirmation, sendAdminOrderAlert, toLocale, type OrderEmailData } from '@/lib/email'
+import { toLocale } from '@/lib/email'
+import { fulfillOrder } from '@/lib/order-fulfillment'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { computeOrderTotals, subtotalOf, round2 } from '@/lib/pricing'
 
@@ -207,6 +208,7 @@ export async function POST(request: Request) {
       items: lineItems.map((i) => ({
         id: i.id,
         name: i.name,
+        emoji: i.emoji,
         quantity: i.quantity,
         price_aed: i.price_aed,
         subtotal: i.subtotal,
@@ -217,46 +219,24 @@ export async function POST(request: Request) {
     const { error } = await supabase.from('orders').insert(payload)
     if (error) throw error
 
-    // ── Decrement stock atomically (oversell guard) ────────────────────────
-    await Promise.all(
-      lineItems.map(async (i) => {
-        const { data: ok, error: rpcErr } = await supabase.rpc('decrement_stock', {
-          p_id: Number(i.id),
-          p_qty: i.quantity,
-        })
-        if (rpcErr || ok === false) {
-          console.error(`Stock decrement failed for product ${i.id} on order ${orderNumber}`, rpcErr)
-        }
-      }),
-    )
-
-    // ── Notifications (graceful no-ops if RESEND_API_KEY is not set) ───────
-    const emailData: OrderEmailData = {
-      order_number: orderNumber,
-      customer_name: fullName,
-      customer_phone: phone,
-      customer_email: email || undefined,
-      delivery_area: area,
-      delivery_emirate: emirate,
-      delivery_building: String(form.building || '').trim() || undefined,
-      delivery_slot: deliverySlot,
-      delivery_notes: String(form.notes || '').trim() || undefined,
-      delivery_fee: deliveryFee,
-      subtotal,
-      vat,
-      promo_code: appliedPromoCode || undefined,
-      promo_discount: promoDiscount,
-      total,
-      items: lineItems.map((i) => ({
-        name: i.name,
-        emoji: i.emoji,
-        quantity: i.quantity,
-        price_aed: i.price_aed,
-      })),
-      whatsapp_number: whatsappNumber,
-      locale,
+    // Card orders stay 'pending' until the Stripe webhook confirms payment;
+    // stock decrement and emails happen there, not here.
+    if (paymentMethod === 'card') {
+      return NextResponse.json({
+        success: true,
+        orderNumber,
+        paymentMethod: 'card',
+        subtotal,
+        vat,
+        deliveryFee,
+        promoCode: appliedPromoCode,
+        promoDiscount,
+        total,
+      })
     }
-    await Promise.all([sendOrderConfirmation(emailData), sendAdminOrderAlert(emailData)])
+
+    // ── COD: decrement stock + send confirmation/admin emails immediately ──
+    await fulfillOrder(supabase, payload, whatsappNumber)
 
     // ── WhatsApp confirmation message ──────────────────────────────────────
     const itemsList = lineItems

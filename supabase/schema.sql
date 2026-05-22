@@ -77,6 +77,8 @@ create table if not exists orders (
   payment_method      text        not null default 'cod',
   payment_status      text        not null default 'pending',
   locale              text        not null default 'en',
+  stripe_session_id        text,
+  stripe_payment_intent_id text,
 
   -- customer snapshot (duplicated so orders survive customer edits/deletes)
   customer_name       text        not null default '',

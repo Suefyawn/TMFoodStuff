@@ -40,6 +40,20 @@ export default function CheckoutPage() {
   const { lang, tr } = useLang()
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const paid = params.get('paid')
+    if (paid) {
+      // Returned from Stripe Checkout after a successful card payment.
+      setOrderNumber(paid)
+      setSubmitted(true)
+      clearCart()
+      return
+    }
+    if (params.get('canceled')) {
+      setFormError(lang === 'ar'
+        ? 'تم إلغاء عملية الدفع. لم يتم خصم أي مبلغ.'
+        : 'Payment canceled — you have not been charged.')
+    }
     if (items.length > 0) {
       posthog.capture('checkout_started', {
         item_count: items.reduce((s, i) => s + i.quantity, 0),
@@ -73,6 +87,9 @@ export default function CheckoutPage() {
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
   const finalTotal = total - promoDiscount
+
+  // Online card payment is offered only when Stripe is configured.
+  const stripeEnabled = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -144,6 +161,25 @@ export default function CheckoutPage() {
       const data = await res.json()
 
       if (data.success) {
+        if (paymentMethod === 'card') {
+          // Order created as pending — hand off to Stripe Checkout.
+          try {
+            const sres = await fetch('/api/stripe/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderNumber: data.orderNumber }),
+            })
+            const sdata = await sres.json()
+            if (sdata.url) {
+              window.location.href = sdata.url
+              return
+            }
+            setFormError(sdata.error || (lang === 'ar' ? 'تعذّر بدء عملية الدفع.' : 'Could not start payment.'))
+          } catch {
+            setFormError(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')
+          }
+          return
+        }
         posthog.capture('order_placed', {
           order_number: data.orderNumber,
           item_count: items.reduce((s, i) => s + i.quantity, 0),
@@ -405,23 +441,32 @@ export default function CheckoutPage() {
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
               <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5">{tr.paymentMethod}</h2>
               <div className="space-y-3">
-                <label className="flex items-center gap-4 p-4 border-2 border-green-500 bg-green-50 rounded-xl cursor-pointer">
+                <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                  paymentMethod === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                }`}>
                   <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
                   <span className="text-2xl">💵</span>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.cashOnDelivery}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{tr.cashOnDeliverySub}</div>
                   </div>
-                  <span className="text-green-600 font-black text-lg">✓</span>
+                  {paymentMethod === 'cod' && <span className="text-green-600 font-black text-lg">✓</span>}
                 </label>
-                <div className="flex items-center gap-4 p-4 border-2 border-gray-100 bg-gray-50 rounded-xl opacity-60">
-                  <span className="text-2xl">💳</span>
-                  <div className="flex-1">
-                    <div className="font-bold text-gray-500">{tr.payOnline}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">{lang === 'ar' ? 'قريباً - Telr' : 'Coming soon via Telr'}</div>
-                  </div>
-                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold">{lang === 'ar' ? 'قريباً' : 'Soon'}</span>
-                </div>
+                {stripeEnabled && (
+                  <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                    paymentMethod === 'card' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                  }`}>
+                    <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="sr-only" />
+                    <span className="text-2xl">💳</span>
+                    <div className="flex-1">
+                      <div className="font-bold text-gray-900">{tr.payOnline}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {lang === 'ar' ? 'بطاقة ائتمان أو خصم — دفع آمن' : 'Credit or debit card — secure payment'}
+                      </div>
+                    </div>
+                    {paymentMethod === 'card' && <span className="text-green-600 font-black text-lg">✓</span>}
+                  </label>
+                )}
               </div>
             </div>
           </div>
@@ -536,7 +581,7 @@ export default function CheckoutPage() {
                     {lang === 'ar' ? 'جاري التأكيد...' : 'Placing order...'}
                   </>
                 ) : (
-                  <>{tr.placeOrder} →</>
+                  <>{paymentMethod === 'card' ? (lang === 'ar' ? 'المتابعة للدفع' : 'Continue to Payment') : tr.placeOrder} →</>
                 )}
               </button>
               <p className="text-xs text-gray-400 text-center mt-4">🔒 {tr.secureNote}</p>

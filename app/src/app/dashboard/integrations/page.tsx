@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe } from 'lucide-react'
+import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe, CreditCard } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
 
 interface Integration {
@@ -133,6 +133,20 @@ export default async function IntegrationsPage() {
         { key: 'SENTRY_PROJECT', label: 'Project slug' },
       ],
       configured: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+    },
+    {
+      id: 'stripe',
+      name: 'Stripe',
+      description: 'Online card payments at checkout',
+      docsUrl: 'https://stripe.com/docs/payments/checkout',
+      icon: CreditCard,
+      iconColor: 'bg-indigo-900/40 text-indigo-400',
+      envVars: [
+        { key: 'STRIPE_SECRET_KEY', label: 'Secret Key', secret: true },
+        { key: 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', label: 'Publishable Key' },
+        { key: 'STRIPE_WEBHOOK_SECRET', label: 'Webhook Secret', secret: true },
+      ],
+      configured: !!process.env.STRIPE_SECRET_KEY,
     },
     {
       id: 'domain',
