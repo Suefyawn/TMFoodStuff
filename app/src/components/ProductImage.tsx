@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 
 interface ProductImageProps {
   src?: string
@@ -20,12 +21,13 @@ export function ProductImage({ src, alt, className, emoji }: ProductImageProps) 
   }
 
   return (
-    <img
+    <Image
       src={src}
       alt={alt}
+      fill
+      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
       className={className}
       onError={() => setError(true)}
-      loading="lazy"
     />
   )
 }

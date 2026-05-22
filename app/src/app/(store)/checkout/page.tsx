@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { CheckCircle, ShoppingBag, Package, MessageCircle } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
@@ -21,6 +22,8 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [waMessage, setWaMessage] = useState('')
   const [waNumber, setWaNumber] = useState('')
+  const [formError, setFormError] = useState('')
+  const [promoError, setPromoError] = useState('')
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
@@ -89,11 +92,12 @@ export default function CheckoutPage() {
         const discount = parseFloat((sub * (data.discountPercent / 100)).toFixed(2))
         setPromoApplied(true)
         setPromoDiscount(discount)
+        setPromoError('')
       } else {
-        alert(data.error || (lang === 'ar' ? 'كود خصم غير صالح' : 'Invalid promo code'))
+        setPromoError(data.error || (lang === 'ar' ? 'كود خصم غير صالح' : 'Invalid promo code'))
       }
     } catch {
-      alert(lang === 'ar' ? 'تعذر التحقق من الكود' : 'Could not validate promo code')
+      setPromoError(lang === 'ar' ? 'تعذر التحقق من الكود' : 'Could not validate promo code')
     } finally {
       setPromoLoading(false)
     }
@@ -101,16 +105,17 @@ export default function CheckoutPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setFormError('')
     if (!form.fullName || !form.phone || !form.emirate || !form.area) {
-      alert(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields')
+      setFormError(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields.')
       return
     }
     if (!form.deliveryDate) {
-      alert(lang === 'ar' ? 'يرجى اختيار تاريخ التوصيل' : 'Please select a delivery date')
+      setFormError(lang === 'ar' ? 'يرجى اختيار تاريخ التوصيل' : 'Please select a delivery date.')
       return
     }
     if (!form.deliverySlot) {
-      alert(lang === 'ar' ? 'يرجى اختيار وقت التوصيل' : 'Please select a delivery slot')
+      setFormError(lang === 'ar' ? 'يرجى اختيار وقت التوصيل' : 'Please select a delivery slot.')
       return
     }
 
@@ -157,10 +162,10 @@ export default function CheckoutPage() {
           window.open(`https://wa.me/${data.waNumber}?text=${data.waMessage}`, '_blank')
         }, 1500)
       } else {
-        alert(data.error || (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'))
+        setFormError(data.error || (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'))
       }
     } catch (err) {
-      alert(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')
+      setFormError(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -429,9 +434,9 @@ export default function CheckoutPage() {
               <div className="space-y-3 mb-5 max-h-48 md:max-h-60 overflow-y-auto">
                 {items.map(item => (
                   <div key={item.id} className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="relative w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                        <Image src={item.imageUrl} alt={item.name} fill sizes="40px" className="object-cover" />
                       ) : item.emoji ? (
                         <span className="text-xl">{item.emoji}</span>
                       ) : (
@@ -496,6 +501,9 @@ export default function CheckoutPage() {
                       </button>
                     </div>
                   )}
+                  {promoError && !promoApplied && (
+                    <p className="text-xs text-red-600 mt-2">{promoError}</p>
+                  )}
                 </div>
 
                 {promoApplied && (
@@ -510,10 +518,16 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {formError && (
+                <p className="mt-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 text-center font-medium">
+                  {formError}
+                </p>
+              )}
+
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg min-h-[52px] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg min-h-[52px] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>

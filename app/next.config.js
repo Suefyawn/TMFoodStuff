@@ -9,7 +9,6 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.barakatfresh.ae' },
       { protocol: 'https', hostname: '*.supabase.co' },
     ],
-    unoptimized: true,
   },
   async headers() {
     return [

@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendOrderConfirmation, sendAdminOrderAlert, type OrderEmailData } from '@/lib/email'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import { computeOrderTotals, subtotalOf, round2 } from '@/lib/pricing'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 const VALID_SLOTS = ['morning', 'afternoon', 'evening']
-
-const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100
 
 function parseNum(value: string | undefined, fallback: number): number {
   const n = parseFloat(value ?? '')
@@ -141,20 +140,18 @@ export async function POST(request: Request) {
       (settings.whatsapp_number || DEFAULT_WHATSAPP_NUMBER).replace(/\D/g, '') || DEFAULT_WHATSAPP_NUMBER
 
     // ── Recompute pricing server-side (client values are never trusted) ────
-    const subtotal = round2(lineItems.reduce((s, i) => s + i.subtotal, 0))
-    const vatRate = parseNum(settings.vat_rate, 5) / 100
-    const vat = round2(subtotal * vatRate)
-
+    const vatRatePercent = parseNum(settings.vat_rate, 5)
     const launchFreeDelivery = process.env.NEXT_PUBLIC_LAUNCH_FREE_DELIVERY !== 'false'
-    const deliveryFee = launchFreeDelivery
+    const cartSubtotal = subtotalOf(lineItems)
+    const resolvedDeliveryFee = launchFreeDelivery
       ? 0
-      : subtotal >= parseNum(settings.free_delivery_threshold, 150)
+      : cartSubtotal >= parseNum(settings.free_delivery_threshold, 150)
         ? 0
         : parseNum(settings.delivery_fee, 15)
 
     // ── Re-validate the promo code server-side ─────────────────────────────
     let appliedPromoCode = ''
-    let promoDiscount = 0
+    let promoDiscountPercent = 0
     if (promoCode && String(promoCode).trim()) {
       const { data: promo } = await supabase
         .from('promo_codes')
@@ -164,11 +161,16 @@ export async function POST(request: Request) {
         .maybeSingle()
       if (promo && (!promo.expires_at || new Date(promo.expires_at) >= new Date())) {
         appliedPromoCode = promo.code
-        promoDiscount = round2(subtotal * (Number(promo.discount_percent) / 100))
+        promoDiscountPercent = Number(promo.discount_percent) || 0
       }
     }
 
-    const total = round2(Math.max(0, subtotal + vat + deliveryFee - promoDiscount))
+    const { subtotal, vat, deliveryFee, promoDiscount, total } = computeOrderTotals({
+      lineItems,
+      vatRatePercent,
+      deliveryFee: resolvedDeliveryFee,
+      promoDiscountPercent,
+    })
     const orderNumber = `TM-${Date.now().toString(36).toUpperCase().slice(-6)}`
 
     const payload: Record<string, unknown> = {
