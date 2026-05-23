@@ -57,34 +57,31 @@ export async function POST(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 
-  const { data: order, error: loadErr } = await supabase
-    .from('orders')
-    .select('*')
-    .eq('id', orderId)
-    .maybeSingle()
-  if (loadErr || !order) {
-    console.error('[Stripe webhook] order not found', orderId, loadErr)
-    return NextResponse.json({ received: true })
-  }
-
-  // Stripe retries deliver the same event up to 3 days. Bail out if we've
-  // already marked this order paid so we don't double-fulfil.
-  if (order.payment_status === 'paid') {
-    return NextResponse.json({ received: true, already_fulfilled: true })
-  }
-
-  const { error: updateErr } = await supabase
+  // Atomic transition pending → paid. Filtering on payment_status='pending'
+  // in the UPDATE means two concurrent webhook deliveries (Stripe retries the
+  // same event for up to 3 days) can't both mark the order paid and both fire
+  // fulfilment. Whichever query lands first claims the row; the second gets
+  // zero rows back and exits silently.
+  const { data: claimed, error: updateErr } = await supabase
     .from('orders')
     .update({
       payment_status: 'paid',
-      status: order.status === 'pending' ? 'confirmed' : order.status,
+      status: 'confirmed',
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId)
+    .eq('payment_status', 'pending')
+    .select('id, order_number, customer_name, customer_phone, customer_email, delivery_emirate, delivery_area, delivery_building, delivery_slot, delivery_notes, locale, items, subtotal_aed, subtotal, vat_aed, vat, delivery_fee_aed, delivery_fee, promo_code, promo_discount_aed, promo_discount, total_aed, total')
+    .maybeSingle()
   if (updateErr) {
     console.error('[Stripe webhook] failed to update order', orderId, updateErr)
     return NextResponse.json({ received: true })
   }
+  if (!claimed) {
+    // Either the order doesn't exist or another delivery already claimed it.
+    return NextResponse.json({ received: true, already_fulfilled: true })
+  }
+  const order = claimed
 
   const { data: settingsRows } = await supabase.from('settings').select('key, value')
   const settings: Record<string, string> = {}
