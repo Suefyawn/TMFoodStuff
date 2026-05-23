@@ -6,6 +6,7 @@ import { CheckCircle, ShoppingBag, Package, MessageCircle } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
+import { isValidEmail, isValidUAEPhone } from '@/lib/validators'
 import posthog from 'posthog-js'
 
 const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors"
@@ -110,6 +111,14 @@ export default function CheckoutPage() {
       setFormError(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields.')
       return
     }
+    if (!isValidUAEPhone(form.phone)) {
+      setFormError(lang === 'ar' ? 'رقم الهاتف غير صحيح. مثال: 0501234567' : 'Please enter a valid UAE phone number, e.g. 0501234567.')
+      return
+    }
+    if (form.email && !isValidEmail(form.email)) {
+      setFormError(lang === 'ar' ? 'البريد الإلكتروني غير صحيح.' : 'Please enter a valid email address.')
+      return
+    }
     if (!form.deliveryDate) {
       setFormError(lang === 'ar' ? 'يرجى اختيار تاريخ التوصيل' : 'Please select a delivery date.')
       return
@@ -154,10 +163,12 @@ export default function CheckoutPage() {
           promo_code: promoApplied ? promoCode : undefined,
         })
 
-        // Card payment → redirect to Stripe Checkout; success page handles the
-        // rest. Cart is cleared on the success page so a back-button cancel
-        // doesn't strand the user with an empty cart.
+        // Card payment → redirect to Stripe Checkout. Clear the cart first so
+        // closing the Stripe tab and coming back doesn't leave the user about
+        // to re-pay for an order that's already pending in the orders table.
+        // (Abandoned orders >24h get cancelled by the cron route.)
         if (data.stripeUrl) {
+          clearCart()
           window.location.href = data.stripeUrl
           return
         }

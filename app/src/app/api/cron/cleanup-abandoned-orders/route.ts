@@ -18,13 +18,15 @@ export const dynamic = 'force-dynamic'
 const ABANDONED_AFTER_MS = 24 * 60 * 60 * 1000
 
 export async function GET(request: Request) {
+  // Require *some* form of authentication. Refusing all calls when no method
+  // is configured prevents the route being a free pingable side-effect when
+  // CRON_SECRET hasn't been set in the environment yet.
+  const provided = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
+  const isVercelCron = !!request.headers.get('x-vercel-cron-signature')
   const secret = process.env.CRON_SECRET
-  if (secret) {
-    const provided = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
-    const isVercelCron = !!request.headers.get('x-vercel-cron-signature')
-    if (provided !== secret && !isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const secretOk = !!secret && provided === secret
+  if (!isVercelCron && !secretOk) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const supabase = createClient(

@@ -6,6 +6,7 @@ import { fulfillOrder } from '@/lib/order-fulfillment'
 import { toLocale } from '@/lib/locale'
 import { getStripe } from '@/lib/stripe'
 import { SITE_URL } from '@/lib/site'
+import { isValidEmail, isValidUAEPhone, normaliseUAEPhone } from '@/lib/validators'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 const VALID_SLOTS = ['morning', 'afternoon', 'evening']
@@ -56,7 +57,11 @@ export async function POST(request: Request) {
     if (fullName.length > 120 || phone.length > 40 || area.length > 200 || email.length > 160) {
       return NextResponse.json({ success: false, error: 'One or more fields are too long.' }, { status: 400 })
     }
-    if (email && !email.includes('@')) {
+    if (!isValidUAEPhone(phone)) {
+      return NextResponse.json({ success: false, error: 'Please enter a valid UAE phone number, e.g. 0501234567.' }, { status: 400 })
+    }
+    const normalisedPhone = normaliseUAEPhone(phone)
+    if (email && !isValidEmail(email)) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
@@ -183,7 +188,7 @@ export async function POST(request: Request) {
       payment_status: 'pending',
       customer_name: fullName,
       customer_full_name: fullName,
-      customer_phone: phone,
+      customer_phone: normalisedPhone,
       customer_email: email,
       delivery_emirate: emirate,
       delivery_area: area,
@@ -282,7 +287,7 @@ export async function POST(request: Request) {
     await fulfillOrder({
       supabase,
       orderNumber,
-      customer: { name: fullName, phone, email: email || undefined },
+      customer: { name: fullName, phone: normalisedPhone, email: email || undefined },
       delivery: {
         emirate,
         area,

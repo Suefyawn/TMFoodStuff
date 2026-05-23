@@ -15,12 +15,22 @@ export async function POST(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('promo_codes')
     .select('code, discount_percent, expires_at, is_active')
     .eq('is_active', true)
     .ilike('code', code.trim())
     .maybeSingle()
+
+  if (error) {
+    // Distinguish a real backend failure from a user typing an unknown code,
+    // so the customer doesn't see "Invalid or expired" when the DB is down.
+    console.error('[promo] lookup failed:', error)
+    return NextResponse.json(
+      { valid: false, error: 'Could not validate promo code right now. Please try again.' },
+      { status: 500 },
+    )
+  }
 
   if (!data) return NextResponse.json({ valid: false, error: 'Invalid or expired promo code' })
 

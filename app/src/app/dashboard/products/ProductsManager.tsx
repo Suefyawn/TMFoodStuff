@@ -50,6 +50,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [newProduct, setNewProduct] = useState(emptyProduct)
   const [saving, setSaving] = useState(false)
   const [apiError, setApiError] = useState('')
+  const [saveSuccess, setSaveSuccess] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'category'>('name')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [importRows, setImportRows] = useState<any[] | null>(null)
@@ -101,6 +102,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       } : p))
       setEditing(null)
       setEditData(null)
+      setSaveSuccess('Product updated')
+      setTimeout(() => setSaveSuccess(''), 2500)
     } catch {
       setApiError('Network error — please try again')
     } finally {
@@ -124,6 +127,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       if (!res.ok || !data.ok) { setApiError(data.error || 'Failed to add product'); return }
       setShowAdd(false)
       setNewProduct(emptyProduct)
+      setSaveSuccess('Product created')
+      setTimeout(() => setSaveSuccess(''), 2500)
       router.refresh()
     } catch {
       setApiError('Network error — please try again')
@@ -282,9 +287,15 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   return (
     <div className="p-4 sm:p-6 space-y-4">
       {apiError && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl flex items-center justify-between">
+        <div role="alert" className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl flex items-center justify-between">
           <span>{apiError}</span>
-          <button onClick={() => setApiError('')} className="text-red-400 hover:text-red-300 ml-4 font-bold">✕</button>
+          <button onClick={() => setApiError('')} className="text-red-400 hover:text-red-300 ml-4 font-bold" aria-label="Dismiss error">✕</button>
+        </div>
+      )}
+      {saveSuccess && (
+        <div role="status" className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl flex items-center justify-between">
+          <span>✓ {saveSuccess}</span>
+          <button onClick={() => setSaveSuccess('')} className="text-green-400 hover:text-green-300 ml-4 font-bold" aria-label="Dismiss">✕</button>
         </div>
       )}
       <div className="flex items-center justify-between flex-wrap gap-3">

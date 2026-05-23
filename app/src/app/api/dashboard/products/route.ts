@@ -92,6 +92,20 @@ export async function POST(request: Request) {
 
   const supabase = getSupabase()
 
+  // Pre-check slug uniqueness so we can return a friendly 409 instead of the
+  // raw Postgres unique-violation error.
+  const { data: existingSlug } = await supabase
+    .from('products')
+    .select('id')
+    .eq('slug', body.slug)
+    .maybeSingle()
+  if (existingSlug) {
+    return NextResponse.json(
+      { error: `A product with the slug "${body.slug}" already exists. Pick a different slug.` },
+      { status: 409 },
+    )
+  }
+
   const { data, error } = await supabase.from('products').insert({
     name: body.name,
     name_ar: body.name_ar || '',

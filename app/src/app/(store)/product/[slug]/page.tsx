@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -20,6 +21,41 @@ interface Props {
 export async function generateStaticParams() {
   const slugs = await getAllProductSlugs()
   return slugs.map(slug => ({ slug }))
+}
+
+// Per-product SEO. Without this, every product detail page inherits the
+// generic root <title> "TMFoodStuff — Fresh Fruits & Vegetables UAE", which
+// hurts indexing and social sharing.
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProductBySlug(slug)
+  if (!product) {
+    return { title: 'Product not found', robots: { index: false } }
+  }
+  const title = `${product.name} — ${formatAED(product.priceAED)} per ${product.unit} | TMFoodStuff`
+  const description =
+    (product.description || `Buy fresh ${product.name.toLowerCase()} delivered across the UAE. Premium quality from TMFoodStuff.`).slice(0, 160)
+  const url = `${SITE_URL}/product/${product.slug}`
+  const image = product.imageUrl
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website',
+      siteName: 'TMFoodStuff',
+      images: image ? [{ url: image, alt: product.name }] : undefined,
+    },
+    twitter: {
+      card: image ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  }
 }
 
 export default async function ProductPage({ params }: Props) {
