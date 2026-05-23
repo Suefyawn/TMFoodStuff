@@ -232,39 +232,34 @@ export async function POST(request: Request) {
         )
       }
 
+      // We send a single line item totalling the exact server-computed amount.
+      // Breaking the order into per-product lines (plus a VAT+delivery+promo
+      // adjustment) trips a rounding/edge-case bug: when the promo exceeds
+      // VAT + delivery the adjustment line would go negative, which Stripe
+      // rejects. A single line is less pretty on the receipt but always
+      // matches the order total exactly. The itemised breakdown lives in the
+      // confirmation email and on /dashboard/orders.
+      const itemsSummary = lineItems
+        .map((i) => `${i.name} ×${i.quantity}`)
+        .join(', ')
+        .slice(0, 500)
+
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         payment_method_types: ['card'],
         customer_email: email || undefined,
-        // Stripe needs each line as its own item for the receipt. AED is in
-        // fils (×100). Delivery, VAT, and promo discount fold into a single
-        // adjustment line so the displayed total matches our server total.
         line_items: [
-          ...lineItems.map((i) => ({
-            quantity: i.quantity,
+          {
+            quantity: 1,
             price_data: {
               currency: 'aed',
-              unit_amount: Math.round(i.price_aed * 100),
-              product_data: { name: i.name },
+              unit_amount: Math.round(total * 100),
+              product_data: {
+                name: `TM FoodStuff order ${orderNumber}`,
+                description: itemsSummary,
+              },
             },
-          })),
-          ...(vat + deliveryFee - promoDiscount > 0
-            ? [
-                {
-                  quantity: 1,
-                  price_data: {
-                    currency: 'aed' as const,
-                    unit_amount: Math.round((vat + deliveryFee - promoDiscount) * 100),
-                    product_data: {
-                      name:
-                        promoDiscount > 0
-                          ? `VAT + Delivery − Promo (${appliedPromoCode})`
-                          : 'VAT + Delivery',
-                    },
-                  },
-                },
-              ]
-            : []),
+          },
         ],
         metadata: {
           order_id: String(orderId),
