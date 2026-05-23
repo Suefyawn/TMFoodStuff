@@ -1,166 +1,178 @@
-# 🚀 Vercel Deployment Guide
+# Deployment guide
 
-This guide covers deploying TMFoodStuff to Vercel with a production MongoDB Atlas cluster.
+TMFoodStuff is a Next.js 15 (App Router) storefront backed by Supabase
+(Postgres + Auth + Storage), with optional Stripe, Twilio, Resend, Sentry, and
+PostHog integrations. Vercel is the recommended host. This guide walks through
+the live setup end to end.
 
----
-
-## Step 1: Prepare MongoDB Atlas for Production
-
-### 1. Create a Production Cluster
-
-For production, upgrade from M0 (free) or create a new cluster:
-
-1. Log into [https://cloud.mongodb.com](https://cloud.mongodb.com)
-2. Click **Create** → choose **M10** (dedicated, ~$57/month) or stay on **M0** for initial launch
-3. Select region closest to UAE: **eu-west-1 (Ireland)** or **me-south-1 (Bahrain)** if available
-4. Name it: `tmfoodstuff-prod`
-
-### 2. Create a Production Database User
-
-1. Go to **Database Access** → **Add New Database User**
-2. Username: `tmfoodstuff-prod`
-3. Password: Generate with **Autogenerate Secure Password** — copy it
-4. Database User Privileges: **Atlas Admin** (or **Read and write to any database**)
-5. Click **Add User**
-
-### 3. Whitelist Vercel IPs
-
-Vercel uses dynamic IPs, so you need to allow all traffic:
-
-1. Go to **Network Access** → **Add IP Address**
-2. Click **Allow Access from Anywhere** (adds `0.0.0.0/0`)
-3. Click **Confirm**
-
-> ⚠️ For stricter security on paid plans, use Vercel's static IP feature and whitelist only those.
-
-### 4. Get Your Production Connection String
-
-1. Click **Connect** on your cluster → **Drivers** → Node.js
-2. Copy the URI and format it:
-```
-mongodb+srv://tmfoodstuff-prod:YOURPASSWORD@tmfoodstuff-prod.xxxxx.mongodb.net/tmfoodstuff?retryWrites=true&w=majority&appName=tmfoodstuff-prod
-```
+Every external service is **optional** — when its env vars are blank the
+corresponding feature silently no-ops. You can bring them online one at a time.
 
 ---
 
-## Step 2: Set Up Vercel
+## 1. Supabase
 
-### 1. Install Vercel CLI (optional but useful)
+### 1.1 Project
+
+1. Create a project at https://supabase.com (free tier is fine to launch).
+2. Pick a region close to your users — `ap-southeast-1` for the UAE.
+3. Note the project ref (e.g. `eoecnybevhxfdyzlodua`).
+
+### 1.2 Schema
+
+Apply the migrations in `supabase/migrations/` in order — either with the
+Supabase CLI or through the dashboard SQL editor:
 
 ```bash
-npm install -g vercel
-vercel login
+supabase link --project-ref YOUR_REF
+supabase db push
 ```
 
-### 2. Connect GitHub Repository
+### 1.3 Admin allowlist
 
-1. Go to [https://vercel.com](https://vercel.com) and log in (or sign up)
-2. Click **Add New Project**
-3. Click **Import Git Repository**
-4. Select **GitHub** and authorize Vercel
-5. Find `Suefyawn/TMFoodStuff` and click **Import**
+The dashboard uses two layers: **Supabase Auth** holds the password, and the
+`admin_users` table holds the allowlist. Add yourself to both:
 
-### 3. Configure Build Settings
+1. Authentication → Providers → Email → turn off public sign-ups.
+2. Authentication → Users → Add user → enter your email and a password.
+3. SQL editor:
+   ```sql
+   insert into public.admin_users (email, role, is_active)
+   values ('you@example.com', 'admin', true);
+   ```
 
-On the import screen, set:
+Sign in at `/dashboard/login`.
 
-| Setting | Value |
-|---------|-------|
-| **Framework Preset** | Next.js |
-| **Root Directory** | `app` |
-| **Build Command** | `npm run build` |
-| **Output Directory** | `.next` (auto-detected) |
-| **Install Command** | `npm install` |
+### 1.4 Storage
 
-Click **Root Directory** → type `app` → click **Continue**.
+A `product-images` bucket is needed for product photo uploads. Create it
+**Public** in Storage → Buckets if you want product images served from the
+Supabase CDN.
 
 ---
 
-## Step 3: Set Environment Variables
+## 2. Required env vars
 
-On the Vercel project settings, go to **Settings** → **Environment Variables** and add:
+Copy `app/.env.example` and fill in the values. Required for a minimal
+production launch:
 
-| Variable | Value | Environment |
-|----------|-------|-------------|
-| `MONGODB_URI` | `mongodb+srv://...` | Production, Preview, Development |
-| `PAYLOAD_SECRET` | 64-char random hex string | Production, Preview, Development |
-| `NEXT_PUBLIC_SERVER_URL` | `https://yourdomain.com` | Production |
-| `NEXT_PUBLIC_SERVER_URL` | `https://tmfoodstuff.vercel.app` | Preview |
+| Variable | Where to get it |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API → publishable key (`sb_publishable_...`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role (server-only, keep secret) |
+| `NEXT_PUBLIC_SITE_URL` | The production URL, e.g. `https://tmfoodstuff.ae` |
 
-**Generate a production-strength PAYLOAD_SECRET:**
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-> ⚠️ Use a **different** `PAYLOAD_SECRET` in production than in development. Never reuse secrets across environments.
-
-Click **Deploy** to trigger the first deployment.
+Everything else is optional. Add only what you intend to use.
 
 ---
 
-## Step 4: Custom Domain Setup
+## 3. Optional integrations
 
-### 1. Add Your Domain in Vercel
+### 3.1 Stripe (online card payments)
 
-1. Go to your project → **Settings** → **Domains**
-2. Click **Add Domain**
-3. Enter your domain: `tmfoodstuff.ae` or `www.tmfoodstuff.com`
-4. Click **Add**
+1. Create a Stripe account; switch to **Test mode** for the first run-through.
+2. Grab the test keys from https://dashboard.stripe.com/test/apikeys.
+3. Set:
+   ```env
+   STRIPE_SECRET_KEY=sk_test_...
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+   ```
+4. Add the webhook endpoint after the first deploy:
+   - Dashboard → Developers → Webhooks → **Add endpoint**
+   - URL: `https://YOUR_DOMAIN/api/stripe/webhook`
+   - Event: `checkout.session.completed`
+   - Reveal the signing secret and set `STRIPE_WEBHOOK_SECRET`.
+5. Test with card `4242 4242 4242 4242`, any future expiry, any CVC.
+6. Switch to live keys once you've verified an end-to-end test order.
 
-### 2. Update Your DNS
+Card payment falls back to a "service unavailable" message when these keys are
+missing — Cash on Delivery keeps working regardless.
 
-Vercel will show you DNS records to add. Depending on your domain registrar:
+### 3.2 Twilio (SMS + WhatsApp)
 
-**For apex domain (tmfoodstuff.ae):**
-- Add an **A record**: `@` → `76.76.21.21`
+The same body is sent over both channels for order confirmation, the
+out-for-delivery / delivered status updates, and the admin new-order alert.
 
-**For www subdomain:**
-- Add a **CNAME record**: `www` → `cname.vercel-dns.com`
-
-DNS propagation takes 5 minutes to 48 hours.
-
-### 3. Update NEXT_PUBLIC_SERVER_URL
-
-Once your custom domain is live, update the production environment variable:
+```env
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+TWILIO_SMS_FROM=+12025550100      # purchased SMS-capable number
+TWILIO_WHATSAPP_FROM=+14155238886 # sandbox: whatsapp:+14155238886
+TWILIO_ADMIN_PHONE=+9715XXXXXXXX  # optional, for the new-order alert
 ```
-NEXT_PUBLIC_SERVER_URL=https://www.tmfoodstuff.ae
+
+Notes:
+- UAE SMS delivery may need an approved **Alphanumeric Sender ID** in Twilio
+  Console depending on routing.
+- The WhatsApp sandbox works immediately once each tester sends the join code.
+- For **production WhatsApp business-initiated** messages you must send via
+  Twilio Content Templates (Meta-approved templates). The current code uses
+  freeform `body`, which works for the sandbox and for replies within a 24-hour
+  customer-care session, but not for cold business-initiated WhatsApp.
+
+### 3.3 Resend (transactional email)
+
+```env
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=orders@tmfoodstuff.ae
+ADMIN_EMAIL=orders@tmfoodstuff.ae
 ```
 
-Redeploy after updating env vars (Vercel → Deployments → Redeploy latest).
+Verify your sending domain in https://resend.com/domains (add the DKIM/SPF
+records to your DNS) before going live. Without verification, emails to most
+inboxes will be rejected.
+
+`ADMIN_EMAIL` is **only** the recipient of the new-order alert. It does not
+grant dashboard access — that's controlled by `admin_users`.
+
+### 3.4 Sentry / PostHog
+
+Both pick up their respective env vars and stay dormant otherwise. See
+`app/.env.example` for the variable names.
 
 ---
 
-## Step 5: Post-Deploy Checklist
+## 4. Vercel
 
-After your first successful deployment:
+1. https://vercel.com → **Add New Project** → Import the GitHub repo.
+2. **Root Directory**: `app`.
+3. Framework preset auto-detects Next.js.
+4. Project Settings → **Environment Variables** → paste every key from your
+   `.env.example` into Production (and Preview if you want previews to work).
+5. Deploy.
 
-- [ ] Visit `https://yourdomain.com` — storefront loads
-- [ ] Visit `https://yourdomain.com/admin` — Payload admin loads
-- [ ] Create first admin user in production
-- [ ] Add test category and product
-- [ ] Test checkout form renders
-- [ ] Test cart page renders
-- [ ] Verify MongoDB Atlas shows connections under **Metrics** tab
-- [ ] Set up Atlas **Database Triggers** for order email notifications (optional)
-- [ ] Enable **Atlas Backup** for production data safety
+After the first deploy, add the Stripe webhook (3.1) using the live URL.
 
----
+### Custom domain
 
-## Redeployments
-
-Every push to the `main` branch on GitHub automatically triggers a Vercel deployment. Preview branches get their own URL for testing.
-
-To manually redeploy:
-```bash
-vercel --prod
-```
-
-Or trigger from the Vercel dashboard: **Deployments** → **...** → **Redeploy**.
+Settings → Domains → add `tmfoodstuff.ae`. Vercel shows the exact A record
+(`76.76.21.21`) or CNAME (`cname.vercel-dns.com`) to add at your registrar.
+Update `NEXT_PUBLIC_SITE_URL` and redeploy once DNS is live.
 
 ---
 
-## Monitoring
+## 5. Smoke test
 
-- **Vercel Analytics:** Enable in project settings for Core Web Vitals
-- **MongoDB Atlas Monitoring:** Charts available under your cluster's **Metrics** tab
-- **Error tracking:** Consider adding Sentry (`npm install @sentry/nextjs`) for production error monitoring
+After deploying, walk through one full flow per payment method:
+
+- [ ] Sign in at `/dashboard/login`.
+- [ ] Browse `/shop`, add an item, complete `/checkout` with **Cash on Delivery**.
+- [ ] Confirm the order row appears in Supabase (`select * from orders`).
+- [ ] Confirm the confirmation email lands (if Resend is set).
+- [ ] Confirm the confirmation SMS / WhatsApp lands (if Twilio is set).
+- [ ] In `/dashboard/orders`, flip status to `out_for_delivery` then `delivered`
+      and confirm the status emails / SMS go out.
+- [ ] Repeat the order with **Pay Online**, use Stripe test card
+      `4242 4242 4242 4242`, confirm the webhook marks `payment_status=paid`
+      and fulfilment fires.
+
+---
+
+## 6. Ongoing
+
+- Every push to `main` redeploys via Vercel.
+- The `Secret scan` workflow runs gitleaks on every push and PR.
+- The `CI` workflow runs `npm test` and `npm run build` on every push and PR.
+- Periodically run `mcp__supabase__get_advisors` (or Database → Advisors in the
+  dashboard) to catch new RLS / performance issues.

@@ -137,6 +137,7 @@ export default function CheckoutPage() {
           promoDiscount,
           deliverySlot: form.deliverySlot,
           deliveryDate: form.deliveryDate,
+          locale: lang,
         }),
       })
 
@@ -152,6 +153,15 @@ export default function CheckoutPage() {
           emirate: form.emirate,
           promo_code: promoApplied ? promoCode : undefined,
         })
+
+        // Card payment → redirect to Stripe Checkout; success page handles the
+        // rest. Cart is cleared on the success page so a back-button cancel
+        // doesn't strand the user with an empty cart.
+        if (data.stripeUrl) {
+          window.location.href = data.stripeUrl
+          return
+        }
+
         setOrderNumber(data.orderNumber)
         clearCart()
         setSubmitted(true)
@@ -164,7 +174,7 @@ export default function CheckoutPage() {
       } else {
         setFormError(data.error || (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'))
       }
-    } catch (err) {
+    } catch {
       setFormError(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -400,27 +410,32 @@ export default function CheckoutPage() {
               </p>
             </div>
 
-            {/* Payment Method - simplified */}
+            {/* Payment Method */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
               <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5">{tr.paymentMethod}</h2>
               <div className="space-y-3">
-                <label className="flex items-center gap-4 p-4 border-2 border-green-500 bg-green-50 rounded-xl cursor-pointer">
+                <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
+                  paymentMethod === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                }`}>
                   <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
                   <span className="text-2xl">💵</span>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.cashOnDelivery}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{tr.cashOnDeliverySub}</div>
                   </div>
-                  <span className="text-green-600 font-black text-lg">✓</span>
+                  {paymentMethod === 'cod' && <span className="text-green-600 font-black text-lg">✓</span>}
                 </label>
-                <div className="flex items-center gap-4 p-4 border-2 border-gray-100 bg-gray-50 rounded-xl opacity-60">
+                <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
+                  paymentMethod === 'card' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                }`}>
+                  <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="sr-only" />
                   <span className="text-2xl">💳</span>
                   <div className="flex-1">
-                    <div className="font-bold text-gray-500">{tr.payOnline}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">{lang === 'ar' ? 'قريباً - Telr' : 'Coming soon via Telr'}</div>
+                    <div className="font-bold text-gray-900">{tr.payOnline}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{lang === 'ar' ? 'بطاقة فيزا أو ماستركارد · دفع آمن' : 'Visa or Mastercard · Secure checkout'}</div>
                   </div>
-                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-semibold">{lang === 'ar' ? 'قريباً' : 'Soon'}</span>
-                </div>
+                  {paymentMethod === 'card' && <span className="text-green-600 font-black text-lg">✓</span>}
+                </label>
               </div>
             </div>
           </div>
