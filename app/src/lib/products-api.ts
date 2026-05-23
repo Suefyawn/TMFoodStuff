@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Use service role key for server-side fetching (bypasses RLS)
-// Falls back to anon key for client-side
+// Public storefront browsing uses the anon (publishable) key so the existing
+// "public read active products" / "public read categories" RLS policies
+// govern what's visible. Bypassing RLS with the service role here (the
+// previous behaviour) would expose inactive products and any future
+// row-level restrictions to anonymous visitors.
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
 export interface Product {
