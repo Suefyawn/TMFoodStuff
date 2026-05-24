@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
-import { ArrowLeft, Package, Clock, MapPin, CreditCard, Wallet, CheckCircle2, Truck, XCircle, ShoppingCart } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft, Package, Clock, MapPin, CreditCard, Wallet, CheckCircle2, Truck, XCircle, ShoppingCart, Loader2 } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { useLang } from '@/lib/use-lang'
 import { useState } from 'react'
@@ -67,8 +68,11 @@ function slotLabel(slot: string | null, isAr: boolean): string {
 export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
   const { lang } = useLang()
   const isAr = lang === 'ar'
+  const router = useRouter()
   const { addItem } = useCartStore()
   const [reordered, setReordered] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState('')
 
   const items = Array.isArray(order.items) ? (order.items as Array<{
     id: number | string; name: string; quantity: number; price_aed: number; emoji?: string; slug?: string; unit?: string;
@@ -94,6 +98,37 @@ export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
       }, item.quantity)
     }
     setReordered(true)
+  }
+
+  const isCancellable = order.status === 'pending' || order.status === 'confirmed'
+  const isPaidCard = order.payment_method === 'card' && order.payment_status === 'paid'
+
+  async function cancelOrder() {
+    const confirmText = isPaidCard
+      ? (isAr
+          ? 'سيتم إلغاء الطلب واسترداد المبلغ إلى بطاقتك. هل أنت متأكد؟'
+          : 'This will cancel the order and refund the charge to your card. Are you sure?')
+      : (isAr ? 'هل أنت متأكد من إلغاء الطلب؟' : 'Cancel this order?')
+    if (!confirm(confirmText)) return
+    setCancelling(true)
+    setCancelError('')
+    try {
+      const res = await fetch('/api/account/orders/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_number: order.order_number }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setCancelError(data.error || (isAr ? 'تعذّر الإلغاء.' : 'Could not cancel.'))
+        return
+      }
+      router.refresh()
+    } catch {
+      setCancelError(isAr ? 'خطأ في الاتصال.' : 'Network error.')
+    } finally {
+      setCancelling(false)
+    }
   }
 
   return (
@@ -234,7 +269,7 @@ export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
 
       {/* Reorder */}
       {!isCancelled && items.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+        <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm mb-5">
           {reordered ? (
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <span className="text-green-700 font-bold text-sm inline-flex items-center gap-2">
@@ -254,6 +289,33 @@ export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
               {isAr ? 'إعادة الطلب' : 'Reorder these items'}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Cancel — only while the order hasn't started processing */}
+      {isCancellable && (
+        <div className="bg-white border border-rose-100 rounded-3xl p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-gray-900">
+                {isAr ? 'هل تحتاج إلى إلغاء هذا الطلب؟' : 'Need to cancel this order?'}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {isPaidCard
+                  ? (isAr ? 'سيتم استرداد المبلغ إلى بطاقتك تلقائياً.' : 'A full refund will be issued to your card automatically.')
+                  : (isAr ? 'يمكنك الإلغاء قبل بدء التحضير.' : 'You can cancel before preparation starts.')}
+              </p>
+            </div>
+            <button
+              onClick={cancelOrder}
+              disabled={cancelling}
+              className="inline-flex items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold px-4 py-2.5 rounded-xl text-sm transition-colors disabled:opacity-60"
+            >
+              {cancelling ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <XCircle size={14} aria-hidden="true" />}
+              {cancelling ? (isAr ? 'جاري الإلغاء…' : 'Cancelling…') : (isAr ? 'إلغاء الطلب' : 'Cancel order')}
+            </button>
+          </div>
+          {cancelError && <p role="alert" className="text-sm text-red-600 mt-3">{cancelError}</p>}
         </div>
       )}
     </div>

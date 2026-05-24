@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/audit'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -28,6 +29,12 @@ export async function POST(request: Request) {
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  await logAdminAction({
+    supabase,
+    action: 'category.create',
+    entity: `category:${data?.id}`,
+    after: { name: data?.name, slug: data?.slug },
+  })
   return NextResponse.json({ ok: true, category: data })
 }
 
@@ -43,8 +50,19 @@ export async function PUT(request: Request) {
     if (key in updates) allowed[key] = (updates as any)[key]
   }
 
+  const { data: before } = await supabase.from('categories').select('*').eq('id', parseInt(id)).maybeSingle()
+
   const { error } = await supabase.from('categories').update(allowed).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  await logAdminAction({
+    supabase,
+    action: 'category.update',
+    entity: `category:${id}`,
+    before: before ? Object.fromEntries(Object.keys(allowed).map(k => [k, (before as Record<string, unknown>)[k]])) : undefined,
+    after: allowed,
+  })
+
   return NextResponse.json({ ok: true })
 }
 
@@ -59,5 +77,12 @@ export async function DELETE(request: Request) {
 
   const { error } = await supabase.from('categories').delete().eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  await logAdminAction({
+    supabase,
+    action: 'category.delete',
+    entity: `category:${id}`,
+  })
+
   return NextResponse.json({ ok: true })
 }

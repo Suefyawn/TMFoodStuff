@@ -44,8 +44,18 @@ export default async function AccountPage() {
     .limit(50)
 
   const orders: OrderRow[] = (data || []) as OrderRow[]
-  const fullName =
-    (user.user_metadata && (user.user_metadata.full_name as string | undefined)) || ''
 
-  return <AccountClient email={user.email} fullName={fullName} orders={orders} />
+  // Pull the customer profile so the account header reflects edits the
+  // customer has made to their full_name / phone after signup.
+  const { data: profile } = await admin
+    .from('customers')
+    .select('full_name, phone')
+    .eq('email', user.email.toLowerCase())
+    .maybeSingle()
+  const fullName = (profile?.full_name as string | undefined)
+    || (user.user_metadata && (user.user_metadata.full_name as string | undefined))
+    || ''
+  const phone = (profile?.phone as string | undefined) || ''
+
+  return <AccountClient email={user.email} fullName={fullName} phone={phone} orders={orders} />
 }

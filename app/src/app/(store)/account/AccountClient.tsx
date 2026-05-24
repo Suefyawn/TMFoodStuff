@@ -1,7 +1,9 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
-import { Package, LogOut, ShoppingBag, User as UserIcon, MapPin, Heart, ChevronRight, Sparkles } from 'lucide-react'
+import { Package, LogOut, ShoppingBag, User as UserIcon, MapPin, Heart, ChevronRight, Sparkles, Pencil, Check, X, Loader2 } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
+import { isValidUAEPhone } from '@/lib/validators'
 
 interface OrderRow {
   id: number
@@ -20,6 +22,7 @@ interface OrderRow {
 interface AccountClientProps {
   email: string
   fullName: string
+  phone?: string
   orders: OrderRow[]
 }
 
@@ -52,33 +55,112 @@ function statusLabel(s: string, isAr: boolean): string {
   return (isAr ? ar : en)[s] ?? s
 }
 
-export default function AccountClient({ email, fullName, orders }: AccountClientProps) {
+export default function AccountClient({ email, fullName, phone, orders }: AccountClientProps) {
   const { lang } = useLang()
   const isAr = lang === 'ar'
+  const [editing, setEditing] = useState(false)
+  const [formName, setFormName] = useState(fullName)
+  const [formPhone, setFormPhone] = useState(phone || '')
+  const [displayName, setDisplayName] = useState(fullName)
+  const [displayPhone, setDisplayPhone] = useState(phone || '')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  async function saveProfile() {
+    if (formPhone && !isValidUAEPhone(formPhone)) {
+      setError(isAr ? 'رقم الهاتف غير صحيح.' : 'Please enter a valid UAE phone number.')
+      return
+    }
+    setSaving(true)
+    setError('')
+    try {
+      const res = await fetch('/api/account/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: formName.trim(), phone: formPhone.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || (isAr ? 'تعذّر الحفظ.' : 'Could not save.'))
+        return
+      }
+      setDisplayName(formName.trim())
+      setDisplayPhone(formPhone.trim())
+      setEditing(false)
+    } catch {
+      setError(isAr ? 'خطأ في الاتصال.' : 'Network error.')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
       {/* Header card */}
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-4 min-w-0">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
             <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center shrink-0">
               <UserIcon size={22} className="text-green-700" aria-hidden="true" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-xl md:text-2xl font-black text-gray-900 truncate">
-                {fullName || (isAr ? 'مرحباً' : 'Welcome')}
-              </h1>
-              <p className="text-sm text-gray-500 truncate">{email}</p>
+            <div className="min-w-0 flex-1">
+              {editing ? (
+                <div className="space-y-2">
+                  <input
+                    value={formName}
+                    onChange={e => setFormName(e.target.value)}
+                    placeholder={isAr ? 'الاسم الكامل' : 'Full name'}
+                    aria-label={isAr ? 'الاسم الكامل' : 'Full name'}
+                    className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500"
+                  />
+                  <input
+                    value={formPhone}
+                    onChange={e => setFormPhone(e.target.value)}
+                    placeholder={isAr ? '+971 50 000 0000' : '+971 50 000 0000'}
+                    aria-label={isAr ? 'رقم الهاتف' : 'Phone number'}
+                    type="tel"
+                    className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500"
+                  />
+                  {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
+                  <div className="flex items-center gap-2">
+                    <button onClick={saveProfile} disabled={saving} className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60">
+                      {saving ? <Loader2 size={12} className="animate-spin" aria-hidden="true" /> : <Check size={12} aria-hidden="true" />}
+                      {isAr ? 'حفظ' : 'Save'}
+                    </button>
+                    <button onClick={() => { setEditing(false); setFormName(displayName); setFormPhone(displayPhone); setError('') }} className="inline-flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-xs font-bold px-3 py-1.5">
+                      <X size={12} aria-hidden="true" /> {isAr ? 'إلغاء' : 'Cancel'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h1 className="text-xl md:text-2xl font-black text-gray-900 truncate">
+                    {displayName || (isAr ? 'مرحباً' : 'Welcome')}
+                  </h1>
+                  <p className="text-sm text-gray-500 truncate">{email}</p>
+                  {displayPhone && <p className="text-xs text-gray-400 mt-0.5">{displayPhone}</p>}
+                </>
+              )}
             </div>
           </div>
-          <a
-            href="/account/logout"
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-red-600 transition-colors"
-          >
-            <LogOut size={14} aria-hidden="true" />
-            {isAr ? 'تسجيل الخروج' : 'Sign out'}
-          </a>
+          {!editing && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setEditing(true)}
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-green-700 transition-colors"
+              >
+                <Pencil size={14} aria-hidden="true" />
+                {isAr ? 'تعديل' : 'Edit'}
+              </button>
+              <a
+                href="/account/logout"
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-red-600 transition-colors"
+              >
+                <LogOut size={14} aria-hidden="true" />
+                {isAr ? 'تسجيل الخروج' : 'Sign out'}
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
