@@ -1,17 +1,29 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone, UserCog, Search, FileSpreadsheet, Clock, Heart } from 'lucide-react'
+import { ConfirmProvider } from '@/components/ConfirmDialog'
 
+// Nav groups: ops surfaces (Pick, Deliver, Slips) sit immediately after
+// Orders so the team flow reads top-to-bottom — pick → deliver → reprint.
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
-  { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/dashboard/pick', label: 'Pick', icon: ClipboardCheck },
+  { href: '/dashboard/deliveries', label: 'Deliver', icon: Truck },
+  { href: '/dashboard/packing-slips', label: 'Slips', icon: FileText },
+  { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
   { href: '/dashboard/reviews', label: 'Reviews', icon: MessageSquare },
+  { href: '/dashboard/wishlist-insights', label: 'Wishlists', icon: Heart },
+  { href: '/dashboard/search-analytics', label: 'Searches', icon: Search },
+  { href: '/dashboard/broadcasts', label: 'Broadcasts', icon: Megaphone },
   { href: '/dashboard/stock-history', label: 'Stock', icon: Boxes },
+  { href: '/dashboard/accounting', label: 'Accounting', icon: FileSpreadsheet },
   { href: '/dashboard/audit-log', label: 'Activity', icon: FileText },
+  { href: '/dashboard/team', label: 'Team', icon: UserCog },
+  { href: '/dashboard/delivery-slots', label: 'Slots', icon: Clock },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/integrations', label: 'Integrations', icon: Plug },
 ]
@@ -49,9 +61,11 @@ function MobileNavLink({ item, pathname }: { item: typeof navItems[number]; path
 export default function DashboardShell({
   children,
   userEmail,
+  role = 'admin',
 }: {
   children: React.ReactNode
   userEmail: string
+  role?: 'admin' | 'staff' | 'driver'
 }) {
   const pathname = usePathname()
 
@@ -59,7 +73,15 @@ export default function DashboardShell({
     return <>{children}</>
   }
 
+  // Drivers get a stripped-down shell — only the deliveries surface exists
+  // for them, so the sidebar would only have one entry. Skip it entirely
+  // and let DeliveriesClient be its own full-height app.
+  if (role === 'driver') {
+    return <ConfirmProvider>{children}</ConfirmProvider>
+  }
+
   return (
+    <ConfirmProvider>
     <div className="min-h-screen bg-gray-950 text-gray-100 flex">
       {/* Sidebar */}
       <aside className="hidden lg:flex w-64 flex-col bg-gray-900 border-r border-gray-800 fixed h-full z-30">
@@ -119,5 +141,6 @@ export default function DashboardShell({
         {children}
       </main>
     </div>
+    </ConfirmProvider>
   )
 }

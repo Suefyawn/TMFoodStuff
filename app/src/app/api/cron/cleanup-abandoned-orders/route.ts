@@ -12,6 +12,7 @@
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sweepAbandonedCarts } from '@/lib/cart-recovery'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,8 +68,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: updateErr.message }, { status: 500 })
   }
 
+  // Piggyback the cart-abandonment sweep here so we stay under Vercel
+  // Hobby's 2-cron cap. The sweep is best-effort; its failures never fail
+  // this handler.
+  const recovery = await sweepAbandonedCarts(supabase).catch(err => {
+    console.error('[cleanup-abandoned-orders] cart sweep threw:', err)
+    return { scanned: 0, sent: 0, failed: 0, skipped: 0 }
+  })
+
   return NextResponse.json({
     cancelled: abandoned.length,
     order_numbers: abandoned.map((o) => o.order_number),
+    cart_recovery: recovery,
   })
 }

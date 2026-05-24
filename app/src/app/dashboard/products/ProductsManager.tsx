@@ -1,8 +1,10 @@
 'use client'
-import { useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Trash2, X, Download, Upload } from 'lucide-react'
+import { Search, Plus, Trash2, X, Download, Upload, Package } from 'lucide-react'
+import { useConfirm } from '@/components/ConfirmDialog'
 import ImageUploader from '@/components/ImageUploader'
+import BundleEditor, { type BundleItem } from './BundleEditor'
 
 interface Product {
   id: number
@@ -15,6 +17,8 @@ interface Product {
   compare_at_price_aed: number | null
   unit: string
   stock: number
+  low_stock_threshold: number
+  bundle_items: BundleItem[] | null
   is_active: boolean
   is_featured: boolean
   is_organic: boolean
@@ -33,7 +37,7 @@ interface Category {
 
 const emptyProduct = {
   name: '', name_ar: '', slug: '', category_id: 0, description: '',
-  price_aed: 0, compare_at_price_aed: '' as string | number, unit: 'kg', stock: 0, is_active: true, is_featured: false,
+  price_aed: 0, compare_at_price_aed: '' as string | number, unit: 'kg', stock: 0, low_stock_threshold: 5, bundle_items: null as BundleItem[] | null, is_active: true, is_featured: false,
   is_organic: false, origin: '', emoji: '', image_urls: [] as string[],
 }
 
@@ -43,12 +47,23 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
   const [filterStatus, setFilterStatus] = useState<'' | 'active' | 'inactive'>('')
+  // ?filter=low-stock from the overview banner. useSearchParams() would
+  // pull this in client-side, but a quick window.location check on mount
+  // is enough since the URL never changes mid-session.
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (new URLSearchParams(window.location.search).get('filter') === 'low-stock') {
+      setShowLowStockOnly(true)
+    }
+  }, [])
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [editing, setEditing] = useState<number | null>(null)
   const [editData, setEditData] = useState<any>(null)
   const [showAdd, setShowAdd] = useState(false)
   const [newProduct, setNewProduct] = useState(emptyProduct)
   const [saving, setSaving] = useState(false)
+  const confirm = useConfirm()
   const [apiError, setApiError] = useState('')
   const [saveSuccess, setSaveSuccess] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'category'>('name')
@@ -64,6 +79,10 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       if (filterCat && p.categories?.slug !== filterCat) return false
       if (filterStatus === 'active' && !p.is_active) return false
       if (filterStatus === 'inactive' && p.is_active) return false
+      if (showLowStockOnly) {
+        const threshold = Number(p.low_stock_threshold ?? 5)
+        if (Number(p.stock ?? 0) > threshold) return false
+      }
       return true
     })
 
@@ -76,7 +95,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       return sortDir === 'desc' ? -cmp : cmp
     })
     return result
-  }, [products, search, filterCat, filterStatus, sortBy, sortDir])
+  }, [products, search, filterCat, filterStatus, showLowStockOnly, sortBy, sortDir])
 
   function toggleSort(col: typeof sortBy) {
     if (sortBy === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -139,7 +158,13 @@ export default function ProductsManager({ initialProducts, categories }: { initi
 
   async function deleteSelected() {
     if (selected.size === 0) return
-    if (!confirm(`Delete ${selected.size} product(s)? This cannot be undone.`)) return
+    const ok = await confirm({
+      title: `Delete ${selected.size} product${selected.size === 1 ? '' : 's'}?`,
+      message: 'This is permanent. Existing orders that reference them will keep their captured product names and prices, but the catalog rows are gone.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!ok) return
     setSaving(true)
     setApiError('')
     try {
@@ -170,19 +195,30 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     } catch { /* silent — user can retry */ }
   }
 
-  async function bulkAction(action: 'activate' | 'deactivate') {
+  async function bulkAction(action: 'activate' | 'deactivate' | 'feature' | 'unfeature') {
     if (selected.size === 0) return
     setSaving(true)
     setApiError('')
+    // Map the bulk action to the column + value we'll patch on each row.
+    const isActivate = action === 'activate'
+    const isDeactivate = action === 'deactivate'
+    const isFeature = action === 'feature'
+    const patch: Record<string, boolean> = isActivate || isDeactivate
+      ? { is_active: isActivate }
+      : { is_featured: isFeature }
     try {
       await Promise.all(Array.from(selected).map(id =>
         fetch('/api/dashboard/products', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: String(id), is_active: action === 'activate' }),
+          body: JSON.stringify({ id: String(id), ...patch }),
         })
       ))
-      setProducts(prev => prev.map(p => selected.has(p.id) ? { ...p, is_active: action === 'activate' } : p))
+      setProducts(prev => prev.map(p => {
+        if (!selected.has(p.id)) return p
+        if (isActivate || isDeactivate) return { ...p, is_active: isActivate }
+        return { ...p, is_featured: isFeature }
+      }))
       setSelected(new Set())
     } catch {
       setApiError('Network error — some items may not have updated')
@@ -336,10 +372,12 @@ export default function ProductsManager({ initialProducts, categories }: { initi
           <option value="inactive">Inactive</option>
         </select>
         {selected.size > 0 && (
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-2 ml-auto flex-wrap">
             <span className="text-sm text-gray-400">{selected.size} selected</span>
             <button onClick={() => bulkAction('activate')} className="px-3 py-1.5 bg-green-600/20 text-green-400 text-xs font-bold rounded-lg hover:bg-green-600/30">Activate</button>
             <button onClick={() => bulkAction('deactivate')} className="px-3 py-1.5 bg-yellow-600/20 text-yellow-400 text-xs font-bold rounded-lg hover:bg-yellow-600/30">Deactivate</button>
+            <button onClick={() => bulkAction('feature')} className="px-3 py-1.5 bg-amber-600/20 text-amber-300 text-xs font-bold rounded-lg hover:bg-amber-600/30">Feature</button>
+            <button onClick={() => bulkAction('unfeature')} className="px-3 py-1.5 bg-gray-700 text-gray-300 text-xs font-bold rounded-lg hover:bg-gray-600">Unfeature</button>
             <button onClick={deleteSelected} className="px-3 py-1.5 bg-red-600/20 text-red-400 text-xs font-bold rounded-lg hover:bg-red-600/30 flex items-center gap-1"><Trash2 size={12} /> Delete</button>
           </div>
         )}
@@ -428,6 +466,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Compare-at Price (AED)" value={String(newProduct.compare_at_price_aed ?? '')} onChange={v => setNewProduct({...newProduct, compare_at_price_aed: v === '' ? '' : Number(v)})} type="number" />
               <Input label="Unit" value={newProduct.unit} onChange={v => setNewProduct({...newProduct, unit: v})} />
               <Input label="Stock" value={String(newProduct.stock)} onChange={v => setNewProduct({...newProduct, stock: Number(v)})} type="number" />
+              <Input label="Low-stock alert at" value={String(newProduct.low_stock_threshold)} onChange={v => setNewProduct({...newProduct, low_stock_threshold: Number(v)})} type="number" />
               <Input label="Origin" value={newProduct.origin} onChange={v => setNewProduct({...newProduct, origin: v})} />
               <Input label="Emoji" value={newProduct.emoji} onChange={v => setNewProduct({...newProduct, emoji: v})} />
               <div className="col-span-1 sm:col-span-2">
@@ -443,7 +482,23 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               </div>
               <Toggle label="Organic" checked={newProduct.is_organic} onChange={v => setNewProduct({...newProduct, is_organic: v})} />
               <Toggle label="Featured" checked={newProduct.is_featured} onChange={v => setNewProduct({...newProduct, is_featured: v})} />
+              <Toggle
+                label="Is bundle"
+                checked={!!newProduct.bundle_items}
+                onChange={v => setNewProduct({ ...newProduct, bundle_items: v ? [] : null })}
+              />
             </div>
+            {/* Bundle composition only renders when "Is bundle" is on. The
+                BundleEditor handles its own state shape; we feed it the
+                catalog so the search picker has options to offer. */}
+            {newProduct.bundle_items && (
+              <BundleEditor
+                value={newProduct.bundle_items}
+                onChange={v => setNewProduct({ ...newProduct, bundle_items: v })}
+                bundlePriceAed={Number(newProduct.price_aed) || 0}
+                catalog={products.map(p => ({ id: p.id, name: p.name, emoji: p.emoji, price_aed: p.price_aed, unit: p.unit, is_active: p.is_active }))}
+              />
+            )}
             <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => setShowAdd(false)} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
               <button onClick={addProduct} disabled={saving || !newProduct.name} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">
@@ -476,6 +531,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Compare-at Price (AED)" value={String(editData.compare_at_price_aed ?? '')} onChange={v => setEditData({...editData, compare_at_price_aed: v === '' ? null : Number(v)})} type="number" />
               <Input label="Unit" value={editData.unit || ''} onChange={v => setEditData({...editData, unit: v})} />
               <Input label="Stock" value={String(editData.stock || 0)} onChange={v => setEditData({...editData, stock: Number(v)})} type="number" />
+              <Input label="Low-stock alert at" value={String(editData.low_stock_threshold ?? 5)} onChange={v => setEditData({...editData, low_stock_threshold: Number(v)})} type="number" />
               <Input label="Origin" value={editData.origin || ''} onChange={v => setEditData({...editData, origin: v})} />
               <Input label="Emoji" value={editData.emoji || ''} onChange={v => setEditData({...editData, emoji: v})} />
               <div className="col-span-1 sm:col-span-2">
@@ -492,7 +548,20 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Toggle label="Organic" checked={editData.is_organic || false} onChange={v => setEditData({...editData, is_organic: v})} />
               <Toggle label="Featured" checked={editData.is_featured || false} onChange={v => setEditData({...editData, is_featured: v})} />
               <Toggle label="Active" checked={editData.is_active !== false} onChange={v => setEditData({...editData, is_active: v})} />
+              <Toggle
+                label="Is bundle"
+                checked={!!editData.bundle_items}
+                onChange={v => setEditData({ ...editData, bundle_items: v ? [] : null })}
+              />
             </div>
+            {editData.bundle_items && (
+              <BundleEditor
+                value={editData.bundle_items}
+                onChange={v => setEditData({ ...editData, bundle_items: v })}
+                bundlePriceAed={Number(editData.price_aed) || 0}
+                catalog={products.filter(p => p.id !== editing).map(p => ({ id: p.id, name: p.name, emoji: p.emoji, price_aed: p.price_aed, unit: p.unit, is_active: p.is_active }))}
+              />
+            )}
             <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => { setEditing(null); setEditData(null) }} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
               <button onClick={saveEdit} disabled={saving} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">

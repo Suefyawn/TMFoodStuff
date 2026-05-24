@@ -5,7 +5,10 @@ import { sendOutForDeliveryEmail, sendDeliveredEmail, sendOrderStatusUpdateEmail
 import { notifyOutForDelivery, notifyDelivered } from '@/lib/notify'
 import { toLocale } from '@/lib/locale'
 import { earnPointsForOrder, findCustomerByEmail } from '@/lib/loyalty'
+import { rewardReferralOnDelivery } from '@/lib/referrals'
+import { sendPushToCustomer } from '@/lib/push'
 import { logAdminAction } from '@/lib/audit'
+import { SITE_URL } from '@/lib/site'
 
 const VALID_STATUSES = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
@@ -13,7 +16,10 @@ const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 export async function PATCH(request: Request) {
   if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { id, status } = await request.json()
+  // Bulk callers send { id, status, cancellation_reason? }. The reason is
+  // only meaningful when the new status is 'cancelled' — we ignore it
+  // otherwise so other transitions don't accidentally store stale notes.
+  const { id, status, cancellation_reason } = await request.json()
 
   if (!id || !status) return NextResponse.json({ error: 'id and status are required' }, { status: 400 })
   if (!VALID_STATUSES.includes(status)) return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` }, { status: 400 })
@@ -28,18 +34,30 @@ export async function PATCH(request: Request) {
 
   if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
-  const { error } = await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', parseInt(id))
+  const session = await import('@/lib/admin-auth').then(m => m.getDashboardSession())
+  const actor = session.state === 'ok' ? session.email : null
+
+  const updates: Record<string, unknown> = { status, updated_at: new Date().toISOString() }
+  if (status === 'cancelled') {
+    updates.cancelled_at = new Date().toISOString()
+    updates.cancelled_by = actor
+    if (typeof cancellation_reason === 'string') {
+      updates.cancellation_reason = cancellation_reason.trim().slice(0, 500) || null
+    }
+  }
+
+  const { error } = await supabase.from('orders').update(updates).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Record the transition on the per-order timeline so the customer's
   // tracking page can show when each step happened. Skip no-op transitions
   // (re-saving the same status) — they'd just clutter the timeline.
   if (status !== order.status) {
-    const session = await import('@/lib/admin-auth').then(m => m.getDashboardSession())
     await supabase.from('order_status_history').insert({
       order_id: order.id,
       status,
-      actor_email: session.state === 'ok' ? session.email : null,
+      actor_email: actor,
+      note: status === 'cancelled' && typeof cancellation_reason === 'string' ? cancellation_reason.trim().slice(0, 500) || null : null,
     })
   }
 
@@ -88,6 +106,33 @@ export async function PATCH(request: Request) {
       if (order.customer_email) sendOutForDeliveryEmail(emailData, locale).catch(console.error)
       if (order.customer_phone) notifyOutForDelivery(order.customer_phone, smsSummary, locale).catch(console.error)
     }
+
+    // Web-push ping on every transition that the customer cares about.
+    // Best-effort — never blocks the response. Resolves the customer id
+    // through the same email-match the loyalty earn uses.
+    if (order.customer_email) {
+      void findCustomerByEmail(supabase, order.customer_email)
+        .then(async customerId => {
+          if (!customerId) return
+          const titleByStatus: Record<string, string> = {
+            confirmed: `Order ${order.order_number} confirmed`,
+            processing: `Order ${order.order_number} is being packed`,
+            out_for_delivery: `Order ${order.order_number} is on the way`,
+            delivered: `Order ${order.order_number} delivered`,
+            cancelled: `Order ${order.order_number} cancelled`,
+            refunded: `Order ${order.order_number} refunded`,
+          }
+          const title = titleByStatus[status]
+          if (!title) return
+          await sendPushToCustomer(supabase, customerId, {
+            title,
+            body: `Tap to see the latest update.`,
+            url: `${SITE_URL}/track?o=${encodeURIComponent(order.order_number)}`,
+            tag: `order-${order.order_number}`,
+          })
+        })
+        .catch(err => console.error('[orders] push notification failed:', err))
+    }
     if (status === 'delivered') {
       if (order.customer_email) sendDeliveredEmail(emailData, locale).catch(console.error)
       if (order.customer_phone) notifyDelivered(order.customer_phone, smsSummary, locale).catch(console.error)
@@ -109,6 +154,10 @@ export async function PATCH(request: Request) {
           })
         }
       }
+      // Referral reward (separate from the per-order earn): credits 50 pts
+      // to both referrer and referred when the referred's first order is
+      // delivered. Idempotent — described in lib/referrals.
+      await rewardReferralOnDelivery(supabase, { orderId: order.id })
     }
   }
 

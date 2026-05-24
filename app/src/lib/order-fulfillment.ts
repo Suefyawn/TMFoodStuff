@@ -120,18 +120,27 @@ export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
             return
           }
           // Fire a low-stock alert when this order pushed the product BELOW
-          // the threshold for the first time. Only one email per crossing —
+          // its threshold for the first time. Only one email per crossing —
           // future orders that keep the product below threshold don't spam.
+          //
+          // Threshold is now per-product (products.low_stock_threshold);
+          // falls back to a global default for products that haven't been
+          // tuned yet.
           const { data: row } = await input.supabase
             .from('products')
-            .select('name, slug, stock')
+            .select('name, slug, stock, low_stock_threshold')
             .eq('id', Number(item.id))
             .maybeSingle()
           if (!row) return
           const newStock = Number(row.stock ?? 0)
           const oldStock = newStock + item.quantity
-          if (newStock < LOW_STOCK_THRESHOLD && oldStock >= LOW_STOCK_THRESHOLD) {
+          const threshold = Number(row.low_stock_threshold ?? LOW_STOCK_THRESHOLD)
+          if (newStock < threshold && oldStock >= threshold) {
             await sendAdminLowStockAlert(row.name, row.slug, newStock)
+            // Best-effort push to every signed-in admin device too. Imported
+            // lazily to keep the hot fulfilment path tight.
+            const { notifyAdminsLowStock } = await import('./push-admin')
+            void notifyAdminsLowStock(input.supabase, row.name, row.slug, newStock)
           }
         })(),
       )

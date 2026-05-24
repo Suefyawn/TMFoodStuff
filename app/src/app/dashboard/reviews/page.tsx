@@ -13,7 +13,7 @@ export default async function ReviewsAdminPage() {
   )
   const { data } = await supabase
     .from('product_reviews')
-    .select('id, rating, body, status, created_at, moderated_at, moderator_email, products(slug, name), customers(email, full_name)')
+    .select('id, rating, title, body, images, verified_purchase, helpful_count, admin_reply, admin_reply_at, admin_reply_by, status, created_at, moderated_at, moderator_email, products(slug, name), customers(email, full_name)')
     .order('created_at', { ascending: false })
     .limit(500)
   return <ReviewsClient initialRows={(data || []) as unknown as Array<Row>} />
@@ -22,7 +22,14 @@ export default async function ReviewsAdminPage() {
 interface Row {
   id: number
   rating: number
+  title: string | null
   body: string | null
+  images: Array<{ url: string; alt?: string }> | null
+  verified_purchase: boolean
+  helpful_count: number
+  admin_reply: string | null
+  admin_reply_at: string | null
+  admin_reply_by: string | null
   status: string
   created_at: string
   moderated_at: string | null

@@ -25,6 +25,16 @@ async function getStatusHistory(orderId: number) {
   return data || []
 }
 
+async function getRefunds(orderId: number) {
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const { data } = await supabase
+    .from('order_refunds')
+    .select('id, amount_aed, reason, notes, refund_type, payment_method, stripe_refund_id, restocked, created_at, created_by')
+    .eq('order_id', orderId)
+    .order('created_at', { ascending: false })
+  return data || []
+}
+
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const order = await getOrder(id)
@@ -37,7 +47,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     </div>
   )
 
-  const statusHistory = await getStatusHistory(order.id)
+  const [statusHistory, refunds] = await Promise.all([
+    getStatusHistory(order.id),
+    getRefunds(order.id),
+  ])
+  const orderTotal = Number(order.total_aed ?? order.total ?? 0)
+  const refundedTotal = refunds.reduce((s, r) => s + Number(r.amount_aed), 0)
+  const remainingRefundable = Math.max(0, orderTotal - refundedTotal)
 
   const phone = order.customer_phone || ''
   const waMsg = encodeURIComponent(
@@ -74,6 +90,27 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
+        {/* Cancellation explainer — only renders for cancelled orders that
+            captured a reason. Reads-only here; the reason was set at the
+            time of cancellation. */}
+        {order.status === 'cancelled' && order.cancellation_reason && (
+          <div className="bg-red-900/20 border border-red-700/40 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-8 h-8 bg-red-900/40 rounded-lg flex items-center justify-center shrink-0">
+              <span className="text-red-300 text-sm font-black">✕</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-red-300 mb-0.5">Cancellation reason</p>
+              <p className="text-sm text-red-100 font-bold">{order.cancellation_reason}</p>
+              {order.cancelled_at && (
+                <p className="text-[10px] text-red-400 mt-1">
+                  {new Date(order.cancelled_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {order.cancelled_by && <> · by {order.cancelled_by}</>}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
 
         {/* Full status timeline with actor + note so admins can see who
@@ -92,15 +129,50 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </div>
         </section>
 
-        {isAdmin && (
+        {isAdmin && remainingRefundable > 0.01 && (
           <RefundButton
             orderId={order.id}
             orderNumber={order.order_number}
             paymentMethod={order.payment_method || 'cod'}
             paymentStatus={order.payment_status || 'pending'}
-            totalAed={Number(order.total_aed ?? order.total ?? 0)}
+            totalAed={orderTotal}
+            remainingAed={remainingRefundable}
             hasPaymentIntent={!!order.stripe_payment_intent}
           />
+        )}
+
+        {refunds.length > 0 && (
+          <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+            <h3 className="text-white font-black mb-3 flex items-center gap-2">
+              Refunds
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-900/30 border border-amber-800 rounded px-1.5 py-0.5">
+                AED {refundedTotal.toFixed(2)} of {orderTotal.toFixed(2)} refunded
+              </span>
+            </h3>
+            <ul className="divide-y divide-gray-800">
+              {refunds.map(r => (
+                <li key={r.id} className="py-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                      <span className={`text-[10px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 ${r.refund_type === 'full' ? 'text-red-300 bg-red-900/40 border border-red-800' : 'text-amber-200 bg-amber-900/40 border border-amber-800'}`}>
+                        {r.refund_type}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{r.payment_method}</span>
+                      {r.restocked && <span className="text-[10px] font-bold uppercase tracking-wider text-green-300 bg-green-900/40 border border-green-800 rounded px-1.5 py-0.5">restocked</span>}
+                      <span className="text-[10px] text-gray-500">{new Date(r.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    {r.reason && <p className="text-sm text-gray-300">{r.reason}</p>}
+                    {r.notes && <p className="text-xs text-gray-500 italic">{r.notes}</p>}
+                    {r.stripe_refund_id && <p className="text-[10px] text-gray-600 font-mono mt-1">{r.stripe_refund_id}</p>}
+                    {r.created_by && <p className="text-[10px] text-gray-600 mt-0.5">by {r.created_by}</p>}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-black text-red-400 tabular-nums">AED {Number(r.amount_aed).toFixed(2)}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
         <OrderEditCard

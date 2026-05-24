@@ -8,11 +8,13 @@ import { getStripe } from '@/lib/stripe'
 import { SITE_URL } from '@/lib/site'
 import { isValidEmail, isValidUAEPhone, normaliseUAEPhone } from '@/lib/validators'
 import { resolveRedemption } from '@/lib/points'
+import { recordReferralOnFirstOrder, REFERRAL_COOKIE } from '@/lib/referrals'
+import { clearCustomerCart } from '@/lib/cart-recovery'
+import { validateSlotForDate } from '@/lib/delivery-slots'
 import { getCurrentCustomer } from '@/lib/customer'
 import { getCustomerBalance, recordRedemption } from '@/lib/loyalty'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
-const VALID_SLOTS = ['morning', 'afternoon', 'evening']
 
 function parseNum(value: string | undefined, fallback: number): number {
   const n = parseFloat(value ?? '')
@@ -69,9 +71,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
-    if (!VALID_SLOTS.includes(deliverySlot)) {
-      return NextResponse.json({ success: false, error: 'Please choose a valid delivery slot.' }, { status: 400 })
-    }
     if (!deliveryDate || !acceptableDeliveryDates().includes(String(deliveryDate))) {
       return NextResponse.json({ success: false, error: 'Please choose a valid delivery date.' }, { status: 400 })
     }
@@ -80,6 +79,15 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
+
+    // Hard-validate the slot+date pair against the admin-managed slot
+    // table. Catches: unknown slot key, slot disabled for that weekday,
+    // cutoff already passed, slot at capacity. Mirrors what the storefront
+    // /api/delivery-slots?date= endpoint surfaces.
+    const slotCheck = await validateSlotForDate(supabase, String(deliverySlot), String(deliveryDate))
+    if (!slotCheck.ok) {
+      return NextResponse.json({ success: false, error: slotCheck.reason }, { status: 400 })
+    }
 
     // ── Slot capacity guard ────────────────────────────────────────────────
     // Reject the order if the chosen date+slot is already at the configured
@@ -305,6 +313,29 @@ export async function POST(request: Request) {
         aed: pointsValueAed,
         orderNumber,
       })
+    }
+
+    // ── Customer-attached side effects (referral + cart clear) ────────────
+    // Both need the customer id; resolve once and run both. Best-effort —
+    // failures here never block the order itself.
+    const customerId: number | null = redeemingCustomerId
+      ?? (await getCurrentCustomer())?.id
+      ?? null
+    if (customerId) {
+      const referralCode = request.headers.get('cookie')?.split(';')
+        .map(s => s.trim())
+        .find(s => s.startsWith(`${REFERRAL_COOKIE}=`))?.split('=')[1]
+      if (referralCode) {
+        await recordReferralOnFirstOrder(supabase, {
+          referralCode: decodeURIComponent(referralCode),
+          referredCustomerId: customerId,
+          orderId,
+        })
+      }
+      // Clear the server-side cart snapshot so the abandonment cron doesn't
+      // email a customer who just bought. The local cart is cleared by the
+      // checkout flow itself.
+      await clearCustomerCart(supabase, customerId)
     }
 
     // ── Card payment: redirect to Stripe; fulfilment happens in the webhook ─

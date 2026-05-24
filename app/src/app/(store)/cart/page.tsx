@@ -1,12 +1,25 @@
 'use client'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package, Truck, Sparkles } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
+import CartRecoverHandler from '@/components/CartRecoverHandler'
 
 export default function CartPage() {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <CartRecoverHandler />
+      </Suspense>
+      <CartPageInner />
+    </>
+  )
+}
+
+function CartPageInner() {
   const { items, removeItem, updateQty, clearCart, subtotal } = useCartStore()
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)

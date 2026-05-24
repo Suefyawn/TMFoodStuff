@@ -29,6 +29,10 @@ export interface Product {
   imageUrl?: string
   imageUrls: string[]
   isActive: boolean
+  // Bundle composition — null/empty means this is a regular product.
+  // Each entry is denormalised so the storefront can render the contents
+  // without joining against the component product rows.
+  bundleItems?: Array<{ product_id: number; quantity: number; name: string; emoji?: string }>
 }
 
 export interface Category {
@@ -64,6 +68,7 @@ function mapProduct(row: any): Product {
     imageUrl: row.image_url || undefined,
     imageUrls: Array.isArray(row.image_urls) ? row.image_urls.filter(Boolean) : (row.image_url ? [row.image_url] : []),
     isActive: row.is_active ?? true,
+    bundleItems: Array.isArray(row.bundle_items) && row.bundle_items.length > 0 ? row.bundle_items : undefined,
   }
 }
 

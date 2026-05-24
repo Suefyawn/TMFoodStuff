@@ -9,10 +9,17 @@ import MobileNav from '@/components/MobileNav'
 import FloatingWhatsApp from '@/components/FloatingWhatsApp'
 import PwaInstallPrompt from '@/components/PwaInstallPrompt'
 import ToastContainer from '@/components/ToastContainer'
+import CaptureReferral from '@/components/CaptureReferral'
+import CartSync from '@/components/CartSync'
+import { ConfirmProvider } from '@/components/ConfirmDialog'
+import PushPermissionPrompt from '@/components/PushPermissionPrompt'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <HtmlWrapper>
+      <ConfirmProvider>
+      <CaptureReferral />
+      <CartSync />
       <ServiceAreaBar />
       <LaunchBanner />
       <Navbar />
@@ -24,7 +31,9 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       <MobileNav />
       <FloatingWhatsApp />
       <PwaInstallPrompt />
+      <PushPermissionPrompt />
       <ToastContainer />
+      </ConfirmProvider>
     </HtmlWrapper>
   )
 }

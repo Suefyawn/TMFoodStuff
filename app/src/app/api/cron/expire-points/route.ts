@@ -13,6 +13,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendDailyDigest } from '@/lib/daily-digest'
+import { dispatchDueSubscriptions } from '@/lib/subscriptions'
 
 export const dynamic = 'force-dynamic'
 
@@ -80,5 +81,13 @@ export async function GET(request: Request) {
     return { sent: false, reason: 'threw' as const }
   })
 
-  return NextResponse.json({ expired, scanned: lapsed.length, digest })
+  // Piggyback the subscription dispatcher here — we're at the 2-cron limit
+  // on Vercel Hobby and this is the earliest daily run, which gives ops
+  // the longest lead time to react if something looks off.
+  const subscriptions = await dispatchDueSubscriptions(supabase).catch(err => {
+    console.error('[expire-points] subscriptions dispatcher threw:', err)
+    return { scanned: 0, dispatched: 0, failed: 0, skipped: 0 }
+  })
+
+  return NextResponse.json({ expired, scanned: lapsed.length, digest, subscriptions })
 }

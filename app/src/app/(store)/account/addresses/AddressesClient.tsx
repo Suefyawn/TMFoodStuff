@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Plus, Pencil, Trash2, MapPin, Star, ArrowLeft } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 interface Address {
   id: number
@@ -30,6 +31,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
   const [form, setForm] = useState<Omit<Address, 'id'>>(emptyAddress)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const confirm = useConfirm()
 
   const emirates = isAr ? EMIRATES_AR : EMIRATES_EN
 
@@ -81,7 +83,14 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
   }
 
   async function remove(id: number) {
-    if (!confirm(isAr ? 'حذف هذا العنوان؟' : 'Delete this address?')) return
+    const ok = await confirm({
+      title: isAr ? 'حذف هذا العنوان؟' : 'Delete this address?',
+      message: isAr ? 'لن نستطيع استرجاعه لاحقاً.' : "We won't be able to bring it back.",
+      confirmLabel: isAr ? 'حذف' : 'Delete',
+      cancelLabel: isAr ? 'إلغاء' : 'Cancel',
+      destructive: true,
+    })
+    if (!ok) return
     setBusy(true)
     try {
       const res = await fetch('/api/account/addresses', {
