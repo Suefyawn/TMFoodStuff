@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, ChevronDown, ChevronUp, Send } from 'lucide-react'
+import { Search, ChevronDown, ChevronUp, Send, ExternalLink } from 'lucide-react'
 import MessageComposer from './MessageComposer'
 
 const statusColors: Record<string, string> = {
@@ -78,11 +78,28 @@ export default function CustomersPage() {
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-white font-semibold text-sm truncate">{customer.name}</p>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="text-white font-semibold text-sm truncate">{customer.name}</p>
+                          {customer.tier && customer.tier !== 'bronze' && (
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-amber-300 bg-amber-900/30 border border-amber-700/40 rounded px-1 py-0.5 capitalize">
+                              {customer.tier}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-gray-500 text-xs truncate">{customer.phone}{customer.email && ` · ${customer.email}`}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+                      {customer.id && (
+                        <Link
+                          href={`/dashboard/customers/${customer.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          title="Open full profile"
+                          className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                        >
+                          <ExternalLink size={14} aria-hidden="true" />
+                        </Link>
+                      )}
                       <button
                         onClick={(e) => { e.stopPropagation(); setMessageTarget({ email: customer.email, phone: customer.phone }) }}
                         title="Message this customer"
