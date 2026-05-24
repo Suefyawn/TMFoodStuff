@@ -1,7 +1,7 @@
 'use client'
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Search, X } from 'lucide-react'
+import { Search, X, Download, Calendar } from 'lucide-react'
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
@@ -17,10 +17,20 @@ const statuses = ['', 'pending', 'confirmed', 'processing', 'out_for_delivery', 
 export default function OrdersClient({ initialOrders }: { initialOrders: any[] }) {
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
 
   const filtered = useMemo(() => {
+    const fromTs = fromDate ? new Date(fromDate + 'T00:00:00').getTime() : null
+    // Inclusive end-of-day for the upper bound.
+    const toTs = toDate ? new Date(toDate + 'T23:59:59').getTime() : null
     return initialOrders.filter(o => {
       if (filterStatus && o.status !== filterStatus) return false
+      if (fromTs || toTs) {
+        const t = o.created_at ? new Date(o.created_at).getTime() : 0
+        if (fromTs && t < fromTs) return false
+        if (toTs && t > toTs) return false
+      }
       if (search) {
         const q = search.toLowerCase()
         if (
@@ -31,11 +41,46 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       }
       return true
     })
-  }, [initialOrders, search, filterStatus])
+  }, [initialOrders, search, filterStatus, fromDate, toDate])
 
   // Revenue summary
   const totalRevenue = filtered.reduce((s, o) => s + (o.total || 0), 0)
-  const deliveredRevenue = filtered.filter(o => o.status === 'delivered').reduce((s, o) => s + (o.total || 0), 0)
+
+  function exportCsv() {
+    const headers = [
+      'order_number', 'created_at', 'status', 'payment_method', 'payment_status',
+      'customer_name', 'customer_phone', 'customer_email',
+      'delivery_emirate', 'delivery_area', 'delivery_building', 'delivery_slot',
+      'subtotal_aed', 'vat_aed', 'delivery_fee_aed', 'promo_code', 'promo_discount_aed', 'total_aed', 'item_count',
+    ]
+    const escape = (v: unknown) => {
+      const s = v === null || v === undefined ? '' : String(v)
+      // RFC 4180: wrap in quotes if the value contains comma, quote, or newline; double existing quotes.
+      return /[,"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+    }
+    const rows = filtered.map(o => {
+      const items = Array.isArray(o.items) ? o.items : []
+      return [
+        o.order_number, o.created_at, o.status, o.payment_method, o.payment_status,
+        o.customer_name, o.customer_phone, o.customer_email,
+        o.delivery_emirate, o.delivery_area, o.delivery_building, o.delivery_slot,
+        o.subtotal_aed ?? o.subtotal, o.vat_aed ?? o.vat,
+        o.delivery_fee_aed ?? o.delivery_fee, o.promo_code,
+        o.promo_discount_aed ?? o.promo_discount, o.total_aed ?? o.total,
+        items.length,
+      ].map(escape).join(',')
+    })
+    const csv = [headers.join(','), ...rows].join('\r\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `tmfoodstuff-orders-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
@@ -44,21 +89,49 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
           <h1 className="text-2xl font-black text-white">Orders</h1>
           <p className="text-gray-500 text-sm">{filtered.length} of {initialOrders.length} orders · Revenue: AED {totalRevenue.toFixed(2)}</p>
         </div>
+        <button
+          onClick={exportCsv}
+          disabled={filtered.length === 0}
+          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
+        >
+          <Download size={14} aria-hidden="true" /> Export CSV
+        </button>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap items-center">
         <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} aria-hidden="true" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search order #, name, phone..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500" />
         </div>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
           <option value="">All Statuses</option>
           {statuses.filter(Boolean).map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
         </select>
-        {(search || filterStatus) && (
-          <button onClick={() => { setSearch(''); setFilterStatus('') }} className="text-xs text-gray-500 hover:text-red-400 flex items-center gap-1">
-            <X size={12} /> Clear
+        <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm">
+          <Calendar size={14} className="text-gray-500" aria-hidden="true" />
+          <input
+            type="date"
+            value={fromDate}
+            onChange={e => setFromDate(e.target.value)}
+            aria-label="From date"
+            className="bg-transparent text-gray-300 focus:outline-none w-[120px]"
+          />
+          <span className="text-gray-600">→</span>
+          <input
+            type="date"
+            value={toDate}
+            onChange={e => setToDate(e.target.value)}
+            aria-label="To date"
+            className="bg-transparent text-gray-300 focus:outline-none w-[120px]"
+          />
+        </div>
+        {(search || filterStatus || fromDate || toDate) && (
+          <button
+            onClick={() => { setSearch(''); setFilterStatus(''); setFromDate(''); setToDate('') }}
+            className="text-xs text-gray-500 hover:text-red-400 flex items-center gap-1"
+          >
+            <X size={12} aria-hidden="true" /> Clear
           </button>
         )}
       </div>

@@ -251,7 +251,20 @@ export async function POST(request: Request) {
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
+        // Apple Pay / Google Pay are presented automatically by Stripe Checkout
+        // when the browser supports them and the merchant origin is verified —
+        // they live under the `card` payment method type and need no extra
+        // config here, but we pin the list so future Stripe additions don't
+        // surprise customers at checkout.
         payment_method_types: ['card'],
+        // Make the order number visible on the cardholder statement (Stripe
+        // truncates / sanitises this to 22 chars).
+        payment_intent_data: {
+          description: `TM FoodStuff order ${orderNumber}`,
+          statement_descriptor_suffix: orderNumber.replace(/[^A-Za-z0-9 ]/g, '').slice(0, 22),
+        },
+        // Save the customer's email + phone (if entered) so Stripe Dashboard
+        // shows the right contact when reconciling.
         customer_email: email || undefined,
         line_items: [
           {

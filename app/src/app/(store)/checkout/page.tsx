@@ -2,12 +2,22 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock } from 'lucide-react'
+import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
 import { isValidEmail, isValidUAEPhone } from '@/lib/validators'
 import posthog from 'posthog-js'
+
+interface SavedAddress {
+  id: number
+  label: string | null
+  building: string | null
+  area: string | null
+  emirate: string | null
+  makani: string | null
+  is_default: boolean
+}
 
 const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors"
 
@@ -39,6 +49,9 @@ export default function CheckoutPage() {
   })
 
   const { lang, tr } = useLang()
+  const [signedIn, setSignedIn] = useState(false)
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
+  const [activeAddressId, setActiveAddressId] = useState<number | null>(null)
 
   useEffect(() => {
     if (items.length > 0) {
@@ -49,6 +62,45 @@ export default function CheckoutPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Prefill from the signed-in customer's profile + saved addresses. Silent
+  // 401 for guests; first-time signed-in users with no addresses still see
+  // an empty form.
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/account/me')
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled || !data?.signedIn) return
+        setSignedIn(true)
+        setSavedAddresses(data.addresses || [])
+        const defaultAddr = (data.addresses || []).find((a: SavedAddress) => a.is_default) || (data.addresses || [])[0]
+        setForm(prev => ({
+          ...prev,
+          fullName: prev.fullName || data.fullName || '',
+          phone:    prev.phone    || data.phone    || '',
+          email:    prev.email    || data.email    || '',
+          emirate:  prev.emirate  || (defaultAddr?.emirate  || ''),
+          area:     prev.area     || (defaultAddr?.area     || ''),
+          building: prev.building || (defaultAddr?.building || ''),
+          makani:   prev.makani   || (defaultAddr?.makani   || ''),
+        }))
+        if (defaultAddr) setActiveAddressId(defaultAddr.id)
+      })
+      .catch(() => { /* not signed in or offline — leave form empty */ })
+    return () => { cancelled = true }
+  }, [])
+
+  function applyAddress(a: SavedAddress) {
+    setActiveAddressId(a.id)
+    setForm(prev => ({
+      ...prev,
+      emirate:  a.emirate  || '',
+      area:     a.area     || '',
+      building: a.building || '',
+      makani:   a.makani   || '',
+    }))
+  }
 
   const EMIRATES = lang === 'ar'
     ? ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
@@ -255,6 +307,52 @@ export default function CheckoutPage() {
       <form onSubmit={handleSubmit}>
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2 space-y-5 md:space-y-6">
+            {/* Saved addresses (signed-in customers) */}
+            {signedIn && savedAddresses.length > 0 && (
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <h2 className="font-black text-gray-900 text-base md:text-lg inline-flex items-center gap-2">
+                    <MapPin size={16} className="text-green-600" aria-hidden="true" />
+                    {lang === 'ar' ? 'العنوان المحفوظ' : 'Saved address'}
+                  </h2>
+                  <Link href="/account/addresses" className="text-xs font-bold text-green-700 hover:underline">
+                    {lang === 'ar' ? 'إدارة' : 'Manage'} →
+                  </Link>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {savedAddresses.map(a => {
+                    const active = activeAddressId === a.id
+                    return (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => applyAddress(a)}
+                        className={`flex-shrink-0 text-left rounded-xl border-2 px-4 py-2.5 text-xs transition-colors min-w-[160px] ${
+                          active ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'
+                        }`}
+                      >
+                        <div className="font-bold text-gray-900 truncate">
+                          {a.label || (lang === 'ar' ? 'العنوان' : 'Address')}
+                        </div>
+                        <div className="text-gray-500 truncate">{a.area}, {a.emirate}</div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+            {!signedIn && (
+              <div className="bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
+                <span className="inline-flex items-center gap-2 text-gray-700">
+                  <User size={14} className="text-green-700" aria-hidden="true" />
+                  {lang === 'ar' ? 'لديك حساب؟ سجّل الدخول لتعبئة بياناتك تلقائياً.' : 'Have an account? Sign in to auto-fill your details.'}
+                </span>
+                <Link href="/account/login?next=/checkout" className="font-bold text-green-700 hover:underline">
+                  {lang === 'ar' ? 'تسجيل الدخول' : 'Sign in'} →
+                </Link>
+              </div>
+            )}
+
             {/* Delivery Details */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
               <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5 md:mb-6">{tr.deliveryDetails}</h2>

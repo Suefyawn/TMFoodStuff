@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { User, MapPin, ShoppingBag } from 'lucide-react'
 import OrderStatusUpdater from './OrderStatusUpdater'
+import RefundButton from './RefundButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,6 +47,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
+
+        <RefundButton
+          orderId={order.id}
+          orderNumber={order.order_number}
+          paymentMethod={order.payment_method || 'cod'}
+          paymentStatus={order.payment_status || 'pending'}
+          totalAed={Number(order.total_aed ?? order.total ?? 0)}
+          hasPaymentIntent={!!order.stripe_payment_intent}
+        />
 
         <div className="grid md:grid-cols-2 gap-5">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { Package, LogOut, ShoppingBag, User as UserIcon } from 'lucide-react'
+import { Package, LogOut, ShoppingBag, User as UserIcon, MapPin, Heart, ChevronRight } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 interface OrderRow {
@@ -80,6 +80,36 @@ export default function AccountClient({ email, fullName, orders }: AccountClient
             {isAr ? 'تسجيل الخروج' : 'Sign out'}
           </a>
         </div>
+      </div>
+
+      {/* Quick links */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        <Link
+          href="/account/addresses"
+          className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-3 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
+        >
+          <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center shrink-0">
+            <MapPin size={18} className="text-green-700" aria-hidden="true" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-900 text-sm">{isAr ? 'العناوين' : 'Addresses'}</p>
+            <p className="text-xs text-gray-500">{isAr ? 'حفظ عناوين التوصيل' : 'Save delivery addresses'}</p>
+          </div>
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+        </Link>
+        <Link
+          href="/account/wishlist"
+          className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-3 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
+        >
+          <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center shrink-0">
+            <Heart size={18} className="text-rose-600" aria-hidden="true" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-900 text-sm">{isAr ? 'قائمة المفضلة' : 'Wishlist'}</p>
+            <p className="text-xs text-gray-500">{isAr ? 'المنتجات التي حفظتها' : 'Products you saved'}</p>
+          </div>
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+        </Link>
       </div>
 
       {/* Orders */}
