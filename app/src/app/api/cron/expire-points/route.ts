@@ -4,10 +4,15 @@
 // once (we record the source ledger id in the new row's metadata so a
 // subsequent run can skip rows that already have a matching offset).
 //
+// Also fires the admin daily digest after the expiry pass — piggybacked here
+// rather than added as a third cron so we stay inside Vercel Hobby's 2-cron
+// limit. The digest is best-effort; its failures never fail this handler.
+//
 // Auth model matches the abandoned-orders cleanup: accepts Vercel's signed
 // cron header, or a bearer with the CRON_SECRET.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendDailyDigest } from '@/lib/daily-digest'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,14 +66,19 @@ export async function GET(request: Request) {
       description: `expired:earn_id:${r.id}`,
     }))
 
-  if (reversals.length === 0) {
-    return NextResponse.json({ expired: 0, scanned: lapsed.length })
+  let expired = 0
+  if (reversals.length > 0) {
+    const { error: insertErr } = await supabase.from('customer_points_ledger').insert(reversals)
+    if (insertErr) {
+      return NextResponse.json({ error: insertErr.message }, { status: 500 })
+    }
+    expired = reversals.length
   }
 
-  const { error: insertErr } = await supabase.from('customer_points_ledger').insert(reversals)
-  if (insertErr) {
-    return NextResponse.json({ error: insertErr.message }, { status: 500 })
-  }
+  const digest = await sendDailyDigest(supabase).catch(err => {
+    console.error('[expire-points] digest threw:', err)
+    return { sent: false, reason: 'threw' as const }
+  })
 
-  return NextResponse.json({ expired: reversals.length, scanned: lapsed.length })
+  return NextResponse.json({ expired, scanned: lapsed.length, digest })
 }
