@@ -31,6 +31,18 @@ export async function PATCH(request: Request) {
   const { error } = await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // Record the transition on the per-order timeline so the customer's
+  // tracking page can show when each step happened. Skip no-op transitions
+  // (re-saving the same status) — they'd just clutter the timeline.
+  if (status !== order.status) {
+    const session = await import('@/lib/admin-auth').then(m => m.getDashboardSession())
+    await supabase.from('order_status_history').insert({
+      order_id: order.id,
+      status,
+      actor_email: session.state === 'ok' ? session.email : null,
+    })
+  }
+
   // Audit every status change, including no-op transitions, so the trail is
   // complete even when the dashboard sends a stale "save" click.
   await logAdminAction({

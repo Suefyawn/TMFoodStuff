@@ -20,8 +20,8 @@ export default function Footer() {
   ]
 
   const companyLinks = lang === 'ar'
-    ? [['من نحن', '/about'], ['سياسة التوصيل', '/delivery-policy'], ['سياسة الخصوصية', '/privacy'], ['الشروط والأحكام', '/terms'], ['اتصل بنا', '/contact']]
-    : [['About Us', '/about'], ['Delivery Policy', '/delivery-policy'], ['Privacy Policy', '/privacy'], ['Terms & Conditions', '/terms'], ['Contact Us', '/contact']]
+    ? [['من نحن', '/about'], ['الأسئلة الشائعة', '/faq'], ['سياسة التوصيل', '/delivery-policy'], ['سياسة الخصوصية', '/privacy'], ['الشروط والأحكام', '/terms'], ['اتصل بنا', '/contact']]
+    : [['About Us', '/about'], ['FAQ', '/faq'], ['Delivery Policy', '/delivery-policy'], ['Privacy Policy', '/privacy'], ['Terms & Conditions', '/terms'], ['Contact Us', '/contact']]
 
   return (
     <>
@@ -142,7 +142,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 max-w-7xl mx-auto px-4 py-5 flex flex-col md:flex-row justify-between items-center text-xs gap-2">
-          <span className="text-gray-500 text-center md:text-left">© 2026 TMFoodStuff. {tr.allRights} | {tr.vatRegistered}</span>
+          <span className="text-gray-500 text-center md:text-left">© {new Date().getFullYear()} TMFoodStuff. {tr.allRights} | {tr.vatRegistered}</span>
           <div className="flex flex-col md:flex-row items-center gap-3">
             <span className="text-gray-500">{tr.pricesIncludeVAT}</span>
             <span className="text-gray-600 hidden md:inline">·</span>

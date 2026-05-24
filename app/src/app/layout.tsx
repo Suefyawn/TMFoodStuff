@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import { Suspense } from 'react'
 import { PostHogProvider } from '@/components/PostHogProvider'
 import { SITE_URL } from '@/lib/site'
+import { getServerLocale } from '@/lib/server-locale'
 import './globals.css'
 
 const inter = Inter({
@@ -51,9 +52,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Read the locale cookie server-side so Googlebot sees the right `lang`
+  // attribute, Arabic visitors don't get an LTR flash before hydration, and
+  // screen readers announce text in the chosen language. The client-side
+  // HtmlWrapper used to mutate this on mount — that pattern still runs as a
+  // safety net for the in-tab toggle case, but the SSR pass is now correct.
+  const locale = await getServerLocale()
+  const dir = locale === 'ar' ? 'rtl' : 'ltr'
   return (
-    <html lang="en">
+    <html lang={locale} dir={dir}>
       <head>
         <meta name="theme-color" content="#16a34a" />
         {/* Next.js App Router auto-emits <link rel="icon"> and

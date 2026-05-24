@@ -1,25 +1,13 @@
 'use client'
-import { useState } from 'react'
-import { Search, Package, CheckCircle, Truck, Clock, XCircle, MapPin, Calendar, ShoppingCart, Loader2 } from 'lucide-react'
+import { useState, useEffect, Suspense } from 'react'
+import { Search, Package, MapPin, Calendar, ShoppingCart, Loader2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/lib/store'
 import { useLang } from '@/lib/use-lang'
 import { isValidEmail } from '@/lib/validators'
 import type { Lang } from '@/lib/translations'
 import Link from 'next/link'
-
-const STATUS_STEPS = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered']
-
-function statusMeta(lang: Lang): Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> {
-  const isAr = lang === 'ar'
-  return {
-    pending:          { label: isAr ? 'تم استلام الطلب' : 'Order Received',   color: 'text-yellow-600', bg: 'bg-yellow-100', icon: <Clock size={18} /> },
-    confirmed:        { label: isAr ? 'تم التأكيد' : 'Confirmed',              color: 'text-blue-600',   bg: 'bg-blue-100',   icon: <CheckCircle size={18} /> },
-    processing:       { label: isAr ? 'قيد التحضير' : 'Being Prepared',        color: 'text-purple-600', bg: 'bg-purple-100', icon: <Package size={18} /> },
-    out_for_delivery: { label: isAr ? 'خرج للتوصيل' : 'Out for Delivery',      color: 'text-orange-600', bg: 'bg-orange-100', icon: <Truck size={18} /> },
-    delivered:        { label: isAr ? 'تم التسليم' : 'Delivered',              color: 'text-green-600',  bg: 'bg-green-100',  icon: <CheckCircle size={18} /> },
-    cancelled:        { label: isAr ? 'ملغي' : 'Cancelled',                    color: 'text-red-600',    bg: 'bg-red-100',    icon: <XCircle size={18} /> },
-  }
-}
+import OrderStatusTimeline from '@/components/OrderStatusTimeline'
 
 function slotLabel(slot: string, lang: Lang): string {
   const en: Record<string, string> = {
@@ -35,15 +23,23 @@ function slotLabel(slot: string, lang: Lang): string {
   return (lang === 'ar' ? ar : en)[slot] ?? slot
 }
 
-export default function TrackPage() {
+function TrackInner() {
   const { lang } = useLang()
   const isAr = lang === 'ar'
-  const STATUS_META = statusMeta(lang)
+  const searchParams = useSearchParams()
   const [orderNumber, setOrderNumber] = useState('')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [order, setOrder] = useState<any>(null)
+
+  // Pre-fill the order number from ?o= (e.g. the QR code on the receipt
+  // links to /track?o=TM-123456). The customer still has to enter their
+  // email — the QR is for their convenience, not auto-authentication.
+  useEffect(() => {
+    const o = searchParams.get('o')
+    if (o) setOrderNumber(o.toUpperCase())
+  }, [searchParams])
 
   async function handleTrack(e: React.FormEvent) {
     e.preventDefault()
@@ -76,10 +72,6 @@ export default function TrackPage() {
 
   const { addItem } = useCartStore()
   const [reordered, setReordered] = useState(false)
-
-  const currentStepIndex = order ? STATUS_STEPS.indexOf(order.status) : -1
-  const isCancelled = order?.status === 'cancelled'
-  const meta = order ? (STATUS_META[order.status] || STATUS_META.pending) : null
 
   function handleReorder() {
     if (!order?.items) return
@@ -157,50 +149,31 @@ export default function TrackPage() {
         </button>
       </form>
 
-      {order && meta && (
+      {order && (
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
           {/* Header */}
           <div className="px-6 py-5 border-b border-gray-100">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">
-                  {isAr ? 'الطلب' : 'Order'}
-                </p>
-                <p className="text-xl font-black text-gray-900 font-mono">{order.order_number}</p>
-                {order.customer_name && (
-                  <p className="text-sm text-gray-500 mt-0.5">
-                    {isAr ? `مرحباً، ${order.customer_name}!` : `Hi, ${order.customer_name}!`}
-                  </p>
-                )}
-              </div>
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-sm ${meta.bg} ${meta.color}`}>
-                {meta.icon}
-                {meta.label}
-              </div>
-            </div>
+            <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">
+              {isAr ? 'الطلب' : 'Order'}
+            </p>
+            <p className="text-xl font-black text-gray-900 font-mono">{order.order_number}</p>
+            {order.customer_name && (
+              <p className="text-sm text-gray-500 mt-0.5">
+                {isAr ? `مرحباً، ${order.customer_name}!` : `Hi, ${order.customer_name}!`}
+              </p>
+            )}
           </div>
 
-          {/* Progress bar */}
-          {!isCancelled && (
-            <div className="px-6 py-5 border-b border-gray-100">
-              <div className="flex items-center gap-1">
-                {STATUS_STEPS.map((step, i) => {
-                  const done = i <= currentStepIndex
-                  const active = i === currentStepIndex
-                  return (
-                    <div key={step} className="flex-1 flex flex-col items-center gap-1.5">
-                      <div className={`w-full h-2 rounded-full transition-colors ${
-                        done ? 'bg-green-500' : 'bg-gray-200'
-                      } ${active ? 'ring-2 ring-green-300 ring-offset-1' : ''}`} />
-                      <span className={`text-[10px] font-semibold text-center leading-tight ${done ? 'text-green-600' : 'text-gray-400'}`}>
-                        {STATUS_META[step]?.label.split(' ')[0]}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
+          {/* Vertical status timeline */}
+          <div className="px-6 py-6 border-b border-gray-100">
+            <OrderStatusTimeline
+              history={order.history || []}
+              currentStatus={order.status}
+              deliveryDate={order.delivery_date}
+              deliverySlot={order.delivery_slot ? slotLabel(order.delivery_slot, lang) : null}
+              locale={lang}
+            />
+          </div>
 
           {/* Delivery info */}
           <div className="px-6 py-4 border-b border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -293,5 +266,13 @@ export default function TrackPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function TrackPage() {
+  return (
+    <Suspense fallback={null}>
+      <TrackInner />
+    </Suspense>
   )
 }

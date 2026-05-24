@@ -42,11 +42,13 @@ interface Props {
 export default function SearchAutocomplete({
   className = '',
   inputClassName = '',
-  placeholder = 'Search produce…',
+  placeholder,
   onNavigate,
 }: Props) {
   const router = useRouter()
   const { lang } = useLang()
+  const isAr = lang === 'ar'
+  const ph = placeholder ?? (isAr ? 'ابحث عن منتج…' : 'Search produce…')
   const [q, setQ] = useState('')
   const [data, setData] = useState<Suggestion>({ products: [], categories: [] })
   const [open, setOpen] = useState(false)
@@ -156,8 +158,8 @@ export default function SearchAutocomplete({
           onChange={e => { setQ(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKey}
-          placeholder={placeholder}
-          aria-label="Search products"
+          placeholder={ph}
+          aria-label={isAr ? 'ابحث عن منتجات' : 'Search products'}
           aria-autocomplete="list"
           aria-expanded={open}
           aria-controls="search-suggestions"
@@ -167,7 +169,7 @@ export default function SearchAutocomplete({
           <button
             type="button"
             onClick={() => { setQ(''); setData({ products: [], categories: [] }); inputRef.current?.focus() }}
-            aria-label="Clear search"
+            aria-label={isAr ? 'مسح البحث' : 'Clear search'}
             className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-700 rounded-full"
           >
             <X size={14} aria-hidden="true" />
@@ -182,14 +184,16 @@ export default function SearchAutocomplete({
           className="absolute top-full mt-2 left-0 right-0 bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-[70vh] overflow-y-auto"
         >
           {loading && flat.length === 0 ? (
-            <p className="p-4 text-sm text-gray-500 text-center">Searching…</p>
+            <p className="p-4 text-sm text-gray-500 text-center">{isAr ? 'جاري البحث…' : 'Searching…'}</p>
           ) : flat.length === 0 ? (
-            <p className="p-4 text-sm text-gray-500 text-center">No matches. Press Enter to search anyway.</p>
+            <p className="p-4 text-sm text-gray-500 text-center">
+              {isAr ? 'لا توجد نتائج. اضغط Enter للبحث على أي حال.' : 'No matches. Press Enter to search anyway.'}
+            </p>
           ) : (
             <>
               {data.products.length > 0 && (
                 <div className="p-2">
-                  <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Products</p>
+                  <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">{isAr ? 'منتجات' : 'Products'}</p>
                   {data.products.map((p, i) => {
                     const idx = i
                     const isActive = active === idx
@@ -217,7 +221,7 @@ export default function SearchAutocomplete({
                           <p className="text-xs text-gray-500">
                             AED {p.price_aed.toFixed(2)}
                             {p.unit && <span> / {p.unit}</span>}
-                            {p.stock === 0 && <span className="ml-2 text-red-500 font-semibold">Sold out</span>}
+                            {p.stock === 0 && <span className="ml-2 text-red-500 font-semibold">{isAr ? 'نفد' : 'Sold out'}</span>}
                           </p>
                         </div>
                         {onSale && (
@@ -230,7 +234,7 @@ export default function SearchAutocomplete({
               )}
               {data.categories.length > 0 && (
                 <div className="p-2 border-t border-gray-100">
-                  <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Categories</p>
+                  <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">{isAr ? 'فئات' : 'Categories'}</p>
                   {data.categories.map((c, i) => {
                     const idx = data.products.length + i
                     const isActive = active === idx
@@ -258,8 +262,8 @@ export default function SearchAutocomplete({
                 onClick={submitFullSearch}
                 className="w-full px-4 py-2.5 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 border-t border-gray-100 transition-colors flex items-center justify-center gap-1"
               >
-                See all results for &ldquo;{q.trim()}&rdquo;
-                <ArrowRight size={12} aria-hidden="true" />
+                {isAr ? `كل النتائج عن "${q.trim()}"` : `See all results for "${q.trim()}"`}
+                <ArrowRight size={12} aria-hidden="true" className={isAr ? 'rotate-180' : ''} />
               </button>
             </>
           )}

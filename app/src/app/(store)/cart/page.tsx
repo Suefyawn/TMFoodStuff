@@ -19,8 +19,7 @@ export default function CartPage() {
           <ShoppingCart size={52} className="text-green-300" strokeWidth={1.5} />
         </div>
         <h1 className="text-3xl font-black text-gray-900 mb-3">{tr.cartEmpty}</h1>
-        <p className="text-gray-500 mb-2 text-lg">{lang === 'ar' ? 'يبدو أنك لم تضف أي شيء بعد.' : "Looks like you haven't added anything yet."}</p>
-        <p className="text-gray-400 text-sm mb-8">{tr.cartEmptySub}</p>
+        <p className="text-gray-500 mb-8 text-lg">{lang === 'ar' ? 'يبدو أنك لم تضف أي شيء بعد.' : "Looks like you haven't added anything yet."}</p>
         <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
           {tr.startShopping} <ArrowRight size={16} />
         </Link>
@@ -117,7 +116,7 @@ export default function CartPage() {
             </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between text-gray-600">
-                <span>{tr.subtotal} ({items.reduce((s, i) => s + i.quantity, 0)} {lang === 'ar' ? 'عناصر' : 'items'})</span>
+                <span>{tr.subtotal} ({(() => { const n = items.reduce((s, i) => s + i.quantity, 0); return lang === 'ar' ? `${n} ${n === 1 ? 'عنصر' : n === 2 ? 'عنصران' : n <= 10 ? 'عناصر' : 'عنصراً'}` : `${n} ${n === 1 ? 'item' : 'items'}` })()})</span>
                 <span>{formatAED(sub)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
@@ -127,10 +126,6 @@ export default function CartPage() {
               <div className="flex justify-between text-gray-600">
                 <span>{tr.delivery}</span>
                 <span>{deliveryFee === 0 ? <span className="text-green-600 font-semibold">{tr.freeDelivery}</span> : formatAED(deliveryFee)}</span>
-              </div>
-              <div className="mt-2 p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-2">
-                <Truck size={14} className="text-green-700 shrink-0" aria-hidden="true" />
-                {tr.freeDeliveryNote}
               </div>
               <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                 <span>{tr.total}</span>
@@ -153,8 +148,12 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* Sticky checkout button on mobile */}
-      <div className="fixed bottom-16 left-0 right-0 p-3 bg-white border-t border-gray-100 shadow-lg md:hidden z-40">
+      {/* Sticky checkout button on mobile — sits above MobileNav with
+          iOS safe-area accounted for so the home indicator can't overlap. */}
+      <div
+        className="fixed left-0 right-0 p-3 bg-white border-t border-gray-100 shadow-lg md:hidden z-40"
+        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
+      >
         <Link
           href="/checkout"
           className="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-colors"

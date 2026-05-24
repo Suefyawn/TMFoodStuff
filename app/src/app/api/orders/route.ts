@@ -286,6 +286,14 @@ export async function POST(request: Request) {
     if (error || !inserted) throw error ?? new Error('Order insert returned no row')
     const orderId: number = inserted.id
 
+    // Seed the per-order timeline with the initial 'pending' transition.
+    // Best-effort — a missing row would just mean the tracking page starts
+    // its timeline from the first admin status change instead of placement.
+    await supabase
+      .from('order_status_history')
+      .insert({ order_id: orderId, status: 'pending', actor_email: 'system' })
+      .then(() => undefined, err => console.error('[orders] status_history seed failed:', err))
+
     // ── Record the loyalty-points debit ───────────────────────────────────
     // Done AFTER the order insert so we never debit a customer for an
     // order that never got created.

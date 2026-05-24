@@ -21,5 +21,14 @@ export default async function CustomerOrderPage({ params }: Params) {
     .eq('customer_email', customer.email.toLowerCase())
     .maybeSingle()
   if (!order) notFound()
-  return <CustomerOrderDetail order={order} />
+
+  // Status history powers the in-page timeline. Actor email is omitted so
+  // customers don't see internal staff identifiers.
+  const { data: historyRows } = await supabase
+    .from('order_status_history')
+    .select('status, changed_at')
+    .eq('order_id', order.id)
+    .order('changed_at', { ascending: true })
+
+  return <CustomerOrderDetail order={order} history={historyRows || []} />
 }
