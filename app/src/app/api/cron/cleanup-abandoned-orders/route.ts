@@ -1,0 +1,74 @@
+// Cancels card orders that were created more than 24h ago and never paid.
+// These are sessions where the customer was redirected to Stripe Checkout but
+// closed the tab or otherwise didn't complete payment. Stock was never
+// decremented (that only happens in the Stripe webhook), so no restock is
+// required — we just mark them cancelled to keep the orders table tidy.
+//
+// Intended to run from Vercel Cron. Add to vercel.json:
+//   { "crons": [{ "path": "/api/cron/cleanup-abandoned-orders", "schedule": "0 * * * *" }] }
+// Vercel Cron presents a `x-vercel-cron-signature` header which the platform
+// authenticates upstream; we additionally accept a CRON_SECRET bearer token so
+// the endpoint stays callable from local/staging.
+
+import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+export const dynamic = 'force-dynamic'
+
+const ABANDONED_AFTER_MS = 24 * 60 * 60 * 1000
+
+export async function GET(request: Request) {
+  // Require *some* form of authentication. Refusing all calls when no method
+  // is configured prevents the route being a free pingable side-effect when
+  // CRON_SECRET hasn't been set in the environment yet.
+  const provided = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
+  const isVercelCron = !!request.headers.get('x-vercel-cron-signature')
+  const secret = process.env.CRON_SECRET
+  const secretOk = !!secret && provided === secret
+  if (!isVercelCron && !secretOk) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+
+  const cutoff = new Date(Date.now() - ABANDONED_AFTER_MS).toISOString()
+
+  const { data: abandoned, error: selectErr } = await supabase
+    .from('orders')
+    .select('id, order_number')
+    .eq('payment_method', 'card')
+    .eq('payment_status', 'pending')
+    .eq('status', 'pending')
+    .lt('created_at', cutoff)
+    .limit(500)
+
+  if (selectErr) {
+    return NextResponse.json({ error: selectErr.message }, { status: 500 })
+  }
+
+  if (!abandoned || abandoned.length === 0) {
+    return NextResponse.json({ cancelled: 0 })
+  }
+
+  const ids = abandoned.map((o) => o.id)
+  const { error: updateErr } = await supabase
+    .from('orders')
+    .update({
+      status: 'cancelled',
+      payment_status: 'cancelled',
+      updated_at: new Date().toISOString(),
+    })
+    .in('id', ids)
+
+  if (updateErr) {
+    return NextResponse.json({ error: updateErr.message }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    cancelled: abandoned.length,
+    order_numbers: abandoned.map((o) => o.order_number),
+  })
+}

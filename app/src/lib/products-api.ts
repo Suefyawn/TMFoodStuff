@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Use service role key for server-side fetching (bypasses RLS)
-// Falls back to anon key for client-side
+// Public storefront browsing uses the anon (publishable) key so the existing
+// "public read active products" / "public read categories" RLS policies
+// govern what's visible. Bypassing RLS with the service role here (the
+// previous behaviour) would expose inactive products and any future
+// row-level restrictions to anonymous visitors.
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
 export interface Product {
@@ -14,6 +17,7 @@ export interface Product {
   slug: string
   categorySlug: string
   description: string
+  descriptionAr: string
   priceAED: number
   compareAtPrice?: number
   unit: string
@@ -45,6 +49,7 @@ function mapProduct(row: any): Product {
     slug: row.slug,
     categorySlug: row.categories?.slug || row.category_slug || '',
     description: row.description || '',
+    descriptionAr: row.description_ar || '',
     priceAED: Number(row.price_aed),
     compareAtPrice: row.compare_at_price_aed ? Number(row.compare_at_price_aed) : undefined,
     unit: row.unit || 'kg',
@@ -66,6 +71,7 @@ function fromStaticData(p: any): Product {
   return {
     ...p,
     nameAr: p.nameAr || '',
+    descriptionAr: p.descriptionAr || '',
     imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : p.imageUrl ? [p.imageUrl] : [],
     isActive: p.isActive ?? true,
   }

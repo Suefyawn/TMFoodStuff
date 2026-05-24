@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe } from 'lucide-react'
+import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe, CreditCard, MessageSquare, Clock } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
 
 interface Integration {
@@ -106,6 +106,48 @@ export default async function IntegrationsPage() {
         { key: 'ADMIN_EMAIL', label: 'Admin Email' },
       ],
       configured: !!process.env.RESEND_API_KEY,
+    },
+    {
+      id: 'stripe',
+      name: 'Stripe',
+      description: 'Online card payments (AED) via Stripe Checkout',
+      docsUrl: 'https://stripe.com/docs/payments/checkout',
+      icon: CreditCard,
+      iconColor: 'bg-indigo-900/40 text-indigo-400',
+      envVars: [
+        { key: 'STRIPE_SECRET_KEY', label: 'Secret Key', secret: true },
+        { key: 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', label: 'Publishable Key' },
+        { key: 'STRIPE_WEBHOOK_SECRET', label: 'Webhook Secret', secret: true },
+      ],
+      configured: !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
+    },
+    {
+      id: 'twilio',
+      name: 'Twilio (SMS + WhatsApp)',
+      description: 'Order confirmations and delivery status notifications',
+      docsUrl: 'https://www.twilio.com/docs/sms/quickstart/node',
+      icon: MessageSquare,
+      iconColor: 'bg-rose-900/40 text-rose-400',
+      envVars: [
+        { key: 'TWILIO_ACCOUNT_SID', label: 'Account SID' },
+        { key: 'TWILIO_AUTH_TOKEN', label: 'Auth Token', secret: true },
+        { key: 'TWILIO_SMS_FROM', label: 'SMS Sender' },
+        { key: 'TWILIO_WHATSAPP_FROM', label: 'WhatsApp Sender' },
+        { key: 'TWILIO_ADMIN_PHONE', label: 'Admin Phone' },
+      ],
+      configured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
+    },
+    {
+      id: 'cron',
+      name: 'Scheduled Jobs',
+      description: 'Hourly cleanup of abandoned card-payment orders',
+      docsUrl: 'https://vercel.com/docs/cron-jobs',
+      icon: Clock,
+      iconColor: 'bg-slate-900/40 text-slate-400',
+      envVars: [
+        { key: 'CRON_SECRET', label: 'Cron Secret', secret: true },
+      ],
+      configured: !!process.env.CRON_SECRET,
     },
     {
       id: 'posthog',

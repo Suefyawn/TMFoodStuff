@@ -48,7 +48,7 @@ export async function PATCH(request: Request) {
     // Fire back-in-stock emails if stock was 0 before
     if (current && previousStock === 0) {
       const { data: notifications } = await supabase
-        .from('stock_notifications')
+        .from('low_stock_subscriptions')
         .select('email')
         .eq('product_id', parseInt(id))
         .is('notified_at', null)
@@ -57,7 +57,7 @@ export async function PATCH(request: Request) {
         for (const n of notifications) {
           sendBackInStockEmail(n.email, current.name, current.slug).catch(console.error)
         }
-        await supabase.from('stock_notifications')
+        await supabase.from('low_stock_subscriptions')
           .update({ notified_at: now })
           .eq('product_id', parseInt(id))
           .is('notified_at', null)
@@ -91,6 +91,20 @@ export async function POST(request: Request) {
   }
 
   const supabase = getSupabase()
+
+  // Pre-check slug uniqueness so we can return a friendly 409 instead of the
+  // raw Postgres unique-violation error.
+  const { data: existingSlug } = await supabase
+    .from('products')
+    .select('id')
+    .eq('slug', body.slug)
+    .maybeSingle()
+  if (existingSlug) {
+    return NextResponse.json(
+      { error: `A product with the slug "${body.slug}" already exists. Pick a different slug.` },
+      { status: 409 },
+    )
+  }
 
   const { data, error } = await supabase.from('products').insert({
     name: body.name,

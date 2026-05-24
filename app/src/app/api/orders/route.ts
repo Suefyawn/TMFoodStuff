@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendOrderConfirmation, sendAdminOrderAlert, type OrderEmailData } from '@/lib/email'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { computeOrderTotals, subtotalOf, round2 } from '@/lib/pricing'
+import { fulfillOrder } from '@/lib/order-fulfillment'
+import { toLocale } from '@/lib/locale'
+import { getStripe } from '@/lib/stripe'
+import { SITE_URL } from '@/lib/site'
+import { isValidEmail, isValidUAEPhone, normaliseUAEPhone } from '@/lib/validators'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 const VALID_SLOTS = ['morning', 'afternoon', 'evening']
@@ -12,9 +16,6 @@ function parseNum(value: string | undefined, fallback: number): number {
   return Number.isFinite(n) && n >= 0 ? n : fallback
 }
 
-// Calendar dates (Asia/Dubai) the customer is allowed to pick. The checkout UI
-// offers today..+2; we accept today..+3 so a client/server timezone offset
-// around midnight never rejects a legitimate order.
 function acceptableDeliveryDates(): string[] {
   const dates: string[] = []
   for (let i = 0; i <= 3; i++) {
@@ -34,13 +35,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate } = body
+    const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate, locale: rawLocale } = body
+    const locale = toLocale(rawLocale)
+    const isCardPayment = paymentMethod === 'card'
 
     if (!form || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ success: false, error: 'Invalid order payload' }, { status: 400 })
     }
 
-    // ── Validate customer details ──────────────────────────────────────────
     const fullName = String(form.fullName || '').trim()
     const phone = String(form.phone || '').trim()
     const emirate = String(form.emirate || '').trim()
@@ -55,11 +57,14 @@ export async function POST(request: Request) {
     if (fullName.length > 120 || phone.length > 40 || area.length > 200 || email.length > 160) {
       return NextResponse.json({ success: false, error: 'One or more fields are too long.' }, { status: 400 })
     }
-    if (email && !email.includes('@')) {
+    if (!isValidUAEPhone(phone)) {
+      return NextResponse.json({ success: false, error: 'Please enter a valid UAE phone number, e.g. 0501234567.' }, { status: 400 })
+    }
+    const normalisedPhone = normaliseUAEPhone(phone)
+    if (email && !isValidEmail(email)) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
-    // ── Validate delivery slot / date ──────────────────────────────────────
     if (!VALID_SLOTS.includes(deliverySlot)) {
       return NextResponse.json({ success: false, error: 'Please choose a valid delivery slot.' }, { status: 400 })
     }
@@ -73,8 +78,6 @@ export async function POST(request: Request) {
     )
 
     // ── Resolve cart items to authoritative products ───────────────────────
-    // Only the product id and quantity are trusted from the client; everything
-    // that affects price comes from the database.
     const quantities: Record<string, number> = {}
     for (const it of items) {
       const id = String(it?.id ?? '')
@@ -92,7 +95,15 @@ export async function POST(request: Request) {
       .in('id', productIds)
     if (prodErr) throw prodErr
 
-    const productById: Record<string, any> = {}
+    const productById: Record<string, {
+      id: number
+      name: string
+      price_aed: number
+      unit: string | null
+      stock: number | null
+      is_active: boolean | null
+      emoji: string | null
+    }> = {}
     for (const p of products || []) productById[String(p.id)] = p
 
     const lineItems: Array<{
@@ -132,14 +143,12 @@ export async function POST(request: Request) {
       })
     }
 
-    // ── Store settings (pricing + WhatsApp) ────────────────────────────────
     const { data: settingsRows } = await supabase.from('settings').select('key, value')
     const settings: Record<string, string> = {}
     for (const row of settingsRows || []) settings[row.key] = row.value
     const whatsappNumber =
       (settings.whatsapp_number || DEFAULT_WHATSAPP_NUMBER).replace(/\D/g, '') || DEFAULT_WHATSAPP_NUMBER
 
-    // ── Recompute pricing server-side (client values are never trusted) ────
     const vatRatePercent = parseNum(settings.vat_rate, 5)
     const launchFreeDelivery = process.env.NEXT_PUBLIC_LAUNCH_FREE_DELIVERY !== 'false'
     const cartSubtotal = subtotalOf(lineItems)
@@ -149,7 +158,6 @@ export async function POST(request: Request) {
         ? 0
         : parseNum(settings.delivery_fee, 15)
 
-    // ── Re-validate the promo code server-side ─────────────────────────────
     let appliedPromoCode = ''
     let promoDiscountPercent = 0
     if (promoCode && String(promoCode).trim()) {
@@ -176,11 +184,11 @@ export async function POST(request: Request) {
     const payload: Record<string, unknown> = {
       order_number: orderNumber,
       status: 'pending',
-      payment_method: paymentMethod === 'card' ? 'card' : 'cod',
+      payment_method: isCardPayment ? 'card' : 'cod',
       payment_status: 'pending',
       customer_name: fullName,
       customer_full_name: fullName,
-      customer_phone: phone,
+      customer_phone: normalisedPhone,
       customer_email: email,
       delivery_emirate: emirate,
       delivery_area: area,
@@ -189,7 +197,7 @@ export async function POST(request: Request) {
       delivery_slot: deliverySlot,
       delivery_date: deliveryDate,
       delivery_notes: String(form.notes || '').trim().slice(0, 1000),
-      // Both legacy and canonical `_aed` columns kept in sync.
+      locale,
       subtotal,
       subtotal_aed: subtotal,
       vat,
@@ -211,50 +219,90 @@ export async function POST(request: Request) {
       })),
     }
 
-    const { error } = await supabase.from('orders').insert(payload)
-    if (error) throw error
+    const { data: inserted, error } = await supabase
+      .from('orders')
+      .insert(payload)
+      .select('id')
+      .single()
+    if (error || !inserted) throw error ?? new Error('Order insert returned no row')
+    const orderId: number = inserted.id
 
-    // ── Decrement stock atomically (oversell guard) ────────────────────────
-    await Promise.all(
-      lineItems.map(async (i) => {
-        const { data: ok, error: rpcErr } = await supabase.rpc('decrement_stock', {
-          p_id: Number(i.id),
-          p_qty: i.quantity,
-        })
-        if (rpcErr || ok === false) {
-          console.error(`Stock decrement failed for product ${i.id} on order ${orderNumber}`, rpcErr)
-        }
-      }),
-    )
+    // ── Card payment: redirect to Stripe; fulfilment happens in the webhook ─
+    if (isCardPayment) {
+      const stripe = getStripe()
+      if (!stripe) {
+        return NextResponse.json(
+          { success: false, error: 'Online card payment is not available right now. Please choose Cash on Delivery.' },
+          { status: 503 },
+        )
+      }
 
-    // ── Notifications (graceful no-ops if RESEND_API_KEY is not set) ───────
-    const emailData: OrderEmailData = {
-      order_number: orderNumber,
-      customer_name: fullName,
-      customer_phone: phone,
-      customer_email: email || undefined,
-      delivery_area: area,
-      delivery_emirate: emirate,
-      delivery_building: String(form.building || '').trim() || undefined,
-      delivery_slot: deliverySlot,
-      delivery_notes: String(form.notes || '').trim() || undefined,
-      delivery_fee: deliveryFee,
-      subtotal,
-      vat,
-      promo_code: appliedPromoCode || undefined,
-      promo_discount: promoDiscount,
-      total,
-      items: lineItems.map((i) => ({
-        name: i.name,
-        emoji: i.emoji,
-        quantity: i.quantity,
-        price_aed: i.price_aed,
-      })),
-      whatsapp_number: whatsappNumber,
+      // We send a single line item totalling the exact server-computed amount.
+      // Breaking the order into per-product lines (plus a VAT+delivery+promo
+      // adjustment) trips a rounding/edge-case bug: when the promo exceeds
+      // VAT + delivery the adjustment line would go negative, which Stripe
+      // rejects. A single line is less pretty on the receipt but always
+      // matches the order total exactly. The itemised breakdown lives in the
+      // confirmation email and on /dashboard/orders.
+      const itemsSummary = lineItems
+        .map((i) => `${i.name} ×${i.quantity}`)
+        .join(', ')
+        .slice(0, 500)
+
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        customer_email: email || undefined,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: 'aed',
+              unit_amount: Math.round(total * 100),
+              product_data: {
+                name: `TM FoodStuff order ${orderNumber}`,
+                description: itemsSummary,
+              },
+            },
+          },
+        ],
+        metadata: {
+          order_id: String(orderId),
+          order_number: orderNumber,
+          locale,
+        },
+        success_url: `${SITE_URL}/checkout/success?order=${orderNumber}`,
+        cancel_url: `${SITE_URL}/checkout?cancelled=${orderNumber}`,
+      })
+
+      return NextResponse.json({
+        success: true,
+        orderNumber,
+        stripeUrl: session.url,
+        paymentMethod: 'card',
+      })
     }
-    await Promise.all([sendOrderConfirmation(emailData), sendAdminOrderAlert(emailData)])
 
-    // ── WhatsApp confirmation message ──────────────────────────────────────
+    // ── Cash on Delivery: fulfil inline ────────────────────────────────────
+    await fulfillOrder({
+      supabase,
+      orderNumber,
+      customer: { name: fullName, phone: normalisedPhone, email: email || undefined },
+      delivery: {
+        emirate,
+        area,
+        building: String(form.building || '').trim() || undefined,
+        slot: deliverySlot,
+        notes: String(form.notes || '').trim() || undefined,
+      },
+      totals: { subtotal, vat, deliveryFee, promoCode: appliedPromoCode || undefined, promoDiscount, total },
+      lineItems,
+      locale,
+      whatsappNumber,
+      paidOnline: false,
+      decrementStock: true,
+    })
+
     const itemsList = lineItems
       .map((i) => `• ${i.name} x${i.quantity} = AED ${i.subtotal.toFixed(2)}`)
       .join('\n')
@@ -278,7 +326,7 @@ export async function POST(request: Request) {
         (deliveryFee > 0 ? `Delivery: AED ${deliveryFee.toFixed(2)}\n` : '') +
         (promoDiscount > 0 ? `Promo (${appliedPromoCode}): -AED ${promoDiscount.toFixed(2)}\n` : '') +
         `💰 TOTAL: AED ${total.toFixed(2)}\n` +
-        `💳 ${paymentMethod === 'card' ? 'Card' : 'Cash on Delivery'}\n` +
+        `💳 Cash on Delivery\n` +
         (form.notes ? `📝 Notes: ${String(form.notes).trim()}` : ''),
     )
 
@@ -293,6 +341,7 @@ export async function POST(request: Request) {
       total,
       waMessage,
       waNumber: whatsappNumber,
+      paymentMethod: 'cod',
     })
   } catch (error) {
     console.error('Order error:', error)

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -7,6 +8,7 @@ import ProductCard from '@/components/ProductCard'
 import { formatAED, calculateVAT } from '@/lib/utils'
 import StickyProductCTA from '@/components/StickyProductCTA'
 import { ProductNameDisplay } from '@/components/ProductNameDisplay'
+import { ProductDescription } from '@/components/ProductDescription'
 import ProductImageGallery from '@/components/ProductImageGallery'
 import StockNotifyForm from '@/components/StockNotifyForm'
 import { SITE_URL } from '@/lib/site'
@@ -20,6 +22,41 @@ interface Props {
 export async function generateStaticParams() {
   const slugs = await getAllProductSlugs()
   return slugs.map(slug => ({ slug }))
+}
+
+// Per-product SEO. Without this, every product detail page inherits the
+// generic root <title> "TMFoodStuff — Fresh Fruits & Vegetables UAE", which
+// hurts indexing and social sharing.
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProductBySlug(slug)
+  if (!product) {
+    return { title: 'Product not found', robots: { index: false } }
+  }
+  const title = `${product.name} — ${formatAED(product.priceAED)} per ${product.unit} | TMFoodStuff`
+  const description =
+    (product.description || `Buy fresh ${product.name.toLowerCase()} delivered across the UAE. Premium quality from TMFoodStuff.`).slice(0, 160)
+  const url = `${SITE_URL}/product/${product.slug}`
+  const image = product.imageUrl
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website',
+      siteName: 'TMFoodStuff',
+      images: image ? [{ url: image, alt: product.name }] : undefined,
+    },
+    twitter: {
+      card: image ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+  }
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -118,7 +155,11 @@ export default async function ProductPage({ params }: Props) {
 
           <ProductNameDisplay name={product.name} nameAr={product.nameAr} />
 
-          <p className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base">{product.description}</p>
+          <ProductDescription
+            description={product.description}
+            descriptionAr={product.descriptionAr}
+            className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base"
+          />
 
           <div className="bg-gray-50 rounded-2xl p-4 md:p-5 mb-5 md:mb-6">
             <div className="flex items-baseline gap-3 mb-2 flex-wrap">

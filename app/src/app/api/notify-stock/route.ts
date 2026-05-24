@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    const { error } = await supabase.from('stock_notifications').upsert(
+    const { error } = await supabase.from('low_stock_subscriptions').upsert(
       { product_id: Number(product_id), email: email.trim().toLowerCase() },
       { onConflict: 'product_id,email', ignoreDuplicates: true }
     )

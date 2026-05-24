@@ -6,12 +6,20 @@ function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
+const MAX_ROWS = 5000
+
 export async function POST(request: Request) {
   if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { rows } = await request.json()
   if (!Array.isArray(rows) || rows.length === 0) {
     return NextResponse.json({ error: 'No rows provided' }, { status: 400 })
+  }
+  if (rows.length > MAX_ROWS) {
+    return NextResponse.json(
+      { error: `Too many rows (${rows.length}). Split the file into batches of ${MAX_ROWS} or fewer.` },
+      { status: 413 },
+    )
   }
 
   const supabase = getSupabase()

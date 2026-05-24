@@ -21,6 +21,7 @@ export default function Navbar() {
     { label: tr.vegetables, href: '/shop?category=vegetables' },
     { label: tr.organic, href: '/shop?category=organic' },
     { label: tr.exotic, href: '/shop?category=exotic' },
+    { label: lang === 'ar' ? 'هدايا' : 'Gifts', href: '/shop?category=gifts' },
     { label: tr.allProducts, href: '/shop' },
   ]
 

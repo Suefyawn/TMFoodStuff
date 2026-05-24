@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import { isValidEmail } from '@/lib/validators'
 
 export async function POST(request: Request) {
   try {
@@ -10,8 +11,8 @@ export async function POST(request: Request) {
 
     const { email } = await request.json()
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email required' }, { status: 400 })
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
     const supabase = createClient(
@@ -26,8 +27,8 @@ export async function POST(request: Request) {
     if (error) throw error
 
     return NextResponse.json({ ok: true })
-  } catch (err: any) {
+  } catch (err) {
     console.error('Newsletter error:', err)
-    return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 })
+    return NextResponse.json({ error: 'Could not subscribe right now. Please try again later.' }, { status: 500 })
   }
 }

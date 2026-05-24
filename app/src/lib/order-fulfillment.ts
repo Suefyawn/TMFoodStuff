@@ -1,0 +1,124 @@
+// Shared fulfilment path for newly-placed orders.
+//
+// Both /api/orders (Cash on Delivery) and /api/stripe/webhook
+// (checkout.session.completed) call this so customer notifications, the admin
+// alert, and stock decrement happen exactly once per order, regardless of how
+// the order arrived. Every external send is independently fault-tolerant —
+// failures are logged and swallowed; the caller never retries on this path.
+
+import type { SupabaseClient } from '@supabase/supabase-js'
+import {
+  sendOrderConfirmation,
+  sendAdminOrderAlert,
+  type OrderEmailData,
+} from './email'
+import { notifyOrderConfirmation, notifyAdminNewOrder } from './notify'
+import type { Locale } from './locale'
+
+interface FulfillLineItem {
+  id: number | string
+  name: string
+  emoji: string
+  quantity: number
+  price_aed: number
+}
+
+export interface FulfillOrderInput {
+  supabase: SupabaseClient
+  orderNumber: string
+  customer: {
+    name: string
+    phone: string
+    email?: string
+  }
+  delivery: {
+    emirate: string
+    area: string
+    building?: string
+    slot: string
+    notes?: string
+  }
+  totals: {
+    subtotal: number
+    vat: number
+    deliveryFee: number
+    promoCode?: string
+    promoDiscount: number
+    total: number
+  }
+  lineItems: FulfillLineItem[]
+  locale: Locale
+  whatsappNumber: string
+  paidOnline: boolean
+  /**
+   * When true, run `decrement_stock` for every line item. Set false when the
+   * order row was inserted via a path that already decremented stock (e.g. the
+   * `create_checkout_order` RPC).
+   */
+  decrementStock: boolean
+}
+
+export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
+  const emailData: OrderEmailData = {
+    order_number: input.orderNumber,
+    customer_name: input.customer.name,
+    customer_phone: input.customer.phone,
+    customer_email: input.customer.email || undefined,
+    delivery_area: input.delivery.area,
+    delivery_emirate: input.delivery.emirate,
+    delivery_building: input.delivery.building || undefined,
+    delivery_slot: input.delivery.slot,
+    delivery_notes: input.delivery.notes || undefined,
+    delivery_fee: input.totals.deliveryFee,
+    subtotal: input.totals.subtotal,
+    vat: input.totals.vat,
+    promo_code: input.totals.promoCode || undefined,
+    promo_discount: input.totals.promoDiscount,
+    total: input.totals.total,
+    items: input.lineItems.map((i) => ({
+      name: i.name,
+      emoji: i.emoji,
+      quantity: i.quantity,
+      price_aed: i.price_aed,
+    })),
+    whatsapp_number: input.whatsappNumber,
+    paid_online: input.paidOnline,
+  }
+
+  const summary = {
+    order_number: input.orderNumber,
+    customer_name: input.customer.name,
+    total: input.totals.total,
+  }
+
+  const tasks: Array<PromiseLike<unknown>> = [
+    sendOrderConfirmation(emailData, input.locale),
+    sendAdminOrderAlert(emailData),
+    notifyAdminNewOrder(summary),
+  ]
+
+  if (input.customer.phone) {
+    tasks.push(notifyOrderConfirmation(input.customer.phone, summary, input.locale))
+  }
+
+  if (input.decrementStock) {
+    for (const item of input.lineItems) {
+      tasks.push(
+        (async () => {
+          const { error } = await input.supabase.rpc('decrement_stock', {
+            p_id: Number(item.id),
+            p_qty: item.quantity,
+          })
+          if (error) {
+            console.error(
+              `[fulfillOrder] Stock decrement failed for product ${item.id} on order ${input.orderNumber}`,
+              error,
+            )
+          }
+        })(),
+      )
+    }
+  }
+
+  await Promise.allSettled(tasks)
+}
