@@ -1,7 +1,8 @@
 'use client'
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Phone, MessageCircle, MapPin, Truck, CheckCircle2, Loader2, AlertCircle, Clock, ArrowRight, Navigation } from 'lucide-react'
+import { Phone, MessageCircle, MapPin, Truck, CheckCircle2, Loader2, AlertCircle, Clock, ArrowRight, Navigation, Hand } from 'lucide-react'
 
 interface OrderLite {
   id: number
@@ -26,6 +27,9 @@ interface OrderLite {
 interface Props {
   initialOrders: OrderLite[]
   errorMessage?: string
+  // Truthy when the signed-in user is a driver — enables the
+  // tap-to-claim button on unassigned cards.
+  canClaim?: boolean
 }
 
 const SLOT_ORDER: Record<string, number> = { morning: 0, afternoon: 1, evening: 2 }
@@ -44,7 +48,8 @@ function fullAddress(o: OrderLite): string {
   return parts.join(', ')
 }
 
-export default function DeliveriesClient({ initialOrders, errorMessage }: Props) {
+export default function DeliveriesClient({ initialOrders, errorMessage, canClaim = false }: Props) {
+  const router = useRouter()
   const [orders, setOrders] = useState(initialOrders)
   const [filter, setFilter] = useState<'today' | 'all'>('today')
   const [busyId, setBusyId] = useState<number | null>(null)
@@ -76,6 +81,28 @@ export default function DeliveriesClient({ initialOrders, errorMessage }: Props)
 
   const totalVisible = Object.values(groups).reduce((s, list) => s + list.length, 0)
   const todayCount = orders.filter(o => o.delivery_date === today).length
+
+  async function claimOrder(orderId: number) {
+    setBusyId(orderId)
+    setError('')
+    try {
+      const res = await fetch('/api/dashboard/orders/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: orderId }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Could not claim this order')
+        return
+      }
+      router.refresh()
+    } catch {
+      setError('Network error — try again')
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   async function advance(orderId: number, to: 'out_for_delivery' | 'delivered') {
     setBusyId(orderId)
@@ -160,7 +187,7 @@ export default function DeliveriesClient({ initialOrders, errorMessage }: Props)
                 {emirate} · {list.length} stop{list.length === 1 ? '' : 's'}
               </p>
               <div className="space-y-3">
-                {list.map(o => <DeliveryCard key={o.id} order={o} busy={busyId === o.id} onAdvance={advance} />)}
+                {list.map(o => <DeliveryCard key={o.id} order={o} busy={busyId === o.id} onAdvance={advance} canClaim={canClaim} onClaim={claimOrder} />)}
               </div>
             </section>
           ))
@@ -170,7 +197,7 @@ export default function DeliveriesClient({ initialOrders, errorMessage }: Props)
   )
 }
 
-function DeliveryCard({ order, busy, onAdvance }: { order: OrderLite; busy: boolean; onAdvance: (id: number, to: 'out_for_delivery' | 'delivered') => void }) {
+function DeliveryCard({ order, busy, onAdvance, canClaim, onClaim }: { order: OrderLite; busy: boolean; onAdvance: (id: number, to: 'out_for_delivery' | 'delivered') => void; canClaim?: boolean; onClaim?: (id: number) => void }) {
   const isOut = order.status === 'out_for_delivery'
   const total = Number(order.total_aed ?? order.total ?? 0)
   const collectCod = order.payment_method !== 'card' || order.payment_status !== 'paid'
@@ -257,6 +284,21 @@ function DeliveryCard({ order, busy, onAdvance }: { order: OrderLite; busy: bool
             <span className="text-xs font-bold text-amber-200">Collect cash</span>
             <span className="text-lg font-black text-amber-100 tabular-nums">AED {total.toFixed(2)}</span>
           </div>
+        )}
+
+        {/* Claim button — only visible to drivers on unassigned orders.
+            Disappears the moment another driver grabs it (router.refresh
+            on success pulls the fresh assignment state). */}
+        {canClaim && !order.driver_id && (
+          <button
+            type="button"
+            onClick={() => onClaim?.(order.id)}
+            disabled={busy}
+            className="w-full mb-2 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white text-sm font-bold rounded-xl py-3 transition-colors"
+          >
+            {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Hand size={14} aria-hidden="true" />}
+            {busy ? 'Claiming…' : 'Claim this delivery'}
+          </button>
         )}
 
         {/* Status advance buttons */}

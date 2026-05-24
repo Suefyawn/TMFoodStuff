@@ -75,5 +75,5 @@ export default async function DeliveriesPage() {
 
   const { data, error } = await query
 
-  return <DeliveriesClient initialOrders={(data || []) as OrderLite[]} errorMessage={error?.message} />
+  return <DeliveriesClient initialOrders={(data || []) as OrderLite[]} errorMessage={error?.message} canClaim={session.role === 'driver'} />
 }
