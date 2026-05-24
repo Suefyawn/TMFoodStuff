@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server'
 import { getCurrentCustomer, getServiceRoleClient } from '@/lib/customer'
+import { getCustomerBalance } from '@/lib/loyalty'
 
 export const dynamic = 'force-dynamic'
 
-// One-shot summary for the storefront: who am I + my saved addresses.
-// Used by the checkout page to prefill the delivery form for signed-in users.
+// One-shot summary for the storefront: who am I + my saved addresses + my
+// loyalty balance. Used by the checkout page to prefill the delivery form
+// for signed-in users and to show the points-redemption widget.
 export async function GET() {
   const customer = await getCurrentCustomer()
   if (!customer) return NextResponse.json({ signedIn: false })
   const supabase = getServiceRoleClient()
-  const [{ data: profile }, { data: addresses }] = await Promise.all([
+  const [{ data: profile }, { data: addresses }, pointsBalance] = await Promise.all([
     supabase
       .from('customers')
       .select('full_name, phone, email')
@@ -21,6 +23,7 @@ export async function GET() {
       .eq('customer_id', customer.id)
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: false }),
+    getCustomerBalance(supabase, customer.id),
   ])
   return NextResponse.json({
     signedIn: true,
@@ -28,6 +31,7 @@ export async function GET() {
     fullName: profile?.full_name || customer.fullName || '',
     phone: profile?.phone || '',
     addresses: addresses || [],
+    pointsBalance,
   })
 }
 

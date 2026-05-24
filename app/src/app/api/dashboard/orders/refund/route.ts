@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import { getStripe } from '@/lib/stripe'
+import { reverseOrderPoints } from '@/lib/loyalty'
+import { logAdminAction } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -83,6 +85,22 @@ export async function POST(request: Request) {
         { status: 200 },
       )
     }
+
+    // Reverse any loyalty-points side-effects: cancel an earned credit
+    // and/or restore points the customer redeemed against this order. Only
+    // do this for FULL refunds; partial refunds preserve a proportional
+    // share which is too noisy to compute automatically.
+    if (!isPartial) {
+      await reverseOrderPoints(supabase, { orderId: order.id, orderNumber: order.order_number })
+    }
+
+    await logAdminAction({
+      supabase,
+      action: 'order.refund',
+      entity: `order:${order.id}`,
+      after: { payment_status: isPartial ? 'partially_refunded' : 'refunded', refund_id: refund.id },
+      metadata: { order_number: order.order_number, amount_aed: amountFils / 100, partial: isPartial },
+    })
 
     return NextResponse.json({ ok: true, refundId: refund.id, amount: amountFils / 100, partial: isPartial })
   } catch (err) {

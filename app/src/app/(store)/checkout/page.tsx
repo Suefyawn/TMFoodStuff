@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User } from 'lucide-react'
+import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User, Sparkles } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
 import { isValidEmail, isValidUAEPhone } from '@/lib/validators'
+import { MIN_REDEEM_POINTS, POINTS_PER_AED_REDEEM, resolveRedemption } from '@/lib/points'
 import posthog from 'posthog-js'
 
 interface SavedAddress {
@@ -52,6 +53,8 @@ export default function CheckoutPage() {
   const [signedIn, setSignedIn] = useState(false)
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
   const [activeAddressId, setActiveAddressId] = useState<number | null>(null)
+  const [pointsBalance, setPointsBalance] = useState(0)
+  const [pointsToRedeem, setPointsToRedeem] = useState(0)
 
   useEffect(() => {
     if (items.length > 0) {
@@ -74,6 +77,7 @@ export default function CheckoutPage() {
         if (cancelled || !data?.signedIn) return
         setSignedIn(true)
         setSavedAddresses(data.addresses || [])
+        setPointsBalance(Number(data.pointsBalance || 0))
         const defaultAddr = (data.addresses || []).find((a: SavedAddress) => a.is_default) || (data.addresses || [])[0]
         setForm(prev => ({
           ...prev,
@@ -125,7 +129,15 @@ export default function CheckoutPage() {
 
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
-  const finalTotal = total - promoDiscount
+  const totalBeforePoints = total - promoDiscount
+  // Mirror the server's resolveRedemption so the displayed discount matches
+  // what /api/orders will actually apply.
+  const pointsResolved = pointsToRedeem > 0
+    ? resolveRedemption({ pointsRequested: pointsToRedeem, balance: pointsBalance, subtotalAed: Math.max(0, sub - promoDiscount) })
+    : { points: 0, aed: 0 }
+  const pointsValueAed = pointsResolved.aed
+  const finalTotal = Math.max(0, totalBeforePoints - pointsValueAed)
+  const pointsCapAed = Math.floor(Math.min(pointsBalance, Math.max(0, sub - promoDiscount) * POINTS_PER_AED_REDEEM) / POINTS_PER_AED_REDEEM)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -196,6 +208,7 @@ export default function CheckoutPage() {
           paymentMethod,
           promoCode: promoApplied ? promoCode : '',
           promoDiscount,
+          pointsToRedeem: pointsResolved.points,
           deliverySlot: form.deliverySlot,
           deliveryDate: form.deliveryDate,
           locale: lang,
@@ -642,6 +655,59 @@ export default function CheckoutPage() {
                     <span>-{formatAED(promoDiscount)}</span>
                   </div>
                 )}
+
+                {/* Loyalty points redemption (signed-in customers with at least
+                    the minimum balance) */}
+                {signedIn && pointsBalance >= MIN_REDEEM_POINTS && (
+                  <div className="border-t pt-4 mt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide inline-flex items-center gap-1.5">
+                        <Sparkles size={12} className="text-emerald-600" aria-hidden="true" />
+                        {lang === 'ar' ? 'استبدال نقاط' : 'Redeem points'}
+                      </label>
+                      <span className="text-xs font-bold text-gray-500">
+                        {lang === 'ar' ? 'الرصيد:' : 'Balance:'} {pointsBalance.toLocaleString()} pts
+                      </span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        max={pointsBalance}
+                        step={MIN_REDEEM_POINTS}
+                        value={pointsToRedeem || ''}
+                        onChange={e => setPointsToRedeem(Math.max(0, Math.min(pointsBalance, Number(e.target.value) || 0)))}
+                        placeholder={String(MIN_REDEEM_POINTS)}
+                        aria-label={lang === 'ar' ? 'نقاط للاستبدال' : 'Points to redeem'}
+                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-base md:text-sm focus:outline-none focus:border-emerald-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPointsToRedeem(Math.min(pointsBalance, pointsCapAed * POINTS_PER_AED_REDEEM))}
+                        className="text-xs font-bold text-emerald-700 hover:underline whitespace-nowrap"
+                      >
+                        {lang === 'ar' ? 'استخدم الكل' : 'Use max'}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-1.5">
+                      {lang === 'ar'
+                        ? `الحد الأدنى ${MIN_REDEEM_POINTS} نقطة · ${POINTS_PER_AED_REDEEM} نقطة = 1 درهم`
+                        : `Min ${MIN_REDEEM_POINTS} pts · ${POINTS_PER_AED_REDEEM} pts = AED 1`}
+                    </p>
+                    {pointsResolved.reason && pointsToRedeem > 0 && (
+                      <p className="text-xs text-red-600 mt-1">{pointsResolved.reason}</p>
+                    )}
+                  </div>
+                )}
+
+                {pointsValueAed > 0 && (
+                  <div className="flex justify-between text-emerald-700 font-semibold">
+                    <span className="inline-flex items-center gap-1.5"><Sparkles size={12} aria-hidden="true" /> {pointsResolved.points} pts</span>
+                    <span>-{formatAED(pointsValueAed)}</span>
+                  </div>
+                )}
+
                 <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                   <span>{tr.total}</span>
                   <span className="text-green-700">{formatAED(finalTotal)}</span>

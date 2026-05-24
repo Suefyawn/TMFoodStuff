@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { Package, LogOut, ShoppingBag, User as UserIcon, MapPin, Heart, ChevronRight } from 'lucide-react'
+import { Package, LogOut, ShoppingBag, User as UserIcon, MapPin, Heart, ChevronRight, Sparkles } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 interface OrderRow {
@@ -83,7 +83,20 @@ export default function AccountClient({ email, fullName, orders }: AccountClient
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <Link
+          href="/account/points"
+          className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-3 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
+        >
+          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
+            <Sparkles size={18} className="text-emerald-700" aria-hidden="true" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-900 text-sm">{isAr ? 'النقاط' : 'Points'}</p>
+            <p className="text-xs text-gray-500">{isAr ? 'الرصيد والمكافآت' : 'Balance & rewards'}</p>
+          </div>
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+        </Link>
         <Link
           href="/account/addresses"
           className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-3 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
@@ -173,10 +186,10 @@ export default function AccountClient({ email, fullName, orders }: AccountClient
                     <div className={`text-${isAr ? 'left' : 'right'} flex flex-col items-end shrink-0`}>
                       <span className="text-sm font-black text-green-700">AED {total.toFixed(2)}</span>
                       <Link
-                        href={`/track?order=${o.order_number}`}
+                        href={`/account/orders/${o.order_number}`}
                         className="text-xs font-bold text-gray-500 hover:text-green-700 mt-1"
                       >
-                        {isAr ? 'تتبّع' : 'Track'} →
+                        {isAr ? 'التفاصيل' : 'View'} →
                       </Link>
                     </div>
                   </div>

@@ -7,6 +7,9 @@ import { toLocale } from '@/lib/locale'
 import { getStripe } from '@/lib/stripe'
 import { SITE_URL } from '@/lib/site'
 import { isValidEmail, isValidUAEPhone, normaliseUAEPhone } from '@/lib/validators'
+import { resolveRedemption } from '@/lib/points'
+import { getCurrentCustomer } from '@/lib/customer'
+import { getCustomerBalance, recordRedemption } from '@/lib/loyalty'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 const VALID_SLOTS = ['morning', 'afternoon', 'evening']
@@ -35,9 +38,10 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate, locale: rawLocale } = body
+    const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate, locale: rawLocale, pointsToRedeem } = body
     const locale = toLocale(rawLocale)
     const isCardPayment = paymentMethod === 'card'
+    const pointsRequested = Math.max(0, Math.floor(Number(pointsToRedeem) || 0))
 
     if (!form || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ success: false, error: 'Invalid order payload' }, { status: 400 })
@@ -173,12 +177,40 @@ export async function POST(request: Request) {
       }
     }
 
-    const { subtotal, vat, deliveryFee, promoDiscount, total } = computeOrderTotals({
+    const { subtotal, vat, deliveryFee, promoDiscount, total: totalBeforePoints } = computeOrderTotals({
       lineItems,
       vatRatePercent,
       deliveryFee: resolvedDeliveryFee,
       promoDiscountPercent,
     })
+
+    // ── Loyalty points redemption (signed-in customers only) ──────────────
+    let pointsRedeemed = 0
+    let pointsValueAed = 0
+    let redeemingCustomerId: number | null = null
+    if (pointsRequested > 0) {
+      const customer = await getCurrentCustomer()
+      if (!customer) {
+        return NextResponse.json({ success: false, error: 'Sign in to redeem loyalty points.' }, { status: 401 })
+      }
+      const balance = await getCustomerBalance(supabase, customer.id)
+      // Allow redeeming against the discounted-subtotal so points stack with
+      // a promo code but never let the order go below the VAT line.
+      const redeemableBase = Math.max(0, subtotal - promoDiscount)
+      const resolved = resolveRedemption({
+        pointsRequested,
+        balance,
+        subtotalAed: redeemableBase,
+      })
+      if (resolved.aed <= 0) {
+        return NextResponse.json({ success: false, error: resolved.reason || 'Could not redeem points.' }, { status: 400 })
+      }
+      pointsRedeemed = resolved.points
+      pointsValueAed = resolved.aed
+      redeemingCustomerId = customer.id
+    }
+
+    const total = round2(Math.max(0, totalBeforePoints - pointsValueAed))
     const orderNumber = `TM-${Date.now().toString(36).toUpperCase().slice(-6)}`
 
     const payload: Record<string, unknown> = {
@@ -207,6 +239,8 @@ export async function POST(request: Request) {
       promo_code: appliedPromoCode,
       promo_discount: promoDiscount,
       promo_discount_aed: promoDiscount,
+      points_redeemed: pointsRedeemed,
+      points_value_aed: pointsValueAed,
       total,
       total_aed: total,
       items: lineItems.map((i) => ({
@@ -226,6 +260,19 @@ export async function POST(request: Request) {
       .single()
     if (error || !inserted) throw error ?? new Error('Order insert returned no row')
     const orderId: number = inserted.id
+
+    // ── Record the loyalty-points debit ───────────────────────────────────
+    // Done AFTER the order insert so we never debit a customer for an
+    // order that never got created.
+    if (redeemingCustomerId && pointsRedeemed > 0) {
+      await recordRedemption(supabase, {
+        customerId: redeemingCustomerId,
+        orderId,
+        points: pointsRedeemed,
+        aed: pointsValueAed,
+        orderNumber,
+      })
+    }
 
     // ── Card payment: redirect to Stripe; fulfilment happens in the webhook ─
     if (isCardPayment) {
