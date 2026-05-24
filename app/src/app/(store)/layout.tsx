@@ -10,11 +10,13 @@ import FloatingWhatsApp from '@/components/FloatingWhatsApp'
 import PwaInstallPrompt from '@/components/PwaInstallPrompt'
 import ToastContainer from '@/components/ToastContainer'
 import CaptureReferral from '@/components/CaptureReferral'
+import CartSync from '@/components/CartSync'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <HtmlWrapper>
       <CaptureReferral />
+      <CartSync />
       <ServiceAreaBar />
       <LaunchBanner />
       <Navbar />
