@@ -56,7 +56,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <meta name="theme-color" content="#16a34a" />
-        <link rel="apple-touch-icon" href="/icons/icon.svg" />
+        {/* Next.js App Router auto-emits <link rel="icon"> and
+            <link rel="apple-touch-icon"> for src/app/icon.svg and
+            src/app/apple-icon.png, so no manual links are needed here. */}
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-inter`}>
         <Suspense fallback={null}>
