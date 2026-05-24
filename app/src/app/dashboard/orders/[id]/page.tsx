@@ -1,9 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-import { User, MapPin, ShoppingBag } from 'lucide-react'
+import { User, MapPin, ShoppingBag, Printer } from 'lucide-react'
 import OrderStatusUpdater from './OrderStatusUpdater'
 import RefundButton from './RefundButton'
 import OrderEditCard from './OrderEditCard'
+import OrderStatusTimeline from '@/components/OrderStatusTimeline'
 import { getDashboardSession } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
@@ -12,6 +13,16 @@ async function getOrder(id: string) {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
   const { data } = await supabase.from('orders').select('*').eq('id', parseInt(id)).single()
   return data
+}
+
+async function getStatusHistory(orderId: number) {
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+  const { data } = await supabase
+    .from('order_status_history')
+    .select('status, changed_at, actor_email, note')
+    .eq('order_id', orderId)
+    .order('changed_at', { ascending: true })
+  return data || []
 }
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -25,6 +36,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="text-gray-500">Order not found</div>
     </div>
   )
+
+  const statusHistory = await getStatusHistory(order.id)
 
   const phone = order.customer_phone || ''
   const waMsg = encodeURIComponent(
@@ -40,17 +53,44 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <span className="text-gray-700">/</span>
           <h1 className="text-white font-black truncate">{order.order_number}</h1>
         </div>
-        {phone && (
-          <a href={`https://wa.me/${phone.replace(/\D/g, '')}?text=${waMsg}`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-xl transition-colors shrink-0">
-            💬 <span className="hidden sm:inline">WhatsApp Customer</span><span className="sm:hidden">WhatsApp</span>
-          </a>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href={`/dashboard/orders/${order.id}/invoice`}
+            className="inline-flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm font-bold px-3 sm:px-4 py-2 rounded-xl border border-gray-700 transition-colors"
+            title="Open branded receipt for printing or PDF export"
+          >
+            <Printer size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">Print receipt</span>
+            <span className="sm:hidden">Print</span>
+          </Link>
+          {phone && (
+            <a href={`https://wa.me/${phone.replace(/\D/g, '')}?text=${waMsg}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-xl transition-colors">
+              <span className="hidden sm:inline">WhatsApp Customer</span><span className="sm:hidden">WhatsApp</span>
+            </a>
+          )}
+        </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
+
+        {/* Full status timeline with actor + note so admins can see who
+            changed what and when — same component the customer sees, with
+            the `full` variant turned on. */}
+        <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6">
+          <h2 className="text-[10px] font-black uppercase tracking-wider text-gray-500 mb-4">Status timeline</h2>
+          <div className="[&_p]:!text-gray-300 [&_p.font-bold]:!text-white [&_li_p:not(.font-bold)]:!text-gray-500">
+            <OrderStatusTimeline
+              history={statusHistory}
+              currentStatus={order.status || 'pending'}
+              deliveryDate={order.delivery_date}
+              deliverySlot={order.delivery_slot}
+              variant="full"
+            />
+          </div>
+        </section>
 
         {isAdmin && (
           <RefundButton

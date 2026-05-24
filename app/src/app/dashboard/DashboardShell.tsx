@@ -11,7 +11,7 @@ const navItems = [
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
   { href: '/dashboard/reviews', label: 'Reviews', icon: MessageSquare },
   { href: '/dashboard/stock-history', label: 'Stock', icon: Boxes },
-  { href: '/dashboard/audit-log', label: 'Audit', icon: FileText },
+  { href: '/dashboard/audit-log', label: 'Activity', icon: FileText },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/integrations', label: 'Integrations', icon: Plug },
 ]

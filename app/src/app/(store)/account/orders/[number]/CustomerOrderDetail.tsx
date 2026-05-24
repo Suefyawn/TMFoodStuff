@@ -36,7 +36,7 @@ interface OrderRow {
   created_at: string
 }
 
-const STATUS_STEPS = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered']
+// Status sequence now lives inside the shared OrderStatusTimeline component.
 
 function statusLabel(s: string, isAr: boolean): string {
   const en: Record<string, string> = {
@@ -65,7 +65,9 @@ function slotLabel(slot: string | null, isAr: boolean): string {
   return (isAr ? ar : en)[slot] ?? slot
 }
 
-export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
+import OrderStatusTimeline, { type StatusEvent } from '@/components/OrderStatusTimeline'
+
+export default function CustomerOrderDetail({ order, history = [] }: { order: OrderRow; history?: StatusEvent[] }) {
   const { lang } = useLang()
   const isAr = lang === 'ar'
   const router = useRouter()
@@ -82,7 +84,6 @@ export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
   const vat = Number(order.vat_aed ?? order.vat ?? 0)
   const deliveryFee = Number(order.delivery_fee_aed ?? order.delivery_fee ?? 0)
   const promoDiscount = Number(order.promo_discount_aed ?? order.promo_discount ?? 0)
-  const stepIndex = STATUS_STEPS.indexOf(order.status)
   const isCancelled = order.status === 'cancelled'
   const paidOnline = order.payment_method === 'card' && order.payment_status === 'paid'
 
@@ -157,25 +158,16 @@ export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
           </span>
         </div>
 
-        {/* Progress */}
-        {!isCancelled && (
-          <div className="mb-5">
-            <div className="flex items-center gap-1">
-              {STATUS_STEPS.map((step, i) => {
-                const done = i <= stepIndex
-                const active = i === stepIndex
-                return (
-                  <div key={step} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div className={`w-full h-2 rounded-full transition-colors ${done ? 'bg-green-500' : 'bg-gray-200'} ${active ? 'ring-2 ring-green-300 ring-offset-1' : ''}`} />
-                    <span className={`text-[10px] font-semibold text-center leading-tight ${done ? 'text-green-700' : 'text-gray-400'}`}>
-                      {statusLabel(step, isAr).split(' ')[0]}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
+        {/* Vertical timeline with real timestamps */}
+        <div className="mb-5">
+          <OrderStatusTimeline
+            history={history}
+            currentStatus={order.status}
+            deliveryDate={order.delivery_date}
+            deliverySlot={order.delivery_slot ? slotLabel(order.delivery_slot, isAr) : null}
+            locale={lang}
+          />
+        </div>
 
         {/* Delivery + payment summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

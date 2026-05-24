@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const { data: order, error } = await supabase
       .from('orders')
-      .select('order_number, status, created_at, delivery_slot, delivery_emirate, delivery_area, delivery_building, total, items, promo_code, promo_discount, customer_name, customer_email')
+      .select('id, order_number, status, created_at, delivery_slot, delivery_date, delivery_emirate, delivery_area, delivery_building, total, items, promo_code, promo_discount, customer_name, customer_email')
       .eq('order_number', order_number.trim().toUpperCase())
       .single()
 
@@ -37,11 +37,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email does not match this order.' }, { status: 403 })
     }
 
+    // Pull the per-status history so the timeline on /track can render real
+    // timestamps. Only `status` + `changed_at` are exposed publicly — actor
+    // emails stay internal.
+    const { data: historyRows } = await supabase
+      .from('order_status_history')
+      .select('status, changed_at')
+      .eq('order_id', order.id)
+      .order('changed_at', { ascending: true })
+
     return NextResponse.json({
       order_number: order.order_number,
       status: order.status,
       created_at: order.created_at,
       delivery_slot: order.delivery_slot,
+      delivery_date: order.delivery_date,
       delivery_emirate: order.delivery_emirate,
       delivery_area: order.delivery_area,
       delivery_building: order.delivery_building,
@@ -50,6 +60,7 @@ export async function POST(request: Request) {
       promo_code: order.promo_code,
       promo_discount: order.promo_discount,
       customer_name: order.customer_name,
+      history: historyRows || [],
     })
   } catch {
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })

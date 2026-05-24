@@ -95,6 +95,12 @@ function LoginInner() {
           >
             {loading ? (isAr ? 'جاري الدخول…' : 'Signing in…') : (isAr ? 'تسجيل الدخول' : 'Sign In')}
           </button>
+
+          <p className="text-center -mt-1">
+            <Link href="/account/forgot" className="text-xs text-gray-500 hover:text-green-700 hover:underline">
+              {isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?'}
+            </Link>
+          </p>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">

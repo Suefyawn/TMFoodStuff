@@ -20,8 +20,8 @@ export default function Footer() {
   ]
 
   const companyLinks = lang === 'ar'
-    ? [['من نحن', '/about'], ['سياسة التوصيل', '/delivery-policy'], ['سياسة الخصوصية', '/privacy'], ['الشروط والأحكام', '/terms'], ['اتصل بنا', '/contact']]
-    : [['About Us', '/about'], ['Delivery Policy', '/delivery-policy'], ['Privacy Policy', '/privacy'], ['Terms & Conditions', '/terms'], ['Contact Us', '/contact']]
+    ? [['من نحن', '/about'], ['الأسئلة الشائعة', '/faq'], ['سياسة التوصيل', '/delivery-policy'], ['سياسة الخصوصية', '/privacy'], ['الشروط والأحكام', '/terms'], ['اتصل بنا', '/contact']]
+    : [['About Us', '/about'], ['FAQ', '/faq'], ['Delivery Policy', '/delivery-policy'], ['Privacy Policy', '/privacy'], ['Terms & Conditions', '/terms'], ['Contact Us', '/contact']]
 
   return (
     <>
