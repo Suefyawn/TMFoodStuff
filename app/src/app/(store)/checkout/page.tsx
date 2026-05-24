@@ -13,6 +13,10 @@ interface ApiSlot {
   time_label_ar: string
   available?: boolean
   reason?: 'cutoff_passed' | 'day_off' | 'full'
+  // Capacity tracking for the "almost full" hint. booked = current
+  // non-cancelled orders for this slot+date; max is the configured cap.
+  booked?: number
+  max_orders_per_day?: number | null
 }
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
@@ -153,14 +157,26 @@ export default function CheckoutPage() {
   // custom slots admin creates.
   const SLOT_ICONS: Record<string, typeof Sunrise> = { morning: Sunrise, afternoon: Sun, evening: Moon }
 
-  const DELIVERY_SLOTS = serverSlots.map(s => ({
-    id: s.key,
-    label: lang === 'ar' ? s.label_ar : s.label_en,
-    time: lang === 'ar' ? s.time_label_ar : s.time_label_en,
-    Icon: SLOT_ICONS[s.key] || Clock,
-    available: s.available !== false,
-    reason: s.reason,
-  }))
+  const DELIVERY_SLOTS = serverSlots.map(s => {
+    // "Almost full" surfaces when the slot has a configured cap and ≥70%
+    // of the day's allotment is taken. Nudges urgency without lying.
+    let spotsLeft: number | null = null
+    if (s.max_orders_per_day != null && s.booked != null) {
+      const remaining = Math.max(0, s.max_orders_per_day - s.booked)
+      if (remaining > 0 && s.booked / s.max_orders_per_day >= 0.7) {
+        spotsLeft = remaining
+      }
+    }
+    return {
+      id: s.key,
+      label: lang === 'ar' ? s.label_ar : s.label_en,
+      time: lang === 'ar' ? s.time_label_ar : s.time_label_en,
+      Icon: SLOT_ICONS[s.key] || Clock,
+      available: s.available !== false,
+      reason: s.reason,
+      spotsLeft,
+    }
+  })
 
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
@@ -567,6 +583,11 @@ export default function CheckoutPage() {
                       />
                       <slot.Icon size={22} className={`mb-1.5 ${form.deliverySlot === slot.id ? 'text-green-600' : 'text-gray-400'}`} aria-hidden="true" />
                       <span className="font-bold text-gray-900 text-xs md:text-sm">{slot.label}</span>
+                      {slot.available && slot.spotsLeft != null && (
+                        <span className="absolute top-1 right-1 text-[9px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 rounded px-1 py-0.5" title={lang === 'ar' ? `${slot.spotsLeft} مكان متبقي` : `${slot.spotsLeft} spots left today`}>
+                          {lang === 'ar' ? `${slot.spotsLeft} متبقي` : `${slot.spotsLeft} left`}
+                        </span>
+                      )}
                       <span className="text-xs text-gray-500 mt-0.5 leading-tight">{slot.time}</span>
                       {!slot.available && slot.reason && (
                         <span className="absolute top-1 right-1 text-[9px] font-bold uppercase tracking-wider text-red-700 bg-red-50 border border-red-200 rounded px-1 py-0.5">
