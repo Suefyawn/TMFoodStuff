@@ -3,10 +3,10 @@ import { SITE_URL } from './site'
 import type { Locale } from './locale'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'orders@tmfoodstuff.ae'
+export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'orders@tmfoodstuff.ae'
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'orders@tmfoodstuff.ae'
 
-function getResend() {
+export function getResend() {
   if (!RESEND_API_KEY) return null
   return new Resend(RESEND_API_KEY)
 }

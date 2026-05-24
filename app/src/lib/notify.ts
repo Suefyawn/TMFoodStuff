@@ -168,3 +168,10 @@ export async function notifyAdminNewOrder(order: OrderSummary): Promise<void> {
   const body = adminAlertBody(order)
   await Promise.all([send('sms', ADMIN_PHONE, body), send('whatsapp', ADMIN_PHONE, body)])
 }
+
+// Ad-hoc message a customer over SMS + WhatsApp (whichever channel is
+// configured). Used by the dashboard "Message customer" composer; both
+// channels are silent no-ops when their env vars are missing.
+export async function sendSms(to: string, body: string): Promise<void> {
+  await Promise.all([send('sms', to, body), send('whatsapp', to, body)])
+}

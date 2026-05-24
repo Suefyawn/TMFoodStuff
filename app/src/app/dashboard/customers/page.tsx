@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, ChevronDown, ChevronUp } from 'lucide-react'
+import { Search, ChevronDown, ChevronUp, Send } from 'lucide-react'
+import MessageComposer from './MessageComposer'
 
 const statusColors: Record<string, string> = {
   pending: 'text-yellow-400',
@@ -18,6 +19,7 @@ export default function CustomersPage() {
   const [fetchError, setFetchError] = useState('')
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [messageTarget, setMessageTarget] = useState<{ email?: string; phone?: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/dashboard/customers')
@@ -52,6 +54,14 @@ export default function CustomersPage() {
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, email..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500" />
       </div>
 
+      {messageTarget && (
+        <MessageComposer
+          email={messageTarget.email}
+          phone={messageTarget.phone}
+          onClose={() => setMessageTarget(null)}
+        />
+      )}
+
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
         {filtered.length === 0 ? (
           <p className="p-8 text-center text-gray-600">No customers found</p>
@@ -73,6 +83,13 @@ export default function CustomersPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMessageTarget({ email: customer.email, phone: customer.phone }) }}
+                        title="Message this customer"
+                        className="p-2 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                      >
+                        <Send size={14} aria-hidden="true" />
+                      </button>
                       <div className="text-right">
                         <p className="text-green-400 font-bold text-sm">AED {customer.totalSpent.toFixed(2)}</p>
                         <p className="text-gray-600 text-xs">{customer.totalOrders} orders</p>

@@ -17,6 +17,7 @@ interface OrderEditCardProps {
     delivery_slot: string | null
     delivery_date: string | null
     delivery_notes: string | null
+    admin_notes: string | null
   }
 }
 
@@ -36,6 +37,7 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
     delivery_slot: initial.delivery_slot || '',
     delivery_date: initial.delivery_date || '',
     delivery_notes: initial.delivery_notes || '',
+    admin_notes: initial.admin_notes || '',
   })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -114,12 +116,22 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
         />
         <Field label="Delivery date" value={form.delivery_date} onChange={v => setForm(f => ({ ...f, delivery_date: v }))} type="date" />
         <div className="sm:col-span-2">
-          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Delivery notes</label>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Delivery notes (customer)</label>
           <textarea
             value={form.delivery_notes}
             onChange={e => setForm(f => ({ ...f, delivery_notes: e.target.value }))}
             rows={2}
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Internal admin notes (never shown to customer)</label>
+          <textarea
+            value={form.admin_notes}
+            onChange={e => setForm(f => ({ ...f, admin_notes: e.target.value }))}
+            rows={3}
+            placeholder="e.g. called to reschedule, duplicate of #TM-XYZ, leave at reception"
+            className="w-full bg-gray-800 border border-amber-700/30 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-amber-500"
           />
         </div>
       </div>
