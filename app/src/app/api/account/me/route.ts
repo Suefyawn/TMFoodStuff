@@ -11,10 +11,10 @@ export async function GET() {
   const customer = await getCurrentCustomer()
   if (!customer) return NextResponse.json({ signedIn: false })
   const supabase = getServiceRoleClient()
-  const [{ data: profile }, { data: addresses }, pointsBalance] = await Promise.all([
+  const [{ data: profile }, { data: addresses }, pointsBalance, { count: referralCount }] = await Promise.all([
     supabase
       .from('customers')
-      .select('full_name, phone, email')
+      .select('full_name, phone, email, referral_code')
       .eq('id', customer.id)
       .maybeSingle(),
     supabase
@@ -24,6 +24,11 @@ export async function GET() {
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: false }),
     getCustomerBalance(supabase, customer.id),
+    supabase
+      .from('customer_referrals')
+      .select('id', { count: 'exact', head: true })
+      .eq('referrer_id', customer.id)
+      .eq('status', 'rewarded'),
   ])
   return NextResponse.json({
     signedIn: true,
@@ -32,6 +37,8 @@ export async function GET() {
     phone: profile?.phone || '',
     addresses: addresses || [],
     pointsBalance,
+    referralCode: profile?.referral_code || null,
+    referralCount: referralCount || 0,
   })
 }
 

@@ -8,6 +8,7 @@ import { getStripe } from '@/lib/stripe'
 import { SITE_URL } from '@/lib/site'
 import { isValidEmail, isValidUAEPhone, normaliseUAEPhone } from '@/lib/validators'
 import { resolveRedemption } from '@/lib/points'
+import { recordReferralOnFirstOrder, REFERRAL_COOKIE } from '@/lib/referrals'
 import { getCurrentCustomer } from '@/lib/customer'
 import { getCustomerBalance, recordRedemption } from '@/lib/loyalty'
 
@@ -305,6 +306,38 @@ export async function POST(request: Request) {
         aed: pointsValueAed,
         orderNumber,
       })
+    }
+
+    // ── Referral attribution ──────────────────────────────────────────────
+    // If a ?ref=CODE cookie is set AND this is the customer's first order,
+    // record a pending referral. The reward fires on `delivered`.
+    if (redeemingCustomerId == null) {
+      // Resolve customer id even for non-redemption flows so we can attribute.
+      const currentCustomer = await getCurrentCustomer()
+      if (currentCustomer) {
+        const referralCode = request.headers.get('cookie')?.split(';')
+          .map(s => s.trim())
+          .find(s => s.startsWith(`${REFERRAL_COOKIE}=`))?.split('=')[1]
+        if (referralCode) {
+          await recordReferralOnFirstOrder(supabase, {
+            referralCode: decodeURIComponent(referralCode),
+            referredCustomerId: currentCustomer.id,
+            orderId,
+          })
+        }
+      }
+    } else {
+      // Already resolved the customer for redemption — reuse the id.
+      const referralCode = request.headers.get('cookie')?.split(';')
+        .map(s => s.trim())
+        .find(s => s.startsWith(`${REFERRAL_COOKIE}=`))?.split('=')[1]
+      if (referralCode) {
+        await recordReferralOnFirstOrder(supabase, {
+          referralCode: decodeURIComponent(referralCode),
+          referredCustomerId: redeemingCustomerId,
+          orderId,
+        })
+      }
     }
 
     // ── Card payment: redirect to Stripe; fulfilment happens in the webhook ─

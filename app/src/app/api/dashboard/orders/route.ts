@@ -5,6 +5,7 @@ import { sendOutForDeliveryEmail, sendDeliveredEmail, sendOrderStatusUpdateEmail
 import { notifyOutForDelivery, notifyDelivered } from '@/lib/notify'
 import { toLocale } from '@/lib/locale'
 import { earnPointsForOrder, findCustomerByEmail } from '@/lib/loyalty'
+import { rewardReferralOnDelivery } from '@/lib/referrals'
 import { logAdminAction } from '@/lib/audit'
 
 const VALID_STATUSES = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
@@ -109,6 +110,10 @@ export async function PATCH(request: Request) {
           })
         }
       }
+      // Referral reward (separate from the per-order earn): credits 50 pts
+      // to both referrer and referred when the referred's first order is
+      // delivered. Idempotent — described in lib/referrals.
+      await rewardReferralOnDelivery(supabase, { orderId: order.id })
     }
   }
 

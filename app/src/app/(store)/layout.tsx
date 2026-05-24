@@ -9,10 +9,12 @@ import MobileNav from '@/components/MobileNav'
 import FloatingWhatsApp from '@/components/FloatingWhatsApp'
 import PwaInstallPrompt from '@/components/PwaInstallPrompt'
 import ToastContainer from '@/components/ToastContainer'
+import CaptureReferral from '@/components/CaptureReferral'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <HtmlWrapper>
+      <CaptureReferral />
       <ServiceAreaBar />
       <LaunchBanner />
       <Navbar />
