@@ -8,6 +8,7 @@ import ProductCard from '@/components/ProductCard'
 import { formatAED, calculateVAT } from '@/lib/utils'
 import StickyProductCTA from '@/components/StickyProductCTA'
 import { ProductNameDisplay } from '@/components/ProductNameDisplay'
+import { ProductDescription } from '@/components/ProductDescription'
 import ProductImageGallery from '@/components/ProductImageGallery'
 import StockNotifyForm from '@/components/StockNotifyForm'
 import { SITE_URL } from '@/lib/site'
@@ -154,7 +155,11 @@ export default async function ProductPage({ params }: Props) {
 
           <ProductNameDisplay name={product.name} nameAr={product.nameAr} />
 
-          <p className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base">{product.description}</p>
+          <ProductDescription
+            description={product.description}
+            descriptionAr={product.descriptionAr}
+            className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base"
+          />
 
           <div className="bg-gray-50 rounded-2xl p-4 md:p-5 mb-5 md:mb-6">
             <div className="flex items-baseline gap-3 mb-2 flex-wrap">

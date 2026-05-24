@@ -17,6 +17,7 @@ export interface Product {
   slug: string
   categorySlug: string
   description: string
+  descriptionAr: string
   priceAED: number
   compareAtPrice?: number
   unit: string
@@ -48,6 +49,7 @@ function mapProduct(row: any): Product {
     slug: row.slug,
     categorySlug: row.categories?.slug || row.category_slug || '',
     description: row.description || '',
+    descriptionAr: row.description_ar || '',
     priceAED: Number(row.price_aed),
     compareAtPrice: row.compare_at_price_aed ? Number(row.compare_at_price_aed) : undefined,
     unit: row.unit || 'kg',
@@ -69,6 +71,7 @@ function fromStaticData(p: any): Product {
   return {
     ...p,
     nameAr: p.nameAr || '',
+    descriptionAr: p.descriptionAr || '',
     imageUrls: Array.isArray(p.imageUrls) ? p.imageUrls : p.imageUrl ? [p.imageUrl] : [],
     isActive: p.isActive ?? true,
   }
