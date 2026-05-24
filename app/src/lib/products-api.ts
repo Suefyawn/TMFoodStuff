@@ -38,6 +38,9 @@ export interface Category {
   slug: string
   emoji: string
   description: string
+  parentId: number | null
+  parentSlug: string | null
+  displayOrder: number
 }
 
 // Transform Supabase snake_case row to camelCase Product
@@ -85,6 +88,9 @@ function mapCategory(row: any): Category {
     slug: row.slug,
     emoji: row.emoji || '',
     description: row.description || '',
+    parentId: row.parent_id ?? null,
+    parentSlug: row.parent?.slug ?? null,
+    displayOrder: row.display_order ?? 0,
   }
 }
 
@@ -165,12 +171,15 @@ export async function getProductsByCategory(categorySlug: string): Promise<Produ
   return (data || []).map(mapProduct)
 }
 
-// Fetch all categories
+// Fetch all categories (including the parent slug so the shop UI can build a
+// two-level nav without an extra round trip).
 export async function getCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from('categories')
-    .select('*')
-    .order('id')
+    .select('*, parent:parent_id(slug)')
+    .eq('is_active', true)
+    .order('parent_id', { nullsFirst: true })
+    .order('display_order')
 
   if (error) {
     console.error('Failed to fetch categories:', error.message)

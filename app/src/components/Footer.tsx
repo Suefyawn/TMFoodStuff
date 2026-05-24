@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { MessageCircle, CreditCard, Phone, MapPin, Leaf, Apple, Sprout, Sparkles, Gift, Truck, Mail, Smartphone } from 'lucide-react'
+import { MessageCircle, CreditCard, Phone, MapPin, Leaf, Apple, Sprout, Gift, Truck, Mail, Smartphone } from 'lucide-react'
 import { NewsletterForm } from './NewsletterForm'
 import { useLang } from '@/lib/use-lang'
 
@@ -15,8 +15,7 @@ export default function Footer() {
     { icon: <Apple size={14} />, label: lang === 'ar' ? 'فواكه' : 'Fruits', href: '/shop?category=fruits' },
     { icon: <Leaf size={14} />, label: lang === 'ar' ? 'خضروات' : 'Vegetables', href: '/shop?category=vegetables' },
     { icon: <Sprout size={14} />, label: lang === 'ar' ? 'عضوي' : 'Organic', href: '/shop?category=organic' },
-    { icon: <Sparkles size={14} />, label: lang === 'ar' ? 'فواكه غريبة' : 'Exotic Fruits', href: '/shop?category=exotic' },
-    { icon: <Gift size={14} />, label: lang === 'ar' ? 'سلال هدايا' : 'Gift Baskets', href: '/shop?category=gifts' },
+    { icon: <Gift size={14} />, label: lang === 'ar' ? 'صناديق وعروض' : 'Boxes & Bundles', href: '/shop?category=gifts' },
     { icon: <Truck size={14} />, label: lang === 'ar' ? 'جميع المنتجات' : 'All Products', href: '/shop' },
   ]
 
@@ -26,16 +25,6 @@ export default function Footer() {
 
   return (
     <>
-      {/* WhatsApp floating button — above bottom nav on mobile */}
-      <a
-        href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-        title={tr.whatsappUs}
-      >
-        <MessageCircle size={26} fill="currentColor" />
-      </a>
 
       <footer className="bg-gray-950 text-gray-400 mt-20">
         {/* Newsletter strip */}
