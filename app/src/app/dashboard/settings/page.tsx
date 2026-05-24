@@ -1,6 +1,17 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Save, Plus, Trash2, X, Store, Truck, Clock, Ticket, CheckCircle2 } from 'lucide-react'
+import { Save, Plus, Trash2, X, Store, Truck, Clock, Ticket, CheckCircle2, Receipt } from 'lucide-react'
+
+// Settings sections become tabs so admins aren't scrolling through a
+// 200-line single page. Tab state is local-only — switching tabs doesn't
+// touch the data, only what's visible.
+type Tab = 'store' | 'delivery' | 'invoice' | 'promos'
+const TABS: Array<{ key: Tab; label: string; icon: typeof Store }> = [
+  { key: 'store', label: 'Store', icon: Store },
+  { key: 'delivery', label: 'Delivery & pricing', icon: Truck },
+  { key: 'invoice', label: 'Tax invoice', icon: Receipt },
+  { key: 'promos', label: 'Promo codes', icon: Ticket },
+]
 
 interface PromoCode {
   id?: number
@@ -17,6 +28,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [newPromo, setNewPromo] = useState({ code: '', discount_percent: 10, expires_at: '' })
+  const [tab, setTab] = useState<Tab>('store')
 
   useEffect(() => {
     fetch('/api/dashboard/settings').then(r => r.json()).then(data => {
@@ -63,7 +75,29 @@ export default function SettingsPage() {
         </button>
       </div>
 
+      {/* Tab bar */}
+      <div className="border-b border-gray-800 flex gap-1 overflow-x-auto">
+        {TABS.map(t => {
+          const active = tab === t.key
+          return (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2.5 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${
+                active
+                  ? 'border-green-500 text-white'
+                  : 'border-transparent text-gray-500 hover:text-white'
+              }`}
+            >
+              <t.icon size={14} aria-hidden="true" /> {t.label}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Store Info */}
+      {tab === 'store' && (
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
         <h3 className="text-white font-black inline-flex items-center gap-2"><Store size={16} className="text-gray-400" aria-hidden="true" /> Store Info</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -71,8 +105,10 @@ export default function SettingsPage() {
           <SettingInput label="WhatsApp Number" value={settings.whatsapp_number || ''} onChange={v => setSettings({...settings, whatsapp_number: v})} />
         </div>
       </div>
+      )}
 
       {/* Delivery & Pricing */}
+      {tab === 'delivery' && (<>
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
         <h3 className="text-white font-black inline-flex items-center gap-2"><Truck size={16} className="text-gray-400" aria-hidden="true" /> Delivery & Pricing</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -88,9 +124,13 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Delivery Slots */}
+      {/* Legacy delivery slot block — superseded by /dashboard/delivery-slots
+          but kept until existing field-based config is migrated. */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black inline-flex items-center gap-2"><Clock size={16} className="text-gray-400" aria-hidden="true" /> Delivery Slots</h3>
+        <h3 className="text-white font-black inline-flex items-center gap-2"><Clock size={16} className="text-gray-400" aria-hidden="true" /> Legacy slot config</h3>
+        <p className="text-xs text-amber-300/80 bg-amber-900/15 border border-amber-700/30 rounded px-3 py-2">
+          Newer slot management lives at <a href="/dashboard/delivery-slots" className="underline">Slots</a> — these fields are kept for older code paths.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Slot names (comma-separated)</label>
@@ -105,10 +145,12 @@ export default function SettingsPage() {
         </div>
         <p className="text-xs text-gray-500">When a slot reaches capacity the storefront rejects new orders on that slot+date with "fully booked". Cancelled orders don't count.</p>
       </div>
+      </>)}
 
       {/* Tax invoice settings */}
+      {tab === 'invoice' && (
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black inline-flex items-center gap-2"><Ticket size={16} className="text-gray-400" aria-hidden="true" /> Tax Invoice</h3>
+        <h3 className="text-white font-black inline-flex items-center gap-2"><Receipt size={16} className="text-gray-400" aria-hidden="true" /> Tax Invoice</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SettingInput label="VAT TRN" value={settings.vat_trn || ''} onChange={v => setSettings({...settings, vat_trn: v})} />
           <SettingInput label="Company name" value={settings.company_name || ''} onChange={v => setSettings({...settings, company_name: v})} />
@@ -132,8 +174,10 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Promo Codes */}
+      {tab === 'promos' && (
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
         <h3 className="text-white font-black inline-flex items-center gap-2"><Ticket size={16} className="text-gray-400" aria-hidden="true" /> Promo Codes</h3>
 
@@ -186,6 +230,7 @@ export default function SettingsPage() {
           </button>
         </div>
       </div>
+      )}
     </div>
   )
 }

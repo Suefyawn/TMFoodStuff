@@ -2,6 +2,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Plus, Trash2, X, Download, Upload } from 'lucide-react'
+import { useConfirm } from '@/components/ConfirmDialog'
 import ImageUploader from '@/components/ImageUploader'
 
 interface Product {
@@ -60,6 +61,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [showAdd, setShowAdd] = useState(false)
   const [newProduct, setNewProduct] = useState(emptyProduct)
   const [saving, setSaving] = useState(false)
+  const confirm = useConfirm()
   const [apiError, setApiError] = useState('')
   const [saveSuccess, setSaveSuccess] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'category'>('name')
@@ -154,7 +156,13 @@ export default function ProductsManager({ initialProducts, categories }: { initi
 
   async function deleteSelected() {
     if (selected.size === 0) return
-    if (!confirm(`Delete ${selected.size} product(s)? This cannot be undone.`)) return
+    const ok = await confirm({
+      title: `Delete ${selected.size} product${selected.size === 1 ? '' : 's'}?`,
+      message: 'This is permanent. Existing orders that reference them will keep their captured product names and prices, but the catalog rows are gone.',
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!ok) return
     setSaving(true)
     setApiError('')
     try {
@@ -185,19 +193,30 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     } catch { /* silent — user can retry */ }
   }
 
-  async function bulkAction(action: 'activate' | 'deactivate') {
+  async function bulkAction(action: 'activate' | 'deactivate' | 'feature' | 'unfeature') {
     if (selected.size === 0) return
     setSaving(true)
     setApiError('')
+    // Map the bulk action to the column + value we'll patch on each row.
+    const isActivate = action === 'activate'
+    const isDeactivate = action === 'deactivate'
+    const isFeature = action === 'feature'
+    const patch: Record<string, boolean> = isActivate || isDeactivate
+      ? { is_active: isActivate }
+      : { is_featured: isFeature }
     try {
       await Promise.all(Array.from(selected).map(id =>
         fetch('/api/dashboard/products', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: String(id), is_active: action === 'activate' }),
+          body: JSON.stringify({ id: String(id), ...patch }),
         })
       ))
-      setProducts(prev => prev.map(p => selected.has(p.id) ? { ...p, is_active: action === 'activate' } : p))
+      setProducts(prev => prev.map(p => {
+        if (!selected.has(p.id)) return p
+        if (isActivate || isDeactivate) return { ...p, is_active: isActivate }
+        return { ...p, is_featured: isFeature }
+      }))
       setSelected(new Set())
     } catch {
       setApiError('Network error — some items may not have updated')
@@ -351,10 +370,12 @@ export default function ProductsManager({ initialProducts, categories }: { initi
           <option value="inactive">Inactive</option>
         </select>
         {selected.size > 0 && (
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-2 ml-auto flex-wrap">
             <span className="text-sm text-gray-400">{selected.size} selected</span>
             <button onClick={() => bulkAction('activate')} className="px-3 py-1.5 bg-green-600/20 text-green-400 text-xs font-bold rounded-lg hover:bg-green-600/30">Activate</button>
             <button onClick={() => bulkAction('deactivate')} className="px-3 py-1.5 bg-yellow-600/20 text-yellow-400 text-xs font-bold rounded-lg hover:bg-yellow-600/30">Deactivate</button>
+            <button onClick={() => bulkAction('feature')} className="px-3 py-1.5 bg-amber-600/20 text-amber-300 text-xs font-bold rounded-lg hover:bg-amber-600/30">Feature</button>
+            <button onClick={() => bulkAction('unfeature')} className="px-3 py-1.5 bg-gray-700 text-gray-300 text-xs font-bold rounded-lg hover:bg-gray-600">Unfeature</button>
             <button onClick={deleteSelected} className="px-3 py-1.5 bg-red-600/20 text-red-400 text-xs font-bold rounded-lg hover:bg-red-600/30 flex items-center gap-1"><Trash2 size={12} /> Delete</button>
           </div>
         )}
