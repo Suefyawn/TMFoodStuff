@@ -532,6 +532,19 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Unit" value={editData.unit || ''} onChange={v => setEditData({...editData, unit: v})} />
               <Input label="Stock" value={String(editData.stock || 0)} onChange={v => setEditData({...editData, stock: Number(v)})} type="number" />
               <Input label="Low-stock alert at" value={String(editData.low_stock_threshold ?? 5)} onChange={v => setEditData({...editData, low_stock_threshold: Number(v)})} type="number" />
+              {/* Stock history deep-link — opens the global log filtered
+                  to this product's slug. Lets ops trace any specific SKU
+                  without scrolling the catalog-wide audit. */}
+              <div className="flex items-end">
+                <a
+                  href={`/dashboard/stock-history?product=${encodeURIComponent(editData.slug || '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-green-400 hover:text-green-300 underline pb-3"
+                >
+                  View stock history →
+                </a>
+              </div>
               <Input label="Origin" value={editData.origin || ''} onChange={v => setEditData({...editData, origin: v})} />
               <Input label="Emoji" value={editData.emoji || ''} onChange={v => setEditData({...editData, emoji: v})} />
               <div className="col-span-1 sm:col-span-2">
