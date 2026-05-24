@@ -1,7 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#16a34a"/>
-  <path d="M130 380 C110 250 180 130 360 110 Q400 105 400 145 C400 320 280 410 145 410 Q125 405 130 380 Z" fill="#ffffff"/>
-  <path d="M140 400 L390 130" stroke="#16a34a" stroke-width="22" stroke-linecap="round" fill="none"/>
-  <path d="M190 365 Q260 320 320 270" stroke="#16a34a" stroke-width="11" stroke-linecap="round" fill="none"/>
-  <path d="M240 395 Q310 340 370 270" stroke="#16a34a" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <!-- Green leaf silhouette, transparent background. The browser tab
+       paints whatever the OS tab background is, so the leaf reads
+       correctly on both light and dark chrome themes. -->
+  <path d="M130 380 C110 250 180 130 360 110 Q400 105 400 145 C400 320 280 410 145 410 Q125 405 130 380 Z" fill="#16a34a"/>
+  <!-- Veins in a slightly darker green for definition at large sizes;
+       they fade out at tab/favicon size and the silhouette dominates. -->
+  <path d="M140 400 L390 130" stroke="#15803d" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <path d="M190 365 Q260 320 320 270" stroke="#15803d" stroke-width="11" stroke-linecap="round" fill="none"/>
+  <path d="M240 395 Q310 340 370 270" stroke="#15803d" stroke-width="11" stroke-linecap="round" fill="none"/>
 </svg>
