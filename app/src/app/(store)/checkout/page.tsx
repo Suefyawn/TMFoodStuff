@@ -2,12 +2,23 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CheckCircle, ShoppingBag, Package, MessageCircle } from 'lucide-react'
+import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User, Sparkles } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
 import { isValidEmail, isValidUAEPhone } from '@/lib/validators'
+import { MIN_REDEEM_POINTS, POINTS_PER_AED_REDEEM, resolveRedemption } from '@/lib/points'
 import posthog from 'posthog-js'
+
+interface SavedAddress {
+  id: number
+  label: string | null
+  building: string | null
+  area: string | null
+  emirate: string | null
+  makani: string | null
+  is_default: boolean
+}
 
 const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors"
 
@@ -39,6 +50,11 @@ export default function CheckoutPage() {
   })
 
   const { lang, tr } = useLang()
+  const [signedIn, setSignedIn] = useState(false)
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
+  const [activeAddressId, setActiveAddressId] = useState<number | null>(null)
+  const [pointsBalance, setPointsBalance] = useState(0)
+  const [pointsToRedeem, setPointsToRedeem] = useState(0)
 
   useEffect(() => {
     if (items.length > 0) {
@@ -49,6 +65,46 @@ export default function CheckoutPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Prefill from the signed-in customer's profile + saved addresses. Silent
+  // 401 for guests; first-time signed-in users with no addresses still see
+  // an empty form.
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/account/me')
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled || !data?.signedIn) return
+        setSignedIn(true)
+        setSavedAddresses(data.addresses || [])
+        setPointsBalance(Number(data.pointsBalance || 0))
+        const defaultAddr = (data.addresses || []).find((a: SavedAddress) => a.is_default) || (data.addresses || [])[0]
+        setForm(prev => ({
+          ...prev,
+          fullName: prev.fullName || data.fullName || '',
+          phone:    prev.phone    || data.phone    || '',
+          email:    prev.email    || data.email    || '',
+          emirate:  prev.emirate  || (defaultAddr?.emirate  || ''),
+          area:     prev.area     || (defaultAddr?.area     || ''),
+          building: prev.building || (defaultAddr?.building || ''),
+          makani:   prev.makani   || (defaultAddr?.makani   || ''),
+        }))
+        if (defaultAddr) setActiveAddressId(defaultAddr.id)
+      })
+      .catch(() => { /* not signed in or offline — leave form empty */ })
+    return () => { cancelled = true }
+  }, [])
+
+  function applyAddress(a: SavedAddress) {
+    setActiveAddressId(a.id)
+    setForm(prev => ({
+      ...prev,
+      emirate:  a.emirate  || '',
+      area:     a.area     || '',
+      building: a.building || '',
+      makani:   a.makani   || '',
+    }))
+  }
 
   const EMIRATES = lang === 'ar'
     ? ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
@@ -66,14 +122,22 @@ export default function CheckoutPage() {
   })
 
   const DELIVERY_SLOTS = [
-    { id: 'morning', label: lang === 'ar' ? 'صباحاً' : 'Morning', time: lang === 'ar' ? '٨ص - ١٢م' : '8:00 AM – 12:00 PM', icon: '🌅' },
-    { id: 'afternoon', label: lang === 'ar' ? 'ظهراً' : 'Afternoon', time: lang === 'ar' ? '١٢م - ٥م' : '12:00 PM – 5:00 PM', icon: '☀️' },
-    { id: 'evening', label: lang === 'ar' ? 'مساءً' : 'Evening', time: lang === 'ar' ? '٥م - ١٠م' : '5:00 PM – 10:00 PM', icon: '🌙' },
+    { id: 'morning',   label: lang === 'ar' ? 'صباحاً' : 'Morning',   time: lang === 'ar' ? '٨ص - ١٢م' : '8:00 AM – 12:00 PM', Icon: Sunrise },
+    { id: 'afternoon', label: lang === 'ar' ? 'ظهراً' : 'Afternoon', time: lang === 'ar' ? '١٢م - ٥م'  : '12:00 PM – 5:00 PM',  Icon: Sun },
+    { id: 'evening',   label: lang === 'ar' ? 'مساءً' : 'Evening',   time: lang === 'ar' ? '٥م - ١٠م' : '5:00 PM – 10:00 PM',  Icon: Moon },
   ]
 
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
-  const finalTotal = total - promoDiscount
+  const totalBeforePoints = total - promoDiscount
+  // Mirror the server's resolveRedemption so the displayed discount matches
+  // what /api/orders will actually apply.
+  const pointsResolved = pointsToRedeem > 0
+    ? resolveRedemption({ pointsRequested: pointsToRedeem, balance: pointsBalance, subtotalAed: Math.max(0, sub - promoDiscount) })
+    : { points: 0, aed: 0 }
+  const pointsValueAed = pointsResolved.aed
+  const finalTotal = Math.max(0, totalBeforePoints - pointsValueAed)
+  const pointsCapAed = Math.floor(Math.min(pointsBalance, Math.max(0, sub - promoDiscount) * POINTS_PER_AED_REDEEM) / POINTS_PER_AED_REDEEM)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -144,6 +208,7 @@ export default function CheckoutPage() {
           paymentMethod,
           promoCode: promoApplied ? promoCode : '',
           promoDiscount,
+          pointsToRedeem: pointsResolved.points,
           deliverySlot: form.deliverySlot,
           deliveryDate: form.deliveryDate,
           locale: lang,
@@ -255,6 +320,52 @@ export default function CheckoutPage() {
       <form onSubmit={handleSubmit}>
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2 space-y-5 md:space-y-6">
+            {/* Saved addresses (signed-in customers) */}
+            {signedIn && savedAddresses.length > 0 && (
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <h2 className="font-black text-gray-900 text-base md:text-lg inline-flex items-center gap-2">
+                    <MapPin size={16} className="text-green-600" aria-hidden="true" />
+                    {lang === 'ar' ? 'العنوان المحفوظ' : 'Saved address'}
+                  </h2>
+                  <Link href="/account/addresses" className="text-xs font-bold text-green-700 hover:underline">
+                    {lang === 'ar' ? 'إدارة' : 'Manage'} →
+                  </Link>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {savedAddresses.map(a => {
+                    const active = activeAddressId === a.id
+                    return (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => applyAddress(a)}
+                        className={`flex-shrink-0 text-left rounded-xl border-2 px-4 py-2.5 text-xs transition-colors min-w-[160px] ${
+                          active ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'
+                        }`}
+                      >
+                        <div className="font-bold text-gray-900 truncate">
+                          {a.label || (lang === 'ar' ? 'العنوان' : 'Address')}
+                        </div>
+                        <div className="text-gray-500 truncate">{a.area}, {a.emirate}</div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+            {!signedIn && (
+              <div className="bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
+                <span className="inline-flex items-center gap-2 text-gray-700">
+                  <User size={14} className="text-green-700" aria-hidden="true" />
+                  {lang === 'ar' ? 'لديك حساب؟ سجّل الدخول لتعبئة بياناتك تلقائياً.' : 'Have an account? Sign in to auto-fill your details.'}
+                </span>
+                <Link href="/account/login?next=/checkout" className="font-bold text-green-700 hover:underline">
+                  {lang === 'ar' ? 'تسجيل الدخول' : 'Sign in'} →
+                </Link>
+              </div>
+            )}
+
             {/* Delivery Details */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
               <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5 md:mb-6">{tr.deliveryDetails}</h2>
@@ -382,7 +493,7 @@ export default function CheckoutPage() {
                       onChange={() => setForm(f => ({ ...f, deliveryDate: iso }))} className="sr-only" />
                     <span className="font-bold text-gray-900 text-xs md:text-sm">{label}</span>
                     <span className="text-xs text-gray-400 mt-0.5">{new Date(iso + 'T00:00:00').toLocaleDateString(lang === 'ar' ? 'ar-AE' : 'en-AE', { day: 'numeric', month: 'short' })}</span>
-                    {form.deliveryDate === iso && <span className="text-green-600 font-black text-xs mt-1">✓</span>}
+                    {form.deliveryDate === iso && <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />}
                   </label>
                 ))}
               </div>
@@ -407,17 +518,18 @@ export default function CheckoutPage() {
                       onChange={e => setForm(f => ({ ...f, deliverySlot: e.target.value }))}
                       className="sr-only"
                     />
-                    <span className="text-xl md:text-2xl mb-1">{slot.icon}</span>
+                    <slot.Icon size={22} className={`mb-1.5 ${form.deliverySlot === slot.id ? 'text-green-600' : 'text-gray-400'}`} aria-hidden="true" />
                     <span className="font-bold text-gray-900 text-xs md:text-sm">{slot.label}</span>
                     <span className="text-xs text-gray-500 mt-0.5 leading-tight">{slot.time}</span>
                     {form.deliverySlot === slot.id && (
-                      <span className="text-green-600 font-black text-xs mt-1">✓</span>
+                      <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />
                     )}
                   </label>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-3 text-center">
-                🚚 {lang === 'ar' ? 'توصيل مجاني · التوصيل في نفس اليوم متاح' : 'Free delivery · Same day delivery available'}
+              <p className="text-xs text-gray-400 mt-3 text-center inline-flex items-center justify-center gap-1.5 w-full">
+                <Truck size={12} aria-hidden="true" />
+                {lang === 'ar' ? 'توصيل مجاني · التوصيل في نفس اليوم متاح' : 'Free delivery · Same day delivery available'}
               </p>
             </div>
 
@@ -429,23 +541,27 @@ export default function CheckoutPage() {
                   paymentMethod === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
-                  <span className="text-2xl">💵</span>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'cod' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <Wallet size={20} aria-hidden="true" />
+                  </div>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.cashOnDelivery}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{tr.cashOnDeliverySub}</div>
                   </div>
-                  {paymentMethod === 'cod' && <span className="text-green-600 font-black text-lg">✓</span>}
+                  {paymentMethod === 'cod' && <CheckCircle size={20} className="text-green-600" aria-hidden="true" />}
                 </label>
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
                   paymentMethod === 'card' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="sr-only" />
-                  <span className="text-2xl">💳</span>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'card' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <CreditCard size={20} aria-hidden="true" />
+                  </div>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.payOnline}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{lang === 'ar' ? 'بطاقة فيزا أو ماستركارد · دفع آمن' : 'Visa or Mastercard · Secure checkout'}</div>
                   </div>
-                  {paymentMethod === 'card' && <span className="text-green-600 font-black text-lg">✓</span>}
+                  {paymentMethod === 'card' && <CheckCircle size={20} className="text-green-600" aria-hidden="true" />}
                 </label>
               </div>
             </div>
@@ -496,8 +612,9 @@ export default function CheckoutPage() {
                     }
                   </span>
                 </div>
-                <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-1.5">
-                  🎉 <span>{lang === 'ar' ? 'توصيل مجاني — عرض الإطلاق!' : 'Free delivery — Grand Launch Offer!'}</span>
+                <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-2">
+                  <Truck size={14} className="text-green-700 shrink-0" aria-hidden="true" />
+                  <span>{lang === 'ar' ? 'توصيل مجاني — عرض الإطلاق!' : 'Free delivery — Grand Launch Offer!'}</span>
                 </div>
 
                 {/* Promo Code */}
@@ -538,6 +655,59 @@ export default function CheckoutPage() {
                     <span>-{formatAED(promoDiscount)}</span>
                   </div>
                 )}
+
+                {/* Loyalty points redemption (signed-in customers with at least
+                    the minimum balance) */}
+                {signedIn && pointsBalance >= MIN_REDEEM_POINTS && (
+                  <div className="border-t pt-4 mt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide inline-flex items-center gap-1.5">
+                        <Sparkles size={12} className="text-emerald-600" aria-hidden="true" />
+                        {lang === 'ar' ? 'استبدال نقاط' : 'Redeem points'}
+                      </label>
+                      <span className="text-xs font-bold text-gray-500">
+                        {lang === 'ar' ? 'الرصيد:' : 'Balance:'} {pointsBalance.toLocaleString()} pts
+                      </span>
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        max={pointsBalance}
+                        step={MIN_REDEEM_POINTS}
+                        value={pointsToRedeem || ''}
+                        onChange={e => setPointsToRedeem(Math.max(0, Math.min(pointsBalance, Number(e.target.value) || 0)))}
+                        placeholder={String(MIN_REDEEM_POINTS)}
+                        aria-label={lang === 'ar' ? 'نقاط للاستبدال' : 'Points to redeem'}
+                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-base md:text-sm focus:outline-none focus:border-emerald-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPointsToRedeem(Math.min(pointsBalance, pointsCapAed * POINTS_PER_AED_REDEEM))}
+                        className="text-xs font-bold text-emerald-700 hover:underline whitespace-nowrap"
+                      >
+                        {lang === 'ar' ? 'استخدم الكل' : 'Use max'}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-1.5">
+                      {lang === 'ar'
+                        ? `الحد الأدنى ${MIN_REDEEM_POINTS} نقطة · ${POINTS_PER_AED_REDEEM} نقطة = 1 درهم`
+                        : `Min ${MIN_REDEEM_POINTS} pts · ${POINTS_PER_AED_REDEEM} pts = AED 1`}
+                    </p>
+                    {pointsResolved.reason && pointsToRedeem > 0 && (
+                      <p className="text-xs text-red-600 mt-1">{pointsResolved.reason}</p>
+                    )}
+                  </div>
+                )}
+
+                {pointsValueAed > 0 && (
+                  <div className="flex justify-between text-emerald-700 font-semibold">
+                    <span className="inline-flex items-center gap-1.5"><Sparkles size={12} aria-hidden="true" /> {pointsResolved.points} pts</span>
+                    <span>-{formatAED(pointsValueAed)}</span>
+                  </div>
+                )}
+
                 <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                   <span>{tr.total}</span>
                   <span className="text-green-700">{formatAED(finalTotal)}</span>
@@ -557,14 +727,16 @@ export default function CheckoutPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <span className="animate-spin">⏳</span>
+                    <Loader2 size={20} className="animate-spin" aria-hidden="true" />
                     {lang === 'ar' ? 'جاري التأكيد...' : 'Placing order...'}
                   </>
                 ) : (
                   <>{tr.placeOrder} →</>
                 )}
               </button>
-              <p className="text-xs text-gray-400 text-center mt-4">🔒 {tr.secureNote}</p>
+              <p className="text-xs text-gray-400 text-center mt-4 inline-flex items-center justify-center gap-1.5 w-full">
+                <Lock size={11} aria-hidden="true" /> {tr.secureNote}
+              </p>
             </div>
           </div>
         </div>

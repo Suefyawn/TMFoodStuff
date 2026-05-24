@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Search, Package, CheckCircle, Truck, Clock, XCircle, MapPin, Calendar, ShoppingCart } from 'lucide-react'
+import { Search, Package, CheckCircle, Truck, Clock, XCircle, MapPin, Calendar, ShoppingCart, Loader2 } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { useLang } from '@/lib/use-lang'
 import { isValidEmail } from '@/lib/validators'
@@ -150,7 +150,7 @@ export default function TrackPage() {
           disabled={loading}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
         >
-          {loading ? <span className="animate-spin" aria-hidden="true">⏳</span> : <Search size={18} aria-hidden="true" />}
+          {loading ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Search size={18} aria-hidden="true" />}
           {loading
             ? (isAr ? 'جاري البحث…' : 'Looking up…')
             : (isAr ? 'تتبع الطلب' : 'Track Order')}

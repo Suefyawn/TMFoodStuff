@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import type { Product } from '@/lib/products-api'
-import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Sparkles, Droplets, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
+import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 const homeCategories = [
@@ -34,26 +34,8 @@ const homeCategories = [
     iconColor: 'text-emerald-600',
   },
   {
-    name: 'Exotic Fruits',
-    nameAr: 'فواكه غريبة',
-    slug: 'exotic',
-    icon: Sparkles,
-    color: 'bg-yellow-50 hover:bg-yellow-100',
-    border: 'border-yellow-100',
-    iconColor: 'text-yellow-500',
-  },
-  {
-    name: 'Fresh Juices',
-    nameAr: 'عصائر طازجة',
-    slug: 'juices',
-    icon: Droplets,
-    color: 'bg-orange-50 hover:bg-orange-100',
-    border: 'border-orange-100',
-    iconColor: 'text-orange-500',
-  },
-  {
-    name: 'Gift Baskets',
-    nameAr: 'سلال هدايا',
+    name: 'Boxes & Bundles',
+    nameAr: 'صناديق وعروض',
     slug: 'gifts',
     icon: Gift,
     color: 'bg-purple-50 hover:bg-purple-100',

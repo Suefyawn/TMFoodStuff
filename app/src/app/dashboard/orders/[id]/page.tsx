@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { User, MapPin, ShoppingBag } from 'lucide-react'
 import OrderStatusUpdater from './OrderStatusUpdater'
+import RefundButton from './RefundButton'
+import OrderEditCard from './OrderEditCard'
+import { getDashboardSession } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +17,8 @@ async function getOrder(id: string) {
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const order = await getOrder(id)
+  const session = await getDashboardSession()
+  const isAdmin = session.state === 'ok' && session.role === 'admin'
 
   if (!order) return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center">
@@ -46,9 +52,37 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
 
+        {isAdmin && (
+          <RefundButton
+            orderId={order.id}
+            orderNumber={order.order_number}
+            paymentMethod={order.payment_method || 'cod'}
+            paymentStatus={order.payment_status || 'pending'}
+            totalAed={Number(order.total_aed ?? order.total ?? 0)}
+            hasPaymentIntent={!!order.stripe_payment_intent}
+          />
+        )}
+
+        <OrderEditCard
+          orderId={order.id}
+          status={order.status || 'pending'}
+          initial={{
+            customer_name: order.customer_name,
+            customer_phone: order.customer_phone,
+            customer_email: order.customer_email,
+            delivery_emirate: order.delivery_emirate,
+            delivery_area: order.delivery_area,
+            delivery_building: order.delivery_building,
+            delivery_makani: order.delivery_makani,
+            delivery_slot: order.delivery_slot,
+            delivery_date: order.delivery_date,
+            delivery_notes: order.delivery_notes,
+          }}
+        />
+
         <div className="grid md:grid-cols-2 gap-5">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-white font-black mb-4">👤 Customer</h3>
+            <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><User size={16} className="text-gray-400" aria-hidden="true" /> Customer</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">Name</span><span className="text-white font-semibold">{order.customer_name || '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Phone</span><span className="text-white">{phone || '—'}</span></div>
@@ -57,7 +91,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </div>
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-white font-black mb-4">📍 Delivery</h3>
+            <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><MapPin size={16} className="text-gray-400" aria-hidden="true" /> Delivery</h3>
             <div className="space-y-2 text-sm">
               {order.delivery_date && <div className="flex justify-between"><span className="text-gray-500">Date</span><span className="text-white font-semibold">{new Date(order.delivery_date + 'T00:00:00').toLocaleDateString('en-AE', { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>}
               <div className="flex justify-between"><span className="text-gray-500">Slot</span><span className="text-white font-semibold capitalize">{order.delivery_slot || '—'}</span></div>
@@ -71,7 +105,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-          <h3 className="text-white font-black p-5 border-b border-gray-800">🛒 Order Items</h3>
+          <h3 className="text-white font-black p-5 border-b border-gray-800 inline-flex items-center gap-2"><ShoppingBag size={16} className="text-gray-400" aria-hidden="true" /> Order Items</h3>
           <div className="divide-y divide-gray-800">
             {items.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between px-5 py-3">

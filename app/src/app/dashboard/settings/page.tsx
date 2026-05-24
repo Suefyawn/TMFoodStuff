@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Save, Plus, Trash2, X } from 'lucide-react'
+import { Save, Plus, Trash2, X, Store, Truck, Clock, Ticket, CheckCircle2 } from 'lucide-react'
 
 interface PromoCode {
   id?: number
@@ -58,13 +58,14 @@ export default function SettingsPage() {
           <p className="text-gray-500 text-sm">Store configuration</p>
         </div>
         <button onClick={saveSettings} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-50">
-          <Save size={16} /> {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Settings'}
+          {saved ? <CheckCircle2 size={16} aria-hidden="true" /> : <Save size={16} aria-hidden="true" />}
+          {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Settings'}
         </button>
       </div>
 
       {/* Store Info */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black">🏪 Store Info</h3>
+        <h3 className="text-white font-black inline-flex items-center gap-2"><Store size={16} className="text-gray-400" aria-hidden="true" /> Store Info</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SettingInput label="Store Name" value={settings.store_name || ''} onChange={v => setSettings({...settings, store_name: v})} />
           <SettingInput label="WhatsApp Number" value={settings.whatsapp_number || ''} onChange={v => setSettings({...settings, whatsapp_number: v})} />
@@ -73,7 +74,7 @@ export default function SettingsPage() {
 
       {/* Delivery & Pricing */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black">🚚 Delivery & Pricing</h3>
+        <h3 className="text-white font-black inline-flex items-center gap-2"><Truck size={16} className="text-gray-400" aria-hidden="true" /> Delivery & Pricing</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SettingInput label="Delivery Fee (AED)" value={settings.delivery_fee || '0'} onChange={v => setSettings({...settings, delivery_fee: v})} type="number" />
           <SettingInput label="VAT Rate (%)" value={settings.vat_rate || '5'} onChange={v => setSettings({...settings, vat_rate: v})} type="number" />
@@ -89,14 +90,14 @@ export default function SettingsPage() {
 
       {/* Delivery Slots */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black">🕐 Delivery Slots</h3>
+        <h3 className="text-white font-black inline-flex items-center gap-2"><Clock size={16} className="text-gray-400" aria-hidden="true" /> Delivery Slots</h3>
         <p className="text-xs text-gray-500">Comma-separated slot names</p>
         <input value={settings.delivery_slots || 'morning,afternoon,evening'} onChange={e => setSettings({...settings, delivery_slots: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
       </div>
 
       {/* Promo Codes */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black">🎟️ Promo Codes</h3>
+        <h3 className="text-white font-black inline-flex items-center gap-2"><Ticket size={16} className="text-gray-400" aria-hidden="true" /> Promo Codes</h3>
 
         {promoCodes.length > 0 && (
           <div className="space-y-2">

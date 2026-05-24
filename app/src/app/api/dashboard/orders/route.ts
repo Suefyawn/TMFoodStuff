@@ -4,6 +4,8 @@ import { isAdminAuthed } from '@/lib/admin-auth'
 import { sendOutForDeliveryEmail, sendDeliveredEmail } from '@/lib/email'
 import { notifyOutForDelivery, notifyDelivered } from '@/lib/notify'
 import { toLocale } from '@/lib/locale'
+import { earnPointsForOrder, findCustomerByEmail } from '@/lib/loyalty'
+import { logAdminAction } from '@/lib/audit'
 
 const VALID_STATUSES = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
@@ -20,7 +22,7 @@ export async function PATCH(request: Request) {
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, order_number, customer_name, customer_email, customer_phone, delivery_slot, total, total_aed, status, locale, payment_method, payment_status')
+    .select('id, order_number, customer_name, customer_email, customer_phone, delivery_slot, total, total_aed, subtotal_aed, subtotal, status, locale, payment_method, payment_status')
     .eq('id', parseInt(id))
     .maybeSingle()
 
@@ -28,6 +30,17 @@ export async function PATCH(request: Request) {
 
   const { error } = await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Audit every status change, including no-op transitions, so the trail is
+  // complete even when the dashboard sends a stale "save" click.
+  await logAdminAction({
+    supabase,
+    action: 'order.status_change',
+    entity: `order:${order.id}`,
+    before: { status: order.status },
+    after: { status },
+    metadata: { order_number: order.order_number },
+  })
 
   // Only fire notifications when the status actually transitions.
   if (status !== order.status) {
@@ -63,6 +76,24 @@ export async function PATCH(request: Request) {
     if (status === 'delivered') {
       if (order.customer_email) sendDeliveredEmail(emailData, locale).catch(console.error)
       if (order.customer_phone) notifyDelivered(order.customer_phone, smsSummary, locale).catch(console.error)
+      // Credit loyalty points to the customer matched on email. The ledger
+      // has a UNIQUE constraint on (order_id, 'order_earned') so a second
+      // delivered → delivered transition can't double-credit.
+      if (order.customer_email) {
+        const customerId = await findCustomerByEmail(supabase, order.customer_email)
+        if (customerId) {
+          const subtotal = Number(order.subtotal_aed ?? order.subtotal ?? 0)
+          await earnPointsForOrder(supabase, {
+            customerId,
+            orderId: order.id,
+            subtotalAed: subtotal,
+            orderNumber: order.order_number,
+            customerEmail: order.customer_email,
+            customerName: order.customer_name,
+            locale,
+          })
+        }
+      }
     }
   }
 

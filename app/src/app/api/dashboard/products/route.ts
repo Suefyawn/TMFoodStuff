@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { getDashboardSession, isAdminAuthed, isAdminAdminAuthed } from '@/lib/admin-auth'
 import { sendBackInStockEmail } from '@/lib/email'
+import { logAdminAction } from '@/lib/audit'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -65,8 +66,41 @@ export async function PATCH(request: Request) {
     }
   }
 
+  // Capture the pre-update row so the audit log + stock history can record
+  // the exact diff (rather than guessing what the operator changed).
+  const { data: snapshot } = await supabase
+    .from('products')
+    .select('id, name, slug, stock, price_aed, is_active, is_featured, is_organic, compare_at_price_aed')
+    .eq('id', parseInt(id))
+    .maybeSingle()
+
   const { error } = await supabase.from('products').update(dbUpdates).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Stock history — only when the operator actually touched the stock value.
+  if (snapshot && dbUpdates.stock !== undefined && Number(dbUpdates.stock) !== Number(snapshot.stock)) {
+    const session = await getDashboardSession()
+    const actorEmail = session.state === 'ok' ? session.email : null
+    const after = Number(dbUpdates.stock)
+    const before = Number(snapshot.stock ?? 0)
+    await supabase.from('product_stock_history').insert({
+      product_id: parseInt(id),
+      before,
+      after,
+      delta: after - before,
+      reason: after > before ? 'admin_restock' : 'admin_set',
+      actor_email: actorEmail,
+    })
+  }
+
+  await logAdminAction({
+    supabase,
+    action: 'product.update',
+    entity: `product:${id}`,
+    before: snapshot || undefined,
+    after: dbUpdates,
+  })
+
   return NextResponse.json({ ok: true })
 }
 
@@ -126,12 +160,37 @@ export async function POST(request: Request) {
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  await logAdminAction({
+    supabase,
+    action: 'product.create',
+    entity: `product:${data?.id}`,
+    after: { name: data?.name, slug: data?.slug, price_aed: data?.price_aed, stock: data?.stock },
+  })
+
+  // Initial stock history entry so the product's full lifetime is auditable.
+  if (data?.id && Number(data?.stock ?? 0) > 0) {
+    const session = await getDashboardSession()
+    await supabase.from('product_stock_history').insert({
+      product_id: data.id,
+      before: 0,
+      after: Number(data.stock),
+      delta: Number(data.stock),
+      reason: 'admin_restock',
+      actor_email: session.state === 'ok' ? session.email : null,
+      note: 'initial stock on create',
+    })
+  }
+
   return NextResponse.json({ ok: true, product: data })
 }
 
-// DELETE product(s)
+// DELETE product(s) — admin role only; staff can deactivate via PATCH but
+// can't permanently delete a product (and lose its history).
 export async function DELETE(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await isAdminAdminAuthed()) {
+    return NextResponse.json({ error: 'Only admins can delete products.' }, { status: 403 })
+  }
   const { ids } = await request.json()
   const supabase = getSupabase()
 
@@ -139,5 +198,13 @@ export async function DELETE(request: Request) {
   const { error } = await supabase.from('products').delete().in('id', idList.map(Number))
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  await logAdminAction({
+    supabase,
+    action: 'product.delete',
+    entity: idList.length === 1 ? `product:${idList[0]}` : 'product:bulk',
+    metadata: { deleted_ids: idList.map(Number), count: idList.length },
+  })
+
   return NextResponse.json({ ok: true, deleted: idList.length })
 }

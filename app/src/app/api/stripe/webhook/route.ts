@@ -40,6 +40,7 @@ export async function POST(request: Request) {
   const session = event.data.object as {
     id: string
     payment_status?: string
+    payment_intent?: string | null
     metadata?: Record<string, string> | null
   }
   if (session.payment_status !== 'paid') {
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
     .update({
       payment_status: 'paid',
       status: 'confirmed',
+      stripe_payment_intent: session.payment_intent || null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId)

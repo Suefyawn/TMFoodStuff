@@ -19,9 +19,8 @@ export default function Navbar() {
   const navLinks = [
     { label: tr.fruits, href: '/shop?category=fruits' },
     { label: tr.vegetables, href: '/shop?category=vegetables' },
+    { label: lang === 'ar' ? 'صناديق' : 'Boxes', href: '/shop?category=gifts' },
     { label: tr.organic, href: '/shop?category=organic' },
-    { label: tr.exotic, href: '/shop?category=exotic' },
-    { label: lang === 'ar' ? 'هدايا' : 'Gifts', href: '/shop?category=gifts' },
     { label: tr.allProducts, href: '/shop' },
   ]
 

@@ -39,15 +39,31 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isProtected =
+  const isDashboardProtected =
     pathname.startsWith('/dashboard') &&
     !pathname.startsWith('/dashboard/login') &&
     !pathname.startsWith('/dashboard/logout')
 
-  if (isProtected && !user) {
+  if (isDashboardProtected && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard/login'
     url.search = ''
+    return NextResponse.redirect(url)
+  }
+
+  // Customer-facing /account. Sub-pages /login, /signup, /logout are public so
+  // an unauthenticated visitor can actually get to the sign-in form.
+  const isAccountProtected =
+    pathname === '/account' ||
+    (pathname.startsWith('/account/') &&
+      !pathname.startsWith('/account/login') &&
+      !pathname.startsWith('/account/signup') &&
+      !pathname.startsWith('/account/logout'))
+
+  if (isAccountProtected && !user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/account/login'
+    url.searchParams.set('next', pathname + (request.nextUrl.search || ''))
     return NextResponse.redirect(url)
   }
 
@@ -55,5 +71,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/admin'],
+  matcher: ['/dashboard/:path*', '/admin/:path*', '/admin', '/account/:path*', '/account'],
 }

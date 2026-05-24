@@ -1,14 +1,15 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Clock, CheckCircle2, Loader2, Truck, Package, XCircle } from 'lucide-react'
 
 const statuses = [
-  { value: 'pending', label: '🟡 Pending' },
-  { value: 'confirmed', label: '✅ Confirmed' },
-  { value: 'processing', label: '🔄 Processing' },
-  { value: 'out_for_delivery', label: '🚚 Out for Delivery' },
-  { value: 'delivered', label: '📦 Delivered' },
-  { value: 'cancelled', label: '❌ Cancelled' },
+  { value: 'pending',          label: 'Pending',          Icon: Clock,        accent: 'text-yellow-400' },
+  { value: 'confirmed',        label: 'Confirmed',        Icon: CheckCircle2, accent: 'text-blue-400' },
+  { value: 'processing',       label: 'Processing',       Icon: Loader2,      accent: 'text-purple-400' },
+  { value: 'out_for_delivery', label: 'Out for Delivery', Icon: Truck,        accent: 'text-orange-400' },
+  { value: 'delivered',        label: 'Delivered',        Icon: Package,      accent: 'text-green-400' },
+  { value: 'cancelled',        label: 'Cancelled',        Icon: XCircle,      accent: 'text-red-400' },
 ]
 
 const CONFIRM_STATUSES = ['delivered', 'cancelled']
@@ -52,20 +53,24 @@ export default function OrderStatusUpdater({ orderId, currentStatus }: { orderId
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
       <h3 className="text-white font-black mb-4">Order Status</h3>
       <div className="flex flex-wrap gap-2">
-        {statuses.map(s => (
-          <button
-            key={s.value}
-            onClick={() => updateStatus(s.value)}
-            disabled={saving}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-              status === s.value
-                ? 'bg-green-600 text-white ring-2 ring-green-500 ring-offset-2 ring-offset-gray-900'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {saving && status !== s.value ? s.label : s.label}
-          </button>
-        ))}
+        {statuses.map(s => {
+          const active = status === s.value
+          return (
+            <button
+              key={s.value}
+              onClick={() => updateStatus(s.value)}
+              disabled={saving}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                active
+                  ? 'bg-green-600 text-white ring-2 ring-green-500 ring-offset-2 ring-offset-gray-900'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              <s.Icon size={14} className={active ? 'text-white' : s.accent} aria-hidden="true" />
+              {s.label}
+            </button>
+          )
+        })}
       </div>
       {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
       {saving && <p className="mt-2 text-xs text-gray-500">Saving...</p>}

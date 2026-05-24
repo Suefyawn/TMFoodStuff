@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
@@ -9,6 +9,9 @@ const navItems = [
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
+  { href: '/dashboard/reviews', label: 'Reviews', icon: MessageSquare },
+  { href: '/dashboard/stock-history', label: 'Stock', icon: Boxes },
+  { href: '/dashboard/audit-log', label: 'Audit', icon: FileText },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/integrations', label: 'Integrations', icon: Plug },
 ]
@@ -62,7 +65,9 @@ export default function DashboardShell({
       <aside className="hidden lg:flex w-64 flex-col bg-gray-900 border-r border-gray-800 fixed h-full z-30">
         <div className="px-6 py-5 border-b border-gray-800">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-2xl">🥬</span>
+            <span className="w-8 h-8 rounded-lg bg-green-600/20 flex items-center justify-center">
+              <Leaf size={16} className="text-green-400" aria-hidden="true" />
+            </span>
             <span className="font-black text-lg text-white">TMFoodStuff</span>
           </Link>
           <p className="text-xs text-gray-600 mt-1">Admin Dashboard</p>
@@ -89,7 +94,9 @@ export default function DashboardShell({
       <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-gray-900 border-b border-gray-800 px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-lg">🥬</span>
+            <span className="w-6 h-6 rounded-md bg-green-600/20 flex items-center justify-center">
+              <Leaf size={12} className="text-green-400" aria-hidden="true" />
+            </span>
             <span className="font-black text-white">TMFoodStuff</span>
           </Link>
           <div className="flex items-center overflow-x-auto gap-0.5 max-w-[calc(100vw-160px)] scrollbar-none">

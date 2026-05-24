@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { formatAED } from '@/lib/utils'
 import AddToCartButton from './AddToCartButton'
 import { ProductImage } from './ProductImage'
+import WishlistButton from './WishlistButton'
 import { Leaf, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
@@ -69,6 +70,12 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             </div>
           )}
+          {/* Wishlist heart — bottom-right of image so it doesn't clash with
+              the sale badge. WishlistButton stops click propagation so it
+              doesn't trigger the parent Link. */}
+          <div className="absolute bottom-2 right-2">
+            <WishlistButton productId={product.id} size="sm" />
+          </div>
         </div>
       </Link>
 

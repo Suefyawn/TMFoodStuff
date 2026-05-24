@@ -10,10 +10,13 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   sendOrderConfirmation,
   sendAdminOrderAlert,
+  sendAdminLowStockAlert,
   type OrderEmailData,
 } from './email'
 import { notifyOrderConfirmation, notifyAdminNewOrder } from './notify'
 import type { Locale } from './locale'
+
+const LOW_STOCK_THRESHOLD = 5
 
 interface FulfillLineItem {
   id: number | string
@@ -105,15 +108,30 @@ export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
     for (const item of input.lineItems) {
       tasks.push(
         (async () => {
-          const { error } = await input.supabase.rpc('decrement_stock', {
+          const { data: ok, error } = await input.supabase.rpc('decrement_stock', {
             p_id: Number(item.id),
             p_qty: item.quantity,
           })
-          if (error) {
+          if (error || ok === false) {
             console.error(
               `[fulfillOrder] Stock decrement failed for product ${item.id} on order ${input.orderNumber}`,
               error,
             )
+            return
+          }
+          // Fire a low-stock alert when this order pushed the product BELOW
+          // the threshold for the first time. Only one email per crossing —
+          // future orders that keep the product below threshold don't spam.
+          const { data: row } = await input.supabase
+            .from('products')
+            .select('name, slug, stock')
+            .eq('id', Number(item.id))
+            .maybeSingle()
+          if (!row) return
+          const newStock = Number(row.stock ?? 0)
+          const oldStock = newStock + item.quantity
+          if (newStock < LOW_STOCK_THRESHOLD && oldStock >= LOW_STOCK_THRESHOLD) {
+            await sendAdminLowStockAlert(row.name, row.slug, newStock)
           }
         })(),
       )
