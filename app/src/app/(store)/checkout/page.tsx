@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CheckCircle, ShoppingBag, Package, MessageCircle } from 'lucide-react'
+import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
@@ -66,9 +66,9 @@ export default function CheckoutPage() {
   })
 
   const DELIVERY_SLOTS = [
-    { id: 'morning', label: lang === 'ar' ? 'صباحاً' : 'Morning', time: lang === 'ar' ? '٨ص - ١٢م' : '8:00 AM – 12:00 PM', icon: '🌅' },
-    { id: 'afternoon', label: lang === 'ar' ? 'ظهراً' : 'Afternoon', time: lang === 'ar' ? '١٢م - ٥م' : '12:00 PM – 5:00 PM', icon: '☀️' },
-    { id: 'evening', label: lang === 'ar' ? 'مساءً' : 'Evening', time: lang === 'ar' ? '٥م - ١٠م' : '5:00 PM – 10:00 PM', icon: '🌙' },
+    { id: 'morning',   label: lang === 'ar' ? 'صباحاً' : 'Morning',   time: lang === 'ar' ? '٨ص - ١٢م' : '8:00 AM – 12:00 PM', Icon: Sunrise },
+    { id: 'afternoon', label: lang === 'ar' ? 'ظهراً' : 'Afternoon', time: lang === 'ar' ? '١٢م - ٥م'  : '12:00 PM – 5:00 PM',  Icon: Sun },
+    { id: 'evening',   label: lang === 'ar' ? 'مساءً' : 'Evening',   time: lang === 'ar' ? '٥م - ١٠م' : '5:00 PM – 10:00 PM',  Icon: Moon },
   ]
 
   const sub = subtotal()
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
                       onChange={() => setForm(f => ({ ...f, deliveryDate: iso }))} className="sr-only" />
                     <span className="font-bold text-gray-900 text-xs md:text-sm">{label}</span>
                     <span className="text-xs text-gray-400 mt-0.5">{new Date(iso + 'T00:00:00').toLocaleDateString(lang === 'ar' ? 'ar-AE' : 'en-AE', { day: 'numeric', month: 'short' })}</span>
-                    {form.deliveryDate === iso && <span className="text-green-600 font-black text-xs mt-1">✓</span>}
+                    {form.deliveryDate === iso && <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />}
                   </label>
                 ))}
               </div>
@@ -407,17 +407,18 @@ export default function CheckoutPage() {
                       onChange={e => setForm(f => ({ ...f, deliverySlot: e.target.value }))}
                       className="sr-only"
                     />
-                    <span className="text-xl md:text-2xl mb-1">{slot.icon}</span>
+                    <slot.Icon size={22} className={`mb-1.5 ${form.deliverySlot === slot.id ? 'text-green-600' : 'text-gray-400'}`} aria-hidden="true" />
                     <span className="font-bold text-gray-900 text-xs md:text-sm">{slot.label}</span>
                     <span className="text-xs text-gray-500 mt-0.5 leading-tight">{slot.time}</span>
                     {form.deliverySlot === slot.id && (
-                      <span className="text-green-600 font-black text-xs mt-1">✓</span>
+                      <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />
                     )}
                   </label>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-3 text-center">
-                🚚 {lang === 'ar' ? 'توصيل مجاني · التوصيل في نفس اليوم متاح' : 'Free delivery · Same day delivery available'}
+              <p className="text-xs text-gray-400 mt-3 text-center inline-flex items-center justify-center gap-1.5 w-full">
+                <Truck size={12} aria-hidden="true" />
+                {lang === 'ar' ? 'توصيل مجاني · التوصيل في نفس اليوم متاح' : 'Free delivery · Same day delivery available'}
               </p>
             </div>
 
@@ -429,23 +430,27 @@ export default function CheckoutPage() {
                   paymentMethod === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
-                  <span className="text-2xl">💵</span>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'cod' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <Wallet size={20} aria-hidden="true" />
+                  </div>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.cashOnDelivery}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{tr.cashOnDeliverySub}</div>
                   </div>
-                  {paymentMethod === 'cod' && <span className="text-green-600 font-black text-lg">✓</span>}
+                  {paymentMethod === 'cod' && <CheckCircle size={20} className="text-green-600" aria-hidden="true" />}
                 </label>
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
                   paymentMethod === 'card' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="sr-only" />
-                  <span className="text-2xl">💳</span>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'card' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <CreditCard size={20} aria-hidden="true" />
+                  </div>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.payOnline}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{lang === 'ar' ? 'بطاقة فيزا أو ماستركارد · دفع آمن' : 'Visa or Mastercard · Secure checkout'}</div>
                   </div>
-                  {paymentMethod === 'card' && <span className="text-green-600 font-black text-lg">✓</span>}
+                  {paymentMethod === 'card' && <CheckCircle size={20} className="text-green-600" aria-hidden="true" />}
                 </label>
               </div>
             </div>
@@ -496,8 +501,9 @@ export default function CheckoutPage() {
                     }
                   </span>
                 </div>
-                <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-1.5">
-                  🎉 <span>{lang === 'ar' ? 'توصيل مجاني — عرض الإطلاق!' : 'Free delivery — Grand Launch Offer!'}</span>
+                <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-2">
+                  <Truck size={14} className="text-green-700 shrink-0" aria-hidden="true" />
+                  <span>{lang === 'ar' ? 'توصيل مجاني — عرض الإطلاق!' : 'Free delivery — Grand Launch Offer!'}</span>
                 </div>
 
                 {/* Promo Code */}
@@ -557,14 +563,16 @@ export default function CheckoutPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <span className="animate-spin">⏳</span>
+                    <Loader2 size={20} className="animate-spin" aria-hidden="true" />
                     {lang === 'ar' ? 'جاري التأكيد...' : 'Placing order...'}
                   </>
                 ) : (
                   <>{tr.placeOrder} →</>
                 )}
               </button>
-              <p className="text-xs text-gray-400 text-center mt-4">🔒 {tr.secureNote}</p>
+              <p className="text-xs text-gray-400 text-center mt-4 inline-flex items-center justify-center gap-1.5 w-full">
+                <Lock size={11} aria-hidden="true" /> {tr.secureNote}
+              </p>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { TrendingUp, AlertTriangle, ShoppingCart, CheckCircle2 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -121,7 +122,7 @@ export default async function DashboardPage() {
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Revenue chart */}
         <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h3 className="text-white font-black mb-4">📊 Revenue (Last 30 Days)</h3>
+          <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><TrendingUp size={16} className="text-green-400" aria-hidden="true" /> Revenue (Last 30 Days)</h3>
           <div className="flex items-end gap-0.5 h-40">
             {stats.dailyRevenue.map((d, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
@@ -143,9 +144,9 @@ export default async function DashboardPage() {
 
         {/* Low stock alerts */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h3 className="text-white font-black mb-4">⚠️ Low Stock Alerts</h3>
+          <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><AlertTriangle size={16} className="text-amber-400" aria-hidden="true" /> Low Stock Alerts</h3>
           {stats.lowStock.length === 0 ? (
-            <p className="text-gray-600 text-sm">All products well stocked ✅</p>
+            <p className="text-gray-600 text-sm inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-green-500" aria-hidden="true" /> All products well stocked</p>
           ) : (
             <div className="space-y-2">
               {stats.lowStock.map((p: any) => (
@@ -167,7 +168,7 @@ export default async function DashboardPage() {
       {/* Recent orders */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
-          <h3 className="text-white font-black">🛒 Recent Orders</h3>
+          <h3 className="text-white font-black inline-flex items-center gap-2"><ShoppingCart size={16} className="text-green-400" aria-hidden="true" /> Recent Orders</h3>
           <Link href="/dashboard/orders" className="text-green-400 text-sm font-bold hover:underline">View all →</Link>
         </div>
         {stats.recentOrders.length === 0 ? (

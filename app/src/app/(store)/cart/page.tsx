@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package } from 'lucide-react'
+import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package, Truck, Sparkles } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
@@ -106,8 +106,9 @@ export default function CartPage() {
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
             <h2 className="font-black text-gray-900 text-xl mb-4">{lang === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h2>
-            <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex items-center gap-1.5">
-              🎉 <span>
+            <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex items-center gap-2">
+              <Sparkles size={14} className="text-green-700 shrink-0" aria-hidden="true" />
+              <span>
                 {lang === 'ar'
                   ? <><span className="font-black">التوصيل مجاني</span> — عرض الإطلاق!</>
                   : <><span className="font-black">FREE DELIVERY ACTIVE</span> — Grand Launch Offer!</>
@@ -127,8 +128,9 @@ export default function CartPage() {
                 <span>{tr.delivery}</span>
                 <span>{deliveryFee === 0 ? <span className="text-green-600 font-semibold">{tr.freeDelivery}</span> : formatAED(deliveryFee)}</span>
               </div>
-              <div className="mt-2 p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold">
-                🚚 {tr.freeDeliveryNote}
+              <div className="mt-2 p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-2">
+                <Truck size={14} className="text-green-700 shrink-0" aria-hidden="true" />
+                {tr.freeDeliveryNote}
               </div>
               <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                 <span>{tr.total}</span>

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { User, MapPin, ShoppingBag } from 'lucide-react'
 import OrderStatusUpdater from './OrderStatusUpdater'
 
 export const dynamic = 'force-dynamic'
@@ -48,7 +49,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
         <div className="grid md:grid-cols-2 gap-5">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-white font-black mb-4">👤 Customer</h3>
+            <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><User size={16} className="text-gray-400" aria-hidden="true" /> Customer</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">Name</span><span className="text-white font-semibold">{order.customer_name || '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Phone</span><span className="text-white">{phone || '—'}</span></div>
@@ -57,7 +58,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </div>
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-white font-black mb-4">📍 Delivery</h3>
+            <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><MapPin size={16} className="text-gray-400" aria-hidden="true" /> Delivery</h3>
             <div className="space-y-2 text-sm">
               {order.delivery_date && <div className="flex justify-between"><span className="text-gray-500">Date</span><span className="text-white font-semibold">{new Date(order.delivery_date + 'T00:00:00').toLocaleDateString('en-AE', { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>}
               <div className="flex justify-between"><span className="text-gray-500">Slot</span><span className="text-white font-semibold capitalize">{order.delivery_slot || '—'}</span></div>
@@ -71,7 +72,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </div>
 
         <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-          <h3 className="text-white font-black p-5 border-b border-gray-800">🛒 Order Items</h3>
+          <h3 className="text-white font-black p-5 border-b border-gray-800 inline-flex items-center gap-2"><ShoppingBag size={16} className="text-gray-400" aria-hidden="true" /> Order Items</h3>
           <div className="divide-y divide-gray-800">
             {items.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between px-5 py-3">
