@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Trash2 } from 'lucide-react'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 interface Category {
   id: number
@@ -18,6 +19,7 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState('')
   const [apiError, setApiError] = useState('')
+  const confirm = useConfirm()
   const [editing, setEditing] = useState<number | null>(null)
   const [editData, setEditData] = useState<any>(null)
   const [showAdd, setShowAdd] = useState(false)
@@ -78,7 +80,13 @@ export default function CategoriesPage() {
   }
 
   async function deleteCategory(id: number) {
-    if (!confirm('Delete this category? Products in it won\'t be deleted but will become uncategorized.')) return
+    const ok = await confirm({
+      title: 'Delete this category?',
+      message: "Products in it won't be deleted but will become uncategorized.",
+      confirmLabel: 'Delete',
+      destructive: true,
+    })
+    if (!ok) return
     setApiError('')
     try {
       const res = await fetch('/api/dashboard/categories', {
