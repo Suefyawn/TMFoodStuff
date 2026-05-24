@@ -2,7 +2,8 @@
 // ledger. Kept here (separate from points.ts which holds the rules) so it
 // can pull in the service-role client without dragging it into pages.
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { pointsEarnedFor, pointsExpiryDate } from './points'
+import { aedValueOfPoints, MIN_REDEEM_POINTS, pointsEarnedFor, pointsExpiryDate } from './points'
+import { sendPointsThresholdEmail } from './email'
 
 export async function getCustomerBalance(
   supabase: SupabaseClient,
@@ -41,13 +42,30 @@ export async function findCustomerByEmail(
  * Credit points for a delivered order, idempotent on (order_id,
  * 'order_earned'). Safe to call multiple times — the unique index
  * uniq_points_earn_per_order prevents duplicates.
+ *
+ * When the credit pushes the customer past the minimum-redeem threshold
+ * for the first time, fires a one-shot re-engagement email so they know
+ * their points are now usable.
  */
 export async function earnPointsForOrder(
   supabase: SupabaseClient,
-  args: { customerId: number; orderId: number; subtotalAed: number; orderNumber: string },
+  args: {
+    customerId: number
+    orderId: number
+    subtotalAed: number
+    orderNumber: string
+    customerEmail?: string | null
+    customerName?: string | null
+    locale?: 'en' | 'ar'
+  },
 ): Promise<number> {
   const points = pointsEarnedFor(args.subtotalAed)
   if (points <= 0) return 0
+
+  // Pre-credit balance so we can detect the threshold crossing after the
+  // insert. Cheap: a single SUM-style read of the ledger.
+  const balanceBefore = await getCustomerBalance(supabase, args.customerId)
+
   const { error } = await supabase.from('customer_points_ledger').insert({
     customer_id: args.customerId,
     order_id: args.orderId,
@@ -64,6 +82,19 @@ export async function earnPointsForOrder(
     }
     return 0
   }
+
+  const balanceAfter = balanceBefore + points
+  const crossed = balanceBefore < MIN_REDEEM_POINTS && balanceAfter >= MIN_REDEEM_POINTS
+  if (crossed && args.customerEmail) {
+    sendPointsThresholdEmail({
+      to: args.customerEmail,
+      customerName: args.customerName || '',
+      balance: balanceAfter,
+      aedAvailable: aedValueOfPoints(balanceAfter),
+      locale: args.locale || 'en',
+    }).catch(err => console.error('[loyalty] threshold email failed:', err))
+  }
+
   return points
 }
 

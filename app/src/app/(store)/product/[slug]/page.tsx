@@ -11,6 +11,7 @@ import { ProductNameDisplay } from '@/components/ProductNameDisplay'
 import { ProductDescription } from '@/components/ProductDescription'
 import ProductImageGallery from '@/components/ProductImageGallery'
 import StockNotifyForm from '@/components/StockNotifyForm'
+import ProductReviews from '@/components/ProductReviews'
 import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 60
@@ -217,6 +218,10 @@ export default async function ProductPage({ params }: Props) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mb-8 md:mb-12">
+        <ProductReviews productId={product.id} productSlug={product.slug} />
       </div>
 
       {related.length > 0 && (

@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
@@ -9,6 +9,8 @@ const navItems = [
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
+  { href: '/dashboard/reviews', label: 'Reviews', icon: MessageSquare },
+  { href: '/dashboard/audit-log', label: 'Audit Log', icon: FileText },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/integrations', label: 'Integrations', icon: Plug },
 ]

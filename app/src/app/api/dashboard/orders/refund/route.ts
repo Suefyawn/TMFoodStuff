@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { isAdminAdminAuthed } from '@/lib/admin-auth'
 import { getStripe } from '@/lib/stripe'
 import { reverseOrderPoints } from '@/lib/loyalty'
 import { logAdminAction } from '@/lib/audit'
@@ -14,7 +14,9 @@ interface RefundBody {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await isAdminAdminAuthed())) {
+    return NextResponse.json({ error: 'Only admins can issue refunds.' }, { status: 403 })
+  }
   const body = (await request.json()) as RefundBody
   const orderId = Number(body.id)
   if (!orderId) return NextResponse.json({ error: 'Order id required' }, { status: 400 })

@@ -450,6 +450,67 @@ export async function sendAdminOrderAlert(order: OrderEmailData): Promise<void> 
   }
 }
 
+// Customer-facing re-engagement email fired by earnPointsForOrder the first
+// time a customer's balance crosses MIN_REDEEM_POINTS. Bilingual.
+export async function sendPointsThresholdEmail(args: {
+  to: string
+  customerName: string
+  balance: number
+  aedAvailable: number
+  locale: Locale
+}): Promise<void> {
+  const resend = getResend()
+  if (!resend) return
+  const isAr = args.locale === 'ar'
+  const subject = isAr
+    ? `🎁 لديك ${args.balance} نقطة — يمكنك استبدالها بـ AED ${args.aedAvailable}`
+    : `🎁 You have ${args.balance} points — redeem AED ${args.aedAvailable} off`
+  const heading = isAr ? 'وصلت نقاطك إلى الحد القابل للاستبدال!' : 'Your points are ready to redeem!'
+  const intro = isAr
+    ? `مرحباً ${args.customerName || 'هناك'}، رصيدك الحالي ${args.balance} نقطة. استبدلها بـ AED ${args.aedAvailable} خصم في طلبك التالي.`
+    : `Hi ${args.customerName || 'there'}, you've reached ${args.balance} TM FoodStuff points. Use them for AED ${args.aedAvailable} off your next order.`
+  const cta = isAr ? 'تسوّق الآن' : 'Shop now'
+
+  const html = `<!DOCTYPE html>
+<html lang="${args.locale}" dir="${isAr ? 'rtl' : 'ltr'}">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+        <tr><td style="background:linear-gradient(135deg,#16a34a,#047857);border-radius:16px 16px 0 0;padding:36px 32px;text-align:center;color:#ffffff">
+          <div style="font-size:48px;font-weight:900;letter-spacing:-1px">${args.balance}</div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:0.85;margin-top:4px">${isAr ? 'نقاط' : 'TM POINTS'}</div>
+        </td></tr>
+        <tr><td style="background:#ffffff;padding:32px 32px 28px;text-align:center">
+          <h1 style="margin:0 0 12px;font-size:22px;font-weight:900;color:#111827">${heading}</h1>
+          <p style="margin:0 0 24px;font-size:15px;color:#6b7280;line-height:1.6">${intro}</p>
+          <a href="${SITE_URL}/shop" style="display:inline-block;background:#16a34a;color:#ffffff;font-weight:700;font-size:15px;padding:14px 28px;border-radius:12px;text-decoration:none">${cta} →</a>
+          <p style="margin:18px 0 0;font-size:12px;color:#9ca3af">
+            ${isAr ? 'تنتهي صلاحية النقاط بعد 12 شهراً من تاريخ كسبها.' : 'Points expire 12 months from the date earned.'}
+          </p>
+        </td></tr>
+        <tr><td style="background:#f9fafb;border-radius:0 0 16px 16px;padding:18px 32px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;font-size:12px;color:#9ca3af">
+            <a href="${SITE_URL}/account/points" style="color:#16a34a;text-decoration:none">${isAr ? 'عرض الرصيد والسجل' : 'View balance & history'}</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+  try {
+    await resend.emails.send({
+      from: `TM FoodStuff <${FROM_EMAIL}>`,
+      to: args.to,
+      subject,
+      html,
+    })
+  } catch (err) {
+    console.error('[Resend] Failed to send points threshold email:', err)
+  }
+}
+
 // Fired by fulfillOrder when a product's stock falls below the threshold for
 // the first time (only on the crossing, not on every subsequent low-stock
 // order). Admin-facing, English-only — operational tooling.

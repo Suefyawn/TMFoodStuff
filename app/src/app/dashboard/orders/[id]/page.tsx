@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { User, MapPin, ShoppingBag } from 'lucide-react'
 import OrderStatusUpdater from './OrderStatusUpdater'
 import RefundButton from './RefundButton'
+import OrderEditCard from './OrderEditCard'
+import { getDashboardSession } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +17,8 @@ async function getOrder(id: string) {
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const order = await getOrder(id)
+  const session = await getDashboardSession()
+  const isAdmin = session.state === 'ok' && session.role === 'admin'
 
   if (!order) return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center">
@@ -48,13 +52,32 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
 
-        <RefundButton
+        {isAdmin && (
+          <RefundButton
+            orderId={order.id}
+            orderNumber={order.order_number}
+            paymentMethod={order.payment_method || 'cod'}
+            paymentStatus={order.payment_status || 'pending'}
+            totalAed={Number(order.total_aed ?? order.total ?? 0)}
+            hasPaymentIntent={!!order.stripe_payment_intent}
+          />
+        )}
+
+        <OrderEditCard
           orderId={order.id}
-          orderNumber={order.order_number}
-          paymentMethod={order.payment_method || 'cod'}
-          paymentStatus={order.payment_status || 'pending'}
-          totalAed={Number(order.total_aed ?? order.total ?? 0)}
-          hasPaymentIntent={!!order.stripe_payment_intent}
+          status={order.status || 'pending'}
+          initial={{
+            customer_name: order.customer_name,
+            customer_phone: order.customer_phone,
+            customer_email: order.customer_email,
+            delivery_emirate: order.delivery_emirate,
+            delivery_area: order.delivery_area,
+            delivery_building: order.delivery_building,
+            delivery_makani: order.delivery_makani,
+            delivery_slot: order.delivery_slot,
+            delivery_date: order.delivery_date,
+            delivery_notes: order.delivery_notes,
+          }}
         />
 
         <div className="grid md:grid-cols-2 gap-5">

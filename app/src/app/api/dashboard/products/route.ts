@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { isAdminAuthed, isAdminAdminAuthed } from '@/lib/admin-auth'
 import { sendBackInStockEmail } from '@/lib/email'
 
 function getSupabase() {
@@ -129,9 +129,12 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, product: data })
 }
 
-// DELETE product(s)
+// DELETE product(s) — admin role only; staff can deactivate via PATCH but
+// can't permanently delete a product (and lose its history).
 export async function DELETE(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await isAdminAdminAuthed()) {
+    return NextResponse.json({ error: 'Only admins can delete products.' }, { status: 403 })
+  }
   const { ids } = await request.json()
   const supabase = getSupabase()
 

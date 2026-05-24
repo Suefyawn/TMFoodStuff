@@ -88,6 +88,9 @@ export async function PATCH(request: Request) {
             orderId: order.id,
             subtotalAed: subtotal,
             orderNumber: order.order_number,
+            customerEmail: order.customer_email,
+            customerName: order.customer_name,
+            locale,
           })
         }
       }

@@ -60,6 +60,19 @@ export async function getCurrentCustomer(): Promise<CustomerRecord | null> {
     console.error('[customer] failed to create customer record', insertErr)
     return null
   }
+
+  // Sign-up bonus — credit a small loyalty balance so the customer can see
+  // the rewards programme work immediately. Best-effort: ledger failure here
+  // doesn't block account creation.
+  const SIGNUP_BONUS_POINTS = 100
+  await admin.from('customer_points_ledger').insert({
+    customer_id: inserted.id,
+    delta: SIGNUP_BONUS_POINTS,
+    reason: 'signup_bonus',
+    description: 'Welcome to TM FoodStuff — sign-up bonus',
+    expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+  })
+
   return { id: inserted.id, authUserId: user.id, email: user.email, fullName }
 }
 
