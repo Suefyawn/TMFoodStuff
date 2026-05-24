@@ -46,6 +46,40 @@ async function getStats() {
     .filter((o: any) => new Date(o.created_at) >= weekAgo)
     .reduce((sum: number, o: any) => sum + (o.total || 0), 0)
 
+  // ── Derived KPIs ─────────────────────────────────────────────────────
+  // AOV: average non-cancelled order value over the 30-day window. Gives
+  // the team a single number to watch when running promos.
+  const validOrders = (monthlyOrders || []).filter((o: any) => o.status !== 'cancelled')
+  const monthRevenue = validOrders.reduce((s: number, o: any) => s + (o.total || 0), 0)
+  const aov = validOrders.length > 0 ? monthRevenue / validOrders.length : 0
+
+  // Repeat-customer rate: % of buyers who placed >1 order in the window.
+  // Pull every order in the window (not just non-cancelled) so we don't
+  // over-count someone whose first order was cancelled.
+  const { data: monthBuyers } = await supabase
+    .from('orders')
+    .select('customer_phone, customer_email')
+    .gte('created_at', monthAgo.toISOString())
+    .neq('status', 'cancelled')
+    .limit(5000)
+  const buyerCounts = new Map<string, number>()
+  for (const o of (monthBuyers || []) as Array<{ customer_phone: string | null; customer_email: string | null }>) {
+    const key = (o.customer_email || '').toLowerCase() || (o.customer_phone || '').replace(/\D/g, '')
+    if (!key) continue
+    buyerCounts.set(key, (buyerCounts.get(key) || 0) + 1)
+  }
+  const totalBuyers = buyerCounts.size
+  const repeatBuyers = Array.from(buyerCounts.values()).filter(n => n >= 2).length
+  const repeatRate = totalBuyers > 0 ? (repeatBuyers / totalBuyers) * 100 : 0
+
+  // Conversion proxy: 30-day cart abandonment recovery vs. orders placed.
+  // Doesn't measure storefront-wide conversion (we'd need session data)
+  // but gives ops a rough recovered-vs-paid ratio.
+  const { count: customersCount } = await supabase
+    .from('customers')
+    .select('id', { count: 'exact', head: true })
+    .is('deleted_at', null)
+
   // Daily revenue chart data — last 30 days
   const dailyRevenue = []
   for (let i = 29; i >= 0; i--) {
@@ -75,6 +109,11 @@ async function getStats() {
     totalProducts: totalProducts || 0,
     todayRevenue,
     weekRevenue,
+    monthRevenue,
+    aov,
+    repeatRate,
+    totalBuyers,
+    customersCount: customersCount || 0,
     recentOrders: recentOrders || [],
     dailyRevenue,
     statusCounts,
@@ -141,7 +180,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats cards */}
+      {/* Top-line money stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Today Revenue', value: `AED ${stats.todayRevenue.toFixed(2)}`, sub: `${stats.todayOrders} orders today`, color: 'text-green-400' },
@@ -157,25 +196,67 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-4">
-        {/* Revenue chart */}
-        <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><TrendingUp size={16} className="text-green-400" aria-hidden="true" /> Revenue (Last 30 Days)</h3>
-          <div className="flex items-end gap-0.5 h-40">
-            {stats.dailyRevenue.map((d, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
-                <div
-                  className="w-full bg-green-600/30 rounded-t transition-all hover:bg-green-600/60"
-                  style={{ height: `${Math.max((d.revenue / maxRevenue) * 100, 2)}%` }}
-                />
-                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                  {d.day} · AED {d.revenue.toFixed(0)} · {d.orders} order{d.orders !== 1 ? 's' : ''}
-                </div>
-              </div>
-            ))}
+      {/* Behavioural KPIs — 30-day window. These move slowly so put them
+          below the daily money cards but above the chart. */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Month Revenue', value: `AED ${stats.monthRevenue.toFixed(0)}`, sub: 'Last 30 days', color: 'text-cyan-400' },
+          { label: 'Average Order', value: `AED ${stats.aov.toFixed(2)}`, sub: '30-day AOV', color: 'text-emerald-400' },
+          { label: 'Repeat Rate', value: `${stats.repeatRate.toFixed(0)}%`, sub: `${stats.totalBuyers} unique buyers`, color: stats.repeatRate >= 30 ? 'text-green-400' : 'text-amber-400' },
+          { label: 'Customers', value: String(stats.customersCount), sub: 'registered accounts', color: 'text-indigo-400' },
+        ].map(card => (
+          <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">{card.label}</p>
+            <p className={`text-2xl font-black ${card.color}`}>{card.value}</p>
+            <p className="text-gray-600 text-xs mt-1">{card.sub}</p>
           </div>
-          <div className="flex justify-between mt-1">
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-4">
+        {/* Revenue chart — bars + Y-axis ticks. Tick marks are gridlines
+            (horizontal dashed lines) at 25/50/75/100% of max revenue so
+            the team can eyeball "is today's bar bigger than last week's
+            best day" without hovering for the tooltip. */}
+        <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h3 className="text-white font-black inline-flex items-center gap-2"><TrendingUp size={16} className="text-green-400" aria-hidden="true" /> Revenue (last 30 days)</h3>
+            <p className="text-xs text-gray-500">Peak: <span className="text-gray-300 font-bold">AED {maxRevenue.toFixed(0)}</span></p>
+          </div>
+          <div className="flex gap-2">
+            {/* Y-axis labels */}
+            <div className="flex flex-col justify-between text-[10px] text-gray-600 text-right pr-1 h-40 tabular-nums">
+              <span>AED {maxRevenue.toFixed(0)}</span>
+              <span>{(maxRevenue * 0.75).toFixed(0)}</span>
+              <span>{(maxRevenue * 0.5).toFixed(0)}</span>
+              <span>{(maxRevenue * 0.25).toFixed(0)}</span>
+              <span>0</span>
+            </div>
+            {/* Chart canvas with horizontal gridlines */}
+            <div className="flex-1 relative">
+              <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                {[0, 1, 2, 3, 4].map(i => (
+                  <div key={i} className="border-t border-dashed border-gray-800" />
+                ))}
+              </div>
+              <div className="relative flex items-end gap-0.5 h-40">
+                {stats.dailyRevenue.map((d, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
+                    <div
+                      className="w-full bg-green-600/30 rounded-t transition-all hover:bg-green-600/60"
+                      style={{ height: `${Math.max((d.revenue / maxRevenue) * 100, 2)}%` }}
+                    />
+                    <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                      {d.day} · AED {d.revenue.toFixed(0)} · {d.orders} order{d.orders !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-between mt-2 pl-10">
             <span className="text-xs text-gray-600">{stats.dailyRevenue[0]?.day}</span>
+            <span className="text-xs text-gray-600">{stats.dailyRevenue[14]?.day}</span>
             <span className="text-xs text-gray-600">Today</span>
           </div>
         </div>
