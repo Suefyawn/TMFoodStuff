@@ -48,7 +48,7 @@ export async function POST() {
   //    are needed for accounting and they contain only personal data.
   await Promise.all([
     supabase.from('push_subscriptions').delete().eq('customer_id', customer.id),
-    supabase.from('customer_wishlist').delete().eq('customer_id', customer.id),
+    supabase.from('customer_wishlists').delete().eq('customer_id', customer.id),
     supabase.from('customer_addresses').delete().eq('customer_id', customer.id),
     supabase.from('customer_carts').delete().eq('customer_id', customer.id),
     // Cancel any active subscriptions so the dispatcher doesn't try to

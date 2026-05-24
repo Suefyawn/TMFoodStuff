@@ -90,6 +90,27 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
+        {/* Cancellation explainer — only renders for cancelled orders that
+            captured a reason. Reads-only here; the reason was set at the
+            time of cancellation. */}
+        {order.status === 'cancelled' && order.cancellation_reason && (
+          <div className="bg-red-900/20 border border-red-700/40 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-8 h-8 bg-red-900/40 rounded-lg flex items-center justify-center shrink-0">
+              <span className="text-red-300 text-sm font-black">✕</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-red-300 mb-0.5">Cancellation reason</p>
+              <p className="text-sm text-red-100 font-bold">{order.cancellation_reason}</p>
+              {order.cancelled_at && (
+                <p className="text-[10px] text-red-400 mt-1">
+                  {new Date(order.cancelled_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {order.cancelled_by && <> · by {order.cancelled_by}</>}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
 
         {/* Full status timeline with actor + note so admins can see who

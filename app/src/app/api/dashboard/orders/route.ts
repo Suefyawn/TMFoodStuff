@@ -16,7 +16,10 @@ const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 export async function PATCH(request: Request) {
   if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { id, status } = await request.json()
+  // Bulk callers send { id, status, cancellation_reason? }. The reason is
+  // only meaningful when the new status is 'cancelled' — we ignore it
+  // otherwise so other transitions don't accidentally store stale notes.
+  const { id, status, cancellation_reason } = await request.json()
 
   if (!id || !status) return NextResponse.json({ error: 'id and status are required' }, { status: 400 })
   if (!VALID_STATUSES.includes(status)) return NextResponse.json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` }, { status: 400 })
@@ -31,18 +34,30 @@ export async function PATCH(request: Request) {
 
   if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
-  const { error } = await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', parseInt(id))
+  const session = await import('@/lib/admin-auth').then(m => m.getDashboardSession())
+  const actor = session.state === 'ok' ? session.email : null
+
+  const updates: Record<string, unknown> = { status, updated_at: new Date().toISOString() }
+  if (status === 'cancelled') {
+    updates.cancelled_at = new Date().toISOString()
+    updates.cancelled_by = actor
+    if (typeof cancellation_reason === 'string') {
+      updates.cancellation_reason = cancellation_reason.trim().slice(0, 500) || null
+    }
+  }
+
+  const { error } = await supabase.from('orders').update(updates).eq('id', parseInt(id))
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Record the transition on the per-order timeline so the customer's
   // tracking page can show when each step happened. Skip no-op transitions
   // (re-saving the same status) — they'd just clutter the timeline.
   if (status !== order.status) {
-    const session = await import('@/lib/admin-auth').then(m => m.getDashboardSession())
     await supabase.from('order_status_history').insert({
       order_id: order.id,
       status,
-      actor_email: session.state === 'ok' ? session.email : null,
+      actor_email: actor,
+      note: status === 'cancelled' && typeof cancellation_reason === 'string' ? cancellation_reason.trim().slice(0, 500) || null : null,
     })
   }
 

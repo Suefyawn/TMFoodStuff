@@ -34,7 +34,7 @@ export async function GET() {
     supabase.from('product_reviews').select('product_id, rating, title, body, images, verified_purchase, status, created_at').eq('customer_id', customer.id),
     supabase.from('customer_referrals').select('referred_id, referred_order_id, status, reward_points, created_at, rewarded_at').eq('referrer_id', customer.id),
     supabase.from('customer_referrals').select('referrer_id, referred_order_id, status, reward_points, created_at, rewarded_at').eq('referred_id', customer.id),
-    supabase.from('customer_wishlist').select('product_id, created_at').eq('customer_id', customer.id),
+    supabase.from('customer_wishlists').select('product_id, created_at').eq('customer_id', customer.id),
     supabase.from('subscriptions').select('*').eq('customer_id', customer.id),
     supabase.from('push_subscriptions').select('endpoint, user_agent, created_at, last_seen_at').eq('customer_id', customer.id),
   ])
