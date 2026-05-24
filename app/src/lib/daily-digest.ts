@@ -37,6 +37,7 @@ interface ProductRow {
   slug: string | null
   stock: number | null
   unit: string | null
+  low_stock_threshold?: number | null
 }
 
 interface DigestResult {
@@ -110,15 +111,20 @@ export async function sendDailyDigest(supabase: SupabaseClient): Promise<DigestR
       .slice(0, 5)
   }
 
-  // Low-stock products (active, stock below threshold).
+  // Low-stock products: stock <= each product's own threshold. We can't
+  // express "column <= column" cleanly in PostgREST, so we fetch a wide
+  // band (anything ≤ LOW_STOCK_THRESHOLD as a safety net) and filter in JS.
+  // The products_low_stock_idx partial index makes the wide query fast.
   const { data: lowStockRaw } = await supabase
     .from('products')
-    .select('id, name, slug, stock, unit')
+    .select('id, name, slug, stock, unit, low_stock_threshold')
     .eq('is_active', true)
     .lte('stock', LOW_STOCK_THRESHOLD)
     .order('stock', { ascending: true })
-    .limit(15)
-  const lowStock = (lowStockRaw || []) as ProductRow[]
+    .limit(50)
+  const lowStock = ((lowStockRaw || []) as ProductRow[])
+    .filter(p => Number(p.stock ?? 0) <= Number(p.low_stock_threshold ?? LOW_STOCK_THRESHOLD))
+    .slice(0, 15)
 
   // Abandoned card orders pending for > 1h but < 24h (the cron cancels >24h).
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString()

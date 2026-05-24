@@ -29,8 +29,17 @@ async function getStats() {
     supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(10),
     supabase.from('orders').select('total').gte('created_at', today.toISOString()),
     supabase.from('orders').select('total, status, created_at').gte('created_at', monthAgo.toISOString()),
-    supabase.from('products').select('id, name, stock, emoji').eq('is_active', true).lt('stock', 10).order('stock').limit(10),
+    // Pull a wide band of low-stock candidates and refine against each
+    // product's own threshold below. The products_low_stock_idx partial
+    // index keeps this cheap even as the catalog grows.
+    supabase.from('products').select('id, name, stock, emoji, low_stock_threshold').eq('is_active', true).lte('stock', 10).order('stock').limit(30),
   ])
+
+  // Apply per-product threshold filter in JS — PostgREST can't express
+  // "column ≤ column".
+  const lowStockFiltered = (lowStock || []).filter((p: { stock: number | null; low_stock_threshold: number | null }) =>
+    Number(p.stock ?? 0) <= Number(p.low_stock_threshold ?? 5)
+  ).slice(0, 10)
 
   const todayRevenue = (todayOrderDocs || []).reduce((sum: number, o: any) => sum + (o.total || 0), 0)
   const weekRevenue = (monthlyOrders || [])
@@ -69,7 +78,7 @@ async function getStats() {
     recentOrders: recentOrders || [],
     dailyRevenue,
     statusCounts,
-    lowStock: lowStock || [],
+    lowStock: lowStockFiltered,
   }
 }
 
@@ -88,6 +97,29 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      {/* Low-stock banner: only surfaces when there's actually something to
+          act on. Links straight to the products list filtered to the
+          offending rows. */}
+      {stats.lowStock.length > 0 && (
+        <Link
+          href="/dashboard/products?filter=low-stock"
+          className="block bg-amber-900/30 border border-amber-700/60 hover:border-amber-500 rounded-2xl px-4 py-3 transition-colors"
+        >
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3 min-w-0">
+              <AlertTriangle size={18} className="text-amber-300 shrink-0" aria-hidden="true" />
+              <p className="text-amber-100 font-bold text-sm">
+                {stats.lowStock.length} product{stats.lowStock.length === 1 ? '' : 's'} running low
+                <span className="text-amber-300/70 font-normal ml-2">
+                  ({stats.lowStock.slice(0, 3).map((p: { name: string }) => p.name).join(', ')}{stats.lowStock.length > 3 ? '…' : ''})
+                </span>
+              </p>
+            </div>
+            <span className="text-xs font-bold text-amber-200 shrink-0">Restock →</span>
+          </div>
+        </Link>
+      )}
+
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black text-white">Dashboard</h1>

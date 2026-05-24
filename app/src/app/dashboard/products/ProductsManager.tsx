@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Plus, Trash2, X, Download, Upload } from 'lucide-react'
 import ImageUploader from '@/components/ImageUploader'
@@ -15,6 +15,7 @@ interface Product {
   compare_at_price_aed: number | null
   unit: string
   stock: number
+  low_stock_threshold: number
   is_active: boolean
   is_featured: boolean
   is_organic: boolean
@@ -33,7 +34,7 @@ interface Category {
 
 const emptyProduct = {
   name: '', name_ar: '', slug: '', category_id: 0, description: '',
-  price_aed: 0, compare_at_price_aed: '' as string | number, unit: 'kg', stock: 0, is_active: true, is_featured: false,
+  price_aed: 0, compare_at_price_aed: '' as string | number, unit: 'kg', stock: 0, low_stock_threshold: 5, is_active: true, is_featured: false,
   is_organic: false, origin: '', emoji: '', image_urls: [] as string[],
 }
 
@@ -43,6 +44,16 @@ export default function ProductsManager({ initialProducts, categories }: { initi
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
   const [filterStatus, setFilterStatus] = useState<'' | 'active' | 'inactive'>('')
+  // ?filter=low-stock from the overview banner. useSearchParams() would
+  // pull this in client-side, but a quick window.location check on mount
+  // is enough since the URL never changes mid-session.
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (new URLSearchParams(window.location.search).get('filter') === 'low-stock') {
+      setShowLowStockOnly(true)
+    }
+  }, [])
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [editing, setEditing] = useState<number | null>(null)
   const [editData, setEditData] = useState<any>(null)
@@ -64,6 +75,10 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       if (filterCat && p.categories?.slug !== filterCat) return false
       if (filterStatus === 'active' && !p.is_active) return false
       if (filterStatus === 'inactive' && p.is_active) return false
+      if (showLowStockOnly) {
+        const threshold = Number(p.low_stock_threshold ?? 5)
+        if (Number(p.stock ?? 0) > threshold) return false
+      }
       return true
     })
 
@@ -76,7 +91,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       return sortDir === 'desc' ? -cmp : cmp
     })
     return result
-  }, [products, search, filterCat, filterStatus, sortBy, sortDir])
+  }, [products, search, filterCat, filterStatus, showLowStockOnly, sortBy, sortDir])
 
   function toggleSort(col: typeof sortBy) {
     if (sortBy === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -428,6 +443,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Compare-at Price (AED)" value={String(newProduct.compare_at_price_aed ?? '')} onChange={v => setNewProduct({...newProduct, compare_at_price_aed: v === '' ? '' : Number(v)})} type="number" />
               <Input label="Unit" value={newProduct.unit} onChange={v => setNewProduct({...newProduct, unit: v})} />
               <Input label="Stock" value={String(newProduct.stock)} onChange={v => setNewProduct({...newProduct, stock: Number(v)})} type="number" />
+              <Input label="Low-stock alert at" value={String(newProduct.low_stock_threshold)} onChange={v => setNewProduct({...newProduct, low_stock_threshold: Number(v)})} type="number" />
               <Input label="Origin" value={newProduct.origin} onChange={v => setNewProduct({...newProduct, origin: v})} />
               <Input label="Emoji" value={newProduct.emoji} onChange={v => setNewProduct({...newProduct, emoji: v})} />
               <div className="col-span-1 sm:col-span-2">
@@ -476,6 +492,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Compare-at Price (AED)" value={String(editData.compare_at_price_aed ?? '')} onChange={v => setEditData({...editData, compare_at_price_aed: v === '' ? null : Number(v)})} type="number" />
               <Input label="Unit" value={editData.unit || ''} onChange={v => setEditData({...editData, unit: v})} />
               <Input label="Stock" value={String(editData.stock || 0)} onChange={v => setEditData({...editData, stock: Number(v)})} type="number" />
+              <Input label="Low-stock alert at" value={String(editData.low_stock_threshold ?? 5)} onChange={v => setEditData({...editData, low_stock_threshold: Number(v)})} type="number" />
               <Input label="Origin" value={editData.origin || ''} onChange={v => setEditData({...editData, origin: v})} />
               <Input label="Emoji" value={editData.emoji || ''} onChange={v => setEditData({...editData, emoji: v})} />
               <div className="col-span-1 sm:col-span-2">
