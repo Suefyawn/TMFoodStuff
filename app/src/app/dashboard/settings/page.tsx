@@ -91,8 +91,46 @@ export default function SettingsPage() {
       {/* Delivery Slots */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
         <h3 className="text-white font-black inline-flex items-center gap-2"><Clock size={16} className="text-gray-400" aria-hidden="true" /> Delivery Slots</h3>
-        <p className="text-xs text-gray-500">Comma-separated slot names</p>
-        <input value={settings.delivery_slots || 'morning,afternoon,evening'} onChange={e => setSettings({...settings, delivery_slots: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Slot names (comma-separated)</label>
+            <input value={settings.delivery_slots || 'morning,afternoon,evening'} onChange={e => setSettings({...settings, delivery_slots: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
+          </div>
+          <SettingInput
+            label="Capacity per slot per day (0 = unlimited)"
+            value={settings.slot_capacity_per_day || '0'}
+            onChange={v => setSettings({...settings, slot_capacity_per_day: v})}
+            type="number"
+          />
+        </div>
+        <p className="text-xs text-gray-500">When a slot reaches capacity the storefront rejects new orders on that slot+date with "fully booked". Cancelled orders don't count.</p>
+      </div>
+
+      {/* Tax invoice settings */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+        <h3 className="text-white font-black inline-flex items-center gap-2"><Ticket size={16} className="text-gray-400" aria-hidden="true" /> Tax Invoice</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <SettingInput label="VAT TRN" value={settings.vat_trn || ''} onChange={v => setSettings({...settings, vat_trn: v})} />
+          <SettingInput label="Company name" value={settings.company_name || ''} onChange={v => setSettings({...settings, company_name: v})} />
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Company address</label>
+            <textarea
+              rows={2}
+              value={settings.company_address || ''}
+              onChange={e => setSettings({...settings, company_address: e.target.value})}
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Invoice footer note</label>
+            <textarea
+              rows={2}
+              value={settings.invoice_footer_note || ''}
+              onChange={e => setSettings({...settings, invoice_footer_note: e.target.value})}
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Promo Codes */}

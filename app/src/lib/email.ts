@@ -420,6 +420,81 @@ export async function sendOutForDeliveryEmail(order: StatusUpdateEmailData, loca
   }
 }
 
+// Generic "your order is now <status>" email. Used for the intermediate
+// statuses (confirmed, processing) that don't have a bespoke template.
+// Lighter-weight than the out-for-delivery / delivered designs because the
+// information density is lower.
+const STATUS_LABEL: Record<string, { en: string; ar: string }> = {
+  confirmed:  { en: 'Confirmed',     ar: 'تم التأكيد' },
+  processing: { en: 'Being prepared', ar: 'قيد التحضير' },
+}
+const STATUS_SUB: Record<string, { en: string; ar: string }> = {
+  confirmed: {
+    en: 'We\'ve received your order and confirmed delivery. We\'ll let you know when it\'s on the way.',
+    ar: 'تم استلام طلبك وتأكيد التوصيل. سنعلمك حين يخرج للتوصيل.',
+  },
+  processing: {
+    en: 'Our team is now packing your order. Expect another update when it\'s out for delivery.',
+    ar: 'فريقنا يقوم بتجهيز طلبك. ستصلك رسالة أخرى عند خروجه للتوصيل.',
+  },
+}
+
+export async function sendOrderStatusUpdateEmail(
+  order: StatusUpdateEmailData,
+  status: 'confirmed' | 'processing',
+  locale: Locale,
+): Promise<void> {
+  const resend = getResend()
+  if (!resend) return
+  const tr = T[locale]
+  const label = STATUS_LABEL[status]?.[locale] || status
+  const sub = STATUS_SUB[status]?.[locale] || ''
+  const subject = locale === 'ar'
+    ? `طلبك #${order.order_number} — ${label}`
+    : `Your order #${order.order_number} — ${label}`
+  const html = `<!DOCTYPE html>
+<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+        <tr><td style="background:#16a34a;border-radius:16px 16px 0 0;padding:24px 32px;text-align:center">
+          <div style="color:#ffffff;font-size:20px;font-weight:900">TM FoodStuff</div>
+          <div style="color:#bbf7d0;font-size:12px;margin-top:2px">${tr.tagline}</div>
+        </td></tr>
+        <tr><td style="background:#ffffff;padding:28px 32px">
+          <h1 style="margin:0 0 6px;font-size:18px;font-weight:900;color:#111827">${label}</h1>
+          <p style="margin:0 0 18px;font-size:14px;color:#6b7280;line-height:1.6">${order.customer_name ? (locale === 'ar' ? `مرحباً ${order.customer_name}، ` : `Hi ${order.customer_name}, `) : ''}${sub}</p>
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:12px 16px;font-size:13px;color:#15803d">
+            <strong>${locale === 'ar' ? 'رقم الطلب' : 'Order'}</strong>: #${order.order_number}
+            &nbsp;·&nbsp; <strong>${tr.totalLabel}</strong>: AED ${Number(order.total).toFixed(2)}
+          </div>
+          <div style="text-align:center;margin-top:22px">
+            <a href="${SITE_URL}/account/orders/${order.order_number}" style="display:inline-block;background:#16a34a;color:#ffffff;font-weight:700;font-size:13px;padding:11px 22px;border-radius:10px;text-decoration:none">
+              ${locale === 'ar' ? 'عرض الطلب' : 'View order'}
+            </a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#f9fafb;border-radius:0 0 16px 16px;padding:14px 32px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;font-size:11px;color:#9ca3af">${tr.footer}</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+  try {
+    await resend.emails.send({
+      from: `TM FoodStuff <${FROM_EMAIL}>`,
+      to: order.customer_email,
+      subject,
+      html,
+    })
+  } catch (err) {
+    console.error(`[Resend] Failed to send ${status} email:`, err)
+  }
+}
+
 export async function sendDeliveredEmail(order: StatusUpdateEmailData, locale: Locale): Promise<void> {
   const resend = getResend()
   if (!resend) return

@@ -8,6 +8,7 @@ import HtmlWrapper from '@/components/HtmlWrapper'
 import MobileNav from '@/components/MobileNav'
 import FloatingWhatsApp from '@/components/FloatingWhatsApp'
 import PwaInstallPrompt from '@/components/PwaInstallPrompt'
+import ToastContainer from '@/components/ToastContainer'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -23,6 +24,7 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       <MobileNav />
       <FloatingWhatsApp />
       <PwaInstallPrompt />
+      <ToastContainer />
     </HtmlWrapper>
   )
 }
