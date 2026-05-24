@@ -1,19 +1,17 @@
 'use client'
 import Link from 'next/link'
-import { ShoppingCart, Menu, X, Search, Leaf, User, Package } from 'lucide-react'
+import { ShoppingCart, Menu, X, Leaf, User, Package } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import LangToggle from '@/components/LangToggle'
 import { useLang } from '@/lib/use-lang'
+import SearchAutocomplete from '@/components/SearchAutocomplete'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [mobileSearch, setMobileSearch] = useState('')
   const totalItems = useCartStore(state => state.totalItems())
   const pathname = usePathname()
-  const router = useRouter()
   const { lang, tr } = useLang()
 
   const navLinks = [
@@ -23,21 +21,6 @@ export default function Navbar() {
     { label: tr.organic, href: '/shop?category=organic' },
     { label: tr.allProducts, href: '/shop' },
   ]
-
-  function handleSearch(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery('')
-    }
-  }
-
-  function handleMobileSearch(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' && mobileSearch.trim()) {
-      router.push(`/shop?q=${encodeURIComponent(mobileSearch.trim())}`)
-      setMobileSearch('')
-      setOpen(false)
-    }
-  }
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -53,17 +36,7 @@ export default function Navbar() {
 
           {/* Search bar (desktop center) */}
           <div className="hidden md:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={handleSearch}
-                placeholder={tr.search}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-transparent rounded-full text-sm focus:outline-none focus:bg-white focus:border-green-400 transition-all"
-              />
-            </div>
+            <SearchAutocomplete className="w-full" placeholder={tr.search} />
           </div>
 
           {/* Nav links (desktop) */}
@@ -126,17 +99,11 @@ export default function Navbar() {
         >
           {/* Mobile search */}
           <div className="px-1 pt-3 pb-2">
-            <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-              <input
-                type="text"
-                value={mobileSearch}
-                onChange={e => setMobileSearch(e.target.value)}
-                onKeyDown={handleMobileSearch}
-                placeholder={tr.search}
-                className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full text-base focus:outline-none focus:bg-white focus:border-green-400 border border-transparent transition-all"
-              />
-            </div>
+            <SearchAutocomplete
+              placeholder={tr.search}
+              inputClassName="w-full pl-10 pr-9 py-3 bg-gray-100 rounded-full text-base focus:outline-none focus:bg-white focus:border-green-400 border border-transparent transition-all"
+              onNavigate={() => setOpen(false)}
+            />
           </div>
           <div className="border-t border-gray-100 py-2 space-y-1">
             {navLinks.map(link => (

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe, CreditCard, MessageSquare, Clock } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
+import DigestPreviewButton from './DigestPreviewButton'
 
 interface Integration {
   id: string
@@ -140,7 +141,7 @@ export default async function IntegrationsPage() {
     {
       id: 'cron',
       name: 'Scheduled Jobs',
-      description: 'Hourly cleanup of abandoned card-payment orders',
+      description: 'Daily: cancel abandoned card orders, expire loyalty points, send admin daily digest',
       docsUrl: 'https://vercel.com/docs/cron-jobs',
       icon: Clock,
       iconColor: 'bg-slate-900/40 text-slate-400',
@@ -219,7 +220,16 @@ export default async function IntegrationsPage() {
         ))}
       </div>
 
-      <div className="mt-8 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <h2 className="font-bold text-white mb-2">Daily digest preview</h2>
+        <p className="text-sm text-gray-400">
+          Manually send the daily digest email so you can verify formatting and thresholds
+          without waiting for the 02:30 UTC cron. Requires Resend to be configured.
+        </p>
+        <DigestPreviewButton />
+      </div>
+
+      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
         <h2 className="font-bold text-white mb-3">How to add environment variables</h2>
         <ol className="space-y-2 text-sm text-gray-400">
           <li className="flex gap-2"><span className="text-gray-600 font-mono">1.</span> Go to your Vercel project → Settings → Environment Variables</li>
