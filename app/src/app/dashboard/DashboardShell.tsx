@@ -1,12 +1,17 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck } from 'lucide-react'
 
+// Nav groups: ops surfaces (Pick, Deliver, Slips) sit immediately after
+// Orders so the team flow reads top-to-bottom — pick → deliver → reprint.
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
-  { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/dashboard/pick', label: 'Pick', icon: ClipboardCheck },
+  { href: '/dashboard/deliveries', label: 'Deliver', icon: Truck },
+  { href: '/dashboard/packing-slips', label: 'Slips', icon: FileText },
+  { href: '/dashboard/products', label: 'Products', icon: Package },
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
   { href: '/dashboard/reviews', label: 'Reviews', icon: MessageSquare },

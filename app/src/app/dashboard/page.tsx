@@ -93,12 +93,18 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-black text-white">Dashboard</h1>
           <p className="text-gray-500 text-sm">TMFoodStuff Admin Overview</p>
         </div>
-        <div className="flex gap-2 shrink-0">
-          <Link href="/dashboard/products" className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
-            + Add Product
+        <div className="flex gap-2 shrink-0 flex-wrap">
+          <Link href="/dashboard/pick" className="px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors inline-flex items-center gap-1.5">
+            Pick queue
           </Link>
-          <Link href="/dashboard/orders" className="hidden sm:block px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-xl transition-colors">
-            View Orders
+          <Link href="/dashboard/deliveries" className="px-3 sm:px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-bold rounded-xl transition-colors inline-flex items-center gap-1.5">
+            Deliveries
+          </Link>
+          <Link href="/dashboard/packing-slips" className="hidden sm:inline-flex px-3 sm:px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-xl transition-colors items-center gap-1.5">
+            Print slips
+          </Link>
+          <Link href="/dashboard/orders" className="hidden sm:block px-3 sm:px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-xl transition-colors">
+            All orders
           </Link>
         </div>
       </div>
