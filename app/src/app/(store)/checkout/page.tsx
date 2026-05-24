@@ -2,7 +2,18 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User, Sparkles } from 'lucide-react'
+import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User, Sparkles, Clock } from 'lucide-react'
+
+// Shape from /api/delivery-slots?date=…
+interface ApiSlot {
+  key: string
+  label_en: string
+  label_ar: string
+  time_label_en: string
+  time_label_ar: string
+  available?: boolean
+  reason?: 'cutoff_passed' | 'day_off' | 'full'
+}
 import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
@@ -121,11 +132,35 @@ export default function CheckoutPage() {
     return { iso, label }
   })
 
-  const DELIVERY_SLOTS = [
-    { id: 'morning',   label: lang === 'ar' ? 'صباحاً' : 'Morning',   time: lang === 'ar' ? '٨ص - ١٢م' : '8:00 AM – 12:00 PM', Icon: Sunrise },
-    { id: 'afternoon', label: lang === 'ar' ? 'ظهراً' : 'Afternoon', time: lang === 'ar' ? '١٢م - ٥م'  : '12:00 PM – 5:00 PM',  Icon: Sun },
-    { id: 'evening',   label: lang === 'ar' ? 'مساءً' : 'Evening',   time: lang === 'ar' ? '٥م - ١٠م' : '5:00 PM – 10:00 PM',  Icon: Moon },
-  ]
+  // Slots are admin-managed at /dashboard/delivery-slots. We fetch the
+  // bookable set for the currently-selected date so the picker shows the
+  // right cutoff/capacity reality at this exact moment.
+  const [serverSlots, setServerSlots] = useState<ApiSlot[]>([])
+  useEffect(() => {
+    let cancelled = false
+    const url = form.deliveryDate
+      ? `/api/delivery-slots?date=${form.deliveryDate}`
+      : '/api/delivery-slots'
+    fetch(url)
+      .then(r => r.json())
+      .then(data => { if (!cancelled) setServerSlots(data.slots || []) })
+      .catch(() => { /* fallback: leave whatever was there */ })
+    return () => { cancelled = true }
+  }, [form.deliveryDate])
+
+  // Icon mapping: the API doesn't carry an icon, so we map by key for
+  // the three legacy slots and fall back to a generic Clock for any
+  // custom slots admin creates.
+  const SLOT_ICONS: Record<string, typeof Sunrise> = { morning: Sunrise, afternoon: Sun, evening: Moon }
+
+  const DELIVERY_SLOTS = serverSlots.map(s => ({
+    id: s.key,
+    label: lang === 'ar' ? s.label_ar : s.label_en,
+    time: lang === 'ar' ? s.time_label_ar : s.time_label_en,
+    Icon: SLOT_ICONS[s.key] || Clock,
+    available: s.available !== false,
+    reason: s.reason,
+  }))
 
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
@@ -500,32 +535,50 @@ export default function CheckoutPage() {
 
               {/* Slot picker */}
               <p className="text-sm font-semibold text-gray-700 mb-2">{lang === 'ar' ? 'اختر الوقت' : 'Choose a time slot'}</p>
-              <div className="grid grid-cols-3 gap-2 md:gap-3">
-                {DELIVERY_SLOTS.map(slot => (
-                  <label
-                    key={slot.id}
-                    className={`flex flex-col items-center p-3 md:p-4 border-2 rounded-xl cursor-pointer transition-all text-center ${
-                      form.deliverySlot === slot.id
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="deliverySlot"
-                      value={slot.id}
-                      checked={form.deliverySlot === slot.id}
-                      onChange={e => setForm(f => ({ ...f, deliverySlot: e.target.value }))}
-                      className="sr-only"
-                    />
-                    <slot.Icon size={22} className={`mb-1.5 ${form.deliverySlot === slot.id ? 'text-green-600' : 'text-gray-400'}`} aria-hidden="true" />
-                    <span className="font-bold text-gray-900 text-xs md:text-sm">{slot.label}</span>
-                    <span className="text-xs text-gray-500 mt-0.5 leading-tight">{slot.time}</span>
-                    {form.deliverySlot === slot.id && (
-                      <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />
-                    )}
-                  </label>
-                ))}
+              <div className={`grid gap-2 md:gap-3 ${DELIVERY_SLOTS.length <= 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'}`}>
+                {DELIVERY_SLOTS.length === 0 && (
+                  <p className="col-span-full text-sm text-gray-500 text-center py-4">
+                    {lang === 'ar' ? 'اختر التاريخ أولاً لعرض الأوقات المتاحة.' : 'Pick a date above to see available slots.'}
+                  </p>
+                )}
+                {DELIVERY_SLOTS.map(slot => {
+                  const reasonText: Record<string, string> = lang === 'ar'
+                    ? { cutoff_passed: 'انتهى الوقت', day_off: 'غير متاح', full: 'مكتمل' }
+                    : { cutoff_passed: 'Too late', day_off: 'Off', full: 'Full' }
+                  return (
+                    <label
+                      key={slot.id}
+                      className={`relative flex flex-col items-center p-3 md:p-4 border-2 rounded-xl transition-all text-center ${
+                        !slot.available
+                          ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                          : form.deliverySlot === slot.id
+                            ? 'border-green-500 bg-green-50 cursor-pointer'
+                            : 'border-gray-200 hover:border-gray-300 cursor-pointer'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="deliverySlot"
+                        value={slot.id}
+                        checked={form.deliverySlot === slot.id}
+                        onChange={e => setForm(f => ({ ...f, deliverySlot: e.target.value }))}
+                        disabled={!slot.available}
+                        className="sr-only"
+                      />
+                      <slot.Icon size={22} className={`mb-1.5 ${form.deliverySlot === slot.id ? 'text-green-600' : 'text-gray-400'}`} aria-hidden="true" />
+                      <span className="font-bold text-gray-900 text-xs md:text-sm">{slot.label}</span>
+                      <span className="text-xs text-gray-500 mt-0.5 leading-tight">{slot.time}</span>
+                      {!slot.available && slot.reason && (
+                        <span className="absolute top-1 right-1 text-[9px] font-bold uppercase tracking-wider text-red-700 bg-red-50 border border-red-200 rounded px-1 py-0.5">
+                          {reasonText[slot.reason]}
+                        </span>
+                      )}
+                      {form.deliverySlot === slot.id && slot.available && (
+                        <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />
+                      )}
+                    </label>
+                  )
+                })}
               </div>
               <p className="text-xs text-gray-400 mt-3 text-center inline-flex items-center justify-center gap-1.5 w-full">
                 <Truck size={12} aria-hidden="true" />

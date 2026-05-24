@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone, UserCog, Search, FileSpreadsheet } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone, UserCog, Search, FileSpreadsheet, Clock } from 'lucide-react'
 import { ConfirmProvider } from '@/components/ConfirmDialog'
 
 // Nav groups: ops surfaces (Pick, Deliver, Slips) sit immediately after
@@ -22,6 +22,7 @@ const navItems = [
   { href: '/dashboard/accounting', label: 'Accounting', icon: FileSpreadsheet },
   { href: '/dashboard/audit-log', label: 'Activity', icon: FileText },
   { href: '/dashboard/team', label: 'Team', icon: UserCog },
+  { href: '/dashboard/delivery-slots', label: 'Slots', icon: Clock },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/integrations', label: 'Integrations', icon: Plug },
 ]

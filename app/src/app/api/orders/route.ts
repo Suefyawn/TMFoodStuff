@@ -10,11 +10,11 @@ import { isValidEmail, isValidUAEPhone, normaliseUAEPhone } from '@/lib/validato
 import { resolveRedemption } from '@/lib/points'
 import { recordReferralOnFirstOrder, REFERRAL_COOKIE } from '@/lib/referrals'
 import { clearCustomerCart } from '@/lib/cart-recovery'
+import { validateSlotForDate } from '@/lib/delivery-slots'
 import { getCurrentCustomer } from '@/lib/customer'
 import { getCustomerBalance, recordRedemption } from '@/lib/loyalty'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
-const VALID_SLOTS = ['morning', 'afternoon', 'evening']
 
 function parseNum(value: string | undefined, fallback: number): number {
   const n = parseFloat(value ?? '')
@@ -71,9 +71,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
-    if (!VALID_SLOTS.includes(deliverySlot)) {
-      return NextResponse.json({ success: false, error: 'Please choose a valid delivery slot.' }, { status: 400 })
-    }
     if (!deliveryDate || !acceptableDeliveryDates().includes(String(deliveryDate))) {
       return NextResponse.json({ success: false, error: 'Please choose a valid delivery date.' }, { status: 400 })
     }
@@ -82,6 +79,15 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
+
+    // Hard-validate the slot+date pair against the admin-managed slot
+    // table. Catches: unknown slot key, slot disabled for that weekday,
+    // cutoff already passed, slot at capacity. Mirrors what the storefront
+    // /api/delivery-slots?date= endpoint surfaces.
+    const slotCheck = await validateSlotForDate(supabase, String(deliverySlot), String(deliveryDate))
+    if (!slotCheck.ok) {
+      return NextResponse.json({ success: false, error: slotCheck.reason }, { status: 400 })
+    }
 
     // ── Slot capacity guard ────────────────────────────────────────────────
     // Reject the order if the chosen date+slot is already at the configured
