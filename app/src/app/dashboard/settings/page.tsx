@@ -222,7 +222,7 @@ export default function SettingsPage() {
             </div>
             <div>
               <label className="text-xs text-gray-500 mb-1 block">Expires</label>
-              <input type="date" value={newPromo.expires_at} onChange={e => setNewPromo({...newPromo, expires_at: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
+              <input type="date" value={newPromo.expires_at} onChange={e => setNewPromo({...newPromo, expires_at: e.target.value})} style={{ colorScheme: 'dark' }} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
             </div>
           </div>
           <button onClick={addPromo} disabled={!newPromo.code} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50 sm:self-end">

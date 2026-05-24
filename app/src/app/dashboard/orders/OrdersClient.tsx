@@ -182,6 +182,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
             value={fromDate}
             onChange={e => setFromDate(e.target.value)}
             aria-label="From date"
+            style={{ colorScheme: 'dark' }}
             className="bg-transparent text-gray-300 focus:outline-none w-[120px]"
           />
           <span className="text-gray-600">→</span>
@@ -190,6 +191,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
             value={toDate}
             onChange={e => setToDate(e.target.value)}
             aria-label="To date"
+            style={{ colorScheme: 'dark' }}
             className="bg-transparent text-gray-300 focus:outline-none w-[120px]"
           />
         </div>

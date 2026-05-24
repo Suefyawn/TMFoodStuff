@@ -20,6 +20,7 @@ async function getStats() {
     { data: recentOrders },
     { data: todayOrderDocs },
     { data: monthlyOrders },
+    { data: monthlyOrderItems },
     { data: lowStock },
   ] = await Promise.all([
     supabase.from('orders').select('*', { count: 'exact', head: true }),
@@ -29,6 +30,10 @@ async function getStats() {
     supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(10),
     supabase.from('orders').select('total').gte('created_at', today.toISOString()),
     supabase.from('orders').select('total, status, created_at').gte('created_at', monthAgo.toISOString()),
+    // Items from non-cancelled month orders so we can compute per-product
+    // 30-day velocity and surface reorder hints. Separate from the
+    // monthlyOrders query above because that one only needs totals.
+    supabase.from('orders').select('items').gte('created_at', monthAgo.toISOString()).neq('status', 'cancelled'),
     // Pull a wide band of low-stock candidates and refine against each
     // product's own threshold below. The products_low_stock_idx partial
     // index keeps this cheap even as the catalog grows.
@@ -40,6 +45,43 @@ async function getStats() {
   const lowStockFiltered = (lowStock || []).filter((p: { stock: number | null; low_stock_threshold: number | null }) =>
     Number(p.stock ?? 0) <= Number(p.low_stock_threshold ?? 5)
   ).slice(0, 10)
+
+  // ── Reorder suggestions ────────────────────────────────────────────────
+  // For each product seen in the 30-day order history, compute units
+  // sold per day. If current stock < 7 days of supply at that velocity,
+  // surface it as a "reorder N" hint. The N is enough to last 14 days.
+  // Bounded to top 5 most urgent so the banner stays scannable.
+  const unitsByProduct = new Map<number, number>()
+  for (const o of (monthlyOrderItems || []) as Array<{ items: unknown }>) {
+    const items = Array.isArray(o.items) ? o.items as Array<{ id?: number | string; product_id?: number | string; quantity?: number }> : []
+    for (const it of items) {
+      const pid = Number(it.product_id ?? it.id)
+      if (!Number.isFinite(pid)) continue
+      unitsByProduct.set(pid, (unitsByProduct.get(pid) || 0) + (Number(it.quantity) || 0))
+    }
+  }
+  const reorderHints: Array<{ id: number; name: string; emoji: string | null; stock: number; perDay: number; daysLeft: number; reorderQty: number }> = []
+  for (const p of (lowStock || []) as Array<{ id: number; name: string; emoji: string | null; stock: number }>) {
+    const monthly = unitsByProduct.get(p.id) || 0
+    if (monthly === 0) continue  // No velocity data — can't suggest
+    const perDay = monthly / 30
+    const stock = Number(p.stock ?? 0)
+    const daysLeft = perDay > 0 ? stock / perDay : Infinity
+    if (daysLeft < 7) {
+      // Reorder enough for 14 days, rounded up to the nearest 5.
+      const target = Math.ceil((perDay * 14 - stock) / 5) * 5
+      reorderHints.push({
+        id: p.id,
+        name: p.name,
+        emoji: p.emoji,
+        stock,
+        perDay: Math.round(perDay * 10) / 10,
+        daysLeft: Math.round(daysLeft * 10) / 10,
+        reorderQty: Math.max(5, target),
+      })
+    }
+  }
+  reorderHints.sort((a, b) => a.daysLeft - b.daysLeft)
 
   const todayRevenue = (todayOrderDocs || []).reduce((sum: number, o: any) => sum + (o.total || 0), 0)
   const weekRevenue = (monthlyOrders || [])
@@ -118,6 +160,7 @@ async function getStats() {
     dailyRevenue,
     statusCounts,
     lowStock: lowStockFiltered,
+    reorderHints: reorderHints.slice(0, 5),
   }
 }
 
@@ -157,6 +200,37 @@ export default async function DashboardPage() {
             <span className="text-xs font-bold text-amber-200 shrink-0">Restock →</span>
           </div>
         </Link>
+      )}
+
+      {/* Reorder suggestion widget — sits below the low-stock banner so
+          the urgency-now items get attention first. Velocity-based so
+          we don't nag about slow-movers that happen to be below threshold. */}
+      {stats.reorderHints.length > 0 && (
+        <div className="bg-blue-900/15 border border-blue-700/40 rounded-2xl p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-blue-900/40 rounded-lg flex items-center justify-center text-blue-300 shrink-0 mt-0.5 text-sm font-black">↻</div>
+            <div className="min-w-0 flex-1">
+              <p className="text-blue-100 font-bold text-sm mb-2">Suggested reorders (velocity-based)</p>
+              <ul className="space-y-1.5">
+                {stats.reorderHints.map((h: { id: number; name: string; emoji: string | null; stock: number; perDay: number; daysLeft: number; reorderQty: number }) => (
+                  <li key={h.id} className="flex items-center justify-between gap-3 text-xs flex-wrap">
+                    <span className="text-blue-100 truncate">
+                      {h.emoji && <span className="mr-1">{h.emoji}</span>}
+                      <span className="font-bold">{h.name}</span>
+                      <span className="text-blue-300/70 ml-2">{h.perDay}/day · {h.stock} left ≈ {h.daysLeft}d</span>
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-200 bg-blue-900/40 border border-blue-700 rounded px-2 py-0.5">
+                      Reorder ~{h.reorderQty}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[10px] text-blue-300/60 mt-2">
+                Based on the last 30 days. Reorder quantity targets 14 days of supply, rounded up.
+              </p>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="flex items-start justify-between flex-wrap gap-3">
