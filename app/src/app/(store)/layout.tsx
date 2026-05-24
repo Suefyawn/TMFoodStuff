@@ -12,6 +12,7 @@ import ToastContainer from '@/components/ToastContainer'
 import CaptureReferral from '@/components/CaptureReferral'
 import CartSync from '@/components/CartSync'
 import { ConfirmProvider } from '@/components/ConfirmDialog'
+import PushPermissionPrompt from '@/components/PushPermissionPrompt'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -30,6 +31,7 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       <MobileNav />
       <FloatingWhatsApp />
       <PwaInstallPrompt />
+      <PushPermissionPrompt />
       <ToastContainer />
       </ConfirmProvider>
     </HtmlWrapper>

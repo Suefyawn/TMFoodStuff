@@ -6,7 +6,9 @@ import { notifyOutForDelivery, notifyDelivered } from '@/lib/notify'
 import { toLocale } from '@/lib/locale'
 import { earnPointsForOrder, findCustomerByEmail } from '@/lib/loyalty'
 import { rewardReferralOnDelivery } from '@/lib/referrals'
+import { sendPushToCustomer } from '@/lib/push'
 import { logAdminAction } from '@/lib/audit'
+import { SITE_URL } from '@/lib/site'
 
 const VALID_STATUSES = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
@@ -88,6 +90,33 @@ export async function PATCH(request: Request) {
     if (status === 'out_for_delivery') {
       if (order.customer_email) sendOutForDeliveryEmail(emailData, locale).catch(console.error)
       if (order.customer_phone) notifyOutForDelivery(order.customer_phone, smsSummary, locale).catch(console.error)
+    }
+
+    // Web-push ping on every transition that the customer cares about.
+    // Best-effort — never blocks the response. Resolves the customer id
+    // through the same email-match the loyalty earn uses.
+    if (order.customer_email) {
+      void findCustomerByEmail(supabase, order.customer_email)
+        .then(async customerId => {
+          if (!customerId) return
+          const titleByStatus: Record<string, string> = {
+            confirmed: `Order ${order.order_number} confirmed`,
+            processing: `Order ${order.order_number} is being packed`,
+            out_for_delivery: `Order ${order.order_number} is on the way`,
+            delivered: `Order ${order.order_number} delivered`,
+            cancelled: `Order ${order.order_number} cancelled`,
+            refunded: `Order ${order.order_number} refunded`,
+          }
+          const title = titleByStatus[status]
+          if (!title) return
+          await sendPushToCustomer(supabase, customerId, {
+            title,
+            body: `Tap to see the latest update.`,
+            url: `${SITE_URL}/track?o=${encodeURIComponent(order.order_number)}`,
+            tag: `order-${order.order_number}`,
+          })
+        })
+        .catch(err => console.error('[orders] push notification failed:', err))
     }
     if (status === 'delivered') {
       if (order.customer_email) sendDeliveredEmail(emailData, locale).catch(console.error)
