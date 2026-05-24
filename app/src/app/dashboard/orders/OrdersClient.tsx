@@ -1,7 +1,9 @@
 'use client'
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, X, Download, Calendar } from 'lucide-react'
+import { Search, X, Download, Calendar, CheckSquare, Square, Loader2 } from 'lucide-react'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
@@ -15,10 +17,24 @@ const statusColors: Record<string, string> = {
 const statuses = ['', 'pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'cancelled']
 
 export default function OrdersClient({ initialOrders }: { initialOrders: any[] }) {
+  const router = useRouter()
+  const confirm = useConfirm()
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
+  const [filterEmirate, setFilterEmirate] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+  // Selection state for bulk actions. Set of order ids — the checkboxes
+  // in the table sync with this.
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [bulkBusy, setBulkBusy] = useState(false)
+
+  // Unique emirates seen across all orders — populates the filter dropdown.
+  const emirates = useMemo(() => {
+    const s = new Set<string>()
+    for (const o of initialOrders) if (o.delivery_emirate) s.add(o.delivery_emirate)
+    return Array.from(s).sort()
+  }, [initialOrders])
 
   const filtered = useMemo(() => {
     const fromTs = fromDate ? new Date(fromDate + 'T00:00:00').getTime() : null
@@ -26,6 +42,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
     const toTs = toDate ? new Date(toDate + 'T23:59:59').getTime() : null
     return initialOrders.filter(o => {
       if (filterStatus && o.status !== filterStatus) return false
+      if (filterEmirate && o.delivery_emirate !== filterEmirate) return false
       if (fromTs || toTs) {
         const t = o.created_at ? new Date(o.created_at).getTime() : 0
         if (fromTs && t < fromTs) return false
@@ -41,7 +58,51 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       }
       return true
     })
-  }, [initialOrders, search, filterStatus, fromDate, toDate])
+  }, [initialOrders, search, filterStatus, filterEmirate, fromDate, toDate])
+
+  // Bulk action handler — calls PATCH /api/dashboard/orders for each
+  // selected id. Errors are collected but never block sibling updates.
+  async function bulkSetStatus(status: string) {
+    const ids = Array.from(selected)
+    if (ids.length === 0) return
+    const ok = await confirm({
+      title: `Mark ${ids.length} order${ids.length === 1 ? '' : 's'} as ${status.replace(/_/g, ' ')}?`,
+      message: 'Customers will get the same status-change notifications as a single-order update. Hard to undo at scale.',
+      confirmLabel: `Mark ${ids.length}`,
+      destructive: status === 'cancelled',
+    })
+    if (!ok) return
+    setBulkBusy(true)
+    try {
+      await Promise.all(ids.map(id =>
+        fetch('/api/dashboard/orders', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, status }),
+        }).catch(() => undefined)
+      ))
+      setSelected(new Set())
+      router.refresh()
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
+  function toggleAll() {
+    if (selected.size === filtered.length) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(filtered.map(o => o.id)))
+    }
+  }
+  function toggleOne(id: number) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   // Revenue summary
   const totalRevenue = filtered.reduce((s, o) => s + (o.total || 0), 0)
@@ -108,6 +169,12 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
           <option value="">All Statuses</option>
           {statuses.filter(Boolean).map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
         </select>
+        {emirates.length > 0 && (
+          <select value={filterEmirate} onChange={e => setFilterEmirate(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+            <option value="">All Emirates</option>
+            {emirates.map(em => <option key={em} value={em}>{em}</option>)}
+          </select>
+        )}
         <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm">
           <Calendar size={14} className="text-gray-500" aria-hidden="true" />
           <input
@@ -128,13 +195,53 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
         </div>
         {(search || filterStatus || fromDate || toDate) && (
           <button
-            onClick={() => { setSearch(''); setFilterStatus(''); setFromDate(''); setToDate('') }}
+            onClick={() => { setSearch(''); setFilterStatus(''); setFilterEmirate(''); setFromDate(''); setToDate('') }}
             className="text-xs text-gray-500 hover:text-red-400 flex items-center gap-1"
           >
             <X size={12} aria-hidden="true" /> Clear
           </button>
         )}
       </div>
+
+      {/* Bulk action bar — appears when rows are checked. Sticky-ish:
+          inside the page flow but visually prominent. */}
+      {selected.size > 0 && (
+        <div className="bg-green-900/20 border border-green-600/40 rounded-2xl px-4 py-3 flex items-center gap-3 flex-wrap">
+          <p className="text-sm font-bold text-green-200">
+            {selected.size} order{selected.size === 1 ? '' : 's'} selected
+          </p>
+          <div className="flex gap-1.5 flex-wrap">
+            {(['confirmed', 'processing', 'out_for_delivery', 'delivered'] as const).map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => bulkSetStatus(s)}
+                disabled={bulkBusy}
+                className="text-xs font-bold text-gray-200 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg px-3 py-1.5 disabled:opacity-60"
+              >
+                Mark {s.replace(/_/g, ' ')}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => bulkSetStatus('cancelled')}
+              disabled={bulkBusy}
+              className="text-xs font-bold text-red-300 bg-red-900/30 hover:bg-red-900/50 border border-red-700/50 rounded-lg px-3 py-1.5 disabled:opacity-60"
+            >
+              Cancel
+            </button>
+          </div>
+          {bulkBusy && <Loader2 size={14} className="animate-spin text-green-400 ml-auto" aria-hidden="true" />}
+          <button
+            type="button"
+            onClick={() => setSelected(new Set())}
+            disabled={bulkBusy}
+            className="text-xs text-gray-400 hover:text-white font-bold ml-auto"
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
@@ -193,6 +300,13 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-800">
+                    <th className="px-3 py-3 w-10">
+                      <button type="button" onClick={toggleAll} aria-label="Toggle all" className="text-gray-500 hover:text-white">
+                        {selected.size === filtered.length && filtered.length > 0
+                          ? <CheckSquare size={16} className="text-green-400" aria-hidden="true" />
+                          : <Square size={16} aria-hidden="true" />}
+                      </button>
+                    </th>
                     <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Order</th>
                     <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Customer</th>
                     <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Location</th>
@@ -215,7 +329,14 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                       `We'll be in touch shortly. Thank you! 🥦`
                     )
                     return (
-                      <tr key={order.id} className="hover:bg-gray-800/30 transition-colors">
+                      <tr key={order.id} className={`hover:bg-gray-800/30 transition-colors ${selected.has(order.id) ? 'bg-green-900/10' : ''}`}>
+                        <td className="px-3 py-4 w-10">
+                          <button type="button" onClick={() => toggleOne(order.id)} aria-label="Select order" className="text-gray-500 hover:text-white">
+                            {selected.has(order.id)
+                              ? <CheckSquare size={16} className="text-green-400" aria-hidden="true" />
+                              : <Square size={16} aria-hidden="true" />}
+                          </button>
+                        </td>
                         <td className="px-5 py-4">
                           <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-green-400 text-sm">{order.order_number}</Link>
                           <p className="text-gray-600 text-xs mt-0.5">
