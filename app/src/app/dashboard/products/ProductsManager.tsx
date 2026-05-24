@@ -195,6 +195,27 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     } catch { /* silent — user can retry */ }
   }
 
+  // Inline +/- stock buttons on each product row. Optimistic update —
+  // reverts if the API call fails. Stock history captures the change
+  // via the same PATCH endpoint (it already records before/after).
+  async function adjustStock(id: number, current: number, delta: number) {
+    const next = Math.max(0, current + delta)
+    if (next === current) return
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, stock: next } : p))
+    try {
+      const res = await fetch('/api/dashboard/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: String(id), stock: next }),
+      })
+      if (!res.ok) {
+        setProducts(prev => prev.map(p => p.id === id ? { ...p, stock: current } : p))
+      }
+    } catch {
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, stock: current } : p))
+    }
+  }
+
   async function bulkAction(action: 'activate' | 'deactivate' | 'feature' | 'unfeature') {
     if (selected.size === 0) return
     setSaving(true)
@@ -683,7 +704,28 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                     <td className="px-4 py-3 text-gray-400 text-xs">{product.categories?.name || '—'}</td>
                     <td className="px-4 py-3 text-green-400 font-bold text-sm">AED {Number(product.price_aed).toFixed(2)}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-sm font-semibold ${product.stock > 10 ? 'text-gray-300' : product.stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>{product.stock}</span>
+                      <div className="inline-flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => adjustStock(product.id, product.stock, -1)}
+                          disabled={product.stock <= 0}
+                          aria-label="Decrement stock"
+                          title="-1 (sold/lost)"
+                          className="w-6 h-6 inline-flex items-center justify-center bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          –
+                        </button>
+                        <span className={`text-sm font-semibold tabular-nums w-8 text-center ${product.stock > 10 ? 'text-gray-300' : product.stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>{product.stock}</span>
+                        <button
+                          type="button"
+                          onClick={() => adjustStock(product.id, product.stock, 1)}
+                          aria-label="Increment stock"
+                          title="+1 (restock)"
+                          className="w-6 h-6 inline-flex items-center justify-center bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-gray-300"
+                        >
+                          +
+                        </button>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${product.is_active ? 'bg-green-500/15 text-green-400 hover:bg-red-500/15 hover:text-red-400' : 'bg-red-500/15 text-red-400 hover:bg-green-500/15 hover:text-green-400'}`}>
