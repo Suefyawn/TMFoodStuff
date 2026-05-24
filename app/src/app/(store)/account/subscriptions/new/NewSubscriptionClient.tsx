@@ -1,5 +1,5 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Plus, Minus, Search, Loader2, AlertCircle, Repeat } from 'lucide-react'
@@ -37,11 +37,16 @@ const FREQ_OPTIONS = [
   { days: 30, en: 'Every month', ar: 'كل شهر', desc: { en: '12 deliveries/year', ar: '١٢ توصيلة/سنة' } },
 ] as const
 
-const SLOTS = [
-  { value: 'morning', en: 'Morning (8AM-12PM)', ar: 'الصباح (8 ص - 12 ظ)' },
-  { value: 'afternoon', en: 'Afternoon (12PM-5PM)', ar: 'الظهيرة (12 ظ - 5 م)' },
-  { value: 'evening', en: 'Evening (5PM-10PM)', ar: 'المساء (5 م - 10 م)' },
-] as const
+// Slot options now come from the admin-managed delivery_slots table via
+// the public /api/delivery-slots endpoint — same source the checkout
+// picker uses. Falls back to the legacy three if the fetch fails so the
+// form never renders empty.
+interface SlotOption { key: string; label_en: string; label_ar: string; time_label_en: string; time_label_ar: string }
+const FALLBACK_SLOTS: SlotOption[] = [
+  { key: 'morning', label_en: 'Morning', label_ar: 'الصباح', time_label_en: '8AM-12PM', time_label_ar: '8 ص - 12 ظ' },
+  { key: 'afternoon', label_en: 'Afternoon', label_ar: 'الظهيرة', time_label_en: '12PM-5PM', time_label_ar: '12 ظ - 5 م' },
+  { key: 'evening', label_en: 'Evening', label_ar: 'المساء', time_label_en: '5PM-10PM', time_label_ar: '5 م - 10 م' },
+]
 
 export default function NewSubscriptionClient({ products, addresses, defaultName, defaultPhone }: Props) {
   const { lang } = useLang()
@@ -52,7 +57,20 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
   const [search, setSearch] = useState('')
   const [picks, setPicks] = useState<Record<number, number>>({}) // productId → qty
   const [frequencyDays, setFrequencyDays] = useState<7 | 14 | 30>(7)
-  const [slot, setSlot] = useState<'morning' | 'afternoon' | 'evening'>('morning')
+  const [slot, setSlot] = useState<string>('morning')
+  const [slotOptions, setSlotOptions] = useState<SlotOption[]>(FALLBACK_SLOTS)
+  useEffect(() => {
+    fetch('/api/delivery-slots')
+      .then(r => r.json())
+      .then((data: { slots?: SlotOption[] }) => {
+        if (data.slots && data.slots.length > 0) {
+          setSlotOptions(data.slots)
+          if (!data.slots.some(s => s.key === slot)) setSlot(data.slots[0].key)
+        }
+      })
+      .catch(() => { /* fallback already set */ })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const defaultAddress = addresses.find(a => a.is_default) || addresses[0]
   const [emirate, setEmirate] = useState(defaultAddress?.emirate || '')
   const [area, setArea] = useState(defaultAddress?.area || '')
@@ -273,10 +291,14 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
           <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">{isAr ? 'وقت التسليم' : 'Delivery slot'}</p>
           <select
             value={slot}
-            onChange={e => setSlot(e.target.value as 'morning' | 'afternoon' | 'evening')}
+            onChange={e => setSlot(e.target.value)}
             className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500"
           >
-            {SLOTS.map(s => <option key={s.value} value={s.value}>{isAr ? s.ar : s.en}</option>)}
+            {slotOptions.map(s => (
+              <option key={s.key} value={s.key}>
+                {(isAr ? s.label_ar : s.label_en) + ' (' + (isAr ? s.time_label_ar : s.time_label_en) + ')'}
+              </option>
+            ))}
           </select>
         </div>
 

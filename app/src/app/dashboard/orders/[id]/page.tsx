@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { User, MapPin, ShoppingBag, Printer } from 'lucide-react'
 import OrderStatusUpdater from './OrderStatusUpdater'
 import RefundButton from './RefundButton'
+import DriverAssigner from './DriverAssigner'
 import OrderEditCard from './OrderEditCard'
 import OrderStatusTimeline from '@/components/OrderStatusTimeline'
 import { getDashboardSession } from '@/lib/admin-auth'
@@ -112,6 +113,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         )}
 
         <OrderStatusUpdater orderId={String(order.id)} currentStatus={order.status || 'pending'} />
+
+        <DriverAssigner orderId={order.id} initialDriverId={order.driver_id || null} />
 
         {/* Full status timeline with actor + note so admins can see who
             changed what and when — same component the customer sees, with

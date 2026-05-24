@@ -20,6 +20,7 @@ interface OrderLite {
   total: number | null
   payment_method: string | null
   payment_status: string | null
+  driver_id?: string | null
 }
 
 interface Props {
@@ -183,6 +184,7 @@ function DeliveryCard({ order, busy, onAdvance }: { order: OrderLite; busy: bool
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="font-mono font-black text-white text-sm">{order.order_number}</span>
             {isOut && <span className="text-[9px] font-bold uppercase tracking-wider text-amber-200 bg-amber-900/50 border border-amber-700 rounded px-1.5 py-0.5">On the way</span>}
+            {!order.driver_id && <span className="text-[9px] font-bold uppercase tracking-wider text-blue-200 bg-blue-900/40 border border-blue-700 rounded px-1.5 py-0.5" title="Not assigned to a specific driver — anyone can take it">Unassigned</span>}
             {order.delivery_slot && (
               <span className="inline-flex items-center gap-1 text-[10px] text-gray-400">
                 <Clock size={10} aria-hidden="true" /> {order.delivery_slot}

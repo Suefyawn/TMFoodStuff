@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Package, Clock, MapPin, CreditCard, Wallet, CheckCircle2, Truck, XCircle, ShoppingCart, Loader2, FileText } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { useLang } from '@/lib/use-lang'
+import { useConfirm } from '@/components/ConfirmDialog'
 import { useState } from 'react'
 
 interface OrderRow {
@@ -74,6 +75,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
   const { addItem } = useCartStore()
   const [reordered, setReordered] = useState(false)
   const [cancelling, setCancelling] = useState(false)
+  const confirm = useConfirm()
   const [cancelError, setCancelError] = useState('')
 
   const items = Array.isArray(order.items) ? (order.items as Array<{
@@ -105,12 +107,19 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
   const isPaidCard = order.payment_method === 'card' && order.payment_status === 'paid'
 
   async function cancelOrder() {
-    const confirmText = isPaidCard
+    const message = isPaidCard
       ? (isAr
-          ? 'سيتم إلغاء الطلب واسترداد المبلغ إلى بطاقتك. هل أنت متأكد؟'
-          : 'This will cancel the order and refund the charge to your card. Are you sure?')
-      : (isAr ? 'هل أنت متأكد من إلغاء الطلب؟' : 'Cancel this order?')
-    if (!confirm(confirmText)) return
+          ? 'سيتم إلغاء الطلب واسترداد المبلغ إلى بطاقتك (قد يستغرق 5-10 أيام عمل).'
+          : "We'll cancel the order and refund to your card (typically 5-10 business days).")
+      : (isAr ? 'لن يتم استرداد أي مبلغ لأنك دفعت نقداً عند الاستلام.' : 'No refund needed — you pay cash on delivery.')
+    const ok = await confirm({
+      title: isAr ? 'إلغاء هذا الطلب؟' : 'Cancel this order?',
+      message,
+      confirmLabel: isAr ? 'إلغاء الطلب' : 'Cancel order',
+      cancelLabel: isAr ? 'احتفظ به' : 'Keep it',
+      destructive: true,
+    })
+    if (!ok) return
     setCancelling(true)
     setCancelError('')
     try {
