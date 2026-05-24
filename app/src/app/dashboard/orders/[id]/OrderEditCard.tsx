@@ -165,6 +165,10 @@ function Field(props: { label: string; value: string; onChange: (v: string) => v
         type={props.type || 'text'}
         value={props.value}
         onChange={e => props.onChange(e.target.value)}
+        // colorScheme=dark only matters for date/time inputs but doesn't
+        // hurt the rest — keeps the calendar popup readable against the
+        // dark dashboard background instead of forcing a white panel.
+        style={props.type === 'date' || props.type === 'time' ? { colorScheme: 'dark' } : undefined}
         className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
       />
     </div>
