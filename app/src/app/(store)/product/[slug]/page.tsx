@@ -242,6 +242,29 @@ export default async function ProductPage({ params }: Props) {
         unit={product.unit}
       />
 
+      {/* Bundle contents — only renders when this product is a bundle.
+          Plain inline section so SEO crawlers see the components in the
+          page body, and so the i18n switch keeps working without a
+          client component. */}
+      {product.bundleItems && product.bundleItems.length > 0 && (
+        <div className="mb-8 md:mb-12">
+          <section className="bg-white border border-gray-100 rounded-2xl p-5 md:p-7 shadow-sm">
+            <h2 className="text-xl font-black text-gray-900 mb-4">What&apos;s inside</h2>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {product.bundleItems.map((it, i) => (
+                <li key={`${it.product_id}-${i}`} className="flex items-center justify-between gap-2 bg-gray-50 rounded-xl px-3 py-2.5 text-sm">
+                  <span className="text-gray-800 truncate">
+                    {it.emoji && <span className="mr-1.5">{it.emoji}</span>}
+                    <span className="font-bold">{it.name}</span>
+                  </span>
+                  <span className="text-xs font-bold text-gray-500 tabular-nums shrink-0">× {it.quantity}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      )}
+
       <div className="mb-8 md:mb-12">
         <ProductReviews productId={product.id} productSlug={product.slug} />
       </div>

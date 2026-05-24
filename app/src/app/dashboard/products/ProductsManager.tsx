@@ -1,9 +1,10 @@
 'use client'
 import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Trash2, X, Download, Upload } from 'lucide-react'
+import { Search, Plus, Trash2, X, Download, Upload, Package } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
 import ImageUploader from '@/components/ImageUploader'
+import BundleEditor, { type BundleItem } from './BundleEditor'
 
 interface Product {
   id: number
@@ -17,6 +18,7 @@ interface Product {
   unit: string
   stock: number
   low_stock_threshold: number
+  bundle_items: BundleItem[] | null
   is_active: boolean
   is_featured: boolean
   is_organic: boolean
@@ -35,7 +37,7 @@ interface Category {
 
 const emptyProduct = {
   name: '', name_ar: '', slug: '', category_id: 0, description: '',
-  price_aed: 0, compare_at_price_aed: '' as string | number, unit: 'kg', stock: 0, low_stock_threshold: 5, is_active: true, is_featured: false,
+  price_aed: 0, compare_at_price_aed: '' as string | number, unit: 'kg', stock: 0, low_stock_threshold: 5, bundle_items: null as BundleItem[] | null, is_active: true, is_featured: false,
   is_organic: false, origin: '', emoji: '', image_urls: [] as string[],
 }
 
@@ -480,7 +482,23 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               </div>
               <Toggle label="Organic" checked={newProduct.is_organic} onChange={v => setNewProduct({...newProduct, is_organic: v})} />
               <Toggle label="Featured" checked={newProduct.is_featured} onChange={v => setNewProduct({...newProduct, is_featured: v})} />
+              <Toggle
+                label="Is bundle"
+                checked={!!newProduct.bundle_items}
+                onChange={v => setNewProduct({ ...newProduct, bundle_items: v ? [] : null })}
+              />
             </div>
+            {/* Bundle composition only renders when "Is bundle" is on. The
+                BundleEditor handles its own state shape; we feed it the
+                catalog so the search picker has options to offer. */}
+            {newProduct.bundle_items && (
+              <BundleEditor
+                value={newProduct.bundle_items}
+                onChange={v => setNewProduct({ ...newProduct, bundle_items: v })}
+                bundlePriceAed={Number(newProduct.price_aed) || 0}
+                catalog={products.map(p => ({ id: p.id, name: p.name, emoji: p.emoji, price_aed: p.price_aed, unit: p.unit, is_active: p.is_active }))}
+              />
+            )}
             <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => setShowAdd(false)} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
               <button onClick={addProduct} disabled={saving || !newProduct.name} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">
@@ -530,7 +548,20 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Toggle label="Organic" checked={editData.is_organic || false} onChange={v => setEditData({...editData, is_organic: v})} />
               <Toggle label="Featured" checked={editData.is_featured || false} onChange={v => setEditData({...editData, is_featured: v})} />
               <Toggle label="Active" checked={editData.is_active !== false} onChange={v => setEditData({...editData, is_active: v})} />
+              <Toggle
+                label="Is bundle"
+                checked={!!editData.bundle_items}
+                onChange={v => setEditData({ ...editData, bundle_items: v ? [] : null })}
+              />
             </div>
+            {editData.bundle_items && (
+              <BundleEditor
+                value={editData.bundle_items}
+                onChange={v => setEditData({ ...editData, bundle_items: v })}
+                bundlePriceAed={Number(editData.price_aed) || 0}
+                catalog={products.filter(p => p.id !== editing).map(p => ({ id: p.id, name: p.name, emoji: p.emoji, price_aed: p.price_aed, unit: p.unit, is_active: p.is_active }))}
+              />
+            )}
             <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => { setEditing(null); setEditData(null) }} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
               <button onClick={saveEdit} disabled={saving} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">

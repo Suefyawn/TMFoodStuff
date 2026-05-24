@@ -34,15 +34,21 @@ interface OrderRow {
   created_at: string
 }
 
+interface BundleComponent { name: string; quantity: number; emoji?: string }
+
 interface Props {
   date: string
   orders: OrderRow[]
   qrs: (string | null)[]
   settings: Record<string, string>
+  // Map of product_id → bundle components. Populated only for products
+  // that ARE bundles. Picker uses this to expand bundle line items into
+  // their constituents on the slip.
+  bundleMap: Record<number, BundleComponent[]>
   statusAll: boolean
 }
 
-export default function PackingSlipsView({ date, orders, qrs, settings, statusAll }: Props) {
+export default function PackingSlipsView({ date, orders, qrs, settings, bundleMap, statusAll }: Props) {
   const router = useRouter()
   const company = settings.company_name || 'TM FoodStuff'
 
@@ -101,7 +107,7 @@ export default function PackingSlipsView({ date, orders, qrs, settings, statusAl
       ) : (
         <div className="max-w-5xl mx-auto py-6 print:py-0 print:max-w-none">
           {orders.map((o, idx) => (
-            <Slip key={o.id} order={o} qrSvg={qrs[idx]} company={company} settings={settings} />
+            <Slip key={o.id} order={o} qrSvg={qrs[idx]} company={company} settings={settings} bundleMap={bundleMap} />
           ))}
         </div>
       )}
@@ -119,7 +125,7 @@ export default function PackingSlipsView({ date, orders, qrs, settings, statusAl
   )
 }
 
-function Slip({ order, qrSvg, company, settings }: { order: OrderRow; qrSvg: string | null; company: string; settings: Record<string, string> }) {
+function Slip({ order, qrSvg, company, settings, bundleMap }: { order: OrderRow; qrSvg: string | null; company: string; settings: Record<string, string>; bundleMap: Record<number, BundleComponent[]> }) {
   const items = Array.isArray(order.items) ? (order.items as Item[]) : []
   const total = Number(order.total_aed ?? order.total ?? 0)
   const paymentLabel = order.payment_method === 'card'
@@ -194,16 +200,46 @@ function Slip({ order, qrSvg, company, settings }: { order: OrderRow; qrSvg: str
           <tbody>
             {items.length === 0 ? (
               <tr><td colSpan={4} className="py-3 text-xs text-gray-500 italic">No line items.</td></tr>
-            ) : items.map((it, i) => (
-              <tr key={i} className="border-b border-gray-100">
-                <td className="py-2.5 pr-2">
-                  <span className="inline-block w-5 h-5 border-2 border-gray-400 rounded" aria-label="check box" />
-                </td>
-                <td className="py-2.5 px-2 font-bold text-gray-900">{it.product_name || it.name || `#${it.id ?? i}`}</td>
-                <td className="py-2.5 px-2 text-right tabular-nums font-mono text-base text-gray-900">{it.quantity ?? 1}</td>
-                <td className="py-2.5 pl-2 text-gray-600">{it.unit || ''}</td>
-              </tr>
-            ))}
+            ) : items.flatMap((it, i) => {
+              const productId = Number((it as { product_id?: number | string; id?: number | string }).product_id ?? it.id)
+              const components = Number.isFinite(productId) ? bundleMap[productId] : undefined
+              const lineQty = Number(it.quantity ?? 1)
+              const rows = [
+                <tr key={`it-${i}`} className={`border-b border-gray-100 ${components ? 'bg-amber-50/40' : ''}`}>
+                  <td className="py-2.5 pr-2">
+                    <span className="inline-block w-5 h-5 border-2 border-gray-400 rounded" aria-label="check box" />
+                  </td>
+                  <td className="py-2.5 px-2 font-bold text-gray-900">
+                    {it.product_name || it.name || `#${it.id ?? i}`}
+                    {components && <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-300 rounded px-1.5 py-0.5">Bundle</span>}
+                  </td>
+                  <td className="py-2.5 px-2 text-right tabular-nums font-mono text-base text-gray-900">{lineQty}</td>
+                  <td className="py-2.5 pl-2 text-gray-600">{it.unit || ''}</td>
+                </tr>,
+              ]
+              // Indented sub-rows for bundle components. Multiply by the
+              // bundle's line quantity so "2 boxes" expands the contents.
+              if (components) {
+                components.forEach((c, ci) => {
+                  rows.push(
+                    <tr key={`it-${i}-c-${ci}`} className="border-b border-gray-100 bg-amber-50/20">
+                      <td className="py-2 pr-2">
+                        <span className="inline-block w-3 h-3 border border-gray-400 rounded ml-3" aria-label="check box" />
+                      </td>
+                      <td className="py-2 px-2 text-gray-700 pl-6">
+                        {c.emoji && <span className="mr-1">{c.emoji}</span>}
+                        {c.name}
+                      </td>
+                      <td className="py-2 px-2 text-right tabular-nums font-mono text-sm text-gray-700">
+                        {Number(c.quantity) * lineQty}
+                      </td>
+                      <td className="py-2 pl-2 text-gray-500 text-xs">component</td>
+                    </tr>
+                  )
+                })
+              }
+              return rows
+            })}
           </tbody>
         </table>
 

@@ -51,6 +51,31 @@ export default async function PackingSlipsPage({ searchParams }: { searchParams:
   const settings: Record<string, string> = {}
   for (const row of settingsRes.data || []) settings[row.key] = row.value
 
+  // Bundle expansion: scan every order's items, collect the product_ids,
+  // pull their bundle_items in one query, and pass a lookup down to the
+  // view so bundles get expanded inline ("Family Box → 2 mango, 1kg banana").
+  const productIds = new Set<number>()
+  for (const o of orders) {
+    const items = Array.isArray(o.items) ? o.items as Array<{ id?: number | string; product_id?: number | string }> : []
+    for (const it of items) {
+      const id = Number(it.product_id ?? it.id)
+      if (Number.isFinite(id)) productIds.add(id)
+    }
+  }
+  const bundleMap: Record<number, Array<{ name: string; quantity: number; emoji?: string }>> = {}
+  if (productIds.size > 0) {
+    const { data: prods } = await supabase
+      .from('products')
+      .select('id, bundle_items')
+      .in('id', Array.from(productIds))
+      .not('bundle_items', 'is', null)
+    for (const p of prods || []) {
+      if (Array.isArray(p.bundle_items) && p.bundle_items.length > 0) {
+        bundleMap[Number(p.id)] = p.bundle_items as Array<{ name: string; quantity: number; emoji?: string }>
+      }
+    }
+  }
+
   // Generate a QR per order in parallel. Failures are silently nulled.
   const qrs = await Promise.all(
     orders.map(o => generateQrSvg(`${SITE_URL}/dashboard/orders/${o.id}`)),
@@ -62,6 +87,7 @@ export default async function PackingSlipsPage({ searchParams }: { searchParams:
       orders={orders}
       qrs={qrs}
       settings={settings}
+      bundleMap={bundleMap}
       statusAll={params.status === 'all'}
     />
   )
