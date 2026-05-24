@@ -69,7 +69,22 @@ export async function isAdminAuthed(): Promise<boolean> {
 // Strict gate: only role='admin' (not 'staff'). Use for destructive operations
 // like refunds, product deletes, and bulk actions. Staff get read-write on
 // orders/products but can't fire money-moving or irreversible changes.
+//
+// Prefer `requirePermission(...)` for new code — this stays for the routes
+// that pre-date the permission catalog.
 export async function isAdminAdminAuthed(): Promise<boolean> {
   const session = await getDashboardSession()
   return session.state === 'ok' && session.role === 'admin'
+}
+
+// Returns the session if it has the given permission, otherwise returns
+// null. Lazy-imports the permission catalog to avoid a circular dep.
+export async function requirePermission(
+  permission: import('./permissions').Permission,
+): Promise<DashboardSession & { state: 'ok' } | null> {
+  const session = await getDashboardSession()
+  if (session.state !== 'ok') return null
+  const { hasPermission } = await import('./permissions')
+  if (!hasPermission(session.role, permission)) return null
+  return session
 }

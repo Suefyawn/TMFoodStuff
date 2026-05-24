@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation'
 import { Users } from 'lucide-react'
 import { getDashboardSession } from '@/lib/admin-auth'
 import TeamClient from './TeamClient'
+import PermissionsMatrix from './PermissionsMatrix'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,6 +51,8 @@ export default async function TeamPage() {
         initial={(data || []) as TeamMember[]}
         currentEmail={session.email}
       />
+
+      <PermissionsMatrix />
     </div>
   )
 }
