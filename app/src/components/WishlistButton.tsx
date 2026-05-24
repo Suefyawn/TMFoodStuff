@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Heart } from 'lucide-react'
 import { useWishlistStore } from '@/lib/wishlist-store'
 import { useLang } from '@/lib/use-lang'
+import { Toast } from './Toast'
 
 interface WishlistButtonProps {
   productId: string | number
@@ -21,6 +22,7 @@ export default function WishlistButton({ productId, size = 'sm' }: WishlistButto
   const load = useWishlistStore(s => s.load)
   const toggle = useWishlistStore(s => s.toggle)
   const [busy, setBusy] = useState(false)
+  const [showSignInToast, setShowSignInToast] = useState(false)
 
   useEffect(() => { load() }, [load])
 
@@ -32,8 +34,12 @@ export default function WishlistButton({ productId, size = 'sm' }: WishlistButto
     const result = await toggle(productId)
     setBusy(false)
     if (result.signedIn === false) {
-      // Send guests to login; the button will work on the next visit.
-      router.push('/account/login?next=' + encodeURIComponent(window.location.pathname + window.location.search))
+      // Show a brief toast so guests understand why we're sending them away,
+      // then redirect after a beat so they can actually read it.
+      setShowSignInToast(true)
+      setTimeout(() => {
+        router.push('/account/login?next=' + encodeURIComponent(window.location.pathname + window.location.search))
+      }, 1100)
     }
   }
 
@@ -44,21 +50,28 @@ export default function WishlistButton({ productId, size = 'sm' }: WishlistButto
     : (isAr ? 'أضف إلى المفضلة' : 'Add to wishlist')
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={busy}
-      aria-label={label}
-      aria-pressed={has}
-      title={label}
-      style={{ width: dimension, height: dimension }}
-      className={`inline-flex items-center justify-center rounded-full border transition-colors ${
-        has
-          ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
-          : 'bg-white/90 backdrop-blur border-gray-200 text-gray-500 hover:text-rose-600 hover:border-rose-200'
-      } ${busy ? 'opacity-60 cursor-wait' : 'cursor-pointer'} focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 shadow-sm`}
-    >
-      <Heart size={iconSize} fill={has && !signedIn ? 'none' : has ? 'currentColor' : 'none'} aria-hidden="true" />
-    </button>
+    <>
+      <Toast
+        message={isAr ? 'سجّل دخول لحفظ المفضلة' : 'Sign in to save favorites'}
+        show={showSignInToast}
+        onClose={() => setShowSignInToast(false)}
+      />
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={busy}
+        aria-label={label}
+        aria-pressed={has}
+        title={label}
+        style={{ width: dimension, height: dimension }}
+        className={`inline-flex items-center justify-center rounded-full border transition-colors ${
+          has
+            ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
+            : 'bg-white/90 backdrop-blur border-gray-200 text-gray-500 hover:text-rose-600 hover:border-rose-200'
+        } ${busy ? 'opacity-60 cursor-wait' : 'cursor-pointer'} focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 shadow-sm`}
+      >
+        <Heart size={iconSize} fill={has && !signedIn ? 'none' : has ? 'currentColor' : 'none'} aria-hidden="true" />
+      </button>
+    </>
   )
 }

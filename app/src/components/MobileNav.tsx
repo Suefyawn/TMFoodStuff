@@ -21,7 +21,12 @@ export default function MobileNav() {
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-lg z-50 safe-area-pb">
       <div className="grid grid-cols-4 h-16">
         {links.map(({ href, icon: Icon, label, badge }) => {
-          const isActive = pathname === href || (href !== '/' && href !== '#' && pathname.startsWith(href))
+          // /checkout and /checkout/success have no own tab; light up Cart so
+          // the customer keeps a clear sense of place during checkout.
+          const onCheckout = pathname.startsWith('/checkout')
+          const isActive = onCheckout
+            ? href === '/cart'
+            : pathname === href || (href !== '/' && href !== '#' && pathname.startsWith(href))
           return (
             <Link
               key={href}

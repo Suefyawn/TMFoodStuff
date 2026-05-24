@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Globe, Leaf, Package, Truck } from 'lucide-react'
 import { getProductBySlug, getProducts, getCategories, getAllProductSlugs } from '@/lib/products-api'
 import AddToCartButton from '@/components/AddToCartButton'
 import ProductCard from '@/components/ProductCard'
@@ -15,6 +15,7 @@ import ProductReviews from '@/components/ProductReviews'
 import RecentlyViewed from '@/components/RecentlyViewed'
 import TrackRecentView from '@/components/TrackRecentView'
 import { SITE_URL } from '@/lib/site'
+import { getServerLocale } from '@/lib/server-locale'
 
 export const revalidate = 60
 
@@ -67,8 +68,12 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProductBySlug(slug)
   if (!product) notFound()
 
+  const locale = await getServerLocale()
+  const isAr = locale === 'ar'
+
   const categories = await getCategories()
   const category = categories.find(c => c.slug === product.categorySlug)
+  const categoryName = category ? (isAr && category.nameAr ? category.nameAr : category.name) : ''
   const vatAmount = calculateVAT(product.priceAED)
   const totalWithVAT = product.priceAED + vatAmount
 
@@ -120,22 +125,22 @@ export default async function ProductPage({ params }: Props) {
         href="/shop"
         className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors mb-4 md:mb-6 group min-h-[44px]"
       >
-        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform rtl-flip" />
-        Back to Shop
+        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform rtl-flip" aria-hidden="true" />
+        {isAr ? 'العودة للمتجر' : 'Back to shop'}
       </Link>
 
       <nav className="hidden md:flex items-center gap-2 text-sm text-gray-500 mb-8">
-        <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
+        <Link href="/" className="hover:text-green-600 transition-colors">{isAr ? 'الرئيسية' : 'Home'}</Link>
         <span>/</span>
-        <Link href="/shop" className="hover:text-green-600 transition-colors">Shop</Link>
+        <Link href="/shop" className="hover:text-green-600 transition-colors">{isAr ? 'المتجر' : 'Shop'}</Link>
         <span>/</span>
         {category && (
           <>
-            <Link href={`/shop?category=${category.slug}`} className="hover:text-green-600 transition-colors capitalize">{category.name}</Link>
+            <Link href={`/shop?category=${category.slug}`} className="hover:text-green-600 transition-colors capitalize">{categoryName}</Link>
             <span>/</span>
           </>
         )}
-        <span className="text-gray-800 font-medium">{product.name}</span>
+        <span className="text-gray-800 font-medium">{isAr && product.nameAr ? product.nameAr : product.name}</span>
       </nav>
 
       <div className="grid md:grid-cols-2 gap-6 md:gap-10 mb-12 md:mb-16">
@@ -152,7 +157,7 @@ export default async function ProductPage({ params }: Props) {
         <div className="flex flex-col justify-start md:justify-center">
           {category && (
             <Link href={`/shop?category=${category.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-50 px-3 py-1.5 rounded-full mb-3 md:mb-4 w-fit hover:bg-green-100 transition-colors">
-              {category.emoji} {category.name}
+              {category.emoji} {categoryName}
             </Link>
           )}
 
@@ -173,19 +178,23 @@ export default async function ProductPage({ params }: Props) {
                   <span className="bg-red-500 text-white text-sm font-black px-2.5 py-0.5 rounded-full">-{discountPct}%</span>
                 </>
               )}
-              <span className="text-gray-500 text-sm">per {product.unit}</span>
+              <span className="text-gray-500 text-sm">{isAr ? `لكل ${product.unit}` : `per ${product.unit}`}</span>
             </div>
             <div className="text-xs text-gray-400 space-y-1">
-              <div className="flex justify-between"><span>Price excl. VAT</span><span>{formatAED(product.priceAED)}</span></div>
-              <div className="flex justify-between"><span>VAT (5%)</span><span>{formatAED(vatAmount)}</span></div>
-              <div className="flex justify-between font-bold text-gray-600 border-t pt-1 mt-1"><span>Total incl. VAT</span><span>{formatAED(totalWithVAT)}</span></div>
+              <div className="flex justify-between"><span>{isAr ? 'السعر بدون ضريبة' : 'Price excl. VAT'}</span><span>{formatAED(product.priceAED)}</span></div>
+              <div className="flex justify-between"><span>{isAr ? 'ضريبة القيمة المضافة (٥٪)' : 'VAT (5%)'}</span><span>{formatAED(vatAmount)}</span></div>
+              <div className="flex justify-between font-bold text-gray-600 border-t pt-1 mt-1"><span>{isAr ? 'الإجمالي شامل الضريبة' : 'Total incl. VAT'}</span><span>{formatAED(totalWithVAT)}</span></div>
             </div>
           </div>
 
           <div className="flex items-center gap-2 mb-5 md:mb-6">
-            <div className={`w-2.5 h-2.5 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-400'}`} />
+            <div className={`w-2.5 h-2.5 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-400'}`} aria-hidden="true" />
             <span className={`text-sm font-semibold ${product.stock > 0 ? 'text-green-700' : 'text-red-600'}`}>
-              {product.stock > 20 ? 'In Stock' : product.stock > 0 ? `Only ${product.stock} left` : 'Out of Stock'}
+              {product.stock > 20
+                ? (isAr ? 'متوفر' : 'In stock')
+                : product.stock > 0
+                  ? (isAr ? `تبقى ${product.stock} فقط` : `Only ${product.stock} left`)
+                  : (isAr ? 'نفد المخزون' : 'Out of stock')}
             </span>
           </div>
 
@@ -200,23 +209,23 @@ export default async function ProductPage({ params }: Props) {
           <div className="mt-5 md:mt-6 grid grid-cols-2 gap-2 md:gap-3 text-sm">
             {product.origin && (
               <div className="flex items-center gap-2 text-gray-500">
-                <span>🌍</span>
-                <span>Origin: <span className="font-semibold text-gray-700">{product.origin}</span></span>
+                <Globe size={14} className="text-gray-400 shrink-0" aria-hidden="true" />
+                <span>{isAr ? 'المصدر:' : 'Origin:'} <span className="font-semibold text-gray-700">{product.origin}</span></span>
               </div>
             )}
             {product.isOrganic && (
               <div className="flex items-center gap-2 text-gray-500">
-                <span>🌱</span>
-                <span className="font-semibold text-green-700">Certified Organic</span>
+                <Leaf size={14} className="text-green-600 shrink-0" aria-hidden="true" />
+                <span className="font-semibold text-green-700">{isAr ? 'عضوي معتمد' : 'Certified organic'}</span>
               </div>
             )}
             <div className="flex items-center gap-2 text-gray-500">
-              <span>📦</span>
-              <span>Sold per <span className="font-semibold text-gray-700">{product.unit}</span></span>
+              <Package size={14} className="text-gray-400 shrink-0" aria-hidden="true" />
+              <span>{isAr ? 'يُباع لكل' : 'Sold per'} <span className="font-semibold text-gray-700">{product.unit}</span></span>
             </div>
             <div className="flex items-center gap-2 text-gray-500">
-              <span>🚚</span>
-              <span className="font-semibold text-green-700">Same day delivery</span>
+              <Truck size={14} className="text-green-600 shrink-0" aria-hidden="true" />
+              <span className="font-semibold text-green-700">{isAr ? 'توصيل في نفس اليوم' : 'Same-day delivery'}</span>
             </div>
           </div>
         </div>
@@ -243,7 +252,9 @@ export default async function ProductPage({ params }: Props) {
 
       {related.length > 0 && (
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-5 md:mb-6">More {category?.name}</h2>
+          <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-5 md:mb-6">
+            {isAr ? `المزيد من ${categoryName}` : `More ${categoryName}`}
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
             {related.map(p => (
               <ProductCard key={p.id} product={p} />

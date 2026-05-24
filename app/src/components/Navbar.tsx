@@ -55,8 +55,8 @@ export default function Navbar() {
           {/* Right side */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <Link href="/track" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
-              <Package size={16} />
-              <span>Track Order</span>
+              <Package size={16} aria-hidden="true" />
+              <span>{lang === 'ar' ? 'تتبع الطلب' : 'Track order'}</span>
             </Link>
             <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
               <User size={16} />
@@ -126,8 +126,8 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                 onClick={() => setOpen(false)}
               >
-                <Package size={16} />
-                Track Order
+                <Package size={16} aria-hidden="true" />
+                {lang === 'ar' ? 'تتبع الطلب' : 'Track order'}
               </Link>
               <Link
                 href="/account"

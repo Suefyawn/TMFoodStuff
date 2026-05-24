@@ -69,7 +69,7 @@ export default function QuickViewModal({ product, onClose }: Props) {
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close quick view"
+          aria-label={lang === 'ar' ? 'إغلاق العرض السريع' : 'Close quick view'}
           className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/95 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-700 shadow-md"
         >
           <X size={16} aria-hidden="true" />

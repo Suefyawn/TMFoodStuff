@@ -121,7 +121,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
 
       {/* Hero */}
       <section
-        className="relative overflow-hidden min-h-[calc(100vh-4rem)] flex items-center"
+        className="relative overflow-hidden lg:min-h-[calc(100vh-4rem)] flex items-center py-12 lg:py-0"
         style={{ background: 'linear-gradient(135deg, #14532d 0%, #166534 40%, #15803d 70%, #16a34a 100%)' }}
       >
         {/* SVG geometric pattern overlay */}

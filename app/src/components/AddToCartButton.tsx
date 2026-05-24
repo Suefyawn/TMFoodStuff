@@ -61,7 +61,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
     return (
       <div>
         <Toast
-          message={`${product.name} added to cart`}
+          message={lang === 'ar' ? `تمت إضافة ${product.name} إلى السلة` : `${product.name} added to cart`}
           show={showToast}
           onClose={() => setShowToast(false)}
         />
@@ -99,7 +99,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
   return (
     <div>
       <Toast
-        message={`${product.name} added to cart`}
+        message={lang === 'ar' ? `تمت إضافة ${product.name} إلى السلة` : `${product.name} added to cart`}
         show={showToast}
         onClose={() => setShowToast(false)}
       />
