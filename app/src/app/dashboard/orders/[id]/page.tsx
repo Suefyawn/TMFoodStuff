@@ -77,6 +77,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             delivery_slot: order.delivery_slot,
             delivery_date: order.delivery_date,
             delivery_notes: order.delivery_notes,
+            admin_notes: order.admin_notes,
           }}
         />
 

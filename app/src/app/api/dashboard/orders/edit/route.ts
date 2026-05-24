@@ -16,6 +16,7 @@ const EDITABLE_FIELDS = [
   'delivery_slot',
   'delivery_date',
   'delivery_notes',
+  'admin_notes',
 ] as const
 
 type EditableField = (typeof EDITABLE_FIELDS)[number]
@@ -48,7 +49,7 @@ export async function PATCH(request: Request) {
 
   const { data: existing } = await supabase
     .from('orders')
-    .select('id, order_number, status, customer_name, customer_phone, customer_email, delivery_emirate, delivery_area, delivery_building, delivery_makani, delivery_slot, delivery_date, delivery_notes')
+    .select('id, order_number, status, customer_name, customer_phone, customer_email, delivery_emirate, delivery_area, delivery_building, delivery_makani, delivery_slot, delivery_date, delivery_notes, admin_notes')
     .eq('id', orderId)
     .maybeSingle() as { data: (Record<EditableField, string | null> & { id: number; order_number: string; status: string }) | null }
   if (!existing) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -85,6 +86,7 @@ export async function PATCH(request: Request) {
       delivery_building: 200,
       delivery_makani: 100,
       delivery_notes: 1000,
+      admin_notes: 2000,
     }
     const capped = max[key] ? value.slice(0, max[key]) : value
     updates[key] = capped === '' ? null : capped
