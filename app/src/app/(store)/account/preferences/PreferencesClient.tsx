@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Mail, MessageCircle, Bell, Download, Trash2, AlertTriangle, Loader2 } from 'lucide-react'
+import { ArrowLeft, Mail, MessageCircle, Bell, Download, Trash2, AlertTriangle, Loader2, CreditCard } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 import { useConfirm } from '@/components/ConfirmDialog'
 
@@ -16,6 +16,26 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
   const [prefs, setPrefs] = useState(initial)
   const [savingKey, setSavingKey] = useState<keyof Initial | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [openingBilling, setOpeningBilling] = useState(false)
+  const [billingError, setBillingError] = useState('')
+
+  async function openBillingPortal() {
+    setOpeningBilling(true)
+    setBillingError('')
+    try {
+      const res = await fetch('/api/account/billing-portal', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok || !data.url) {
+        setBillingError(data.error || (isAr ? 'تعذّر فتح لوحة الفوترة.' : 'Could not open billing portal.'))
+        return
+      }
+      window.location.href = data.url
+    } catch {
+      setBillingError(isAr ? 'خطأ في الاتصال.' : 'Network error.')
+    } finally {
+      setOpeningBilling(false)
+    }
+  }
 
   async function setPref(key: keyof Initial, value: boolean) {
     setSavingKey(key)
@@ -106,6 +126,30 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
             onChange={v => setPref('push', v)}
           />
         </ul>
+      </section>
+
+      {/* Billing — opens Stripe Customer Portal where the customer can
+          manage saved payment methods + see past charges. The endpoint
+          lazy-creates the Stripe Customer the first time it's needed. */}
+      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
+        <h2 className="font-black text-gray-900 mb-1">{isAr ? 'الفوترة وبطاقات الدفع' : 'Billing & saved cards'}</h2>
+        <p className="text-xs text-gray-500 mb-4">
+          {isAr
+            ? 'إدارة بطاقاتك المحفوظة وعرض الفواتير السابقة في صفحة Stripe الآمنة.'
+            : "Manage your saved cards and see past charges on Stripe's secure page. We never touch card data ourselves."}
+        </p>
+        <button
+          type="button"
+          onClick={openBillingPortal}
+          disabled={openingBilling}
+          className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-sm px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
+        >
+          {openingBilling ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <CreditCard size={14} aria-hidden="true" />}
+          {openingBilling ? (isAr ? 'جارٍ الفتح…' : 'Opening…') : (isAr ? 'إدارة طرق الدفع' : 'Manage payment methods')}
+        </button>
+        {billingError && (
+          <p role="alert" className="mt-2 text-xs text-red-600">{billingError}</p>
+        )}
       </section>
 
       {/* Privacy + data */}

@@ -24,7 +24,12 @@ const REASON_BADGE: Record<string, string> = {
 }
 
 export default function StockHistoryClient({ initialRows }: { initialRows: Row[] }) {
-  const [search, setSearch] = useState('')
+  // Pre-fill search from ?product=slug so the products page can deep-link
+  // straight to the filtered history for a single SKU.
+  const [search, setSearch] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return new URLSearchParams(window.location.search).get('product') || ''
+  })
   const [reason, setReason] = useState('')
 
   const reasons = useMemo(() => Array.from(new Set(initialRows.map(r => r.reason))).sort(), [initialRows])
