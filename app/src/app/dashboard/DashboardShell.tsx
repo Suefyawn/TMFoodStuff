@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone, UserCog } from 'lucide-react'
 
 // Nav groups: ops surfaces (Pick, Deliver, Slips) sit immediately after
 // Orders so the team flow reads top-to-bottom — pick → deliver → reprint.
@@ -18,6 +18,7 @@ const navItems = [
   { href: '/dashboard/broadcasts', label: 'Broadcasts', icon: Megaphone },
   { href: '/dashboard/stock-history', label: 'Stock', icon: Boxes },
   { href: '/dashboard/audit-log', label: 'Activity', icon: FileText },
+  { href: '/dashboard/team', label: 'Team', icon: UserCog },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/integrations', label: 'Integrations', icon: Plug },
 ]
@@ -55,13 +56,22 @@ function MobileNavLink({ item, pathname }: { item: typeof navItems[number]; path
 export default function DashboardShell({
   children,
   userEmail,
+  role = 'admin',
 }: {
   children: React.ReactNode
   userEmail: string
+  role?: 'admin' | 'staff' | 'driver'
 }) {
   const pathname = usePathname()
 
   if (pathname === '/dashboard/login' || pathname === '/dashboard/logout') {
+    return <>{children}</>
+  }
+
+  // Drivers get a stripped-down shell — only the deliveries surface exists
+  // for them, so the sidebar would only have one entry. Skip it entirely
+  // and let DeliveriesClient be its own full-height app.
+  if (role === 'driver') {
     return <>{children}</>
   }
 

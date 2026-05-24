@@ -1,7 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 import { createSupabaseServerClient } from './supabase-server'
 
-export type AdminRole = 'admin' | 'staff'
+// 'driver' is a scoped role that only sees the delivery queue + their own
+// shifts. They use the same /dashboard/login but the dashboard layout
+// auto-routes them to /dashboard/deliveries on entry and blocks everything
+// else. Admin/staff retain full or near-full access.
+export type AdminRole = 'admin' | 'staff' | 'driver'
+
+// Allowlist of paths a driver can navigate to. Everything else under
+// /dashboard/* redirects to /dashboard/deliveries.
+const DRIVER_ALLOWED_PATHS = [
+  '/dashboard/deliveries',
+  '/dashboard/logout',
+]
+
+export function isDriverAllowedPath(pathname: string): boolean {
+  return DRIVER_ALLOWED_PATHS.some(p => pathname === p || pathname.startsWith(`${p}/`))
+}
 
 export type DashboardSession =
   | { state: 'guest' }
@@ -21,8 +36,15 @@ async function getAllowlistRow(email: string): Promise<{ role: AdminRole } | nul
     .eq('email', email.toLowerCase())
     .maybeSingle()
   if (!data || data.is_active === false) return null
-  const role: AdminRole = data.role === 'admin' ? 'admin' : 'staff'
+  const role: AdminRole = data.role === 'admin' ? 'admin' : data.role === 'driver' ? 'driver' : 'staff'
   return { role }
+}
+
+// Lets driver-only routes (and shared routes like /dashboard/deliveries)
+// authorise drivers without granting full dashboard access.
+export async function isDriverOrAdminAuthed(): Promise<boolean> {
+  const session = await getDashboardSession()
+  return session.state === 'ok'
 }
 
 // Resolves the full dashboard session state. Used by the dashboard layout to

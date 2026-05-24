@@ -1,5 +1,7 @@
 import Link from 'next/link'
-import { getDashboardSession } from '@/lib/admin-auth'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { getDashboardSession, isDriverAllowedPath } from '@/lib/admin-auth'
 import DashboardShell from './DashboardShell'
 
 export const dynamic = 'force-dynamic'
@@ -8,7 +10,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await getDashboardSession()
 
   if (session.state === 'ok') {
-    return <DashboardShell userEmail={session.email}>{children}</DashboardShell>
+    // Drivers only ever see the delivery queue. Hard-redirect them away
+    // from anything else they might wander to via direct URL.
+    if (session.role === 'driver') {
+      const h = await headers()
+      const pathname = h.get('x-pathname') || h.get('x-invoke-path') || ''
+      if (pathname && !isDriverAllowedPath(pathname)) {
+        redirect('/dashboard/deliveries')
+      }
+    }
+    return <DashboardShell userEmail={session.email} role={session.role}>{children}</DashboardShell>
   }
 
   if (session.state === 'denied') {
