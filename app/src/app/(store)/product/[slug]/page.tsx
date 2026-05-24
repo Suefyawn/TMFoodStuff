@@ -12,6 +12,8 @@ import { ProductDescription } from '@/components/ProductDescription'
 import ProductImageGallery from '@/components/ProductImageGallery'
 import StockNotifyForm from '@/components/StockNotifyForm'
 import ProductReviews from '@/components/ProductReviews'
+import RecentlyViewed from '@/components/RecentlyViewed'
+import TrackRecentView from '@/components/TrackRecentView'
 import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 60
@@ -220,8 +222,23 @@ export default async function ProductPage({ params }: Props) {
         </div>
       </div>
 
+      <TrackRecentView
+        id={product.id}
+        slug={product.slug}
+        name={product.name}
+        nameAr={product.nameAr}
+        imageUrl={product.imageUrl}
+        emoji={product.emoji}
+        priceAED={product.priceAED}
+        unit={product.unit}
+      />
+
       <div className="mb-8 md:mb-12">
         <ProductReviews productId={product.id} productSlug={product.slug} />
+      </div>
+
+      <div className="mb-8 md:mb-12">
+        <RecentlyViewed excludeSlug={product.slug} />
       </div>
 
       {related.length > 0 && (

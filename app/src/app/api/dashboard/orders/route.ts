@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
-import { sendOutForDeliveryEmail, sendDeliveredEmail } from '@/lib/email'
+import { sendOutForDeliveryEmail, sendDeliveredEmail, sendOrderStatusUpdateEmail } from '@/lib/email'
 import { notifyOutForDelivery, notifyDelivered } from '@/lib/notify'
 import { toLocale } from '@/lib/locale'
 import { earnPointsForOrder, findCustomerByEmail } from '@/lib/loyalty'
@@ -69,6 +69,9 @@ export async function PATCH(request: Request) {
       total: totalNumber,
     }
 
+    if ((status === 'confirmed' || status === 'processing') && order.customer_email) {
+      sendOrderStatusUpdateEmail(emailData, status, locale).catch(console.error)
+    }
     if (status === 'out_for_delivery') {
       if (order.customer_email) sendOutForDeliveryEmail(emailData, locale).catch(console.error)
       if (order.customer_phone) notifyOutForDelivery(order.customer_phone, smsSummary, locale).catch(console.error)

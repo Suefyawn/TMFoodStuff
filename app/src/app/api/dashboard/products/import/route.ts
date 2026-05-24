@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { getDashboardSession, isAdminAuthed } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/audit'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -29,11 +30,27 @@ export async function POST(request: Request) {
   const catMap: Record<string, number> = {}
   for (const c of (cats || [])) catMap[c.slug] = c.id
 
-  // Fetch existing slugs to distinguish insert vs update
+  // Fetch existing slugs + stock so we can both distinguish insert vs update
+  // and write the stock-history delta for each change.
   const slugs = rows.map((r: any) => r.slug).filter(Boolean)
-  const { data: existing } = await supabase.from('products').select('id, slug').in('slug', slugs)
-  const existingMap: Record<string, number> = {}
-  for (const p of (existing || [])) existingMap[p.slug] = p.id
+  const { data: existing } = await supabase
+    .from('products')
+    .select('id, slug, stock')
+    .in('slug', slugs)
+  const existingMap: Record<string, { id: number; stock: number }> = {}
+  for (const p of (existing || [])) existingMap[p.slug] = { id: p.id, stock: Number(p.stock ?? 0) }
+
+  const session = await getDashboardSession()
+  const actorEmail = session.state === 'ok' ? session.email : null
+  const stockHistoryRows: Array<{
+    product_id: number
+    before: number
+    after: number
+    delta: number
+    reason: 'admin_set' | 'admin_restock'
+    actor_email: string | null
+    note: string
+  }> = []
 
   const imported: string[] = []
   const updated: string[] = []
@@ -68,17 +85,67 @@ export async function POST(request: Request) {
       updated_at: new Date().toISOString(),
     }
 
-    const existingId = existingMap[payload.slug]
-    if (existingId) {
-      const { error } = await supabase.from('products').update(payload).eq('id', existingId)
-      if (error) errors.push(`Row "${row.name}": ${error.message}`)
-      else updated.push(row.name)
+    const existingEntry = existingMap[payload.slug]
+    if (existingEntry) {
+      const { error } = await supabase.from('products').update(payload).eq('id', existingEntry.id)
+      if (error) {
+        errors.push(`Row "${row.name}": ${error.message}`)
+      } else {
+        updated.push(row.name)
+        if (payload.stock !== existingEntry.stock) {
+          stockHistoryRows.push({
+            product_id: existingEntry.id,
+            before: existingEntry.stock,
+            after: payload.stock,
+            delta: payload.stock - existingEntry.stock,
+            reason: payload.stock > existingEntry.stock ? 'admin_restock' : 'admin_set',
+            actor_email: actorEmail,
+            note: 'CSV import',
+          })
+        }
+      }
     } else {
-      const { error } = await supabase.from('products').insert(payload)
-      if (error) errors.push(`Row "${row.name}": ${error.message}`)
-      else imported.push(row.name)
+      const { data: insertedRow, error } = await supabase
+        .from('products')
+        .insert(payload)
+        .select('id')
+        .single()
+      if (error) {
+        errors.push(`Row "${row.name}": ${error.message}`)
+      } else {
+        imported.push(row.name)
+        if (insertedRow && payload.stock > 0) {
+          stockHistoryRows.push({
+            product_id: insertedRow.id,
+            before: 0,
+            after: payload.stock,
+            delta: payload.stock,
+            reason: 'admin_restock',
+            actor_email: actorEmail,
+            note: 'CSV import — initial stock',
+          })
+        }
+      }
     }
   }
+
+  // Write the stock history in one batched insert. Best-effort: failure
+  // doesn't roll back the import (which already succeeded).
+  if (stockHistoryRows.length > 0) {
+    await supabase.from('product_stock_history').insert(stockHistoryRows)
+  }
+
+  await logAdminAction({
+    supabase,
+    action: 'product.csv_import',
+    metadata: {
+      rows: rows.length,
+      imported: imported.length,
+      updated: updated.length,
+      errors: errors.length,
+      stock_changes: stockHistoryRows.length,
+    },
+  })
 
   return NextResponse.json({ ok: true, imported: imported.length, updated: updated.length, errors })
 }
