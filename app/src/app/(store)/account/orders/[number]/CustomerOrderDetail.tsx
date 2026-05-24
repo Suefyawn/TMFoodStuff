@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Package, Clock, MapPin, CreditCard, Wallet, CheckCircle2, Truck, XCircle, ShoppingCart, Loader2 } from 'lucide-react'
+import { ArrowLeft, Package, Clock, MapPin, CreditCard, Wallet, CheckCircle2, Truck, XCircle, ShoppingCart, Loader2, FileText } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
 import { useLang } from '@/lib/use-lang'
 import { useState } from 'react'
@@ -236,6 +236,29 @@ export default function CustomerOrderDetail({ order }: { order: OrderRow }) {
           ))}
         </ul>
       </div>
+
+      {/* Invoice link */}
+      <Link
+        href={`/account/orders/${order.order_number}/invoice`}
+        className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 mb-5 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
+            <FileText size={18} className="text-gray-600" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-bold text-gray-900 text-sm">
+              {isAr ? 'فاتورة ضريبية' : 'Tax invoice'}
+            </p>
+            <p className="text-xs text-gray-500">
+              {isAr ? 'مع رقم TRN وتفصيل ضريبة القيمة المضافة' : 'With VAT TRN and full VAT breakdown'}
+            </p>
+          </div>
+        </div>
+        <span className="text-xs font-bold text-green-700 group-hover:underline shrink-0">
+          {isAr ? 'عرض / تنزيل' : 'View / Print'} →
+        </span>
+      </Link>
 
       {/* Totals */}
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
