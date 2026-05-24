@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, ChevronDown, ChevronUp, Send, ExternalLink } from 'lucide-react'
 import MessageComposer from './MessageComposer'
@@ -20,6 +20,8 @@ export default function CustomersPage() {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [messageTarget, setMessageTarget] = useState<{ email?: string; phone?: string } | null>(null)
+  const [tierFilter, setTierFilter] = useState<string>('')
+  const [orderFilter, setOrderFilter] = useState<'' | 'has_orders' | 'no_orders' | 'repeat'>('')
 
   useEffect(() => {
     fetch('/api/dashboard/customers')
@@ -32,12 +34,30 @@ export default function CustomersPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const filtered = customers.filter(c =>
-    !search ||
-    (c.name || '').toLowerCase().includes(search.toLowerCase()) ||
-    (c.phone || '').includes(search) ||
-    (c.email || '').toLowerCase().includes(search.toLowerCase())
-  )
+  const tierCounts = useMemo(() => {
+    const out: Record<string, number> = {}
+    for (const c of customers) {
+      const key = c.tier || '—'
+      out[key] = (out[key] || 0) + 1
+    }
+    return out
+  }, [customers])
+
+  const filtered = customers.filter(c => {
+    if (search) {
+      const q = search.toLowerCase()
+      if (
+        !(c.name || '').toLowerCase().includes(q) &&
+        !(c.phone || '').includes(search) &&
+        !(c.email || '').toLowerCase().includes(q)
+      ) return false
+    }
+    if (tierFilter && c.tier !== tierFilter) return false
+    if (orderFilter === 'has_orders' && (c.totalOrders || 0) === 0) return false
+    if (orderFilter === 'no_orders' && (c.totalOrders || 0) > 0) return false
+    if (orderFilter === 'repeat' && (c.totalOrders || 0) < 2) return false
+    return true
+  })
 
   if (loading) return <div className="p-6 text-gray-500">Loading customers...</div>
   if (fetchError) return <div className="p-6 text-red-400">Error: {fetchError}</div>
@@ -49,9 +69,27 @@ export default function CustomersPage() {
         <p className="text-gray-500 text-sm">{customers.length} unique customers</p>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, email..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500" />
+      <div className="flex gap-3 flex-wrap items-center">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, email..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500" />
+        </div>
+        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+          <option value="">All tiers</option>
+          {['bronze', 'silver', 'gold', 'platinum'].map(t => (
+            <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)} ({tierCounts[t] || 0})</option>
+          ))}
+        </select>
+        <select value={orderFilter} onChange={e => setOrderFilter(e.target.value as typeof orderFilter)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+          <option value="">Any order count</option>
+          <option value="has_orders">Has ordered</option>
+          <option value="repeat">Repeat customers</option>
+          <option value="no_orders">Never ordered</option>
+        </select>
+        {(search || tierFilter || orderFilter) && (
+          <button onClick={() => { setSearch(''); setTierFilter(''); setOrderFilter('') }} className="text-xs text-gray-500 hover:text-red-400">Clear</button>
+        )}
+        <span className="text-xs text-gray-500 ml-auto">{filtered.length} of {customers.length}</span>
       </div>
 
       {messageTarget && (
