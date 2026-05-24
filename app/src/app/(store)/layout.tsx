@@ -11,10 +11,12 @@ import PwaInstallPrompt from '@/components/PwaInstallPrompt'
 import ToastContainer from '@/components/ToastContainer'
 import CaptureReferral from '@/components/CaptureReferral'
 import CartSync from '@/components/CartSync'
+import { ConfirmProvider } from '@/components/ConfirmDialog'
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <HtmlWrapper>
+      <ConfirmProvider>
       <CaptureReferral />
       <CartSync />
       <ServiceAreaBar />
@@ -29,6 +31,7 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       <FloatingWhatsApp />
       <PwaInstallPrompt />
       <ToastContainer />
+      </ConfirmProvider>
     </HtmlWrapper>
   )
 }

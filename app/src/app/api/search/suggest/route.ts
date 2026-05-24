@@ -83,6 +83,26 @@ export async function GET(request: Request) {
     emoji: c.emoji,
   }))
 
+  // Fire-and-forget log so /dashboard/search-analytics can surface the
+  // top no-results queries — a signal for which products to source next.
+  // We only log when the query is ≥3 chars to avoid logging every key-by-
+  // key typeahead step (the first 1-2 chars on the way to a real query).
+  if (safe.length >= 3) {
+    const logger = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    )
+    void logger
+      .from('search_logs')
+      .insert({
+        query: safe.toLowerCase(),
+        query_length: safe.length,
+        product_hits: products.length,
+        category_hits: categories.length,
+      })
+      .then(() => undefined, err => console.error('[search] log insert failed:', err))
+  }
+
   return NextResponse.json(
     { products, categories },
     { headers: { 'Cache-Control': 'public, max-age=10, stale-while-revalidate=30' } },

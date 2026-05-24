@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { RotateCcw, Loader2, AlertCircle } from 'lucide-react'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 interface RefundButtonProps {
   orderId: number
@@ -35,6 +36,7 @@ export default function RefundButton({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState('')
+  const confirm = useConfirm()
 
   async function issue() {
     const parsed = parseFloat(amount)
@@ -47,10 +49,15 @@ export default function RefundButton({
       return
     }
     const isFull = Math.abs(parsed - remainingAed) < 0.01
-    const confirmText = isCard
-      ? `${isFull ? 'Full' : 'Partial'} refund of AED ${parsed.toFixed(2)} for order #${orderNumber}? Stripe will return this to the customer's card${isFull ? ' and the order will be marked refunded' : ''}.`
-      : `${isFull ? 'Full' : 'Partial'} refund of AED ${parsed.toFixed(2)} for order #${orderNumber}? This records a COD refund — you handle the cash separately.`
-    if (!confirm(confirmText)) return
+    const ok = await confirm({
+      title: `${isFull ? 'Full' : 'Partial'} refund of AED ${parsed.toFixed(2)}?`,
+      message: isCard
+        ? `Stripe will return this to the customer's card${isFull ? ' and the order will be marked refunded' : ''}. Cannot be undone.`
+        : `Records a COD refund for order #${orderNumber}. You handle the cash separately.`,
+      confirmLabel: isCard ? 'Refund via Stripe' : 'Record refund',
+      destructive: true,
+    })
+    if (!ok) return
 
     setBusy(true)
     setError('')

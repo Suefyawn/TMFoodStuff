@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { UserPlus, Loader2, AlertCircle, Trash2, Shield, ShieldCheck, Truck, CircleSlash } from 'lucide-react'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 interface TeamMember {
   id: number
@@ -33,6 +34,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
   const [role, setRole] = useState<TeamMember['role']>('staff')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const confirm = useConfirm()
 
   async function add(e: React.FormEvent) {
     e.preventDefault()
@@ -90,7 +92,13 @@ export default function TeamClient({ initial, currentEmail }: Props) {
   }
 
   async function remove(id: number, who: string) {
-    if (!confirm(`Remove ${who} from the dashboard team? They'll lose access immediately.`)) return
+    const ok = await confirm({
+      title: `Remove ${who}?`,
+      message: 'They will lose dashboard access immediately. You can re-invite by email any time.',
+      confirmLabel: 'Remove',
+      destructive: true,
+    })
+    if (!ok) return
     const prev = rows
     setRows(rs => rs.filter(r => r.id !== id))
     try {

@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone, UserCog } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store, Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone, UserCog, Search, FileSpreadsheet } from 'lucide-react'
+import { ConfirmProvider } from '@/components/ConfirmDialog'
 
 // Nav groups: ops surfaces (Pick, Deliver, Slips) sit immediately after
 // Orders so the team flow reads top-to-bottom — pick → deliver → reprint.
@@ -15,8 +16,10 @@ const navItems = [
   { href: '/dashboard/categories', label: 'Categories', icon: Tags },
   { href: '/dashboard/customers', label: 'Customers', icon: Users },
   { href: '/dashboard/reviews', label: 'Reviews', icon: MessageSquare },
+  { href: '/dashboard/search-analytics', label: 'Searches', icon: Search },
   { href: '/dashboard/broadcasts', label: 'Broadcasts', icon: Megaphone },
   { href: '/dashboard/stock-history', label: 'Stock', icon: Boxes },
+  { href: '/dashboard/accounting', label: 'Accounting', icon: FileSpreadsheet },
   { href: '/dashboard/audit-log', label: 'Activity', icon: FileText },
   { href: '/dashboard/team', label: 'Team', icon: UserCog },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
@@ -72,10 +75,11 @@ export default function DashboardShell({
   // for them, so the sidebar would only have one entry. Skip it entirely
   // and let DeliveriesClient be its own full-height app.
   if (role === 'driver') {
-    return <>{children}</>
+    return <ConfirmProvider>{children}</ConfirmProvider>
   }
 
   return (
+    <ConfirmProvider>
     <div className="min-h-screen bg-gray-950 text-gray-100 flex">
       {/* Sidebar */}
       <aside className="hidden lg:flex w-64 flex-col bg-gray-900 border-r border-gray-800 fixed h-full z-30">
@@ -135,5 +139,6 @@ export default function DashboardShell({
         {children}
       </main>
     </div>
+    </ConfirmProvider>
   )
 }
