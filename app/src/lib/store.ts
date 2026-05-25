@@ -12,11 +12,19 @@ export interface CartItem {
   quantity: number
 }
 
+export interface CartItemPatch {
+  id: string
+  priceAED?: number
+  quantity?: number
+  remove?: boolean
+}
+
 interface CartStore {
   items: CartItem[]
   addItem: (item: Omit<CartItem, 'quantity'>, qty?: number) => void
   removeItem: (id: string) => void
   updateQty: (id: string, qty: number) => void
+  syncItems: (patches: CartItemPatch[]) => void
   clearCart: () => void
   totalItems: () => number
   subtotal: () => number
@@ -48,6 +56,24 @@ export const useCartStore = create<CartStore>()(
             items: state.items.map(i => i.id === id ? { ...i, quantity: qty } : i),
           }))
         }
+      },
+      syncItems: (patches) => {
+        if (patches.length === 0) return
+        const byId = new Map(patches.map(p => [p.id, p]))
+        set(state => ({
+          items: state.items.flatMap(i => {
+            const p = byId.get(i.id)
+            if (!p) return [i]
+            if (p.remove) return []
+            const nextQty = p.quantity != null ? p.quantity : i.quantity
+            if (nextQty <= 0) return []
+            return [{
+              ...i,
+              ...(p.priceAED != null ? { priceAED: p.priceAED } : {}),
+              quantity: nextQty,
+            }]
+          }),
+        }))
       },
       clearCart: () => set({ items: [] }),
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
