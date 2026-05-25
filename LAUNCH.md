@@ -57,8 +57,21 @@ Tick each off, top-to-bottom. Anything blocked, ask.
       → Providers → Email → "Confirm email" toggle. The storefront
       already handles the "check your inbox" UX; this is just the
       backend toggle.
+- [ ] **Leaked-password protection** turned on: Supabase Dashboard →
+      Authentication → Policies → "Enable HaveIBeenPwned check". Blocks
+      signups using credentials known to have been compromised.
 - [ ] Site URL set to production domain in Auth → URL Configuration
 - [ ] Email templates customised (optional but recommended for branding)
+
+## 5a. Supabase Storage
+
+- [ ] **Tighten public-bucket listing**: Supabase Dashboard → Storage →
+      Policies → `product-images`. The current SELECT policy "Public
+      read product images" allows clients to list every file in the
+      bucket. Either edit the policy to a `name = bucket_id || '/'`
+      style match so anonymous viewers can read individual objects but
+      can't enumerate them, or accept the current behaviour if the
+      bucket only contains catalog images you'd publish anyway.
 
 ## 6. PWA push notifications
 

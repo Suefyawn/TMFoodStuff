@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Trash2, X, Download, Upload, Package } from 'lucide-react'
+import { Search, Plus, Trash2, X, Download, Upload } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
 import ImageUploader from '@/components/ImageUploader'
 import BundleEditor, { type BundleItem } from './BundleEditor'
