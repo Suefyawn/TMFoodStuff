@@ -82,31 +82,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: slotCheck.reason }, { status: 400 })
     }
 
-    // ── Slot capacity guard ────────────────────────────────────────────────
-    // Reject the order if the chosen date+slot is already at the configured
-    // capacity. 0 / null / missing setting = unlimited. Cancelled orders
-    // don't count toward the cap.
-    const { data: capRow } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'slot_capacity_per_day')
-      .maybeSingle()
-    const slotCap = Math.max(0, parseInt(capRow?.value || '0', 10) || 0)
-    if (slotCap > 0) {
-      const { count } = await supabase
-        .from('orders')
-        .select('id', { count: 'exact', head: true })
-        .eq('delivery_date', deliveryDate)
-        .eq('delivery_slot', deliverySlot)
-        .neq('status', 'cancelled')
-      if ((count ?? 0) >= slotCap) {
-        return NextResponse.json(
-          { success: false, error: 'This delivery slot is fully booked. Please choose another time.' },
-          { status: 409 },
-        )
-      }
-    }
-
     // ── Resolve cart items to authoritative products ───────────────────────
     const quantities: Record<string, number> = {}
     for (const it of items) {

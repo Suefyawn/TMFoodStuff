@@ -13,7 +13,6 @@ const DEFAULTS: Record<string, string> = {
   delivery_fee: '15',
   vat_rate: '5',
   min_order_amount: '0',
-  delivery_slots: 'morning,afternoon,evening',
   free_delivery_threshold: '150',
 }
 
