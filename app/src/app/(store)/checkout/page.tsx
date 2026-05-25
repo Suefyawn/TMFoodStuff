@@ -23,6 +23,7 @@ import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
 import { isValidEmail, isValidUAEPhone } from '@/lib/validators'
 import { MIN_REDEEM_POINTS, POINTS_PER_AED_REDEEM, resolveRedemption } from '@/lib/points'
+import { useCartValidation, CartValidationBanner } from '@/components/CartValidation'
 import posthog from 'posthog-js'
 
 interface SavedAddress {
@@ -65,6 +66,8 @@ export default function CheckoutPage() {
   })
 
   const { lang, tr } = useLang()
+  const { result: validation } = useCartValidation()
+  const checkoutBlocked = validation?.blocking ?? false
   const [signedIn, setSignedIn] = useState(false)
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
   const [activeAddressId, setActiveAddressId] = useState<number | null>(null)
@@ -367,6 +370,8 @@ export default function CheckoutPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
       <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-6 md:mb-8">{tr.checkout}</h1>
+
+      <CartValidationBanner result={validation} />
 
       <form onSubmit={handleSubmit}>
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
@@ -796,7 +801,10 @@ export default function CheckoutPage() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || checkoutBlocked}
+                title={checkoutBlocked
+                  ? (lang === 'ar' ? 'يرجى حل المشكلات في السلة قبل المتابعة' : 'Please resolve the issues above before continuing')
+                  : undefined}
                 className="w-full mt-4 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg min-h-[52px] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
@@ -804,6 +812,8 @@ export default function CheckoutPage() {
                     <Loader2 size={20} className="animate-spin" aria-hidden="true" />
                     {lang === 'ar' ? 'جاري التأكيد...' : 'Placing order...'}
                   </>
+                ) : checkoutBlocked ? (
+                  <>{lang === 'ar' ? 'حل مشكلات السلة أولاً' : 'Fix cart issues to continue'}</>
                 ) : (
                   <>{tr.placeOrder} →</>
                 )}

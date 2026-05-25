@@ -7,6 +7,7 @@ import { useCartStore } from '@/lib/store'
 import { formatAED, calculateTotal } from '@/lib/utils'
 import { useLang } from '@/lib/use-lang'
 import CartRecoverHandler from '@/components/CartRecoverHandler'
+import { useCartValidation, CartValidationBanner } from '@/components/CartValidation'
 
 export default function CartPage() {
   return (
@@ -24,6 +25,8 @@ function CartPageInner() {
   const sub = subtotal()
   const { vat, deliveryFee, total } = calculateTotal(sub)
   const { lang, tr } = useLang()
+  const { result: validation } = useCartValidation()
+  const checkoutBlocked = validation?.blocking ?? false
 
   if (items.length === 0) {
     return (
@@ -55,6 +58,8 @@ function CartPageInner() {
           <Trash2 size={15} /> {tr.clearAll}
         </button>
       </div>
+
+      <CartValidationBanner result={validation} />
 
       <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
         {/* Items list */}
@@ -145,12 +150,24 @@ function CartPageInner() {
                 <span className="text-green-700">{formatAED(total)}</span>
               </div>
             </div>
-            <Link
-              href="/checkout"
-              className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg flex items-center justify-center gap-2"
-            >
-              {tr.proceedCheckout} <ArrowRight size={18} />
-            </Link>
+            {checkoutBlocked ? (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title={lang === 'ar' ? 'يرجى حل المشكلات في السلة قبل المتابعة' : 'Please resolve the issues above before continuing'}
+                className="w-full mt-6 bg-gray-300 text-gray-500 font-black py-4 rounded-xl text-lg shadow flex items-center justify-center gap-2 cursor-not-allowed"
+              >
+                {lang === 'ar' ? 'حل مشكلات السلة أولاً' : 'Fix cart issues to continue'}
+              </button>
+            ) : (
+              <Link
+                href="/checkout"
+                className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg flex items-center justify-center gap-2"
+              >
+                {tr.proceedCheckout} <ArrowRight size={18} />
+              </Link>
+            )}
             <Link href="/shop" className="w-full mt-3 text-center text-sm text-gray-500 hover:text-green-600 transition-colors block">
               ← {tr.continueShopping}
             </Link>
@@ -167,12 +184,23 @@ function CartPageInner() {
         className="fixed left-0 right-0 p-3 bg-white border-t border-gray-100 shadow-lg md:hidden z-40"
         style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
       >
-        <Link
-          href="/checkout"
-          className="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-colors"
-        >
-          {tr.checkout} · {formatAED(total)} <ArrowRight size={18} />
-        </Link>
+        {checkoutBlocked ? (
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="w-full bg-gray-300 text-gray-500 font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow cursor-not-allowed"
+          >
+            {lang === 'ar' ? 'حل مشكلات السلة أولاً' : 'Fix cart issues to continue'}
+          </button>
+        ) : (
+          <Link
+            href="/checkout"
+            className="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-colors"
+          >
+            {tr.checkout} · {formatAED(total)} <ArrowRight size={18} />
+          </Link>
+        )}
       </div>
       {/* Bottom spacer so content isn't hidden behind sticky bar on mobile */}
       <div className="h-24 md:hidden" />
