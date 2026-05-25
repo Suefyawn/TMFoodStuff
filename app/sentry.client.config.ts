@@ -6,6 +6,9 @@ if (dsn) {
   Sentry.init({
     dsn,
     environment: process.env.NODE_ENV,
+    release: process.env.NEXT_PUBLIC_SENTRY_RELEASE
+      || process.env.VERCEL_GIT_COMMIT_SHA
+      || undefined,
     tracesSampleRate: 0.2,
     replaysOnErrorSampleRate: 1.0,
     replaysSessionSampleRate: 0.05,

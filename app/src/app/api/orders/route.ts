@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import { logError, getRequestId } from '@/lib/log'
 import { computeOrderTotals, subtotalOf, round2 } from '@/lib/pricing'
 import { fulfillOrder } from '@/lib/order-fulfillment'
 import { toLocale } from '@/lib/locale'
@@ -31,6 +32,7 @@ function acceptableDeliveryDates(): string[] {
 }
 
 export async function POST(request: Request) {
+  const reqId = getRequestId(request)
   try {
     if (!rateLimit(`orders:${getClientIp(request)}`, 10, 60_000)) {
       return NextResponse.json(
@@ -300,7 +302,7 @@ export async function POST(request: Request) {
     await supabase
       .from('order_status_history')
       .insert({ order_id: orderId, status: 'pending', actor_email: 'system' })
-      .then(() => undefined, err => console.error('[orders] status_history seed failed:', err))
+      .then(() => undefined, err => logError('orders.status_history_seed', err, { reqId, orderId }))
 
     // ── Record the loyalty-points debit ───────────────────────────────────
     // Done AFTER the order insert so we never debit a customer for an
@@ -468,9 +470,9 @@ export async function POST(request: Request) {
       paymentMethod: 'cod',
     })
   } catch (error) {
-    console.error('Order error:', error)
+    logError('orders', error, { reqId, request })
     return NextResponse.json(
-      { success: false, error: 'Could not place your order. Please try again.' },
+      { success: false, error: 'Could not place your order. Please try again.', reqId },
       { status: 500 },
     )
   }

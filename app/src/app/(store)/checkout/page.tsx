@@ -302,7 +302,10 @@ export default function CheckoutPage() {
           window.open(`https://wa.me/${data.waNumber}?text=${data.waMessage}`, '_blank')
         }, 1500)
       } else {
-        setFormError(data.error || (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'))
+        const baseMsg = data.error || (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.')
+        // Server returns reqId on internal errors so customers can quote it
+        // to support and we can immediately find the matching Sentry trace.
+        setFormError(data.reqId ? `${baseMsg} (ref: ${data.reqId})` : baseMsg)
       }
     } catch {
       setFormError(lang === 'ar' ? 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.' : 'Connection error. Please try again.')
