@@ -32,6 +32,9 @@ interface NavItem {
   exact?: boolean
   badgeKey?: BadgeKey
   adminOnly?: boolean
+  // Only show to staff (used to put items in front of staff that admins
+  // reach via a deeper hub like Settings).
+  staffOnly?: boolean
 }
 
 interface NavSection {
@@ -50,7 +53,7 @@ const NAV: NavSection[] = [
     ],
   },
   {
-    title: 'Fulfillment',
+    title: 'Operations',
     items: [
       { href: '/dashboard/pick', label: 'Pick queue', icon: ClipboardCheck },
       { href: '/dashboard/deliveries', label: 'Deliveries', icon: Truck },
@@ -60,18 +63,16 @@ const NAV: NavSection[] = [
   {
     title: 'Catalog',
     items: [
+      // Single hub entry. Categories + Stock log live as sub-nav tabs on
+      // the products page rather than as their own sidebar items.
       { href: '/dashboard/products', label: 'Products', icon: Package },
-      { href: '/dashboard/categories', label: 'Categories', icon: Tags },
-      { href: '/dashboard/stock-history', label: 'Stock log', icon: Boxes },
-      { href: '/dashboard/delivery-slots', label: 'Delivery slots', icon: Clock },
     ],
   },
   {
     title: 'Customers',
     items: [
-      { href: '/dashboard/customers', label: 'All customers', icon: Users },
-      { href: '/dashboard/wishlist-insights', label: 'Wishlists', icon: Heart },
-      { href: '/dashboard/search-analytics', label: 'Searches', icon: Search },
+      // Customers hub. Wishlists + Searches are sub-nav tabs.
+      { href: '/dashboard/customers', label: 'Customers', icon: Users },
     ],
   },
   {
@@ -82,12 +83,15 @@ const NAV: NavSection[] = [
     ],
   },
   {
-    title: 'Admin',
+    title: 'Settings',
     items: [
-      { href: '/dashboard/team', label: 'Team', icon: UserCog, adminOnly: true },
+      // Settings hub. Delivery slots, Team, Integrations, Activity log
+      // are sub-nav tabs inside the page.
       { href: '/dashboard/settings', label: 'Settings', icon: Settings, adminOnly: true },
-      { href: '/dashboard/integrations', label: 'Integrations', icon: Plug, adminOnly: true },
-      { href: '/dashboard/audit-log', label: 'Activity log', icon: FileText },
+      // Staff don't have settings.edit but DO have audit_log.view, so
+      // they get a direct entry into the Activity log instead of going
+      // through the locked Settings page.
+      { href: '/dashboard/audit-log', label: 'Activity log', icon: FileText, staffOnly: true },
     ],
   },
 ]
@@ -132,7 +136,11 @@ function filterSections(role: Role): NavSection[] {
   return NAV
     .map(section => ({
       ...section,
-      items: section.items.filter(it => !(it.adminOnly && role !== 'admin')),
+      items: section.items.filter(it => {
+        if (it.adminOnly && role !== 'admin') return false
+        if (it.staffOnly && role !== 'staff') return false
+        return true
+      }),
     }))
     .filter(section => section.items.length > 0)
 }

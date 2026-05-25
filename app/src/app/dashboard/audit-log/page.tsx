@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import { redirect } from 'next/navigation'
+import SubNav, { SETTINGS_SUBNAV } from '@/components/dashboard/SubNav'
 import AuditLogClient from './AuditLogClient'
 
 export const dynamic = 'force-dynamic'
@@ -18,5 +19,12 @@ export default async function AuditLogPage() {
     .select('id, actor_email, action, entity, before, after, metadata, created_at')
     .order('created_at', { ascending: false })
     .limit(500)
-  return <AuditLogClient initialRows={data || []} />
+  return (
+    <div className="px-4 sm:px-6 pt-4 sm:pt-6">
+      <SubNav items={SETTINGS_SUBNAV} />
+      <div className="-mx-4 sm:-mx-6 -mt-5">
+        <AuditLogClient initialRows={data || []} />
+      </div>
+    </div>
+  )
 }

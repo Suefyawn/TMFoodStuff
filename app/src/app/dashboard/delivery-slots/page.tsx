@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Clock } from 'lucide-react'
 import { getDashboardSession } from '@/lib/admin-auth'
 import PageHeader from '@/components/dashboard/PageHeader'
+import SubNav, { SETTINGS_SUBNAV } from '@/components/dashboard/SubNav'
 import SlotsClient from './SlotsClient'
 
 export const dynamic = 'force-dynamic'
@@ -25,6 +26,7 @@ export default async function DeliverySlotsPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-5">
+      <SubNav items={SETTINGS_SUBNAV} />
       <PageHeader
         icon={Clock}
         iconTone="cyan"

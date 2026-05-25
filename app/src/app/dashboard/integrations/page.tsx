@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { CheckCircle, XCircle, ExternalLink, Mail, BarChart3, AlertTriangle, Database, Globe, CreditCard, MessageSquare, Clock } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
+import SubNav, { SETTINGS_SUBNAV } from '@/components/dashboard/SubNav'
 import DigestPreviewButton from './DigestPreviewButton'
 
 interface Integration {
@@ -195,6 +196,7 @@ export default async function IntegrationsPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl">
+      <SubNav items={SETTINGS_SUBNAV} />
       <div className="mb-8">
         <h1 className="text-2xl font-black text-white">Integrations</h1>
         <p className="text-gray-400 mt-1 text-sm">
