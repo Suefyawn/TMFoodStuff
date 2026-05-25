@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Save, Plus, Trash2, X, Store, Truck, Clock, Ticket, CheckCircle2, Receipt } from 'lucide-react'
+import { Save, Plus, Trash2, X, Store, Truck, Ticket, CheckCircle2, Receipt } from 'lucide-react'
 import SubNav, { SETTINGS_SUBNAV } from '@/components/dashboard/SubNav'
 
 // Settings sections become tabs so admins aren't scrolling through a
@@ -126,27 +126,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Legacy delivery slot block — superseded by /dashboard/delivery-slots
-          but kept until existing field-based config is migrated. */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black inline-flex items-center gap-2"><Clock size={16} className="text-gray-400" aria-hidden="true" /> Legacy slot config</h3>
-        <p className="text-xs text-amber-300/80 bg-amber-900/15 border border-amber-700/30 rounded px-3 py-2">
-          Newer slot management lives at <a href="/dashboard/delivery-slots" className="underline">Slots</a> — these fields are kept for older code paths.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Slot names (comma-separated)</label>
-            <input value={settings.delivery_slots || 'morning,afternoon,evening'} onChange={e => setSettings({...settings, delivery_slots: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-          </div>
-          <SettingInput
-            label="Capacity per slot per day (0 = unlimited)"
-            value={settings.slot_capacity_per_day || '0'}
-            onChange={v => setSettings({...settings, slot_capacity_per_day: v})}
-            type="number"
-          />
-        </div>
-        <p className="text-xs text-gray-500">When a slot reaches capacity the storefront rejects new orders on that slot+date with "fully booked". Cancelled orders don't count.</p>
-      </div>
       </>)}
 
       {/* Tax invoice settings */}
