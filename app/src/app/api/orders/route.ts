@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { logError, getRequestId } from '@/lib/log'
+import { parseJsonBody } from '@/lib/validate-body'
+import { OrderBodySchema } from '@/lib/schemas/orders'
 import { computeOrderTotals, subtotalOf, round2 } from '@/lib/pricing'
 import { fulfillOrder } from '@/lib/order-fulfillment'
 import { toLocale } from '@/lib/locale'
@@ -41,30 +43,19 @@ export async function POST(request: Request) {
       )
     }
 
-    const body = await request.json()
+    const parsed = await parseJsonBody(request, OrderBodySchema)
+    if (!parsed.ok) return parsed.response
+    const body = parsed.data
     const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate, locale: rawLocale, pointsToRedeem } = body
     const locale = toLocale(rawLocale)
     const isCardPayment = paymentMethod === 'card'
     const pointsRequested = Math.max(0, Math.floor(Number(pointsToRedeem) || 0))
 
-    if (!form || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ success: false, error: 'Invalid order payload' }, { status: 400 })
-    }
-
-    const fullName = String(form.fullName || '').trim()
-    const phone = String(form.phone || '').trim()
-    const emirate = String(form.emirate || '').trim()
-    const area = String(form.area || '').trim()
-    const email = String(form.email || '').trim()
-    if (!fullName || !phone || !emirate || !area) {
-      return NextResponse.json(
-        { success: false, error: 'Please fill in all required delivery details.' },
-        { status: 400 },
-      )
-    }
-    if (fullName.length > 120 || phone.length > 40 || area.length > 200 || email.length > 160) {
-      return NextResponse.json({ success: false, error: 'One or more fields are too long.' }, { status: 400 })
-    }
+    const fullName = form.fullName
+    const phone = form.phone
+    const emirate = form.emirate
+    const area = form.area
+    const email = form.email
     if (!isValidUAEPhone(phone)) {
       return NextResponse.json({ success: false, error: 'Please enter a valid UAE phone number, e.g. 0501234567.' }, { status: 400 })
     }
@@ -73,7 +64,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address.' }, { status: 400 })
     }
 
-    if (!deliveryDate || !acceptableDeliveryDates().includes(String(deliveryDate))) {
+    if (!acceptableDeliveryDates().includes(deliveryDate)) {
       return NextResponse.json({ success: false, error: 'Please choose a valid delivery date.' }, { status: 400 })
     }
 
@@ -259,11 +250,11 @@ export async function POST(request: Request) {
       customer_email: email,
       delivery_emirate: emirate,
       delivery_area: area,
-      delivery_building: String(form.building || '').trim().slice(0, 200),
-      delivery_makani: String(form.makani || '').trim().slice(0, 100),
+      delivery_building: form.building,
+      delivery_makani: form.makani,
       delivery_slot: deliverySlot,
       delivery_date: deliveryDate,
-      delivery_notes: String(form.notes || '').trim().slice(0, 1000),
+      delivery_notes: form.notes,
       locale,
       subtotal,
       subtotal_aed: subtotal,
@@ -417,9 +408,9 @@ export async function POST(request: Request) {
       delivery: {
         emirate,
         area,
-        building: String(form.building || '').trim() || undefined,
+        building: form.building || undefined,
         slot: deliverySlot,
-        notes: String(form.notes || '').trim() || undefined,
+        notes: form.notes || undefined,
       },
       totals: { subtotal, vat, deliveryFee, promoCode: appliedPromoCode || undefined, promoDiscount, total },
       lineItems,
@@ -453,7 +444,7 @@ export async function POST(request: Request) {
         (promoDiscount > 0 ? `Promo (${appliedPromoCode}): -AED ${promoDiscount.toFixed(2)}\n` : '') +
         `💰 TOTAL: AED ${total.toFixed(2)}\n` +
         `💳 Cash on Delivery\n` +
-        (form.notes ? `📝 Notes: ${String(form.notes).trim()}` : ''),
+        (form.notes ? `📝 Notes: ${form.notes}` : ''),
     )
 
     return NextResponse.json({
