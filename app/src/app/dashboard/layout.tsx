@@ -1,10 +1,28 @@
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { createClient } from '@supabase/supabase-js'
 import { getDashboardSession, isDriverAllowedPath } from '@/lib/admin-auth'
 import DashboardShell from './DashboardShell'
 
 export const dynamic = 'force-dynamic'
+
+// Fetch the counts the sidebar surfaces as badges (orders pending,
+// reviews pending, unanswered inbox threads). One round trip via three
+// HEAD-mode count queries — cheap, runs once per layout render.
+async function fetchSidebarBadges(): Promise<{ orders: number; reviews: number; inbox: number }> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+  const [{ count: orders }, { count: reviews }, { count: inbox }] = await Promise.all([
+    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('product_reviews').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('support_threads').select('id', { count: 'exact', head: true })
+      .eq('status', 'open').eq('last_message_direction', 'in'),
+  ])
+  return { orders: orders || 0, reviews: reviews || 0, inbox: inbox || 0 }
+}
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getDashboardSession()
@@ -18,8 +36,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
       if (pathname && !isDriverAllowedPath(pathname)) {
         redirect('/dashboard/deliveries')
       }
+      return <DashboardShell userEmail={session.email} role={session.role}>{children}</DashboardShell>
     }
-    return <DashboardShell userEmail={session.email} role={session.role}>{children}</DashboardShell>
+    const badges = await fetchSidebarBadges()
+    return (
+      <DashboardShell userEmail={session.email} role={session.role} badges={badges}>
+        {children}
+      </DashboardShell>
+    )
   }
 
   if (session.state === 'denied') {
