@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, ChevronDown, ChevronUp, Send, ExternalLink } from 'lucide-react'
+import SubNav, { CUSTOMERS_SUBNAV } from '@/components/dashboard/SubNav'
 import MessageComposer from './MessageComposer'
 
 const statusColors: Record<string, string> = {
@@ -64,6 +65,7 @@ export default function CustomersPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
+      <SubNav items={CUSTOMERS_SUBNAV} />
       <div>
         <h1 className="text-2xl font-black text-white">Customers</h1>
         <p className="text-gray-500 text-sm">{customers.length} unique customers</p>

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Trash2 } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
+import SubNav, { CATALOG_SUBNAV } from '@/components/dashboard/SubNav'
 
 interface Category {
   id: number
@@ -106,6 +107,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
+      <SubNav items={CATALOG_SUBNAV} />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-white">Categories</h1>

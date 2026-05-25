@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { Search, AlertCircle, TrendingUp } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import PageHeader from '@/components/dashboard/PageHeader'
+import SubNav, { CUSTOMERS_SUBNAV } from '@/components/dashboard/SubNav'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,6 +66,7 @@ export default async function SearchAnalyticsPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-5">
+      <SubNav items={CUSTOMERS_SUBNAV} />
       <PageHeader
         icon={Search}
         iconTone="purple"

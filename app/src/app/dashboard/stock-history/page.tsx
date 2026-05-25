@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/admin-auth'
 import { redirect } from 'next/navigation'
+import SubNav, { CATALOG_SUBNAV } from '@/components/dashboard/SubNav'
 import StockHistoryClient from './StockHistoryClient'
 
 export const dynamic = 'force-dynamic'
@@ -16,7 +17,14 @@ export default async function StockHistoryPage() {
     .select('id, product_id, delta, before, after, reason, actor_email, order_id, note, created_at, products(name, slug)')
     .order('created_at', { ascending: false })
     .limit(500)
-  return <StockHistoryClient initialRows={(data || []) as unknown as Array<Row>} />
+  return (
+    <div className="px-4 sm:px-6 pt-4 sm:pt-6">
+      <SubNav items={CATALOG_SUBNAV} />
+      <div className="-mx-4 sm:-mx-6 -mt-5">
+        <StockHistoryClient initialRows={(data || []) as unknown as Array<Row>} />
+      </div>
+    </div>
+  )
 }
 
 interface Row {

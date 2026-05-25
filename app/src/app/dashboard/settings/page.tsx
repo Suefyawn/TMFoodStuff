@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Save, Plus, Trash2, X, Store, Truck, Clock, Ticket, CheckCircle2, Receipt } from 'lucide-react'
+import SubNav, { SETTINGS_SUBNAV } from '@/components/dashboard/SubNav'
 
 // Settings sections become tabs so admins aren't scrolling through a
 // 200-line single page. Tab state is local-only — switching tabs doesn't
@@ -64,6 +65,7 @@ export default function SettingsPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-3xl">
+      <SubNav items={SETTINGS_SUBNAV} />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-white">Settings</h1>

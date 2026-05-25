@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation'
 import { Users } from 'lucide-react'
 import { getDashboardSession } from '@/lib/admin-auth'
 import PageHeader from '@/components/dashboard/PageHeader'
+import SubNav, { SETTINGS_SUBNAV } from '@/components/dashboard/SubNav'
 import TeamClient from './TeamClient'
 import PermissionsMatrix from './PermissionsMatrix'
 
@@ -38,6 +39,7 @@ export default async function TeamPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-5">
+      <SubNav items={SETTINGS_SUBNAV} />
       <PageHeader
         icon={Users}
         iconTone="blue"
