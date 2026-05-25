@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { getDashboardSession, isAdminAuthed, isAdminAdminAuthed } from '@/lib/admin-auth'
 import { sendBackInStockEmail } from '@/lib/email'
 import { logAdminAction } from '@/lib/audit'
+import { parseJsonBody } from '@/lib/validate-body'
+import { ProductCreateSchema, ProductUpdateSchema, ProductDeleteSchema } from '@/lib/schemas/products'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -11,47 +13,43 @@ function getSupabase() {
 // UPDATE product
 export async function PATCH(request: Request) {
   if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const { id, ...updates } = await request.json()
+
+  const parsed = await parseJsonBody(request, ProductUpdateSchema)
+  if (!parsed.ok) return parsed.response
+  const { id, priceAED, isActive, image_urls, image_url, ...updates } = parsed.data
   const supabase = getSupabase()
 
-  const dbUpdates: any = { updated_at: new Date().toISOString() }
-  if (updates.priceAED !== undefined) dbUpdates.price_aed = updates.priceAED
-  if (updates.price_aed !== undefined) dbUpdates.price_aed = updates.price_aed
-  if (updates.stock !== undefined) dbUpdates.stock = updates.stock
-  if (updates.isActive !== undefined) dbUpdates.is_active = updates.isActive
-  if (updates.is_active !== undefined) dbUpdates.is_active = updates.is_active
-  if (updates.name !== undefined) dbUpdates.name = updates.name
-  if (updates.name_ar !== undefined) dbUpdates.name_ar = updates.name_ar
-  if (updates.slug !== undefined) dbUpdates.slug = updates.slug
-  if (updates.category_id !== undefined) dbUpdates.category_id = updates.category_id
-  if (updates.description !== undefined) dbUpdates.description = updates.description
-  if (updates.unit !== undefined) dbUpdates.unit = updates.unit
-  if (updates.origin !== undefined) dbUpdates.origin = updates.origin
-  if (updates.emoji !== undefined) dbUpdates.emoji = updates.emoji
-  if (updates.is_organic !== undefined) dbUpdates.is_organic = updates.is_organic
-  if (updates.is_featured !== undefined) dbUpdates.is_featured = updates.is_featured
-  if (updates.compare_at_price_aed !== undefined) dbUpdates.compare_at_price_aed = updates.compare_at_price_aed || null
-  // image_urls is the canonical multi-image column; keep image_url in sync as the primary
-  if (updates.image_urls !== undefined) {
-    const urls = Array.isArray(updates.image_urls) ? updates.image_urls : []
-    dbUpdates.image_urls = urls
-    dbUpdates.image_url = urls[0] ?? null
-  } else if (updates.image_url !== undefined) {
-    dbUpdates.image_url = updates.image_url
+  const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  // Normalise camelCase legacy aliases into snake_case before passing through.
+  if (priceAED !== undefined) dbUpdates.price_aed = priceAED
+  if (isActive !== undefined) dbUpdates.is_active = isActive
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === undefined) continue
+    dbUpdates[key] = value
+  }
+  // image_urls is the canonical multi-image column; keep image_url in sync as the primary.
+  if (image_urls !== undefined) {
+    dbUpdates.image_urls = image_urls
+    dbUpdates.image_url = image_urls[0] ?? null
+  } else if (image_url !== undefined) {
+    dbUpdates.image_url = image_url
+  }
+  if (dbUpdates.compare_at_price_aed === '' || dbUpdates.compare_at_price_aed === 0) {
+    dbUpdates.compare_at_price_aed = null
   }
 
   // Check current stock before updating (for back-in-stock notifications)
   const stockIsBeingRestored = dbUpdates.stock !== undefined && Number(dbUpdates.stock) > 0
   let previousStock = 1 // assume in-stock unless we find otherwise
   if (stockIsBeingRestored) {
-    const { data: current } = await supabase.from('products').select('stock, name, slug').eq('id', parseInt(id)).single()
+    const { data: current } = await supabase.from('products').select('stock, name, slug').eq('id', id).single()
     previousStock = current?.stock ?? 1
     // Fire back-in-stock emails if stock was 0 before
     if (current && previousStock === 0) {
       const { data: notifications } = await supabase
         .from('low_stock_subscriptions')
         .select('email')
-        .eq('product_id', parseInt(id))
+        .eq('product_id', id)
         .is('notified_at', null)
       if (notifications && notifications.length > 0) {
         const now = new Date().toISOString()
@@ -60,7 +58,7 @@ export async function PATCH(request: Request) {
         }
         await supabase.from('low_stock_subscriptions')
           .update({ notified_at: now })
-          .eq('product_id', parseInt(id))
+          .eq('product_id', id)
           .is('notified_at', null)
       }
     }
@@ -71,10 +69,10 @@ export async function PATCH(request: Request) {
   const { data: snapshot } = await supabase
     .from('products')
     .select('id, name, slug, stock, price_aed, is_active, is_featured, is_organic, compare_at_price_aed')
-    .eq('id', parseInt(id))
+    .eq('id', id)
     .maybeSingle()
 
-  const { error } = await supabase.from('products').update(dbUpdates).eq('id', parseInt(id))
+  const { error } = await supabase.from('products').update(dbUpdates).eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Stock history — only when the operator actually touched the stock value.
@@ -84,7 +82,7 @@ export async function PATCH(request: Request) {
     const after = Number(dbUpdates.stock)
     const before = Number(snapshot.stock ?? 0)
     await supabase.from('product_stock_history').insert({
-      product_id: parseInt(id),
+      product_id: id,
       before,
       after,
       delta: after - before,
@@ -107,22 +105,10 @@ export async function PATCH(request: Request) {
 // CREATE product
 export async function POST(request: Request) {
   if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const body = await request.json()
 
-  if (!body.name || typeof body.name !== 'string' || !body.name.trim()) {
-    return NextResponse.json({ error: 'Product name is required' }, { status: 400 })
-  }
-  if (!body.slug || typeof body.slug !== 'string' || !body.slug.trim()) {
-    return NextResponse.json({ error: 'Product slug is required' }, { status: 400 })
-  }
-  const price = parseFloat(body.price_aed)
-  if (isNaN(price) || price < 0) {
-    return NextResponse.json({ error: 'Price must be 0 or greater' }, { status: 400 })
-  }
-  const stock = parseInt(body.stock ?? '0', 10)
-  if (isNaN(stock) || stock < 0) {
-    return NextResponse.json({ error: 'Stock must be 0 or greater' }, { status: 400 })
-  }
+  const parsed = await parseJsonBody(request, ProductCreateSchema)
+  if (!parsed.ok) return parsed.response
+  const body = parsed.data
 
   const supabase = getSupabase()
 
@@ -140,23 +126,24 @@ export async function POST(request: Request) {
     )
   }
 
+  const imageUrls = body.image_urls ?? (body.image_url ? [body.image_url] : [])
   const { data, error } = await supabase.from('products').insert({
     name: body.name,
-    name_ar: body.name_ar || '',
+    name_ar: body.name_ar,
     slug: body.slug,
-    category_id: body.category_id,
-    description: body.description || '',
+    category_id: body.category_id ?? null,
+    description: body.description,
     price_aed: body.price_aed,
-    unit: body.unit || 'kg',
-    stock: body.stock || 0,
+    unit: body.unit,
+    stock: body.stock,
     compare_at_price_aed: body.compare_at_price_aed || null,
-    is_organic: body.is_organic || false,
-    is_featured: body.is_featured || false,
-    is_active: body.is_active !== false,
-    origin: body.origin || '',
-    emoji: body.emoji || '',
-    image_urls: Array.isArray(body.image_urls) ? body.image_urls : (body.image_url ? [body.image_url] : []),
-    image_url: (Array.isArray(body.image_urls) ? body.image_urls[0] : body.image_url) || null,
+    is_organic: body.is_organic,
+    is_featured: body.is_featured,
+    is_active: body.is_active,
+    origin: body.origin,
+    emoji: body.emoji,
+    image_urls: imageUrls,
+    image_url: imageUrls[0] ?? null,
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -191,19 +178,19 @@ export async function DELETE(request: Request) {
   if (!await isAdminAdminAuthed()) {
     return NextResponse.json({ error: 'Only admins can delete products.' }, { status: 403 })
   }
-  const { ids } = await request.json()
+  const parsed = await parseJsonBody(request, ProductDeleteSchema)
+  if (!parsed.ok) return parsed.response
+  const idList = Array.isArray(parsed.data.ids) ? parsed.data.ids : [parsed.data.ids]
   const supabase = getSupabase()
 
-  const idList = Array.isArray(ids) ? ids : [ids]
-  const { error } = await supabase.from('products').delete().in('id', idList.map(Number))
-
+  const { error } = await supabase.from('products').delete().in('id', idList)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await logAdminAction({
     supabase,
     action: 'product.delete',
     entity: idList.length === 1 ? `product:${idList[0]}` : 'product:bulk',
-    metadata: { deleted_ids: idList.map(Number), count: idList.length },
+    metadata: { deleted_ids: idList, count: idList.length },
   })
 
   return NextResponse.json({ ok: true, deleted: idList.length })
