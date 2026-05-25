@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { Users } from 'lucide-react'
 import { getDashboardSession } from '@/lib/admin-auth'
+import PageHeader from '@/components/dashboard/PageHeader'
 import TeamClient from './TeamClient'
 import PermissionsMatrix from './PermissionsMatrix'
 
@@ -37,15 +38,12 @@ export default async function TeamPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-5">
-      <header className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-blue-900/40 rounded-xl flex items-center justify-center">
-          <Users size={20} className="text-blue-300" aria-hidden="true" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-black text-white">Team</h1>
-          <p className="text-gray-500 text-sm">Manage who can sign into the dashboard and what they can see.</p>
-        </div>
-      </header>
+      <PageHeader
+        icon={Users}
+        iconTone="blue"
+        title="Team"
+        subtitle="Manage who can sign into the dashboard and what they can see."
+      />
 
       <TeamClient
         initial={(data || []) as TeamMember[]}

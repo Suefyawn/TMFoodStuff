@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { Download, FileSpreadsheet, Receipt, RotateCcw, Calculator } from 'lucide-react'
+import PageHeader from '@/components/dashboard/PageHeader'
 
 function todayIsoDubai(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dubai' }).format(new Date())
@@ -48,15 +49,12 @@ export default function AccountingClient() {
 
   return (
     <div className="p-4 sm:p-6 space-y-5 max-w-4xl">
-      <header className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-indigo-900/40 rounded-xl flex items-center justify-center">
-          <FileSpreadsheet size={20} className="text-indigo-300" aria-hidden="true" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-black text-white">Accounting exports</h1>
-          <p className="text-gray-500 text-sm">CSV reports for the accountant. UAE timezone.</p>
-        </div>
-      </header>
+      <PageHeader
+        icon={FileSpreadsheet}
+        iconTone="indigo"
+        title="Accounting exports"
+        subtitle="CSV reports for the accountant. UAE timezone."
+      />
 
       <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
         <div>
