@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { Inbox } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
 import { requirePermission } from '@/lib/admin-auth'
+import PageHeader from '@/components/dashboard/PageHeader'
 import InboxClient from './InboxClient'
 
 export const dynamic = 'force-dynamic'
@@ -39,15 +40,12 @@ export default async function InboxPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-5">
-      <header className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-indigo-900/40 rounded-xl flex items-center justify-center">
-          <Inbox size={20} className="text-indigo-300" aria-hidden="true" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-black text-white">Support inbox</h1>
-          <p className="text-gray-500 text-sm">Emails to support@ land here. Reply directly — the customer sees it threaded under the original.</p>
-        </div>
-      </header>
+      <PageHeader
+        icon={Inbox}
+        iconTone="indigo"
+        title="Support inbox"
+        subtitle="Emails to support@ land here. Reply directly — the customer sees it threaded under the original."
+      />
       <InboxClient initialThreads={(data || []) as Thread[]} currentUserEmail={session.email} />
     </div>
   )

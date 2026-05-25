@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Mail, MessageCircle, Send, Megaphone } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
+import PageHeader from '@/components/dashboard/PageHeader'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,23 +46,20 @@ export default async function BroadcastsPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
-      <div className="flex items-start justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-amber-900/40 rounded-xl flex items-center justify-center">
-            <Megaphone size={20} className="text-amber-300" aria-hidden="true" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-black text-white">Broadcasts</h1>
-            <p className="text-gray-500 text-sm">Announcements to customers via email and/or SMS</p>
-          </div>
-        </div>
-        <Link
-          href="/dashboard/broadcasts/new"
-          className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl"
-        >
-          <Send size={14} aria-hidden="true" /> New broadcast
-        </Link>
-      </div>
+      <PageHeader
+        icon={Megaphone}
+        iconTone="amber"
+        title="Broadcasts"
+        subtitle="Announcements to customers via email and/or SMS"
+        actions={
+          <Link
+            href="/dashboard/broadcasts/new"
+            className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl"
+          >
+            <Send size={14} aria-hidden="true" /> New broadcast
+          </Link>
+        }
+      />
 
       <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
         {rows.length === 0 ? (

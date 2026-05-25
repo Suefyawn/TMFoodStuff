@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Heart, AlertTriangle, TrendingUp } from 'lucide-react'
 import { isAdminAuthed } from '@/lib/admin-auth'
+import PageHeader from '@/components/dashboard/PageHeader'
 
 export const dynamic = 'force-dynamic'
 
@@ -86,15 +87,12 @@ export default async function WishlistInsightsPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-5 max-w-5xl">
-      <header className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-rose-900/40 rounded-xl flex items-center justify-center">
-          <Heart size={20} className="text-rose-300" aria-hidden="true" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-black text-white">Wishlist insights</h1>
-          <p className="text-gray-500 text-sm">{totalWishes} saved items across {rows.length} unique products</p>
-        </div>
-      </header>
+      <PageHeader
+        icon={Heart}
+        iconTone="rose"
+        title="Wishlist insights"
+        subtitle={`${totalWishes} saved items across ${rows.length} unique products`}
+      />
 
       {/* Action-tier hint banner — only renders when there's at least
           one product that's high-want + out-of-stock. */}
