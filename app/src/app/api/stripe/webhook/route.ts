@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { getStripe } from '@/lib/stripe'
 import { fulfillOrder } from '@/lib/order-fulfillment'
 import { toLocale } from '@/lib/locale'
+import { logError, getRequestId } from '@/lib/log'
 
 // Stripe verifies the signature against the *raw* request body. App Router
 // route handlers expose it via `request.text()` so this works without any
@@ -12,6 +13,7 @@ export const dynamic = 'force-dynamic'
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 
 export async function POST(request: Request) {
+  const reqId = getRequestId(request)
   const stripe = getStripe()
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   if (!stripe || !webhookSecret) {
@@ -28,8 +30,8 @@ export async function POST(request: Request) {
   try {
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
   } catch (err) {
-    console.error('[Stripe webhook] signature verification failed:', err)
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+    logError('stripe.webhook.signature', err, { reqId })
+    return NextResponse.json({ error: 'Invalid signature', reqId }, { status: 400 })
   }
 
   if (event.type !== 'checkout.session.completed') {
@@ -49,7 +51,8 @@ export async function POST(request: Request) {
 
   const orderId = Number(session.metadata?.order_id ?? '')
   if (!orderId) {
-    console.error('[Stripe webhook] missing order_id metadata on session', session.id)
+    logError('stripe.webhook.missing_order_id', new Error('missing order_id metadata'),
+      { reqId, sessionId: session.id })
     return NextResponse.json({ received: true })
   }
 
@@ -76,7 +79,7 @@ export async function POST(request: Request) {
     .select('id, order_number, customer_name, customer_phone, customer_email, delivery_emirate, delivery_area, delivery_building, delivery_slot, delivery_notes, locale, items, subtotal_aed, subtotal, vat_aed, vat, delivery_fee_aed, delivery_fee, promo_code, promo_discount_aed, promo_discount, total_aed, total')
     .maybeSingle()
   if (updateErr) {
-    console.error('[Stripe webhook] failed to update order', orderId, updateErr)
+    logError('stripe.webhook.update_order', updateErr, { reqId, orderId })
     return NextResponse.json({ received: true })
   }
   if (!claimed) {
