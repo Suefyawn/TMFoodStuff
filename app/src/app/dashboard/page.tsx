@@ -22,6 +22,9 @@ async function getStats() {
     { data: monthlyOrders },
     { data: monthlyOrderItems },
     { data: lowStock },
+    { count: pendingReviews },
+    { count: openInboundThreads },
+    { count: deliveriesToday },
   ] = await Promise.all([
     supabase.from('orders').select('*', { count: 'exact', head: true }),
     supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -38,6 +41,10 @@ async function getStats() {
     // product's own threshold below. The products_low_stock_idx partial
     // index keeps this cheap even as the catalog grows.
     supabase.from('products').select('id, name, stock, emoji, low_stock_threshold').eq('is_active', true).lte('stock', 10).order('stock').limit(30),
+    // Morning briefing — small counts the team checks first thing.
+    supabase.from('product_reviews').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('support_threads').select('id', { count: 'exact', head: true }).eq('status', 'open').eq('last_message_direction', 'in'),
+    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('delivery_date', new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dubai' }).format(new Date())).in('status', ['processing', 'out_for_delivery']),
   ])
 
   // Apply per-product threshold filter in JS — PostgREST can't express
@@ -161,6 +168,13 @@ async function getStats() {
     statusCounts,
     lowStock: lowStockFiltered,
     reorderHints: reorderHints.slice(0, 5),
+    briefing: {
+      pendingOrders: pendingOrders || 0,
+      pendingReviews: pendingReviews || 0,
+      openInboundThreads: openInboundThreads || 0,
+      deliveriesToday: deliveriesToday || 0,
+      lowStockCount: lowStockFiltered.length,
+    },
   }
 }
 
@@ -177,8 +191,44 @@ export default async function DashboardPage() {
   const stats = await getStats()
   const maxRevenue = Math.max(...stats.dailyRevenue.map(d => d.revenue), 1)
 
+  // Morning briefing — surface the four most actionable counts as
+  // clickable chips at the very top, then hide the row entirely on a
+  // quiet day so the dashboard doesn't shout for the sake of it.
+  const briefingItems = [
+    { count: stats.briefing.pendingOrders, href: '/dashboard/orders', label: 'pending orders', tone: 'yellow' as const },
+    { count: stats.briefing.deliveriesToday, href: '/dashboard/deliveries', label: 'deliveries today', tone: 'amber' as const },
+    { count: stats.briefing.openInboundThreads, href: '/dashboard/inbox', label: 'unanswered messages', tone: 'indigo' as const },
+    { count: stats.briefing.pendingReviews, href: '/dashboard/reviews', label: 'reviews pending', tone: 'rose' as const },
+    { count: stats.briefing.lowStockCount, href: '/dashboard/products?filter=low-stock', label: 'low-stock items', tone: 'red' as const },
+  ].filter(b => b.count > 0)
+
+  const briefingTones: Record<string, string> = {
+    yellow: 'bg-yellow-900/30 border-yellow-700/60 hover:border-yellow-500 text-yellow-100',
+    amber:  'bg-amber-900/30 border-amber-700/60 hover:border-amber-500 text-amber-100',
+    indigo: 'bg-indigo-900/30 border-indigo-700/60 hover:border-indigo-500 text-indigo-100',
+    rose:   'bg-rose-900/30 border-rose-700/60 hover:border-rose-500 text-rose-100',
+    red:    'bg-red-900/30 border-red-700/60 hover:border-red-500 text-red-100',
+  }
+
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      {/* Morning briefing — single-glance "what needs my attention now".
+          Each chip is a one-click jump into the relevant surface. */}
+      {briefingItems.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          {briefingItems.map(b => (
+            <Link
+              key={b.href}
+              href={b.href}
+              className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors ${briefingTones[b.tone]}`}
+            >
+              <span className="font-black tabular-nums text-base leading-none">{b.count}</span>
+              <span className="text-xs font-bold leading-none">{b.label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Low-stock banner: only surfaces when there's actually something to
           act on. Links straight to the products list filtered to the
           offending rows. */}
