@@ -1,5 +1,10 @@
-export const metadata = {
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
   title: 'Your Cart',
+  description: 'Review items in your TMFoodStuff cart and proceed to checkout.',
+  alternates: { canonical: '/cart' },
+  robots: { index: false, follow: true },
 }
 
 export default function CartLayout({ children }: { children: React.ReactNode }) {

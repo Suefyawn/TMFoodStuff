@@ -1,5 +1,14 @@
+import type { Metadata } from 'next'
+
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'
 const STORE_EMAIL = process.env.NEXT_PUBLIC_STORE_EMAIL || 'hello@tmfoodstuff.ae'
+
+export const metadata: Metadata = {
+  title: 'Contact Us',
+  description:
+    'Get in touch with TMFoodStuff. WhatsApp is the fastest way to reach our support team — order changes, delivery questions, and feedback welcome.',
+  alternates: { canonical: '/contact' },
+}
 
 export default function ContactPage() {
   return (

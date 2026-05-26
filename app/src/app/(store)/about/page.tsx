@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description:
+    'TMFoodStuff is a UAE-based fresh produce delivery service sourcing direct from farms. Same-day delivery, fair prices, premium quality across all emirates.',
+  alternates: { canonical: '/about' },
+}
+
 export default function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-20">
