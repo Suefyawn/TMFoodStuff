@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Delivery Policy',
+  description:
+    'Delivery zones, slots, cutoffs, fees, and freshness guarantee for TMFoodStuff orders across the UAE.',
+  alternates: { canonical: '/delivery-policy' },
+}
+
 export default function DeliveryPolicyPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-20">

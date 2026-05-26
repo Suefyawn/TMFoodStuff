@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms & Conditions',
+  description:
+    'Terms of service for ordering from TMFoodStuff — payment, delivery, cancellations, refunds, and quality guarantee.',
+  alternates: { canonical: '/terms' },
+}
+
 export default function TermsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-20">

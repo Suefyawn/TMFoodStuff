@@ -1,3 +1,13 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'How TMFoodStuff collects, uses, and protects your information when you order fresh produce in the UAE.',
+  alternates: { canonical: '/privacy' },
+  robots: { index: true, follow: true },
+}
+
 export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-20">
