@@ -24,14 +24,31 @@ export async function getCurrentCustomer(): Promise<CustomerRecord | null> {
   )
 
   // Match on auth_user_id first; fall back to email so a customer who placed
-  // an order as guest before signing up still gets that record linked.
-  const { data: existing } = await admin
-    .from('customers')
-    .select('id, auth_user_id, email, full_name')
-    .or(`auth_user_id.eq.${user.id},email.eq.${user.email.toLowerCase()}`)
-    .order('auth_user_id', { ascending: false, nullsFirst: false })
-    .limit(1)
-    .maybeSingle()
+  // an order as guest before signing up still gets that record linked. Two
+  // parameterised .eq() queries rather than a single interpolated .or() filter
+  // — never build a PostgREST filter string from user input (the email).
+  const emailLc = user.email.toLowerCase()
+  let existing:
+    | { id: number; auth_user_id: string | null; email: string | null; full_name: string | null }
+    | null = null
+  {
+    const { data } = await admin
+      .from('customers')
+      .select('id, auth_user_id, email, full_name')
+      .eq('auth_user_id', user.id)
+      .maybeSingle()
+    existing = data
+  }
+  if (!existing) {
+    const { data } = await admin
+      .from('customers')
+      .select('id, auth_user_id, email, full_name')
+      .eq('email', emailLc)
+      .order('auth_user_id', { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle()
+    existing = data
+  }
 
   if (existing) {
     // Backfill auth_user_id if we matched on email only.

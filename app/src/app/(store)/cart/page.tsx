@@ -80,7 +80,7 @@ function CartPageInner() {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <Link href={`/product/${item.slug}`} className="font-bold text-gray-900 hover:text-green-600 transition-colors line-clamp-1 text-sm md:text-base">
-                  {item.name}
+                  {lang === 'ar' && item.nameAr ? item.nameAr : item.name}
                 </Link>
                 <p className="text-xs text-gray-400 mb-2 md:mb-3">
                   {lang === 'ar' ? `لكل ${item.unit}` : `per ${item.unit}`}

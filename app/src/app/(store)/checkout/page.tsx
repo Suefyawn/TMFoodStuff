@@ -668,7 +668,7 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
+                      <p className="text-sm font-semibold text-gray-900 truncate">{lang === 'ar' && item.nameAr ? item.nameAr : item.name}</p>
                       <p className="text-xs text-gray-400">×{item.quantity}</p>
                     </div>
                     <span className="text-sm font-bold text-gray-700">{formatAED(item.priceAED * item.quantity)}</span>

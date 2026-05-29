@@ -86,6 +86,7 @@ export default async function ProductPage({ params }: Props) {
   const productForCart = {
     id: product.id,
     name: product.name,
+    nameAr: product.nameAr,
     slug: product.slug,
     priceAED: product.priceAED,
     unit: product.unit,
