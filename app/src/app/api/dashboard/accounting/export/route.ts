@@ -7,7 +7,7 @@
 // to the current calendar month if not provided. Admin-only.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +36,7 @@ function firstOfMonthDubai(): string {
 }
 
 export async function GET(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('accounting.export'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const url = new URL(request.url)

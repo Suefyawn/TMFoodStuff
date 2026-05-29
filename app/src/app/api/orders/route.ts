@@ -15,7 +15,7 @@ import { recordReferralOnFirstOrder, REFERRAL_COOKIE } from '@/lib/referrals'
 import { clearCustomerCart } from '@/lib/cart-recovery'
 import { validateSlotForDate } from '@/lib/delivery-slots'
 import { getCurrentCustomer } from '@/lib/customer'
-import { getCustomerBalance, recordRedemption } from '@/lib/loyalty'
+import { getCustomerBalance } from '@/lib/loyalty'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 
@@ -270,17 +270,30 @@ export async function POST(request: Request) {
       .insert({ order_id: orderId, status: 'pending', actor_email: 'system' })
       .then(() => undefined, err => logError('orders.status_history_seed', err, { reqId, orderId }))
 
-    // ── Record the loyalty-points debit ───────────────────────────────────
-    // Done AFTER the order insert so we never debit a customer for an
-    // order that never got created.
+    // ── Record the loyalty-points debit (atomic, double-spend safe) ───────
+    // Done AFTER the order insert so we never debit a customer for an order
+    // that never got created. The redeem_points RPC re-checks the live
+    // balance under a per-customer advisory lock, so concurrent checkouts
+    // can't spend the same points twice. If the balance no longer covers it
+    // (lost a race), we roll back this brand-new unpaid order and ask the
+    // customer to retry rather than honour a discount they can't fund.
     if (redeemingCustomerId && pointsRedeemed > 0) {
-      await recordRedemption(supabase, {
-        customerId: redeemingCustomerId,
-        orderId,
-        points: pointsRedeemed,
-        aed: pointsValueAed,
-        orderNumber,
+      const { data: redeemed, error: redeemErr } = await supabase.rpc('redeem_points', {
+        p_customer_id: redeemingCustomerId,
+        p_order_id: orderId,
+        p_points: pointsRedeemed,
+        p_aed: pointsValueAed,
+        p_order_number: orderNumber,
       })
+      if (redeemErr || !redeemed) {
+        await supabase.from('order_status_history').delete().eq('order_id', orderId)
+        await supabase.from('orders').delete().eq('id', orderId)
+        if (redeemErr) logError('orders.redeem_points', redeemErr, { reqId, orderId })
+        return NextResponse.json(
+          { success: false, error: 'Your loyalty points balance changed. Please review your cart and try again.' },
+          { status: 409 },
+        )
+      }
     }
 
     // ── Customer-attached side effects (referral + cart clear) ────────────

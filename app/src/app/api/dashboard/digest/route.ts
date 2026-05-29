@@ -3,13 +3,13 @@
 // for 02:30 UTC.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { sendDailyDigest } from '@/lib/daily-digest'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST() {
-  if (!(await isAdminAuthed())) {
+  if (!(await requirePermission('analytics.view'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const supabase = createClient(

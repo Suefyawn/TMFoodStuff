@@ -8,7 +8,7 @@
 // in a reasonable wall-clock.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed, getDashboardSession } from '@/lib/admin-auth'
+import { requirePermission, getDashboardSession } from '@/lib/admin-auth'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import { sendSms } from '@/lib/notify'
 import { logAdminAction } from '@/lib/audit'
@@ -62,7 +62,7 @@ async function runBatched<T>(items: T[], worker: (item: T) => Promise<boolean>):
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthed())) {
+  if (!(await requirePermission('broadcasts.send'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as SendBody

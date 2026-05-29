@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
 
 function getSupabase() {
@@ -8,7 +8,7 @@ function getSupabase() {
 }
 
 export async function GET() {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('categories.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const supabase = getSupabase()
   const { data, error } = await supabase.from('categories').select('*').order('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('categories.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const body = await request.json()
   const supabase = getSupabase()
 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('categories.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const { id, ...updates } = await request.json()
   const supabase = getSupabase()
 
@@ -67,7 +67,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('categories.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const { id } = await request.json()
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
   const supabase = getSupabase()

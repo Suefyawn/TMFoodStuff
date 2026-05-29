@@ -33,7 +33,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
     if (session.role === 'driver') {
       const h = await headers()
       const pathname = h.get('x-pathname') || h.get('x-invoke-path') || ''
-      if (pathname && !isDriverAllowedPath(pathname)) {
+      // Fail closed: if we can't determine the path (header stripped) or it
+      // isn't on the driver allowlist, send them to the deliveries queue
+      // rather than rendering whatever admin page they aimed at. Middleware
+      // re-sets x-pathname on the redirected request, so this terminates.
+      if (!pathname || !isDriverAllowedPath(pathname)) {
         redirect('/dashboard/deliveries')
       }
       return <DashboardShell userEmail={session.email} role={session.role}>{children}</DashboardShell>

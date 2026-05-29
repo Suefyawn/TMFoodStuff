@@ -37,9 +37,12 @@ export async function POST(request: Request) {
     )
   }
 
-  // If they paid by card, issue a full Stripe refund first. Only mark the
-  // order cancelled if the refund actually succeeds so we never leave a
-  // customer with a "cancelled" order but a live charge.
+  // If they paid by card, issue a Stripe refund first. Only mark the order
+  // cancelled if the refund actually succeeds so we never leave a customer
+  // with a "cancelled" order but a live charge. We refund only the amount
+  // still outstanding (honouring any prior partial refund recorded by an
+  // admin) and append the refund to the order_refunds ledger so the
+  // accounting stays consistent with the admin refund flow.
   const isPaidCard = order.payment_method === 'card' && order.payment_status === 'paid'
   if (isPaidCard) {
     const stripe = getStripe()
@@ -55,22 +58,46 @@ export async function POST(request: Request) {
         { status: 409 },
       )
     }
-    try {
-      await stripe.refunds.create({
-        payment_intent: order.stripe_payment_intent,
-        reason: 'requested_by_customer',
-        metadata: {
-          order_id: String(order.id),
-          order_number: order.order_number,
-          source: 'customer_self_cancel',
-        },
+
+    const orderTotal = Number(order.total_aed ?? order.total ?? 0)
+    const { data: priorRefunds } = await supabase
+      .from('order_refunds')
+      .select('amount_aed')
+      .eq('order_id', order.id)
+    const alreadyRefunded = (priorRefunds || []).reduce((s, r) => s + Number(r.amount_aed), 0)
+    const remaining = Math.max(0, orderTotal - alreadyRefunded)
+
+    if (remaining > 0.001) {
+      let stripeRefundId: string | null = null
+      try {
+        const refund = await stripe.refunds.create({
+          payment_intent: order.stripe_payment_intent,
+          amount: Math.round(remaining * 100),
+          reason: 'requested_by_customer',
+          metadata: {
+            order_id: String(order.id),
+            order_number: order.order_number,
+            source: 'customer_self_cancel',
+          },
+        })
+        stripeRefundId = refund.id
+      } catch (err) {
+        console.error('[self-cancel] Stripe refund failed:', err)
+        return NextResponse.json(
+          { error: 'We could not process the refund automatically. Please contact support.' },
+          { status: 502 },
+        )
+      }
+      await supabase.from('order_refunds').insert({
+        order_id: order.id,
+        amount_aed: remaining,
+        reason: 'Customer self-cancellation',
+        refund_type: alreadyRefunded === 0 ? 'full' : 'partial',
+        payment_method: 'card',
+        stripe_refund_id: stripeRefundId,
+        restocked: false,
+        created_by: 'customer_self_cancel',
       })
-    } catch (err) {
-      console.error('[self-cancel] Stripe refund failed:', err)
-      return NextResponse.json(
-        { error: 'We could not process the refund automatically. Please contact support.' },
-        { status: 502 },
-      )
     }
   }
 

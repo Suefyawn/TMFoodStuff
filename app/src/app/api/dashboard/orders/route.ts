@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { getDashboardSession } from '@/lib/admin-auth'
+import { hasPermission } from '@/lib/permissions'
 import { sendOutForDeliveryEmail, sendDeliveredEmail, sendOrderStatusUpdateEmail } from '@/lib/email'
 import { notifyOutForDelivery, notifyDelivered } from '@/lib/notify'
 import { toLocale } from '@/lib/locale'
@@ -14,7 +15,8 @@ const VALID_STATUSES = ['pending', 'confirmed', 'processing', 'out_for_delivery'
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 
 export async function PATCH(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getDashboardSession()
+  if (session.state !== 'ok') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // Bulk callers send { id, status, cancellation_reason? }. The reason is
   // only meaningful when the new status is 'cancelled' — we ignore it
@@ -28,14 +30,32 @@ export async function PATCH(request: Request) {
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, order_number, customer_name, customer_email, customer_phone, delivery_slot, total, total_aed, subtotal_aed, subtotal, status, locale, payment_method, payment_status')
+    .select('id, order_number, customer_name, customer_email, customer_phone, delivery_slot, total, total_aed, subtotal_aed, subtotal, status, locale, payment_method, payment_status, driver_id')
     .eq('id', parseInt(id))
     .maybeSingle()
 
   if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
-  const session = await import('@/lib/admin-auth').then(m => m.getDashboardSession())
-  const actor = session.state === 'ok' ? session.email : null
+  // Authorize the transition. Full editors (admin/staff) may make any
+  // transition; drivers are restricted to the delivery steps on orders that
+  // are actually assigned to them. (The dashboard page gate is page-only, so
+  // this is where driver scope is really enforced for status changes.)
+  if (!hasPermission(session.role, 'orders.edit')) {
+    const DRIVER_STATUSES = ['out_for_delivery', 'delivered']
+    if (!hasPermission(session.role, 'deliveries.view') || !DRIVER_STATUSES.includes(status)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+    const { data: me } = await supabase
+      .from('admin_users')
+      .select('id')
+      .eq('email', session.email.toLowerCase())
+      .maybeSingle()
+    if (!me || order.driver_id !== me.id) {
+      return NextResponse.json({ error: 'This delivery is not assigned to you.' }, { status: 403 })
+    }
+  }
+
+  const actor: string | null = session.email
 
   const updates: Record<string, unknown> = { status, updated_at: new Date().toISOString() }
   if (status === 'cancelled') {

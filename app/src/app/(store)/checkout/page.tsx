@@ -297,10 +297,10 @@ export default function CheckoutPage() {
         setSubmitted(true)
         setWaMessage(data.waMessage)
         setWaNumber(data.waNumber)
-        // Auto-open WhatsApp after 1.5s
-        setTimeout(() => {
-          window.open(`https://wa.me/${data.waNumber}?text=${data.waMessage}`, '_blank')
-        }, 1500)
+        // Note: we deliberately do NOT auto-open WhatsApp here. A delayed
+        // window.open() is not tied to a user gesture and is silently blocked
+        // by modern browsers' popup blockers. The success screen shows a
+        // prominent "Confirm on WhatsApp" button the customer taps instead.
       } else {
         const baseMsg = data.error || (lang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.')
         // Server returns reqId on internal errors so customers can quote it

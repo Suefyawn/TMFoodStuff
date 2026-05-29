@@ -37,10 +37,10 @@ export default async function NewSubscriptionPage() {
   const [{ data: products }, { data: addresses }, { data: profile }] = await Promise.all([
     supabase
       .from('products')
-      .select('id, name_en, name_ar, unit, price_aed, emoji')
+      .select('id, name_en:name, name_ar, unit, price_aed, emoji')
       .eq('is_active', true)
-      .gt('stock_quantity', 0)
-      .order('name_en', { ascending: true })
+      .gt('stock', 0)
+      .order('name', { ascending: true })
       .limit(300),
     supabase
       .from('customer_addresses')

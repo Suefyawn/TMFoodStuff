@@ -5,7 +5,7 @@
 // that reference the old key.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
@@ -30,7 +30,7 @@ interface UpdateBody extends Omit<CreateBody, 'key'> {
 }
 
 export async function GET() {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('delivery_slots.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const supabase = createClient(
@@ -46,7 +46,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('delivery_slots.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as CreateBody
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('delivery_slots.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as UpdateBody
@@ -117,7 +117,7 @@ export async function PATCH(request: Request) {
 // Soft-delete only via deactivation. We never hard-delete because existing
 // orders + subscriptions reference the slot key.
 export async function DELETE(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('delivery_slots.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as { id?: number }

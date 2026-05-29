@@ -3,7 +3,7 @@
 // plain text inside a minimal email template; SMS sends as-is.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import { sendSms } from '@/lib/notify'
 import { logAdminAction } from '@/lib/audit'
@@ -30,7 +30,7 @@ function escapeHtml(s: string) {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('customers.message'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const data = (await request.json()) as MessageBody
 
   const channels = Array.isArray(data.channels) ? data.channels : []
