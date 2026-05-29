@@ -65,13 +65,12 @@ Tick each off, top-to-bottom. Anything blocked, ask.
 
 ## 5a. Supabase Storage
 
-- [ ] **Tighten public-bucket listing**: Supabase Dashboard → Storage →
-      Policies → `product-images`. The current SELECT policy "Public
-      read product images" allows clients to list every file in the
-      bucket. Either edit the policy to a `name = bucket_id || '/'`
-      style match so anonymous viewers can read individual objects but
-      can't enumerate them, or accept the current behaviour if the
-      bucket only contains catalog images you'd publish anyway.
+- [x] **Tighten public-bucket listing** — done. The broad "Public read
+      product images" SELECT policy on `storage.objects` was dropped
+      (migration `20260529_production_hardening_indexes_policies_storage`).
+      The bucket is `public=true` and the app serves images via
+      `getPublicUrl()` (public CDN), so individual objects still load but
+      anonymous clients can no longer enumerate the bucket.
 
 ## 6. PWA push notifications
 
