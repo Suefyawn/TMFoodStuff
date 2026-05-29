@@ -1,4 +1,5 @@
 // Twilio SMS + WhatsApp notifications.
+import { logError } from './log'
 //
 // Three customer/admin events go through here: order confirmation, delivery
 // status changes (out_for_delivery, delivered), and the admin new-order alert.
@@ -68,7 +69,7 @@ async function send(channel: 'sms' | 'whatsapp', to: string, body: string): Prom
   try {
     await client.messages.create({ from: fromAddr, to: toAddr, body })
   } catch (err) {
-    console.error(`[Twilio:${channel}] send failed:`, err)
+    logError(`notify.${channel}`, err)
   }
 }
 

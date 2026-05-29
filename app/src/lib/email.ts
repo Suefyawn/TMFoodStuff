@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { logError } from './log'
 import { SITE_URL } from './site'
 import type { Locale } from './locale'
 
@@ -401,7 +402,7 @@ export async function sendOrderConfirmation(order: OrderEmailData, locale: Local
       html: orderConfirmationHtml(order, locale),
     })
   } catch (err) {
-    console.error('[Resend] Failed to send order confirmation:', err)
+    logError('email', err)
   }
 }
 
@@ -416,7 +417,7 @@ export async function sendOutForDeliveryEmail(order: StatusUpdateEmailData, loca
       html: statusUpdateHtml(order, locale, 'out_for_delivery'),
     })
   } catch (err) {
-    console.error('[Resend] Failed to send out-for-delivery email:', err)
+    logError('email', err)
   }
 }
 
@@ -506,7 +507,7 @@ export async function sendDeliveredEmail(order: StatusUpdateEmailData, locale: L
       html: statusUpdateHtml(order, locale, 'delivered'),
     })
   } catch (err) {
-    console.error('[Resend] Failed to send delivered email:', err)
+    logError('email', err)
   }
 }
 
@@ -521,7 +522,7 @@ export async function sendAdminOrderAlert(order: OrderEmailData): Promise<void> 
       html: adminOrderAlertHtml(order),
     })
   } catch (err) {
-    console.error('[Resend] Failed to send admin alert:', err)
+    logError('email', err)
   }
 }
 
@@ -582,7 +583,7 @@ export async function sendPointsThresholdEmail(args: {
       html,
     })
   } catch (err) {
-    console.error('[Resend] Failed to send points threshold email:', err)
+    logError('email', err)
   }
 }
 
@@ -624,7 +625,7 @@ export async function sendAdminLowStockAlert(
       html,
     })
   } catch (err) {
-    console.error('[Resend] Failed to send low-stock alert:', err)
+    logError('email', err)
   }
 }
 
@@ -674,6 +675,6 @@ export async function sendBackInStockEmail(
       html,
     })
   } catch (err) {
-    console.error('[Resend] Failed to send back-in-stock email:', err)
+    logError('email', err)
   }
 }
