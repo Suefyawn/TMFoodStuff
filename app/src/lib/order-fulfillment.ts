@@ -60,6 +60,11 @@ export interface FulfillOrderInput {
    * `create_checkout_order` RPC).
    */
   decrementStock: boolean
+  /**
+   * Set when the caller already reserved stock up-front (COD reserve-before-
+   * confirm). Skips the decrement but still runs the low-stock alert check.
+   */
+  stockReserved?: boolean
 }
 
 export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
@@ -105,20 +110,24 @@ export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
     tasks.push(notifyOrderConfirmation(input.customer.phone, summary, input.locale))
   }
 
-  if (input.decrementStock) {
+  if (input.decrementStock || input.stockReserved) {
     for (const item of input.lineItems) {
       tasks.push(
         (async () => {
-          const { data: ok, error } = await input.supabase.rpc('decrement_stock', {
-            p_id: Number(item.id),
-            p_qty: item.quantity,
-          })
-          if (error || ok === false) {
-            logError('fulfillOrder.decrement_stock', error ?? new Error('decrement returned false'), {
-              orderNumber: input.orderNumber,
-              productId: item.id,
+          // When the caller already reserved stock (COD reserve-before-confirm)
+          // skip the decrement but still run the low-stock check below.
+          if (input.decrementStock && !input.stockReserved) {
+            const { data: ok, error } = await input.supabase.rpc('decrement_stock', {
+              p_id: Number(item.id),
+              p_qty: item.quantity,
             })
-            return
+            if (error || ok === false) {
+              logError('fulfillOrder.decrement_stock', error ?? new Error('decrement returned false'), {
+                orderNumber: input.orderNumber,
+                productId: item.id,
+              })
+              return
+            }
           }
           // Fire a low-stock alert when this order pushed the product BELOW
           // its threshold for the first time. Only one email per crossing —

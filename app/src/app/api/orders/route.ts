@@ -287,12 +287,41 @@ export async function POST(request: Request) {
       })),
     }
 
+    // ── Reserve stock up-front (COD only; card reserves in the webhook after
+    // payment). decrement_stock is atomic (WHERE stock >= qty), so this both
+    // prevents overselling and lets us reject BEFORE creating an order we can't
+    // fulfil. Any partial reservation is rolled back on failure.
+    const reservedItems: Array<{ id: number; qty: number }> = []
+    async function releaseReservedStock() {
+      for (const r of reservedItems) {
+        await supabase.rpc('increment_stock', { p_id: r.id, p_qty: r.qty }).then(() => undefined, () => undefined)
+      }
+    }
+    if (!isCardPayment) {
+      for (const li of lineItems) {
+        const pid = Number(li.id)
+        const { data: ok, error: decErr } = await supabase.rpc('decrement_stock', { p_id: pid, p_qty: li.quantity })
+        if (decErr || ok === false) {
+          await releaseReservedStock()
+          if (decErr) logError('orders.reserve_stock', decErr, { reqId })
+          return NextResponse.json(
+            { success: false, error: `Sorry, "${li.name}" just sold out. Please adjust your cart and try again.` },
+            { status: 409 },
+          )
+        }
+        reservedItems.push({ id: pid, qty: li.quantity })
+      }
+    }
+
     const { data: inserted, error } = await supabase
       .from('orders')
       .insert(payload)
       .select('id')
       .single()
-    if (error || !inserted) throw error ?? new Error('Order insert returned no row')
+    if (error || !inserted) {
+      await releaseReservedStock()
+      throw error ?? new Error('Order insert returned no row')
+    }
     const orderId: number = inserted.id
 
     // Claim the idempotency key now the order exists. A unique-violation here
@@ -330,6 +359,7 @@ export async function POST(request: Request) {
       if (redeemErr || !redeemed) {
         await supabase.from('order_status_history').delete().eq('order_id', orderId)
         await supabase.from('orders').delete().eq('id', orderId)
+        await releaseReservedStock()
         if (redeemErr) logError('orders.redeem_points', redeemErr, { reqId, orderId })
         return NextResponse.json(
           { success: false, error: 'Your loyalty points balance changed. Please review your cart and try again.' },
@@ -447,7 +477,10 @@ export async function POST(request: Request) {
       locale,
       whatsappNumber,
       paidOnline: false,
-      decrementStock: true,
+      // Stock was already reserved above (reserve-before-confirm); fulfillOrder
+      // skips the decrement but still runs its low-stock alert check.
+      decrementStock: false,
+      stockReserved: true,
     })
 
     const itemsList = lineItems
