@@ -14,7 +14,7 @@ import PermissionsMatrix from './PermissionsMatrix'
 export const dynamic = 'force-dynamic'
 
 interface TeamMember {
-  id: number
+  id: string
   email: string
   role: 'admin' | 'staff' | 'driver'
   is_active: boolean
