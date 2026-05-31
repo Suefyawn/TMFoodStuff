@@ -5,8 +5,8 @@
 // thread.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { requirePermission, getDashboardSession } from '@/lib/admin-auth'
-import { getResend, FROM_EMAIL } from '@/lib/email'
+import { requirePermission } from '@/lib/admin-auth'
+import { getResend, SUPPORT_FROM_EMAIL } from '@/lib/email'
 import { logAdminAction } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
@@ -75,7 +75,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       text: string
       headers?: Record<string, string>
     } = {
-      from: `TM FoodStuff Support <${FROM_EMAIL}>`,
+      from: `TM FoodStuff Support <${SUPPORT_FROM_EMAIL}>`,
       to: thread.customer_email,
       subject: replySubject,
       html: replyHtml,
@@ -94,9 +94,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: sendErr.message || 'Send failed' }, { status: 500 })
     }
 
-    const adminEmail = (await getDashboardSession()).state === 'ok'
-      ? (await getDashboardSession() as { state: 'ok'; email: string }).email
-      : null
+    const adminEmail = session.state === 'ok' ? session.email : null
 
     // Persist the outbound message. resend_message_id is what Resend
     // returned; we also store our own message_id as the Resend id (best
@@ -104,7 +102,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const { error: insertErr } = await supabase.from('support_messages').insert({
       thread_id: id,
       direction: 'out',
-      from_email: FROM_EMAIL,
+      from_email: SUPPORT_FROM_EMAIL,
       from_name: 'TM FoodStuff Support',
       to_email: thread.customer_email,
       subject: replySubject,
