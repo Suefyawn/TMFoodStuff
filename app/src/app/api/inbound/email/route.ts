@@ -9,14 +9,16 @@
 // for local dev / first-time integration before the secret is rotated.
 import { NextResponse } from 'next/server'
 import { timingSafeEqual } from 'crypto'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { recordInboundMessage, type IncomingMessage } from '@/lib/support-inbox'
 
 export const dynamic = 'force-dynamic'
 
 interface ResendInboundPayload {
   type?: string
+  created_at?: string
   data?: {
+    email_id?: string
     from?: { email?: string; name?: string }
     to?: Array<{ email?: string; name?: string }>
     subject?: string
@@ -24,9 +26,14 @@ interface ResendInboundPayload {
     html?: string
     message_id?: string
     in_reply_to?: string
+    created_at?: string
     headers?: Record<string, string>
   }
 }
+
+// Resend event types that carry an actual inbound message (someone emailing us)
+// vs. delivery-status events about mail we sent (delivered/opened/bounced/...).
+const INBOUND_TYPES = new Set(['email.received', 'email.inbound', 'inbound.email'])
 
 export async function POST(request: Request) {
   // Verify the webhook signature if a secret is configured. Resend uses
@@ -71,35 +78,78 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
-  const data = payload.data
-  if (!data?.from?.email) {
-    return NextResponse.json({ error: 'Missing from address' }, { status: 400 })
-  }
-
-  const msg: IncomingMessage = {
-    from_email: data.from.email,
-    from_name: data.from.name || null,
-    to_email: data.to?.[0]?.email || null,
-    subject: data.subject || null,
-    body_text: data.text || null,
-    body_html: data.html || null,
-    message_id: data.message_id || data.headers?.['message-id'] || null,
-    in_reply_to: data.in_reply_to || data.headers?.['in-reply-to'] || null,
-  }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 
+  const eventType = payload.type || 'unknown'
+  const data = payload.data
+
+  // Delivery-status events (and anything that isn't a parseable inbound
+  // message) are logged to email_events for the dashboard delivery view.
+  const isInbound = INBOUND_TYPES.has(eventType) && !!data?.from?.email
+  if (!isInbound) {
+    await recordEmailEvent(supabase, eventType, payload, rawBody)
+    return NextResponse.json({ ok: true, recorded: 'event', type: eventType })
+  }
+
+  const msg: IncomingMessage = {
+    from_email: data!.from!.email!,
+    from_name: data!.from!.name || null,
+    to_email: data!.to?.[0]?.email || null,
+    subject: data!.subject || null,
+    body_text: data!.text || null,
+    body_html: data!.html || null,
+    message_id: data!.message_id || data!.headers?.['message-id'] || null,
+    in_reply_to: data!.in_reply_to || data!.headers?.['in-reply-to'] || null,
+  }
+
   try {
     const result = await recordInboundMessage(supabase, msg)
+    // Also log the inbound event to the delivery-status feed.
+    await recordEmailEvent(supabase, eventType, payload, rawBody)
     return NextResponse.json({ ok: true, ...result })
   } catch (err) {
     console.error('[inbound/email] insert failed:', err)
     // Return 200 so Resend doesn't retry forever on persistent failures —
     // we've logged enough to investigate.
     return NextResponse.json({ ok: false, error: 'Insert failed' }, { status: 200 })
+  }
+}
+
+// Persist a Resend webhook event (delivered, opened, clicked, bounced,
+// complained, failed, delivery_delayed, sent, inbound, domain.*, ...) into
+// email_events so the dashboard can show per-email delivery status. Best-effort
+// — never throws into the webhook response.
+async function recordEmailEvent(
+  supabase: SupabaseClient,
+  eventType: string,
+  payload: ResendInboundPayload,
+  rawBody: string,
+): Promise<void> {
+  try {
+    const d = (payload.data || {}) as Record<string, unknown>
+    const toRaw = d.to
+    let recipient: string | null = null
+    if (Array.isArray(toRaw)) {
+      recipient = toRaw
+        .map(t => (typeof t === 'string' ? t : (t as { email?: string })?.email))
+        .filter(Boolean)
+        .join(', ') || null
+    }
+    const occurred = payload.created_at || (typeof d.created_at === 'string' ? d.created_at : null)
+    await supabase.from('email_events').insert({
+      resend_email_id: (typeof d.email_id === 'string' ? d.email_id : null),
+      event_type: eventType,
+      recipient,
+      subject: (typeof d.subject === 'string' ? d.subject : null),
+      occurred_at: occurred,
+      payload: rawBody.length <= 20000 ? JSON.parse(rawBody) : { truncated: true },
+    })
+  } catch (err) {
+    console.error('[inbound/email] email_events insert failed:', err)
   }
 }
 

@@ -63,6 +63,7 @@ export const CUSTOMERS_SUBNAV: SubNavItem[] = [
 
 export const SETTINGS_SUBNAV: SubNavItem[] = [
   { href: '/dashboard/settings', label: 'Store settings', exact: true },
+  { href: '/dashboard/settings/notifications', label: 'Notifications' },
   { href: '/dashboard/delivery-slots', label: 'Delivery slots' },
   { href: '/dashboard/team', label: 'Team' },
   { href: '/dashboard/integrations', label: 'Integrations' },
