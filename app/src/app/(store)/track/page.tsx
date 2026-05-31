@@ -92,9 +92,9 @@ function TrackInner() {
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-16" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="text-center mb-8">
         <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Package size={28} className="text-green-600" aria-hidden="true" />
+          <Package size={28} className="text-forest" aria-hidden="true" />
         </div>
-        <h1 className="text-3xl font-black text-gray-900 mb-2">
+        <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-2">
           {isAr ? 'تتبع طلبك' : 'Track Your Order'}
         </h1>
         <p className="text-gray-500 text-sm">
@@ -113,7 +113,7 @@ function TrackInner() {
             value={orderNumber}
             onChange={e => setOrderNumber(e.target.value.toUpperCase())}
             placeholder="TM-XXXXXX"
-            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors font-mono"
+            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors font-mono"
             required
           />
         </div>
@@ -128,7 +128,7 @@ function TrackInner() {
             onChange={e => setEmail(e.target.value)}
             placeholder="you@example.com"
             aria-invalid={error ? 'true' : undefined}
-            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors"
+            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors"
             required
           />
         </div>
@@ -140,7 +140,7 @@ function TrackInner() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+          className="w-full bg-forest hover:bg-forest-dark text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
         >
           {loading ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Search size={18} aria-hidden="true" />}
           {loading
@@ -156,7 +156,7 @@ function TrackInner() {
             <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">
               {isAr ? 'الطلب' : 'Order'}
             </p>
-            <p className="text-xl font-black text-gray-900 font-mono">{order.order_number}</p>
+            <p className="text-xl font-playfair font-bold text-stone-900 font-mono">{order.order_number}</p>
             {order.customer_name && (
               <p className="text-sm text-gray-500 mt-0.5">
                 {isAr ? `مرحباً، ${order.customer_name}!` : `Hi, ${order.customer_name}!`}
@@ -232,14 +232,14 @@ function TrackInner() {
           {/* Total */}
           <div className="px-6 py-4 border-b border-gray-100">
             {order.promo_code && order.promo_discount > 0 && (
-              <div className="flex justify-between text-sm text-green-600 font-semibold mb-1">
+              <div className="flex justify-between text-sm text-forest font-semibold mb-1">
                 <span>{isAr ? `كود الخصم (${order.promo_code})` : `Promo (${order.promo_code})`}</span>
                 <span>-AED {Number(order.promo_discount).toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between items-center">
-              <span className="font-black text-gray-900">{isAr ? 'الإجمالي' : 'Total'}</span>
-              <span className="text-lg font-black text-green-700">AED {Number(order.total).toFixed(2)}</span>
+              <span className="font-playfair font-bold text-stone-900">{isAr ? 'الإجمالي' : 'Total'}</span>
+              <span className="text-lg font-black text-forest-dark">AED {Number(order.total).toFixed(2)}</span>
             </div>
           </div>
 
@@ -247,17 +247,17 @@ function TrackInner() {
           <div className="px-6 py-4">
             {reordered ? (
               <div className="flex items-center justify-between gap-3">
-                <span className="text-green-600 font-semibold text-sm">
+                <span className="text-forest font-semibold text-sm">
                   {isAr ? '✓ تمت إضافة المنتجات إلى السلة!' : '✓ Items added to cart!'}
                 </span>
-                <Link href="/cart" className="text-sm font-bold text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl transition-colors">
+                <Link href="/cart" className="text-sm font-bold text-white bg-forest hover:bg-forest-dark px-4 py-2 rounded-xl transition-colors">
                   {isAr ? 'الذهاب إلى السلة ←' : 'Go to Cart →'}
                 </Link>
               </div>
             ) : (
               <button
                 onClick={handleReorder}
-                className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-colors text-sm focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+                className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-xl transition-colors text-sm focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
               >
                 <ShoppingCart size={16} aria-hidden="true" /> {isAr ? 'إعادة الطلب' : 'Order Again'}
               </button>

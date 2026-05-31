@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
   if (ready === 'expired') {
     return (
       <div className="max-w-md mx-auto px-4 py-16 md:py-24 text-center" dir={isAr ? 'rtl' : 'ltr'}>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'الرابط منتهي' : 'Link expired'}</h1>
+        <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'الرابط منتهي' : 'Link expired'}</h1>
         <p className="text-gray-500 text-sm mb-6">
           {isAr
             ? 'هذا الرابط لإعادة تعيين كلمة المرور لم يعد صالحاً. اطلب رابطاً جديداً.'
@@ -77,7 +77,7 @@ export default function ResetPasswordPage() {
         </p>
         <Link
           href="/account/forgot"
-          className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl transition-colors"
+          className="inline-block bg-forest hover:bg-forest-dark text-white font-bold px-6 py-3 rounded-xl transition-colors"
         >
           {isAr ? 'طلب رابط جديد' : 'Request a new link'}
         </Link>
@@ -89,9 +89,9 @@ export default function ResetPasswordPage() {
     return (
       <div className="max-w-md mx-auto px-4 py-16 md:py-24 text-center" dir={isAr ? 'rtl' : 'ltr'}>
         <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-5">
-          <CheckCircle2 size={28} className="text-green-700" aria-hidden="true" />
+          <CheckCircle2 size={28} className="text-forest-dark" aria-hidden="true" />
         </div>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'تم التحديث' : 'Password updated'}</h1>
+        <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'تم التحديث' : 'Password updated'}</h1>
         <p className="text-gray-500 text-sm">{isAr ? 'جاري التحويل إلى حسابك…' : 'Redirecting to your account…'}</p>
       </div>
     )
@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
-          <h1 className="text-3xl font-black text-gray-900 mb-1">{isAr ? 'كلمة مرور جديدة' : 'New password'}</h1>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'كلمة مرور جديدة' : 'New password'}</h1>
           <p className="text-gray-500 text-sm">{isAr ? 'اختر كلمة مرور قوية لحسابك.' : 'Choose a strong password for your account.'}</p>
         </div>
 
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
                 minLength={8}
                 required
                 autoFocus
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function ResetPasswordPage() {
                 autoComplete="new-password"
                 minLength={8}
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            className="w-full bg-forest hover:bg-forest-dark text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
           >
             {loading ? (isAr ? 'جاري التحديث…' : 'Updating…') : (isAr ? 'تحديث كلمة المرور' : 'Update password')}
           </button>

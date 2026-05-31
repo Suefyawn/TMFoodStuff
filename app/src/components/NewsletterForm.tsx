@@ -60,14 +60,14 @@ export function NewsletterForm() {
             aria-label={lang === 'ar' ? 'البريد الإلكتروني' : 'Email address'}
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={error ? 'newsletter-error' : undefined}
-            className={`w-full pl-10 pr-4 py-3 rounded-xl bg-gray-800 border text-white placeholder-gray-500 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition-colors ${error ? 'border-red-500' : 'border-gray-700 focus:border-green-500'}`}
+            className={`w-full pl-10 pr-4 py-3 rounded-xl bg-gray-800 border text-white placeholder-gray-500 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light transition-colors ${error ? 'border-red-500' : 'border-gray-700 focus:border-forest-light'}`}
             required
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-3 rounded-xl text-sm transition-colors whitespace-nowrap disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+          className="bg-forest hover:bg-forest-dark text-white font-bold px-5 py-3 rounded-xl text-sm transition-colors whitespace-nowrap disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
         >
           {loading
             ? (lang === 'ar' ? 'جاري الاشتراك…' : 'Subscribing…')

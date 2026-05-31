@@ -188,7 +188,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
       {/* Page header */}
       <div className="bg-white border-b border-gray-100 px-4 py-8 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-black text-gray-900 mb-1">{tr.shopTitle}</h1>
+          <h1 className="text-4xl font-playfair font-bold text-stone-900 mb-1">{tr.shopTitle}</h1>
           <p className="text-gray-500">{tr.shopSubtitle}</p>
         </div>
       </div>
@@ -206,7 +206,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                 onChange={e => handleSearchChange(e.target.value)}
                 placeholder={tr.search}
                 aria-label={tr.search}
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 border-2 border-gray-200 rounded-full text-base md:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors bg-gray-50 focus:bg-white`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 border-2 border-gray-200 rounded-full text-base md:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors bg-gray-50 focus:bg-white`}
               />
               {search && (
                 <button
@@ -224,7 +224,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
               onClick={() => setOrganicOnly(v => !v)}
               aria-pressed={organicOnly}
               className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold border-2 transition-colors min-h-[40px] ${
-                organicOnly ? 'border-green-600 bg-green-50 text-green-700' : 'border-gray-200 text-gray-700 hover:border-green-300'
+                organicOnly ? 'border-forest bg-green-50 text-forest-dark' : 'border-gray-200 text-gray-700 hover:border-green-300'
               }`}
             >
               <Sprout size={14} aria-hidden="true" />
@@ -234,7 +234,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
               onClick={() => setInStockOnly(v => !v)}
               aria-pressed={inStockOnly}
               className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold border-2 transition-colors min-h-[40px] ${
-                inStockOnly ? 'border-green-600 bg-green-50 text-green-700' : 'border-gray-200 text-gray-700 hover:border-green-300'
+                inStockOnly ? 'border-forest bg-green-50 text-forest-dark' : 'border-gray-200 text-gray-700 hover:border-green-300'
               }`}
             >
               <PackageCheck size={14} aria-hidden="true" />
@@ -271,7 +271,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value as SortOption)}
                 aria-label={isAr ? 'ترتيب حسب' : 'Sort by'}
-                className="text-sm font-semibold text-gray-700 border-2 border-gray-200 rounded-full py-2 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 bg-gray-50 focus:bg-white transition-colors cursor-pointer"
+                className="text-sm font-semibold text-gray-700 border-2 border-gray-200 rounded-full py-2 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light bg-gray-50 focus:bg-white transition-colors cursor-pointer"
               >
                 {sortOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -286,8 +286,8 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
               onClick={() => handleCategoryChange('')}
               className={`flex-shrink-0 whitespace-nowrap px-4 py-2.5 min-h-[40px] rounded-full border-2 text-sm font-semibold transition-all ${
                 !activeCategory
-                  ? 'bg-green-600 text-white border-green-600 shadow-sm'
-                  : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-green-600 bg-white'
+                  ? 'bg-forest text-white border-forest shadow-sm'
+                  : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-forest bg-white'
               }`}
             >
               {tr.allItems} ({countForCategory('')})
@@ -302,8 +302,8 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                   onClick={() => handleCategoryChange(cat.slug)}
                   className={`flex-shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[40px] rounded-full border-2 text-sm font-semibold transition-all ${
                     isActive
-                      ? 'bg-green-600 text-white border-green-600 shadow-sm'
-                      : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-green-600 bg-white'
+                      ? 'bg-forest text-white border-forest shadow-sm'
+                      : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-forest bg-white'
                   }`}
                 >
                   {icon}
@@ -325,8 +325,8 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                     onClick={() => handleCategoryChange(sub.slug)}
                     className={`flex-shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-full text-xs font-semibold transition-all ${
                       isActive
-                        ? 'bg-green-100 text-green-800 ring-1 ring-green-300'
-                        : 'bg-gray-100 text-gray-700 hover:bg-green-50 hover:text-green-700'
+                        ? 'bg-green-100 text-forest-dark ring-1 ring-green-300'
+                        : 'bg-gray-100 text-gray-700 hover:bg-green-50 hover:text-forest-dark'
                     }`}
                   >
                     <span aria-hidden="true">{sub.emoji}</span>
@@ -348,26 +348,26 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
               <span className="text-gray-900 font-black">{filtered.length}</span> {tr.productsFound}
             </p>
             {activeCategoryObj && (
-              <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-green-100 text-forest-dark text-xs font-bold px-3 py-1.5 rounded-full">
                 <span aria-hidden="true">{activeCategoryObj.emoji}</span>
                 {isAr && activeCategoryObj.nameAr ? activeCategoryObj.nameAr : activeCategoryObj.name}
-                <button onClick={() => handleCategoryChange('')} aria-label={isAr ? 'إزالة' : 'Remove'} className="hover:text-green-600 ml-0.5">
+                <button onClick={() => handleCategoryChange('')} aria-label={isAr ? 'إزالة' : 'Remove'} className="hover:text-forest ml-0.5">
                   <X size={12} aria-hidden="true" />
                 </button>
               </span>
             )}
             {organicOnly && (
-              <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-green-100 text-forest-dark text-xs font-bold px-3 py-1.5 rounded-full">
                 <Sprout size={11} aria-hidden="true" /> {isAr ? 'عضوي' : 'Organic'}
-                <button onClick={() => setOrganicOnly(false)} aria-label={isAr ? 'إزالة' : 'Remove'} className="hover:text-green-600 ml-0.5">
+                <button onClick={() => setOrganicOnly(false)} aria-label={isAr ? 'إزالة' : 'Remove'} className="hover:text-forest ml-0.5">
                   <X size={12} aria-hidden="true" />
                 </button>
               </span>
             )}
             {inStockOnly && (
-              <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-green-100 text-forest-dark text-xs font-bold px-3 py-1.5 rounded-full">
                 <PackageCheck size={11} aria-hidden="true" /> {isAr ? 'متوفر' : 'In stock'}
-                <button onClick={() => setInStockOnly(false)} aria-label={isAr ? 'إزالة' : 'Remove'} className="hover:text-green-600 ml-0.5">
+                <button onClick={() => setInStockOnly(false)} aria-label={isAr ? 'إزالة' : 'Remove'} className="hover:text-forest ml-0.5">
                   <X size={12} aria-hidden="true" />
                 </button>
               </span>
@@ -401,7 +401,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
             </div>
             <p className="font-black text-gray-700 text-xl mb-2">{isAr ? 'لم يتم العثور على منتجات' : 'No products found'}</p>
             <p className="text-sm text-gray-400 mb-6">{isAr ? 'جرب بحثاً مختلفاً أو فئة أخرى' : 'Try a different search or category'}</p>
-            <button onClick={clearFilters} className="bg-green-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-700 transition-colors text-sm">
+            <button onClick={clearFilters} className="bg-forest text-white font-bold px-6 py-3 rounded-xl hover:bg-forest-dark transition-colors text-sm">
               {isAr ? 'مسح الفلاتر' : 'Clear Filters'}
             </button>
           </div>

@@ -14,7 +14,7 @@ export default function ServiceAreaBar() {
       dir={isAr ? 'rtl' : 'ltr'}
     >
       <div className="max-w-7xl mx-auto px-4 h-7 flex items-center justify-center gap-1.5">
-        <MapPin size={11} className="text-green-600" aria-hidden="true" />
+        <MapPin size={11} className="text-forest" aria-hidden="true" />
         {isAr
           ? <span>توصيل في جميع إمارات الدولة · دبي · أبوظبي · الشارقة · عجمان · رأس الخيمة · أم القيوين · الفجيرة</span>
           : <span>Delivering across all 7 emirates · Dubai · Abu Dhabi · Sharjah · Ajman · RAK · UAQ · Fujairah</span>}

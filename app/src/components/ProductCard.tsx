@@ -38,39 +38,32 @@ export default function ProductCard({ product }: ProductCardProps) {
   const perUnit = lang === 'ar' ? `لكل ${product.unit}` : `per ${product.unit}`
 
   return (
-    <div className={`bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-300 hover:-translate-y-1 group flex flex-col shadow-sm hover:shadow-xl ${!inStock ? 'opacity-80' : ''}`}>
-      <Link href={`/product/${product.slug}`} className="block active:scale-95 transition-transform">
-        <div className={`relative aspect-square overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center ${!inStock ? 'grayscale' : ''}`}>
-          {product.imageUrl ? (
-            <ProductImage
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-              emoji={product.emoji}
-            />
-          ) : (
-            <span className="text-5xl md:text-7xl group-hover:scale-110 transition-transform duration-300">
-              {product.emoji || ''}
-            </span>
-          )}
+    <div className={`surface-card overflow-hidden hover:shadow-lg hover:-translate-y-0.5 group flex flex-col ${!inStock ? 'opacity-80' : ''}`}>
+      <Link href={`/product/${product.slug}`} className="block active:scale-[0.98] transition-transform">
+        <div className={`relative aspect-square overflow-hidden bg-cream flex items-center justify-center ${!inStock ? 'grayscale' : ''}`}>
+          <ProductImage
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          />
           {/* Badges top-left */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
             {product.isOrganic && (
-              <span className="inline-flex items-center gap-0.5 bg-green-500 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
+              <span className="tag-outline border-forest/30 text-forest bg-white/90 backdrop-blur-sm">
                 <Leaf size={9} />
                 <span className="hidden sm:inline">{lang === 'ar' ? 'عضوي' : 'Organic'}</span>
               </span>
             )}
             {!inStock && (
-              <span className="bg-gray-700 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
-                {lang === 'ar' ? 'نفد' : 'Out'}
+              <span className="tag-outline border-stone-300 text-stone-600 bg-white/90 backdrop-blur-sm">
+                {lang === 'ar' ? 'نفد' : 'Out of stock'}
               </span>
             )}
           </div>
           {/* Sale badge top-right */}
           {product.compareAtPrice && product.compareAtPrice > product.priceAED && (
-            <div className="absolute top-2 right-2">
-              <span className="bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full shadow-sm">
+            <div className="absolute top-2.5 right-2.5">
+              <span className="inline-flex items-center bg-clay text-white text-[11px] font-semibold px-2 py-0.5 rounded-md shadow-sm">
                 -{Math.round((1 - product.priceAED / product.compareAtPrice) * 100)}%
               </span>
             </div>
@@ -99,30 +92,30 @@ export default function ProductCard({ product }: ProductCardProps) {
         <QuickViewModal product={product} onClose={() => setQuickView(false)} />
       )}
 
-      <div className="p-2.5 md:p-4 flex flex-col flex-1">
+      <div className="p-3 md:p-4 flex flex-col flex-1">
         <Link href={`/product/${product.slug}`}>
-          <h3 className="font-bold text-gray-900 text-xs md:text-sm mb-0.5 hover:text-green-600 transition-colors line-clamp-2 leading-snug">
+          <h3 className="font-playfair font-medium text-stone-900 text-sm md:text-base mb-0.5 hover:text-forest transition-colors line-clamp-2 leading-snug">
             {displayName}
           </h3>
         </Link>
 
         {product.origin && (
-          <p className="inline-flex items-center gap-1 text-xs text-gray-400 mb-1">
+          <p className="inline-flex items-center gap-1 text-xs text-stone-400 mb-1">
             <MapPin size={9} className="flex-shrink-0" />
             <span className="truncate">{product.origin}</span>
           </p>
         )}
 
-        <p className="text-xs text-gray-400 mb-2">{perUnit}</p>
+        <p className="text-xs text-stone-400 mb-2">{perUnit}</p>
 
         <div className="mt-auto">
-          <div className="mb-2 leading-none">
-            <span className="text-base md:text-xl font-black text-green-600">
+          <div className="mb-2.5 leading-none">
+            <span className="text-base md:text-xl font-semibold text-forest">
               {formatAED(product.priceAED)}
             </span>
-            <span className="text-xs text-gray-400 font-normal ml-0.5">/{product.unit}</span>
+            <span className="text-xs text-stone-400 font-normal ml-0.5">/{product.unit}</span>
             {product.compareAtPrice && product.compareAtPrice > product.priceAED && (
-              <span className="text-xs text-gray-400 line-through ml-2">{formatAED(product.compareAtPrice)}</span>
+              <span className="text-xs text-stone-400 line-through ml-2">{formatAED(product.compareAtPrice)}</span>
             )}
           </div>
           {inStock ? (
@@ -130,7 +123,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           ) : (
             <button
               disabled
-              className="w-full text-center text-xs font-bold text-gray-400 py-2.5 rounded-xl bg-gray-50 cursor-not-allowed border border-gray-200"
+              className="w-full text-center text-xs font-semibold text-stone-400 py-2.5 rounded-lg bg-cream cursor-not-allowed border border-sand"
             >
               {tr.outOfStock}
             </button>

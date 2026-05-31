@@ -106,12 +106,12 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900">{isAr ? 'العناوين المحفوظة' : 'Saved addresses'}</h1>
+          <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900">{isAr ? 'العناوين المحفوظة' : 'Saved addresses'}</h1>
           <p className="text-sm text-gray-500 mt-1">
             {isAr ? 'يتم استخدامها لتعبئة بيانات التوصيل تلقائياً عند الدفع.' : 'Used to auto-fill delivery details at checkout.'}
           </p>
@@ -119,7 +119,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
         {editingId === null && (
           <button
             onClick={startNew}
-            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2.5 rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 bg-forest hover:bg-forest-dark text-white font-bold px-4 py-2.5 rounded-xl transition-colors"
           >
             <Plus size={16} aria-hidden="true" /> {isAr ? 'إضافة عنوان' : 'Add address'}
           </button>
@@ -128,7 +128,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
 
       {editingId !== null && (
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-5">
-          <h2 className="font-black text-gray-900 mb-4">
+          <h2 className="font-playfair font-bold text-stone-900 mb-4">
             {editingId === 'new' ? (isAr ? 'عنوان جديد' : 'New address') : (isAr ? 'تعديل العنوان' : 'Edit address')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -136,12 +136,12 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
               <label className="block text-xs font-bold text-gray-600 mb-1.5">{isAr ? 'تسمية (اختياري)' : 'Label (optional)'}</label>
               <input value={form.label || ''} onChange={e => setForm(f => ({ ...f, label: e.target.value }))}
                 placeholder={isAr ? 'المنزل، المكتب…' : 'Home, Office…'}
-                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1.5">{isAr ? 'الإمارة' : 'Emirate'} *</label>
               <select value={form.emirate || ''} onChange={e => setForm(f => ({ ...f, emirate: e.target.value }))}
-                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-green-500" required>
+                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-forest-light" required>
                 <option value="">{isAr ? 'اختر الإمارة' : 'Select emirate'}</option>
                 {emirates.map(e => <option key={e} value={e}>{e}</option>)}
               </select>
@@ -150,31 +150,31 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
               <label className="block text-xs font-bold text-gray-600 mb-1.5">{isAr ? 'المنطقة' : 'Area'} *</label>
               <input value={form.area || ''} onChange={e => setForm(f => ({ ...f, area: e.target.value }))}
                 placeholder={isAr ? 'جميرا، المرسى…' : 'JLT, Marina, Khalidiyah…'}
-                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" required />
+                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" required />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1.5">{isAr ? 'المبنى / الفيلا' : 'Building / Villa'}</label>
               <input value={form.building || ''} onChange={e => setForm(f => ({ ...f, building: e.target.value }))}
                 placeholder={isAr ? 'اسم البرج أو رقم الفيلا' : 'Tower name or villa number'}
-                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1.5">{isAr ? 'مكاني (اختياري)' : 'Makani (optional)'}</label>
               <input value={form.makani || ''} onChange={e => setForm(f => ({ ...f, makani: e.target.value }))}
                 placeholder={isAr ? 'كود عنوان دبي' : 'Dubai address code'}
-                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
             </div>
             <div className="md:col-span-2">
               <label className="inline-flex items-center gap-2 text-sm text-gray-700">
                 <input type="checkbox" checked={form.is_default} onChange={e => setForm(f => ({ ...f, is_default: e.target.checked }))}
-                  className="w-4 h-4 accent-green-600" />
+                  className="w-4 h-4 accent-forest" />
                 {isAr ? 'استخدم كعنوان افتراضي' : 'Set as default address'}
               </label>
             </div>
           </div>
           {error && <p role="alert" className="text-sm text-red-600 mt-3">{error}</p>}
           <div className="flex items-center gap-2 mt-5">
-            <button onClick={save} disabled={busy} className="bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-60">
+            <button onClick={save} disabled={busy} className="bg-forest hover:bg-forest-dark text-white font-bold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-60">
               {busy ? (isAr ? 'جاري الحفظ…' : 'Saving…') : (isAr ? 'حفظ' : 'Save')}
             </button>
             <button onClick={() => setEditingId(null)} className="text-gray-600 hover:text-gray-900 font-semibold px-3 py-2.5 text-sm">
@@ -200,7 +200,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <h3 className="font-bold text-gray-900">{a.label || (isAr ? 'العنوان' : 'Address')}</h3>
                   {a.is_default && (
-                    <span className="inline-flex items-center gap-1 text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-forest-dark bg-green-50 px-2 py-0.5 rounded-full">
                       <Star size={10} className="fill-current" aria-hidden="true" />
                       {isAr ? 'افتراضي' : 'Default'}
                     </span>
@@ -212,7 +212,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
                 {a.makani && <p className="text-xs text-gray-500 mt-0.5">Makani: {a.makani}</p>}
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => startEdit(a)} aria-label={isAr ? 'تعديل' : 'Edit'} className="p-2 text-gray-500 hover:text-green-700 transition-colors">
+                <button onClick={() => startEdit(a)} aria-label={isAr ? 'تعديل' : 'Edit'} className="p-2 text-gray-500 hover:text-forest-dark transition-colors">
                   <Pencil size={16} aria-hidden="true" />
                 </button>
                 <button onClick={() => remove(a.id)} aria-label={isAr ? 'حذف' : 'Delete'} className="p-2 text-gray-500 hover:text-red-600 transition-colors">

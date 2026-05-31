@@ -46,13 +46,13 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
   if (!mounted) {
     if (size === 'lg') {
       return (
-        <button className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99] min-h-[52px]">
+        <button className="w-full flex items-center justify-center gap-3 bg-forest text-white font-bold py-4 rounded-2xl text-lg hover:bg-forest-dark transition-colors shadow-lg active:scale-[0.99] min-h-[52px]">
           <ShoppingCart size={20} /> {tr.addToCart}
         </button>
       )
     }
     return (
-      <button className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95 min-h-[44px]">
+      <button className="w-full flex items-center justify-center gap-1.5 bg-forest text-white text-sm font-bold py-2.5 rounded-xl hover:bg-forest-dark transition-colors active:scale-95 min-h-[44px]">
         <ShoppingCart size={14} /> {lang === 'ar' ? 'أضف' : 'Add'}
       </button>
     )
@@ -69,7 +69,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
         {qty === 0 ? (
           <button
             onClick={handleAdd}
-            className="w-full flex items-center justify-center gap-3 bg-green-600 text-white font-bold py-4 rounded-2xl text-lg hover:bg-green-700 transition-colors shadow-lg active:scale-[0.99] min-h-[52px]"
+            className="w-full flex items-center justify-center gap-3 bg-forest text-white font-bold py-4 rounded-2xl text-lg hover:bg-forest-dark transition-colors shadow-lg active:scale-[0.99] min-h-[52px]"
           >
             <ShoppingCart size={20} /> {tr.addToCart}
           </button>
@@ -87,7 +87,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
             </div>
             <button
               onClick={handleAdd}
-              className="w-14 h-14 rounded-2xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors shadow"
+              className="w-14 h-14 rounded-2xl bg-forest hover:bg-forest-dark text-white flex items-center justify-center transition-colors shadow"
             >
               <Plus size={18} />
             </button>
@@ -107,7 +107,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
       {qty === 0 ? (
         <button
           onClick={handleAdd}
-          className="w-full flex items-center justify-center gap-1.5 bg-green-600 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-green-700 transition-colors active:scale-95 min-h-[44px]"
+          className="w-full flex items-center justify-center gap-1.5 bg-forest text-white text-sm font-bold py-2.5 rounded-xl hover:bg-forest-dark transition-colors active:scale-95 min-h-[44px]"
         >
           <ShoppingCart size={14} /> {lang === 'ar' ? 'أضف' : 'Add'}
         </button>
@@ -122,7 +122,7 @@ export default function AddToCartButton({ product, size = 'sm' }: Props) {
           <span className="flex-1 text-center font-black text-gray-900 text-base">{qty}</span>
           <button
             onClick={handleAdd}
-            className="w-11 h-11 md:w-9 md:h-9 rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors flex-shrink-0"
+            className="w-11 h-11 md:w-9 md:h-9 rounded-xl bg-forest hover:bg-forest-dark text-white flex items-center justify-center transition-colors flex-shrink-0"
           >
             <Plus size={13} />
           </button>

@@ -52,12 +52,12 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
       {/* Balance hero */}
-      <div className="bg-gradient-to-br from-green-600 to-emerald-700 text-white rounded-3xl p-7 md:p-9 shadow-lg mb-6">
+      <div className="bg-gradient-to-br from-forest to-emerald-700 text-white rounded-3xl p-7 md:p-9 shadow-lg mb-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-green-100 mb-1">{isAr ? 'رصيد النقاط' : 'Points balance'}</p>
@@ -83,23 +83,23 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
 
       {/* How it works */}
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
-        <h2 className="font-black text-gray-900 mb-4 inline-flex items-center gap-2">
+        <h2 className="font-playfair font-bold text-stone-900 mb-4 inline-flex items-center gap-2">
           <Gift size={16} className="text-gray-400" aria-hidden="true" />
           {isAr ? 'كيف يعمل' : 'How it works'}
         </h2>
         <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
           <li className="bg-gray-50 rounded-2xl p-4">
-            <p className="font-black text-gray-900 text-base mb-1">{rules.earnPerAed} {isAr ? 'نقطة' : 'pt'}</p>
+            <p className="font-playfair font-bold text-stone-900 text-base mb-1">{rules.earnPerAed} {isAr ? 'نقطة' : 'pt'}</p>
             <p className="text-gray-500">{isAr ? 'لكل درهم على المجموع الفرعي' : 'for every AED you spend on subtotal'}</p>
           </li>
           <li className="bg-gray-50 rounded-2xl p-4">
-            <p className="font-black text-gray-900 text-base mb-1">{rules.minRedeem} {isAr ? 'نقطة' : 'pts'}</p>
+            <p className="font-playfair font-bold text-stone-900 text-base mb-1">{rules.minRedeem} {isAr ? 'نقطة' : 'pts'}</p>
             <p className="text-gray-500">
               {isAr ? `الحد الأدنى للاستبدال (AED ${rules.aedAtMinRedeem})` : `minimum to redeem (AED ${rules.aedAtMinRedeem})`}
             </p>
           </li>
           <li className="bg-gray-50 rounded-2xl p-4">
-            <p className="font-black text-gray-900 text-base mb-1">12 {isAr ? 'شهر' : 'mo'}</p>
+            <p className="font-playfair font-bold text-stone-900 text-base mb-1">12 {isAr ? 'شهر' : 'mo'}</p>
             <p className="text-gray-500">{isAr ? 'تنتهي صلاحية النقاط بعدها' : 'before earned points expire'}</p>
           </li>
         </ul>
@@ -107,7 +107,7 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
 
       {/* History */}
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm">
-        <h2 className="font-black text-gray-900 mb-4 inline-flex items-center gap-2">
+        <h2 className="font-playfair font-bold text-stone-900 mb-4 inline-flex items-center gap-2">
           <Clock size={16} className="text-gray-400" aria-hidden="true" />
           {isAr ? 'السجل' : 'History'}
         </h2>
@@ -117,7 +117,7 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
               <ShoppingBag size={20} className="text-gray-300" aria-hidden="true" />
             </div>
             <p className="text-sm text-gray-500 mb-4">{isAr ? 'لا توجد سجلات بعد. اطلب أول طلب لتكسب نقاط!' : 'No history yet. Place an order to start earning.'}</p>
-            <Link href="/shop" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm">
+            <Link href="/shop" className="inline-flex items-center gap-2 bg-forest hover:bg-forest-dark text-white font-bold px-4 py-2.5 rounded-xl text-sm">
               {isAr ? 'تصفّح المنتجات' : 'Browse products'}
             </Link>
           </div>
@@ -129,7 +129,7 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
               return (
                 <li key={r.id} className="py-3 first:pt-0 last:pb-0 flex items-center gap-3">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                    isPositive ? 'bg-green-50 text-green-700' : 'bg-rose-50 text-rose-600'
+                    isPositive ? 'bg-green-50 text-forest-dark' : 'bg-rose-50 text-rose-600'
                   }`}>
                     {isPositive ? <ArrowUpRight size={16} aria-hidden="true" /> : <ArrowDownRight size={16} aria-hidden="true" />}
                   </div>
@@ -141,7 +141,7 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
                       {new Date(r.created_at).toLocaleDateString(isAr ? 'ar-AE' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
-                  <span className={`text-sm font-black shrink-0 ${expired ? 'line-through text-gray-400' : isPositive ? 'text-green-700' : 'text-rose-600'}`}>
+                  <span className={`text-sm font-black shrink-0 ${expired ? 'line-through text-gray-400' : isPositive ? 'text-forest-dark' : 'text-rose-600'}`}>
                     {isPositive ? '+' : ''}{r.delta}
                   </span>
                 </li>

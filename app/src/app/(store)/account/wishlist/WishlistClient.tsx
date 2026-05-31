@@ -26,7 +26,7 @@ export default function WishlistClient({ initialItems }: { initialItems: Wishlis
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
@@ -35,7 +35,7 @@ export default function WishlistClient({ initialItems }: { initialItems: Wishlis
           <Heart size={22} className="text-rose-600 fill-rose-600" aria-hidden="true" />
         </div>
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900">{isAr ? 'قائمة المفضلة' : 'My Wishlist'}</h1>
+          <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900">{isAr ? 'قائمة المفضلة' : 'My Wishlist'}</h1>
           <p className="text-sm text-gray-500">
             {initialItems.length} {isAr ? 'منتج' : initialItems.length === 1 ? 'item' : 'items'}
           </p>
@@ -53,7 +53,7 @@ export default function WishlistClient({ initialItems }: { initialItems: Wishlis
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-forest hover:bg-forest-dark text-white font-bold px-5 py-2.5 rounded-xl transition-colors"
           >
             <ShoppingBag size={16} aria-hidden="true" />
             {isAr ? 'تصفّح المنتجات' : 'Browse products'}

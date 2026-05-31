@@ -61,14 +61,16 @@ function SignupInner() {
   if (needsConfirmation) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 md:py-24 text-center" dir={isAr ? 'rtl' : 'ltr'}>
-        <div className="text-5xl mb-4" aria-hidden="true">📬</div>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-forest/10 flex items-center justify-center" aria-hidden="true">
+          <Mail size={28} className="text-forest" strokeWidth={1.75} />
+        </div>
+        <h1 className="font-playfair text-2xl font-bold text-stone-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
         <p className="text-gray-500 text-sm mb-6">
           {isAr
             ? `أرسلنا رابط تأكيد إلى ${email}. اضغط على الرابط لتفعيل حسابك.`
             : `We just sent a confirmation link to ${email}. Click it to activate your account.`}
         </p>
-        <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-green-700 font-bold hover:underline">
+        <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-forest-dark font-bold hover:underline">
           {isAr ? 'العودة لتسجيل الدخول' : 'Back to sign in'}
         </Link>
       </div>
@@ -79,7 +81,7 @@ function SignupInner() {
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
-          <h1 className="text-3xl font-black text-gray-900 mb-1">{isAr ? 'إنشاء حساب' : 'Create account'}</h1>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'إنشاء حساب' : 'Create account'}</h1>
           <p className="text-gray-500 text-sm">{isAr ? 'تتبّع الطلبات، احفظ العناوين، واطلب أسرع' : 'Track orders, save addresses, check out faster'}</p>
         </div>
 
@@ -95,7 +97,7 @@ function SignupInner() {
                 onChange={e => setName(e.target.value)}
                 placeholder={isAr ? 'أحمد المنصوري' : 'Ahmed Al Mansouri'}
                 autoComplete="name"
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -111,7 +113,7 @@ function SignupInner() {
                 placeholder="you@example.com"
                 autoComplete="email"
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -128,7 +130,7 @@ function SignupInner() {
                 autoComplete="new-password"
                 minLength={8}
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -136,7 +138,7 @@ function SignupInner() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            className="w-full bg-forest hover:bg-forest-dark text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
           >
             {loading ? (isAr ? 'جاري إنشاء الحساب…' : 'Creating account…') : (isAr ? 'إنشاء الحساب' : 'Create account')}
           </button>
@@ -144,7 +146,7 @@ function SignupInner() {
 
         <p className="mt-6 text-center text-sm text-gray-500">
           {isAr ? 'لديك حساب؟ ' : 'Already have an account? '}
-          <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-green-700 font-bold hover:underline">
+          <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-forest-dark font-bold hover:underline">
             {isAr ? 'سجّل دخول' : 'Sign in'}
           </Link>
         </p>

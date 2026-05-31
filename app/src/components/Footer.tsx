@@ -31,8 +31,8 @@ export default function Footer() {
         <div className="border-b border-white/10 bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-white font-black text-xl mb-1 flex items-center gap-2">
-                <Leaf size={20} className="text-green-500" />
+              <h3 className="text-white font-playfair font-bold text-xl mb-1 flex items-center gap-2">
+                <Leaf size={20} className="text-forest-light" />
                 {tr.newsletterTitle}
               </h3>
               <p className="text-gray-400 text-sm">{tr.newsletterSub}</p>
@@ -46,8 +46,8 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-5">
-              <Leaf size={20} className="text-green-500" />
-              <span className="font-black text-white text-xl tracking-tight">
+              <Leaf size={20} className="text-forest-light" />
+              <span className="font-playfair font-bold text-white text-xl tracking-tight">
                 TM FoodStuff
               </span>
             </div>
@@ -61,7 +61,7 @@ export default function Footer() {
               href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}?text=Hi%20TMFoodStuff%2C%20I%20need%20help%20with%20my%20order`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-green-700 transition-colors"
+              className="inline-flex items-center gap-2 bg-forest text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-forest-dark transition-colors"
             >
               <MessageCircle size={16} />
               {tr.whatsappUs}
@@ -70,7 +70,7 @@ export default function Footer() {
 
           {/* Shop */}
           <div>
-            <h4 className="font-black text-white mb-5">{lang === 'ar' ? 'تسوق' : 'Shop'}</h4>
+            <h4 className="font-playfair font-bold text-white mb-5">{lang === 'ar' ? 'تسوق' : 'Shop'}</h4>
             <ul className="space-y-2.5 text-sm">
               {shopLinks.map(item => (
                 <li key={item.href}>
@@ -85,8 +85,8 @@ export default function Footer() {
 
           {/* Delivery Areas */}
           <div>
-            <h4 className="font-black text-white mb-5 flex items-center gap-2">
-              <MapPin size={16} className="text-green-500" />
+            <h4 className="font-playfair font-bold text-white mb-5 flex items-center gap-2">
+              <MapPin size={16} className="text-forest-light" />
               {tr.deliveryAreas}
             </h4>
             <ul className="space-y-2.5 text-sm">
@@ -100,7 +100,7 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-black text-white mb-5">{tr.company}</h4>
+            <h4 className="font-playfair font-bold text-white mb-5">{tr.company}</h4>
             <ul className="space-y-2.5 text-sm">
               {companyLinks.map(([label, href]) => (
                 <li key={label}>
@@ -114,11 +114,11 @@ export default function Footer() {
             {/* Contact */}
             <div className="mt-6 space-y-2">
               <a href={`tel:+${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
-                <Phone size={14} className="text-green-600 flex-shrink-0" />
+                <Phone size={14} className="text-forest flex-shrink-0" />
                 +{(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411').replace(/(\d{3})(\d{2})(\d{3})(\d{4})/, '$1 $2 $3 $4')}
               </a>
               <a href={`mailto:${process.env.NEXT_PUBLIC_STORE_EMAIL || 'hello@tmfoodstuff.ae'}`} className="flex items-center gap-2 text-sm hover:text-white transition-colors">
-                <Mail size={14} className="text-green-600 flex-shrink-0" />
+                <Mail size={14} className="text-forest flex-shrink-0" />
                 {process.env.NEXT_PUBLIC_STORE_EMAIL || 'hello@tmfoodstuff.ae'}
               </a>
             </div>
@@ -132,7 +132,7 @@ export default function Footer() {
                 <span className="inline-flex items-center gap-1 bg-gray-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
                   <CreditCard size={12} /> COD
                 </span>
-                <span className="inline-flex items-center gap-1 bg-green-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+                <span className="inline-flex items-center gap-1 bg-forest-dark text-white text-xs font-bold px-3 py-1.5 rounded-lg">
                   <Smartphone size={12} /> Pay
                 </span>
               </div>

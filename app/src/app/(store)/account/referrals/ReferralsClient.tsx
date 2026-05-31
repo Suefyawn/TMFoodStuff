@@ -43,17 +43,17 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
       <header className="mb-7">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-2xl bg-green-100 text-forest-dark flex items-center justify-center">
             <Gift size={22} aria-hidden="true" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
               {isAr ? 'ادعُ صديقاً، اكسبا معاً' : 'Refer a friend, you both win'}
             </h1>
             <p className="text-sm text-gray-500">
@@ -65,9 +65,9 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
 
       {/* Stat row */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-6">
-        <Stat label={isAr ? 'أصدقاء انضموا' : 'Friends joined'} value={String(rewardedCount)} accent="text-green-700" />
+        <Stat label={isAr ? 'أصدقاء انضموا' : 'Friends joined'} value={String(rewardedCount)} accent="text-forest-dark" />
         <Stat label={isAr ? 'بانتظار التوصيل' : 'Pending delivery'} value={String(pendingCount)} accent="text-amber-700" />
-        <Stat label={isAr ? 'نقاط مكتسبة' : 'Points earned'} value={String(totalEarned)} accent="text-green-700" />
+        <Stat label={isAr ? 'نقاط مكتسبة' : 'Points earned'} value={String(totalEarned)} accent="text-forest-dark" />
       </div>
 
       {/* Share card */}
@@ -76,7 +76,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
           {isAr ? 'رمزك' : 'Your code'}
         </p>
         <div className="flex items-center justify-between gap-3 mb-5 bg-green-50 border-2 border-dashed border-green-300 rounded-2xl px-4 py-3">
-          <span className="font-mono font-black text-2xl md:text-3xl tracking-widest text-green-800">{code}</span>
+          <span className="font-mono font-black text-2xl md:text-3xl tracking-widest text-forest-dark">{code}</span>
           <button
             type="button"
             onClick={() => copy(code, 'code')}
@@ -135,7 +135,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
 
       {/* Referrals list */}
       <section>
-        <h2 className="font-black text-gray-900 text-lg mb-3 flex items-center gap-2">
+        <h2 className="font-playfair font-bold text-stone-900 text-lg mb-3 flex items-center gap-2">
           <Users size={16} className="text-gray-400" aria-hidden="true" />
           {isAr ? 'إحالاتك' : 'Your referrals'}
           <span className="text-xs font-bold text-gray-400">({referrals.length})</span>
@@ -160,7 +160,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
                   </p>
                 </div>
                 {r.status === 'rewarded' ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-lg">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-forest-dark bg-green-50 border border-green-200 px-2 py-1 rounded-lg">
                     <Check size={11} aria-hidden="true" /> +{r.reward_points} {isAr ? 'نقطة' : 'pts'}
                   </span>
                 ) : r.status === 'pending' ? (
@@ -193,7 +193,7 @@ function Stat({ label, value, accent }: { label: string; value: string; accent: 
 function Step({ n, text }: { n: number; text: string }) {
   return (
     <li className="flex items-start gap-2.5">
-      <span className="shrink-0 w-5 h-5 rounded-full bg-green-600 text-white text-[10px] font-black flex items-center justify-center mt-0.5">{n}</span>
+      <span className="shrink-0 w-5 h-5 rounded-full bg-forest text-white text-[10px] font-black flex items-center justify-center mt-0.5">{n}</span>
       <span className="leading-relaxed">{text}</span>
     </li>
   )

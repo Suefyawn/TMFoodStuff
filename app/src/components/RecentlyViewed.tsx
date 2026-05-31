@@ -45,10 +45,10 @@ export default function RecentlyViewed({ excludeSlug }: { excludeSlug?: string }
                 emoji={item.emoji}
               />
             </div>
-            <p className="text-xs font-bold text-gray-900 truncate group-hover:text-green-700 transition-colors">
+            <p className="text-xs font-bold text-gray-900 truncate group-hover:text-forest-dark transition-colors">
               {isAr && item.nameAr ? item.nameAr : item.name}
             </p>
-            <p className="text-xs text-green-700 font-black mt-0.5">
+            <p className="text-xs text-forest-dark font-black mt-0.5">
               AED {item.priceAED.toFixed(2)}
             </p>
           </Link>

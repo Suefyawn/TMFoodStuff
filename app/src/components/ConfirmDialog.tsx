@@ -90,7 +90,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
             <div className="p-5">
               <div className="flex items-start gap-3 mb-3">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                  opts.destructive ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
+                  opts.destructive ? 'bg-red-50 text-red-600' : 'bg-green-50 text-forest'
                 }`}>
                   <AlertTriangle size={20} aria-hidden="true" />
                 </div>
@@ -125,7 +125,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                 className={`inline-flex items-center gap-1.5 text-sm font-bold text-white px-4 py-2 rounded-xl transition-colors ${
                   opts.destructive
                     ? 'bg-red-600 hover:bg-red-500'
-                    : 'bg-green-600 hover:bg-green-500'
+                    : 'bg-forest hover:bg-forest-light'
                 }`}
               >
                 {opts.confirmLabel || 'Confirm'}

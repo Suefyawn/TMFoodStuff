@@ -143,7 +143,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
@@ -151,14 +151,14 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
         <div className="flex items-start justify-between gap-3 flex-wrap mb-5">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الطلب' : 'Order'}</p>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 font-mono">#{order.order_number}</h1>
+            <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 font-mono">#{order.order_number}</h1>
             <p className="text-xs text-gray-500 mt-1">
               {new Date(order.created_at).toLocaleString(isAr ? 'ar-AE' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
           <span className={`inline-flex items-center gap-1.5 text-sm font-bold px-3 py-1.5 rounded-xl ${
             isCancelled ? 'bg-gray-200 text-gray-700'
-            : order.status === 'delivered' ? 'bg-green-100 text-green-700'
+            : order.status === 'delivered' ? 'bg-green-100 text-forest-dark'
             : order.status === 'out_for_delivery' ? 'bg-orange-100 text-orange-700'
             : 'bg-blue-100 text-blue-700'
           }`}>
@@ -220,7 +220,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
         <div className="flex items-center gap-2 mb-4">
           <Package size={16} className="text-gray-400" aria-hidden="true" />
-          <h2 className="font-black text-gray-900">{isAr ? 'المنتجات' : 'Items'} ({items.length})</h2>
+          <h2 className="font-playfair font-bold text-stone-900">{isAr ? 'المنتجات' : 'Items'} ({items.length})</h2>
         </div>
         <ul className="divide-y divide-gray-100">
           {items.map((item, i) => (
@@ -256,7 +256,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
             </p>
           </div>
         </div>
-        <span className="text-xs font-bold text-green-700 group-hover:underline shrink-0">
+        <span className="text-xs font-bold text-forest-dark group-hover:underline shrink-0">
           {isAr ? 'عرض / تنزيل' : 'View / Print'} →
         </span>
       </Link>
@@ -274,19 +274,19 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
           </div>
           <div className="flex justify-between text-gray-600">
             <dt>{isAr ? 'التوصيل' : 'Delivery'}</dt>
-            <dd className={deliveryFee === 0 ? 'text-green-600 font-bold' : ''}>
+            <dd className={deliveryFee === 0 ? 'text-forest font-bold' : ''}>
               {deliveryFee === 0 ? (isAr ? 'مجاناً' : 'FREE') : `AED ${deliveryFee.toFixed(2)}`}
             </dd>
           </div>
           {promoDiscount > 0 && (
-            <div className="flex justify-between text-green-700 font-semibold">
+            <div className="flex justify-between text-forest-dark font-semibold">
               <dt>{isAr ? `كود (${order.promo_code})` : `Promo (${order.promo_code})`}</dt>
               <dd>-AED {promoDiscount.toFixed(2)}</dd>
             </div>
           )}
-          <div className="flex justify-between font-black text-gray-900 pt-2 border-t border-gray-100">
+          <div className="flex justify-between font-playfair font-bold text-stone-900 pt-2 border-t border-gray-100">
             <dt>{isAr ? 'الإجمالي' : 'Total'}</dt>
-            <dd className="text-green-700 text-lg">AED {total.toFixed(2)}</dd>
+            <dd className="text-forest-dark text-lg">AED {total.toFixed(2)}</dd>
           </div>
         </dl>
       </div>
@@ -296,11 +296,11 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
         <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm mb-5">
           {reordered ? (
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <span className="text-green-700 font-bold text-sm inline-flex items-center gap-2">
+              <span className="text-forest-dark font-bold text-sm inline-flex items-center gap-2">
                 <CheckCircle2 size={16} aria-hidden="true" />
                 {isAr ? 'تمت إضافة المنتجات إلى السلة' : 'Items added to cart'}
               </span>
-              <Link href="/cart" className="bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors">
+              <Link href="/cart" className="bg-forest hover:bg-forest-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors">
                 {isAr ? 'الذهاب إلى السلة' : 'Go to cart'} →
               </Link>
             </div>

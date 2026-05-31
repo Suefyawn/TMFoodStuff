@@ -77,20 +77,15 @@ export default function QuickViewModal({ product, onClose }: Props) {
 
         <div className="grid sm:grid-cols-2 gap-0">
           {/* Image */}
-          <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-            {product.imageUrl ? (
-              <ProductImage
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-full object-cover"
-                emoji={product.emoji}
-              />
-            ) : (
-              <span className="text-8xl" aria-hidden="true">{product.emoji || '🥦'}</span>
-            )}
+          <div className="relative aspect-square bg-cream flex items-center justify-center">
+            <ProductImage
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
             <div className="absolute top-3 left-3 flex flex-col gap-1.5">
               {product.isOrganic && (
-                <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow">
+                <span className="tag-outline border-forest/30 text-forest bg-white/90 backdrop-blur-sm">
                   <Leaf size={10} aria-hidden="true" />
                   {lang === 'ar' ? 'عضوي' : 'Organic'}
                 </span>
@@ -120,7 +115,7 @@ export default function QuickViewModal({ product, onClose }: Props) {
             )}
 
             <div className="mt-4 leading-none">
-              <span className="text-3xl font-black text-green-600">{formatAED(product.priceAED)}</span>
+              <span className="text-3xl font-black text-forest">{formatAED(product.priceAED)}</span>
               <span className="text-sm text-gray-500 ml-1.5">/{product.unit}</span>
               {onSale && (
                 <span className="text-sm text-gray-400 line-through ml-3">
@@ -149,7 +144,7 @@ export default function QuickViewModal({ product, onClose }: Props) {
             <Link
               href={`/product/${product.slug}`}
               onClick={onClose}
-              className="mt-4 inline-flex items-center justify-center gap-1.5 text-sm font-bold text-green-700 hover:text-green-800 transition-colors"
+              className="mt-4 inline-flex items-center justify-center gap-1.5 text-sm font-bold text-forest-dark hover:text-forest-dark transition-colors"
             >
               {lang === 'ar' ? 'عرض التفاصيل الكاملة' : 'View full details'}
               <ArrowRight size={14} aria-hidden="true" />

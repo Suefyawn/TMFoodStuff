@@ -25,7 +25,7 @@ export default function FloatingWhatsApp() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={isAr ? 'تواصل عبر واتساب' : 'Chat on WhatsApp'}
-      className={`fixed bottom-20 md:bottom-6 ${isAr ? 'left-4 md:left-6' : 'right-4 md:right-6'} z-40 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-full shadow-lg shadow-green-500/30 transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2`}
+      className={`fixed bottom-20 md:bottom-6 ${isAr ? 'left-4 md:left-6' : 'right-4 md:right-6'} z-40 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-full shadow-lg shadow-forest-light/30 transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2`}
     >
       <MessageCircle size={26} fill="currentColor" strokeWidth={0} aria-hidden="true" />
       <span className="sr-only">{isAr ? 'تواصل عبر واتساب' : 'Chat on WhatsApp'}</span>

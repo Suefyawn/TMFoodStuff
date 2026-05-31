@@ -50,7 +50,7 @@ function LoginInner() {
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
-          <h1 className="text-3xl font-black text-gray-900 mb-1">{isAr ? 'تسجيل الدخول' : 'Sign in'}</h1>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'تسجيل الدخول' : 'Sign in'}</h1>
           <p className="text-gray-500 text-sm">{isAr ? 'إلى حسابك في TM FoodStuff' : 'to your TM FoodStuff account'}</p>
         </div>
 
@@ -67,7 +67,7 @@ function LoginInner() {
                 placeholder="you@example.com"
                 autoComplete="email"
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -83,7 +83,7 @@ function LoginInner() {
                 placeholder="••••••••"
                 autoComplete="current-password"
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -91,13 +91,13 @@ function LoginInner() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            className="w-full bg-forest hover:bg-forest-dark text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
           >
             {loading ? (isAr ? 'جاري الدخول…' : 'Signing in…') : (isAr ? 'تسجيل الدخول' : 'Sign In')}
           </button>
 
           <p className="text-center -mt-1">
-            <Link href="/account/forgot" className="text-xs text-gray-500 hover:text-green-700 hover:underline">
+            <Link href="/account/forgot" className="text-xs text-gray-500 hover:text-forest-dark hover:underline">
               {isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?'}
             </Link>
           </p>
@@ -105,7 +105,7 @@ function LoginInner() {
 
         <p className="mt-6 text-center text-sm text-gray-500">
           {isAr ? 'ليس لديك حساب؟ ' : 'No account yet? '}
-          <Link href={`/account/signup?next=${encodeURIComponent(next)}`} className="text-green-700 font-bold hover:underline">
+          <Link href={`/account/signup?next=${encodeURIComponent(next)}`} className="text-forest-dark font-bold hover:underline">
             {isAr ? 'سجّل الآن' : 'Create one'}
           </Link>
         </p>

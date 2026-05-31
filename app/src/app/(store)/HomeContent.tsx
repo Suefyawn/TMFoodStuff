@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
 import type { Product } from '@/lib/products-api'
 import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
@@ -22,7 +23,7 @@ const homeCategories = [
     icon: Leaf,
     color: 'bg-green-50 hover:bg-green-100',
     border: 'border-green-100',
-    iconColor: 'text-green-600',
+    iconColor: 'text-forest',
   },
   {
     name: 'Organic',
@@ -96,7 +97,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
   return (
     <main className="scroll-mt-20">
       {/* Promo banner strip */}
-      <div className="bg-green-600 text-white text-center py-2.5 px-4 text-sm font-semibold">
+      <div className="bg-forest text-white text-center py-2.5 px-4 text-sm font-semibold">
         <span className="md:hidden">
           {lang === 'ar'
             ? <>توصيل مجاني · كود: <span className="bg-white/20 px-2 py-0.5 rounded font-black">FRESH10</span></>
@@ -174,7 +175,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <Link
                   href="/shop"
-                  className="bg-white text-green-700 font-black px-8 md:px-10 py-4 rounded-2xl text-base md:text-lg hover:bg-amber-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-center inline-flex items-center justify-center gap-2 w-full sm:w-auto"
+                  className="bg-white text-forest-dark font-black px-8 md:px-10 py-4 rounded-2xl text-base md:text-lg hover:bg-amber-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-center inline-flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   {tr.shopNow}
                   <ChevronRight size={20} />
@@ -188,27 +189,15 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
               </div>
             </div>
 
-            {/* Right: Product grid visual (desktop only) */}
+            {/* Right: Product photo collage (desktop only) */}
             <div className="hidden lg:block">
               <div className="grid grid-cols-3 gap-3">
-                {[
-                  { emoji: '🍓', name: lang === 'ar' ? 'فراولة' : 'Strawberry', price: '12.00' },
-                  { emoji: '🥑', name: lang === 'ar' ? 'أفوكادو' : 'Avocado', price: '8.50' },
-                  { emoji: '🍇', name: lang === 'ar' ? 'عنب' : 'Grapes', price: '15.00' },
-                  { emoji: '🥦', name: lang === 'ar' ? 'بروكلي' : 'Broccoli', price: '6.00' },
-                  { emoji: '🍊', name: lang === 'ar' ? 'برتقال' : 'Orange', price: '9.00' },
-                  { emoji: '🫐', name: lang === 'ar' ? 'توت أزرق' : 'Blueberry', price: '18.00' },
-                  { emoji: '🍋', name: lang === 'ar' ? 'ليمون' : 'Lemon', price: '4.50' },
-                  { emoji: '🥕', name: lang === 'ar' ? 'جزر' : 'Carrot', price: '5.00' },
-                  { emoji: '🍒', name: lang === 'ar' ? 'كرز' : 'Cherry', price: '22.00' },
-                ].map((item, i) => (
+                {['fruit-001.jpg','fruit-002.jpg','fruit-003.jpg','fruit-004.jpg','fruit-005.jpg','fruit-006.jpg','fruit-007.jpg','fruit-009.jpg','fruit-010.jpg'].map((img, i) => (
                   <div
                     key={i}
-                    className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-3 text-center hover:bg-white/20 transition-all hover:-translate-y-0.5 cursor-default"
+                    className="relative aspect-square rounded-2xl overflow-hidden border border-white/20 shadow-lg transition-transform hover:-translate-y-0.5"
                   >
-                    <div className="text-4xl mb-1.5">{item.emoji}</div>
-                    <div className="text-white text-xs font-bold truncate">{item.name}</div>
-                    <div className="text-amber-300 text-xs font-black mt-0.5">AED {item.price}</div>
+                    <Image src={`/products/${img}`} alt="" fill sizes="140px" className="object-cover" />
                   </div>
                 ))}
               </div>
@@ -242,7 +231,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
         <div className="max-w-7xl mx-auto px-4 py-4 grid grid-cols-2 md:grid-cols-4 gap-3">
           {trustItems.map(item => (
             <div key={item.text} className="flex items-center justify-center gap-2 md:gap-2.5 py-2">
-              <item.icon size={16} className="text-green-600 flex-shrink-0" />
+              <item.icon size={16} className="text-forest flex-shrink-0" />
               <div>
                 <div className="text-xs md:text-sm font-semibold text-gray-800">{item.text}</div>
                 <div className="text-xs text-gray-400 hidden sm:block">{item.sub}</div>
@@ -255,7 +244,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
       {/* Categories */}
       <section className="max-w-7xl mx-auto px-4 py-12 md:py-20 scroll-mt-20">
         <div className="mb-6 md:mb-10">
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">
+          <h2 className="text-3xl md:text-4xl font-playfair font-bold text-stone-900 mb-2">
             {lang === 'ar' ? 'تسوق حسب الفئة' : 'Shop by Category'}
           </h2>
           <p className="text-gray-500 text-base md:text-lg">
@@ -295,14 +284,14 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
               <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 text-xs font-black px-3 py-1.5 rounded-full mb-3">
                 <Zap size={11} /> {lang === 'ar' ? 'تمت إعادة التخزين اليوم' : 'FRESHLY RESTOCKED TODAY'}
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-1">
+              <h2 className="text-3xl md:text-4xl font-playfair font-bold text-stone-900 mb-1">
                 {lang === 'ar' ? 'اختيارات اليوم' : "Today's Picks"}
               </h2>
               <p className="text-gray-500 text-sm md:text-base">
                 {lang === 'ar' ? 'أفضل المبيعات · أطازج منتجات اليوم' : 'Handpicked bestsellers · Freshest of the day'}
               </p>
             </div>
-            <Link href="/shop" className="text-green-600 font-bold hover:underline text-sm hidden sm:flex items-center gap-1">
+            <Link href="/shop" className="text-forest font-bold hover:underline text-sm hidden sm:flex items-center gap-1">
               {lang === 'ar' ? 'عرض الكل' : 'View all'} <ChevronRight size={16} className="inline" />
             </Link>
           </div>
@@ -312,7 +301,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
             ))}
           </div>
           <div className="text-center mt-8 sm:hidden">
-            <Link href="/shop" className="inline-block bg-green-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-green-700 transition-colors">
+            <Link href="/shop" className="inline-block bg-forest text-white font-bold px-8 py-3 rounded-xl hover:bg-forest-dark transition-colors">
               {lang === 'ar' ? 'عرض جميع المنتجات' : 'View All Products'}
             </Link>
           </div>
@@ -347,8 +336,8 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
       {/* Delivery zones */}
       <section className="max-w-7xl mx-auto px-4 py-12 md:py-20 text-center">
         <div className="flex items-center justify-center gap-2 mb-3">
-          <MapPin size={20} className="text-green-600" />
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900">
+          <MapPin size={20} className="text-forest" />
+          <h2 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900">
             {lang === 'ar' ? 'نوصل في جميع أنحاء الإمارات' : 'Delivering Across UAE'}
           </h2>
         </div>
@@ -359,7 +348,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
           {deliveryCities.map(city => (
             <span
               key={city}
-              className="bg-gray-100 text-gray-800 px-4 md:px-5 py-2 md:py-2.5 rounded-full font-semibold text-sm hover:bg-green-100 hover:text-green-800 transition-colors cursor-default"
+              className="bg-gray-100 text-gray-800 px-4 md:px-5 py-2 md:py-2.5 rounded-full font-semibold text-sm hover:bg-green-100 hover:text-forest-dark transition-colors cursor-default"
             >
               {city}
             </span>

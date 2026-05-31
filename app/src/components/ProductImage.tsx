@@ -10,17 +10,14 @@ interface ProductImageProps {
   emoji?: string
 }
 
-export function ProductImage({ src, alt, className, emoji }: ProductImageProps) {
+export function ProductImage({ src, alt, className }: ProductImageProps) {
   const [error, setError] = useState(false)
 
   if (!src || error) {
+    // Clean, neutral placeholder for the premium-grocer look — no emoji.
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-        {emoji ? (
-          <span className="text-6xl" aria-hidden="true">{emoji}</span>
-        ) : (
-          <Leaf size={48} className="text-gray-300" aria-hidden="true" />
-        )}
+      <div className="w-full h-full flex items-center justify-center bg-cream">
+        <Leaf size={40} className="text-sand" aria-hidden="true" strokeWidth={1.5} />
       </div>
     )
   }
