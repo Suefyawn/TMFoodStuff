@@ -16,16 +16,23 @@ export default function DashboardSetPassword() {
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient()
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) setAuthed(true)
-      setReady(true)
-    })
-    // Also check immediately in case the session is already resolved.
+    const params = new URLSearchParams(window.location.search)
+    const tokenHash = params.get('token_hash')
+    const type = params.get('type')
+    if (tokenHash && (type === 'invite' || type === 'recovery')) {
+      // Verify the one-time token from the invite link to establish a session.
+      // Done here (not on a plain GET) so email link-scanners can't consume it.
+      supabase.auth.verifyOtp({ type, token_hash: tokenHash }).then(({ error }) => {
+        setAuthed(!error)
+        setReady(true)
+      })
+      return
+    }
+    // Fallback: a session may already be present (e.g. legacy hash link).
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setAuthed(true)
+      setAuthed(!!data.session)
       setReady(true)
     })
-    return () => sub.subscription.unsubscribe()
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
