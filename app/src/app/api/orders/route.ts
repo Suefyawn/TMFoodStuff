@@ -47,6 +47,7 @@ export async function POST(request: Request) {
     if (!parsed.ok) return parsed.response
     const body = parsed.data
     const { form, items, paymentMethod, promoCode, deliverySlot, deliveryDate, locale: rawLocale, pointsToRedeem } = body
+    const idempotencyKey = typeof body.idempotencyKey === 'string' ? body.idempotencyKey.trim().slice(0, 100) : ''
     const locale = toLocale(rawLocale)
     const isCardPayment = paymentMethod === 'card'
     const pointsRequested = Math.max(0, Math.floor(Number(pointsToRedeem) || 0))
@@ -72,6 +73,38 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
+
+    // Idempotency: if this exact submit was already processed (double-click,
+    // network retry, back-button resubmit), return the existing order rather
+    // than creating a duplicate / charging twice.
+    if (idempotencyKey) {
+      const { data: prior } = await supabase
+        .from('order_idempotency_keys')
+        .select('order_id')
+        .eq('idempotency_key', idempotencyKey)
+        .maybeSingle()
+      if (prior) {
+        const { data: priorOrder } = await supabase
+          .from('orders')
+          .select('order_number, subtotal_aed, vat_aed, delivery_fee_aed, promo_code, promo_discount_aed, total_aed, payment_method')
+          .eq('id', prior.order_id)
+          .maybeSingle()
+        if (priorOrder) {
+          return NextResponse.json({
+            success: true,
+            duplicate: true,
+            orderNumber: priorOrder.order_number,
+            subtotal: Number(priorOrder.subtotal_aed ?? 0),
+            vat: Number(priorOrder.vat_aed ?? 0),
+            deliveryFee: Number(priorOrder.delivery_fee_aed ?? 0),
+            promoCode: priorOrder.promo_code || '',
+            promoDiscount: Number(priorOrder.promo_discount_aed ?? 0),
+            total: Number(priorOrder.total_aed ?? 0),
+            paymentMethod: priorOrder.payment_method || 'cod',
+          })
+        }
+      }
+    }
 
     // Hard-validate the slot+date pair against the admin-managed slot
     // table. Catches: unknown slot key, slot disabled for that weekday,
@@ -261,6 +294,15 @@ export async function POST(request: Request) {
       .single()
     if (error || !inserted) throw error ?? new Error('Order insert returned no row')
     const orderId: number = inserted.id
+
+    // Claim the idempotency key now the order exists. A unique-violation here
+    // means a concurrent duplicate already created an order — logged, not fatal.
+    if (idempotencyKey) {
+      await supabase
+        .from('order_idempotency_keys')
+        .insert({ idempotency_key: idempotencyKey, order_id: orderId })
+        .then(() => undefined, err => logError('orders.idempotency_insert', err, { reqId, orderId }))
+    }
 
     // Seed the per-order timeline with the initial 'pending' transition.
     // Best-effort — a missing row would just mean the tracking page starts

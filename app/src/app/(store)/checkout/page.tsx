@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User, Sparkles, Clock } from 'lucide-react'
@@ -40,6 +40,9 @@ const inputClass = "w-full border-2 border-stone-200 rounded-xl px-4 py-3 text-b
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCartStore()
+  // Stable per-attempt key so a double-click / retry dedupes server-side
+  // instead of creating a second order. Reset after a successful placement.
+  const idempotencyKeyRef = useRef('')
   const [paymentMethod, setPaymentMethod] = useState('cod')
   const [submitted, setSubmitted] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
@@ -247,12 +250,17 @@ export default function CheckoutPage() {
     }
 
     setIsSubmitting(true)
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current =
+        typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`
+    }
 
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          idempotencyKey: idempotencyKeyRef.current,
           form,
           items,
           subtotal: sub,
@@ -272,6 +280,9 @@ export default function CheckoutPage() {
       const data = await res.json()
 
       if (data.success) {
+        // Order placed (or deduped) — clear the key so a genuinely new order
+        // next time gets its own.
+        idempotencyKeyRef.current = ''
         posthog.capture('order_placed', {
           order_number: data.orderNumber,
           item_count: items.reduce((s, i) => s + i.quantity, 0),
