@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store,
   Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone,
   UserCog, Search, FileSpreadsheet, Clock, Heart, Inbox, ChevronDown, Menu, X,
-  ExternalLink,
+  ExternalLink, Mail,
 } from 'lucide-react'
 import { ConfirmProvider } from '@/components/ConfirmDialog'
 
@@ -80,6 +80,7 @@ const NAV: NavSection[] = [
     items: [
       { href: '/dashboard/broadcasts', label: 'Broadcasts', icon: Megaphone },
       { href: '/dashboard/accounting', label: 'Accounting', icon: FileSpreadsheet },
+      { href: '/dashboard/emails', label: 'Email status', icon: Mail },
     ],
   },
   {
