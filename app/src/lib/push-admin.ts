@@ -44,9 +44,9 @@ export async function notifyAdminsLowStock(
       url: `${SITE_URL}/dashboard/products?filter=low-stock`,
       tag: `low-stock-${productSlug}`,
     }
-    for (const id of ids) {
-      void sendPushToCustomer(supabase, id, payload)
-    }
+    // Await all device sends so they aren't dropped when the caller's
+    // serverless function freezes after responding.
+    await Promise.allSettled(ids.map(id => sendPushToCustomer(supabase, id, payload)))
   } catch (err) {
     console.error('[push-admin] notifyAdminsLowStock failed:', err)
   }

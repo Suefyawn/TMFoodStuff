@@ -141,7 +141,7 @@ export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
             // Best-effort push to every signed-in admin device too. Imported
             // lazily to keep the hot fulfilment path tight.
             const { notifyAdminsLowStock } = await import('./push-admin')
-            void notifyAdminsLowStock(input.supabase, row.name, row.slug, newStock)
+            await notifyAdminsLowStock(input.supabase, row.name, row.slug, newStock)
           }
         })(),
       )

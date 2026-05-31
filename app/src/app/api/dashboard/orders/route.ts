@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getDashboardSession } from '@/lib/admin-auth'
 import { hasPermission } from '@/lib/permissions'
@@ -120,18 +120,18 @@ export async function PATCH(request: Request) {
     }
 
     if ((status === 'confirmed' || status === 'processing') && order.customer_email) {
-      sendOrderStatusUpdateEmail(emailData, status, locale).catch(console.error)
+      after(() => sendOrderStatusUpdateEmail(emailData, status, locale).catch(console.error))
     }
     if (status === 'out_for_delivery') {
-      if (order.customer_email) sendOutForDeliveryEmail(emailData, locale).catch(console.error)
-      if (order.customer_phone) notifyOutForDelivery(order.customer_phone, smsSummary, locale).catch(console.error)
+      if (order.customer_email) after(() => sendOutForDeliveryEmail(emailData, locale).catch(console.error))
+      if (order.customer_phone) after(() => notifyOutForDelivery(order.customer_phone, smsSummary, locale).catch(console.error))
     }
 
     // Web-push ping on every transition that the customer cares about.
     // Best-effort — never blocks the response. Resolves the customer id
     // through the same email-match the loyalty earn uses.
     if (order.customer_email) {
-      void findCustomerByEmail(supabase, order.customer_email)
+      after(() => findCustomerByEmail(supabase, order.customer_email)
         .then(async customerId => {
           if (!customerId) return
           const titleByStatus: Record<string, string> = {
@@ -151,11 +151,11 @@ export async function PATCH(request: Request) {
             tag: `order-${order.order_number}`,
           })
         })
-        .catch(err => console.error('[orders] push notification failed:', err))
+        .catch(err => console.error('[orders] push notification failed:', err)))
     }
     if (status === 'delivered') {
-      if (order.customer_email) sendDeliveredEmail(emailData, locale).catch(console.error)
-      if (order.customer_phone) notifyDelivered(order.customer_phone, smsSummary, locale).catch(console.error)
+      if (order.customer_email) after(() => sendDeliveredEmail(emailData, locale).catch(console.error))
+      if (order.customer_phone) after(() => notifyDelivered(order.customer_phone, smsSummary, locale).catch(console.error))
       // Credit loyalty points to the customer matched on email. The ledger
       // has a UNIQUE constraint on (order_id, 'order_earned') so a second
       // delivered → delivered transition can't double-credit.

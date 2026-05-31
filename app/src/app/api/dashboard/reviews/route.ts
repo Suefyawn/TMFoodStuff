@@ -65,7 +65,7 @@ export async function PATCH(request: Request) {
   // Customer notification on first approval transition (pending → approved).
   // Best-effort — never fails the request.
   if (body.status === 'approved' && before && before.status !== 'approved') {
-    void notifyCustomerReviewApproved(before as ReviewWithJoins).catch(err => {
+    await notifyCustomerReviewApproved(before as ReviewWithJoins).catch(err => {
       console.error('[reviews] approval email failed:', err)
     })
   }
