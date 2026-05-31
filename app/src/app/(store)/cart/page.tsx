@@ -35,7 +35,7 @@ function CartPageInner() {
           <ShoppingCart size={52} className="text-green-300" strokeWidth={1.5} />
         </div>
         <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-3">{tr.cartEmpty}</h1>
-        <p className="text-gray-500 mb-8 text-lg">{lang === 'ar' ? 'يبدو أنك لم تضف أي شيء بعد.' : "Looks like you haven't added anything yet."}</p>
+        <p className="text-stone-500 mb-8 text-lg">{lang === 'ar' ? 'يبدو أنك لم تضف أي شيء بعد.' : "Looks like you haven't added anything yet."}</p>
         <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
           {tr.startShopping} <ArrowRight size={16} />
         </Link>
@@ -49,7 +49,7 @@ function CartPageInner() {
         <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 flex items-center gap-2 md:gap-3">
           <ShoppingCart className="text-forest" size={24} />
           {tr.yourCart}
-          <span className="text-base md:text-lg font-normal text-gray-400">({items.length} {lang === 'ar' ? 'عناصر' : 'items'})</span>
+          <span className="text-base md:text-lg font-normal text-stone-400">({items.length} {lang === 'ar' ? 'عناصر' : 'items'})</span>
         </h1>
         <button
           onClick={clearCart}
@@ -65,9 +65,9 @@ function CartPageInner() {
         {/* Items list */}
         <div className="lg:col-span-2 space-y-3 md:space-y-4">
           {items.map(item => (
-            <div key={item.id} className="bg-white rounded-2xl border border-gray-100 p-4 md:p-5 flex gap-3 md:gap-4 shadow-sm">
+            <div key={item.id} className="bg-white rounded-2xl border border-stone-100 p-4 md:p-5 flex gap-3 md:gap-4 shadow-sm">
               {/* Image */}
-              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center">
+              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-stone-50 flex-shrink-0 flex items-center justify-center">
                 {item.imageUrl ? (
                   <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
                 ) : (
@@ -77,19 +77,19 @@ function CartPageInner() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <Link href={`/product/${item.slug}`} className="font-bold text-gray-900 hover:text-forest transition-colors line-clamp-1 text-sm md:text-base">
+                <Link href={`/product/${item.slug}`} className="font-bold text-stone-900 hover:text-forest transition-colors line-clamp-1 text-sm md:text-base">
                   {lang === 'ar' && item.nameAr ? item.nameAr : item.name}
                 </Link>
-                <p className="text-xs text-gray-400 mb-2 md:mb-3">
+                <p className="text-xs text-stone-400 mb-2 md:mb-3">
                   {lang === 'ar' ? `لكل ${item.unit}` : `per ${item.unit}`}
                 </p>
 
                 <div className="flex items-center justify-between gap-2">
                   {/* Qty controls — bigger touch targets on mobile */}
-                  <div className="flex items-center gap-1.5 bg-gray-50 rounded-xl p-1">
+                  <div className="flex items-center gap-1.5 bg-stone-50 rounded-xl p-1">
                     <button
                       onClick={() => updateQty(item.id, item.quantity - 1)}
-                      className="w-10 h-10 md:w-8 md:h-8 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-gray-100 transition-colors"
+                      className="w-10 h-10 md:w-8 md:h-8 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-stone-100 transition-colors"
                     >
                       <Minus size={13} />
                     </button>
@@ -106,7 +106,7 @@ function CartPageInner() {
                     <span className="font-black text-forest-dark text-base md:text-lg">{formatAED(item.priceAED * item.quantity)}</span>
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="w-10 h-10 md:w-8 md:h-8 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"
+                      className="w-10 h-10 md:w-8 md:h-8 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"
                     >
                       <Trash2 size={15} />
                     </button>
@@ -119,7 +119,7 @@ function CartPageInner() {
 
         {/* Order summary */}
         <div className="lg:col-span-1">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
+          <div className="bg-white border border-stone-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
             <h2 className="font-playfair font-bold text-stone-900 text-xl mb-4">{lang === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h2>
             <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-forest-dark font-semibold flex items-center gap-2">
               <Sparkles size={14} className="text-forest-dark shrink-0" aria-hidden="true" />
@@ -131,15 +131,15 @@ function CartPageInner() {
               </span>
             </div>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-stone-600">
                 <span>{tr.subtotal} ({(() => { const n = items.reduce((s, i) => s + i.quantity, 0); return lang === 'ar' ? `${n} ${n === 1 ? 'عنصر' : n === 2 ? 'عنصران' : n <= 10 ? 'عناصر' : 'عنصراً'}` : `${n} ${n === 1 ? 'item' : 'items'}` })()})</span>
                 <span>{formatAED(sub)}</span>
               </div>
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-stone-600">
                 <span>{tr.vat}</span>
                 <span>{formatAED(vat)}</span>
               </div>
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-stone-600">
                 <span>{tr.delivery}</span>
                 <span>{deliveryFee === 0 ? <span className="text-forest font-semibold">{tr.freeDelivery}</span> : formatAED(deliveryFee)}</span>
               </div>
@@ -154,7 +154,7 @@ function CartPageInner() {
                 disabled
                 aria-disabled="true"
                 title={lang === 'ar' ? 'يرجى حل المشكلات في السلة قبل المتابعة' : 'Please resolve the issues above before continuing'}
-                className="w-full mt-6 bg-gray-300 text-gray-500 font-black py-4 rounded-xl text-lg shadow flex items-center justify-center gap-2 cursor-not-allowed"
+                className="w-full mt-6 bg-stone-300 text-stone-500 font-black py-4 rounded-xl text-lg shadow flex items-center justify-center gap-2 cursor-not-allowed"
               >
                 {lang === 'ar' ? 'حل مشكلات السلة أولاً' : 'Fix cart issues to continue'}
               </button>
@@ -166,10 +166,10 @@ function CartPageInner() {
                 {tr.proceedCheckout} <ArrowRight size={18} />
               </Link>
             )}
-            <Link href="/shop" className="w-full mt-3 text-center text-sm text-gray-500 hover:text-forest transition-colors block">
+            <Link href="/shop" className="w-full mt-3 text-center text-sm text-stone-500 hover:text-forest transition-colors block">
               ← {tr.continueShopping}
             </Link>
-            <p className="text-xs text-gray-400 text-center mt-4">
+            <p className="text-xs text-stone-400 text-center mt-4">
               {lang === 'ar' ? 'جميع الأسعار تشمل ضريبة القيمة المضافة ٥٪' : 'All prices include 5% UAE VAT'}
             </p>
           </div>
@@ -179,7 +179,7 @@ function CartPageInner() {
       {/* Sticky checkout button on mobile — sits above MobileNav with
           iOS safe-area accounted for so the home indicator can't overlap. */}
       <div
-        className="fixed left-0 right-0 p-3 bg-white border-t border-gray-100 shadow-lg md:hidden z-40"
+        className="fixed left-0 right-0 p-3 bg-white border-t border-stone-100 shadow-lg md:hidden z-40"
         style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
       >
         {checkoutBlocked ? (
@@ -187,7 +187,7 @@ function CartPageInner() {
             type="button"
             disabled
             aria-disabled="true"
-            className="w-full bg-gray-300 text-gray-500 font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow cursor-not-allowed"
+            className="w-full bg-stone-300 text-stone-500 font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow cursor-not-allowed"
           >
             {lang === 'ar' ? 'حل مشكلات السلة أولاً' : 'Fix cart issues to continue'}
           </button>

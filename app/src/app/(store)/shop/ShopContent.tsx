@@ -184,35 +184,35 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-stone-50" dir={isAr ? 'rtl' : 'ltr'}>
       {/* Page header */}
-      <div className="bg-white border-b border-gray-100 px-4 py-8 scroll-mt-20">
+      <div className="bg-white border-b border-stone-100 px-4 py-8 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-playfair font-bold text-stone-900 mb-1">{tr.shopTitle}</h1>
-          <p className="text-gray-500">{tr.shopSubtitle}</p>
+          <p className="text-stone-500">{tr.shopSubtitle}</p>
         </div>
       </div>
 
       {/* Sticky filter bar */}
-      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-md border-b border-stone-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
           {/* Search + sort row */}
           <div className="flex gap-3 items-center py-3 flex-wrap">
             <div className="relative flex-1 min-w-[200px] max-w-sm">
-              <Search className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-gray-400`} size={16} aria-hidden="true" />
+              <Search className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-stone-400`} size={16} aria-hidden="true" />
               <input
                 type="text"
                 value={search}
                 onChange={e => handleSearchChange(e.target.value)}
                 placeholder={tr.search}
                 aria-label={tr.search}
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 border-2 border-gray-200 rounded-full text-base md:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors bg-gray-50 focus:bg-white`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 border-2 border-stone-200 rounded-full text-base md:text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors bg-stone-50 focus:bg-white`}
               />
               {search && (
                 <button
                   onClick={() => handleSearchChange('')}
                   aria-label={isAr ? 'مسح البحث' : 'Clear search'}
-                  className={`absolute ${isAr ? 'left-3.5' : 'right-3.5'} top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600`}
+                  className={`absolute ${isAr ? 'left-3.5' : 'right-3.5'} top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600`}
                 >
                   <X size={14} aria-hidden="true" />
                 </button>
@@ -224,7 +224,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
               onClick={() => setOrganicOnly(v => !v)}
               aria-pressed={organicOnly}
               className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold border-2 transition-colors min-h-[40px] ${
-                organicOnly ? 'border-forest bg-green-50 text-forest-dark' : 'border-gray-200 text-gray-700 hover:border-green-300'
+                organicOnly ? 'border-forest bg-green-50 text-forest-dark' : 'border-stone-200 text-stone-700 hover:border-green-300'
               }`}
             >
               <Sprout size={14} aria-hidden="true" />
@@ -234,15 +234,15 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
               onClick={() => setInStockOnly(v => !v)}
               aria-pressed={inStockOnly}
               className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold border-2 transition-colors min-h-[40px] ${
-                inStockOnly ? 'border-forest bg-green-50 text-forest-dark' : 'border-gray-200 text-gray-700 hover:border-green-300'
+                inStockOnly ? 'border-forest bg-green-50 text-forest-dark' : 'border-stone-200 text-stone-700 hover:border-green-300'
               }`}
             >
               <PackageCheck size={14} aria-hidden="true" />
               {isAr ? 'متوفر فقط' : 'In stock'}
             </button>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-gray-200 text-sm min-h-[40px]">
-              <span className="text-xs text-gray-500 font-semibold">{isAr ? 'حتى' : 'Max'}</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-stone-200 text-sm min-h-[40px]">
+              <span className="text-xs text-stone-500 font-semibold">{isAr ? 'حتى' : 'Max'}</span>
               <input
                 type="number"
                 inputMode="numeric"
@@ -250,15 +250,15 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                 onChange={e => setMaxPrice(Math.max(0, parseInt(e.target.value, 10) || 0))}
                 placeholder="—"
                 aria-label={isAr ? 'الحد الأقصى للسعر' : 'Max price'}
-                className="w-14 bg-transparent text-sm font-bold text-gray-800 focus:outline-none text-center"
+                className="w-14 bg-transparent text-sm font-bold text-stone-800 focus:outline-none text-center"
                 min={0}
               />
-              <span className="text-xs text-gray-500 font-semibold">AED</span>
+              <span className="text-xs text-stone-500 font-semibold">AED</span>
               {!!maxPrice && (
                 <button
                   onClick={() => setMaxPrice(0)}
                   aria-label={isAr ? 'مسح' : 'Clear'}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-stone-400 hover:text-stone-600"
                 >
                   <X size={12} aria-hidden="true" />
                 </button>
@@ -266,12 +266,12 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
             </div>
 
             <div className="flex items-center gap-2 ml-auto">
-              <SlidersHorizontal size={16} className="text-gray-400 hidden sm:block" aria-hidden="true" />
+              <SlidersHorizontal size={16} className="text-stone-400 hidden sm:block" aria-hidden="true" />
               <select
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value as SortOption)}
                 aria-label={isAr ? 'ترتيب حسب' : 'Sort by'}
-                className="text-sm font-semibold text-gray-700 border-2 border-gray-200 rounded-full py-2 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light bg-gray-50 focus:bg-white transition-colors cursor-pointer"
+                className="text-sm font-semibold text-stone-700 border-2 border-stone-200 rounded-full py-2 px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light bg-stone-50 focus:bg-white transition-colors cursor-pointer"
               >
                 {sortOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -287,7 +287,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
               className={`flex-shrink-0 whitespace-nowrap px-4 py-2.5 min-h-[40px] rounded-full border-2 text-sm font-semibold transition-all ${
                 !activeCategory
                   ? 'bg-forest text-white border-forest shadow-sm'
-                  : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-forest bg-white'
+                  : 'border-stone-200 text-stone-700 hover:border-green-300 hover:text-forest bg-white'
               }`}
             >
               {tr.allItems} ({countForCategory('')})
@@ -303,7 +303,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                   className={`flex-shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2.5 min-h-[40px] rounded-full border-2 text-sm font-semibold transition-all ${
                     isActive
                       ? 'bg-forest text-white border-forest shadow-sm'
-                      : 'border-gray-200 text-gray-700 hover:border-green-300 hover:text-forest bg-white'
+                      : 'border-stone-200 text-stone-700 hover:border-green-300 hover:text-forest bg-white'
                   }`}
                 >
                   {icon}
@@ -326,7 +326,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                     className={`flex-shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[32px] rounded-full text-xs font-semibold transition-all ${
                       isActive
                         ? 'bg-green-100 text-forest-dark ring-1 ring-green-300'
-                        : 'bg-gray-100 text-gray-700 hover:bg-green-50 hover:text-forest-dark'
+                        : 'bg-stone-100 text-stone-700 hover:bg-green-50 hover:text-forest-dark'
                     }`}
                   >
                     <span aria-hidden="true">{sub.emoji}</span>
@@ -343,9 +343,9 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm text-gray-500 font-medium flex items-center gap-1.5">
-              <Package size={14} className="text-gray-400" aria-hidden="true" />
-              <span className="text-gray-900 font-black">{filtered.length}</span> {tr.productsFound}
+            <p className="text-sm text-stone-500 font-medium flex items-center gap-1.5">
+              <Package size={14} className="text-stone-400" aria-hidden="true" />
+              <span className="text-stone-900 font-black">{filtered.length}</span> {tr.productsFound}
             </p>
             {activeCategoryObj && (
               <span className="inline-flex items-center gap-1.5 bg-green-100 text-forest-dark text-xs font-bold px-3 py-1.5 rounded-full">
@@ -382,7 +382,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
             )}
           </div>
           {hasActiveFilters && (
-            <button onClick={clearFilters} className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex items-center gap-1">
+            <button onClick={clearFilters} className="text-xs font-bold text-stone-500 hover:text-red-500 transition-colors flex items-center gap-1">
               <X size={12} aria-hidden="true" /> {tr.clearAll}
             </button>
           )}
@@ -395,12 +395,12 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
             ))}
           </div>
         ) : (
-          <div className="text-center py-24 text-gray-400">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search size={32} className="text-gray-300" aria-hidden="true" />
+          <div className="text-center py-24 text-stone-400">
+            <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search size={32} className="text-stone-300" aria-hidden="true" />
             </div>
-            <p className="font-black text-gray-700 text-xl mb-2">{isAr ? 'لم يتم العثور على منتجات' : 'No products found'}</p>
-            <p className="text-sm text-gray-400 mb-6">{isAr ? 'جرب بحثاً مختلفاً أو فئة أخرى' : 'Try a different search or category'}</p>
+            <p className="font-black text-stone-700 text-xl mb-2">{isAr ? 'لم يتم العثور على منتجات' : 'No products found'}</p>
+            <p className="text-sm text-stone-400 mb-6">{isAr ? 'جرب بحثاً مختلفاً أو فئة أخرى' : 'Try a different search or category'}</p>
             <button onClick={clearFilters} className="bg-forest text-white font-bold px-6 py-3 rounded-xl hover:bg-forest-dark transition-colors text-sm">
               {isAr ? 'مسح الفلاتر' : 'Clear Filters'}
             </button>

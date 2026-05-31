@@ -143,21 +143,21 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
-      <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
+      <div className="bg-white border border-stone-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
         <div className="flex items-start justify-between gap-3 flex-wrap mb-5">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الطلب' : 'Order'}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'الطلب' : 'Order'}</p>
             <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 font-mono">#{order.order_number}</h1>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-stone-500 mt-1">
               {new Date(order.created_at).toLocaleString(isAr ? 'ar-AE' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
           <span className={`inline-flex items-center gap-1.5 text-sm font-bold px-3 py-1.5 rounded-xl ${
-            isCancelled ? 'bg-gray-200 text-gray-700'
+            isCancelled ? 'bg-stone-200 text-stone-700'
             : order.status === 'delivered' ? 'bg-green-100 text-forest-dark'
             : order.status === 'out_for_delivery' ? 'bg-orange-100 text-orange-700'
             : 'bg-blue-100 text-blue-700'
@@ -180,28 +180,28 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
 
         {/* Delivery + payment summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-gray-50 rounded-2xl p-4">
+          <div className="bg-stone-50 rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <MapPin size={14} className="text-gray-400" aria-hidden="true" />
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">{isAr ? 'التوصيل' : 'Delivery'}</p>
+              <MapPin size={14} className="text-stone-400" aria-hidden="true" />
+              <p className="text-xs font-bold uppercase tracking-wider text-stone-500">{isAr ? 'التوصيل' : 'Delivery'}</p>
             </div>
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-stone-900">
               {order.delivery_area}{order.delivery_building ? `, ${order.delivery_building}` : ''}
             </p>
-            <p className="text-xs text-gray-500">{order.delivery_emirate}</p>
-            <p className="text-xs text-gray-500 mt-1">{slotLabel(order.delivery_slot, isAr)}</p>
+            <p className="text-xs text-stone-500">{order.delivery_emirate}</p>
+            <p className="text-xs text-stone-500 mt-1">{slotLabel(order.delivery_slot, isAr)}</p>
             {order.delivery_date && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-stone-500">
                 {new Date(order.delivery_date + 'T00:00:00').toLocaleDateString(isAr ? 'ar-AE' : 'en-GB', { weekday: 'short', day: '2-digit', month: 'short' })}
               </p>
             )}
           </div>
-          <div className="bg-gray-50 rounded-2xl p-4">
+          <div className="bg-stone-50 rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              {paidOnline ? <CreditCard size={14} className="text-gray-400" aria-hidden="true" /> : <Wallet size={14} className="text-gray-400" aria-hidden="true" />}
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">{isAr ? 'الدفع' : 'Payment'}</p>
+              {paidOnline ? <CreditCard size={14} className="text-stone-400" aria-hidden="true" /> : <Wallet size={14} className="text-stone-400" aria-hidden="true" />}
+              <p className="text-xs font-bold uppercase tracking-wider text-stone-500">{isAr ? 'الدفع' : 'Payment'}</p>
             </div>
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-stone-900">
               {paidOnline
                 ? (isAr ? 'بطاقة · مدفوع' : 'Card · Paid')
                 : (isAr ? 'الدفع عند الاستلام' : 'Cash on Delivery')}
@@ -217,22 +217,22 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
       </div>
 
       {/* Items */}
-      <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
+      <div className="bg-white border border-stone-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
         <div className="flex items-center gap-2 mb-4">
-          <Package size={16} className="text-gray-400" aria-hidden="true" />
+          <Package size={16} className="text-stone-400" aria-hidden="true" />
           <h2 className="font-playfair font-bold text-stone-900">{isAr ? 'المنتجات' : 'Items'} ({items.length})</h2>
         </div>
-        <ul className="divide-y divide-gray-100">
+        <ul className="divide-y divide-stone-100">
           {items.map((item, i) => (
             <li key={i} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 {item.emoji && <span className="text-2xl shrink-0" aria-hidden="true">{item.emoji}</span>}
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-gray-900 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-500">×{item.quantity} · AED {Number(item.price_aed).toFixed(2)} {isAr ? 'لكل' : 'per'} {item.unit || 'kg'}</p>
+                  <p className="text-sm font-bold text-stone-900 truncate">{item.name}</p>
+                  <p className="text-xs text-stone-500">×{item.quantity} · AED {Number(item.price_aed).toFixed(2)} {isAr ? 'لكل' : 'per'} {item.unit || 'kg'}</p>
                 </div>
               </div>
-              <span className="text-sm font-bold text-gray-900 shrink-0">AED {(Number(item.price_aed) * item.quantity).toFixed(2)}</span>
+              <span className="text-sm font-bold text-stone-900 shrink-0">AED {(Number(item.price_aed) * item.quantity).toFixed(2)}</span>
             </li>
           ))}
         </ul>
@@ -241,17 +241,17 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
       {/* Invoice link */}
       <Link
         href={`/account/orders/${order.order_number}/invoice`}
-        className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 mb-5 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
+        className="bg-white border border-stone-100 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 mb-5 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
-            <FileText size={18} className="text-gray-600" aria-hidden="true" />
+          <div className="w-10 h-10 bg-stone-100 rounded-xl flex items-center justify-center shrink-0">
+            <FileText size={18} className="text-stone-600" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-gray-900 text-sm">
+            <p className="font-bold text-stone-900 text-sm">
               {isAr ? 'فاتورة ضريبية' : 'Tax invoice'}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-stone-500">
               {isAr ? 'مع رقم TRN وتفصيل ضريبة القيمة المضافة' : 'With VAT TRN and full VAT breakdown'}
             </p>
           </div>
@@ -262,17 +262,17 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
       </Link>
 
       {/* Totals */}
-      <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
+      <div className="bg-white border border-stone-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
         <dl className="space-y-2 text-sm">
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between text-stone-600">
             <dt>{isAr ? 'المجموع الفرعي' : 'Subtotal'}</dt>
             <dd>AED {subtotal.toFixed(2)}</dd>
           </div>
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between text-stone-600">
             <dt>{isAr ? 'الضريبة' : 'VAT (5%)'}</dt>
             <dd>AED {vat.toFixed(2)}</dd>
           </div>
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between text-stone-600">
             <dt>{isAr ? 'التوصيل' : 'Delivery'}</dt>
             <dd className={deliveryFee === 0 ? 'text-forest font-bold' : ''}>
               {deliveryFee === 0 ? (isAr ? 'مجاناً' : 'FREE') : `AED ${deliveryFee.toFixed(2)}`}
@@ -284,7 +284,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
               <dd>-AED {promoDiscount.toFixed(2)}</dd>
             </div>
           )}
-          <div className="flex justify-between font-playfair font-bold text-stone-900 pt-2 border-t border-gray-100">
+          <div className="flex justify-between font-playfair font-bold text-stone-900 pt-2 border-t border-stone-100">
             <dt>{isAr ? 'الإجمالي' : 'Total'}</dt>
             <dd className="text-forest-dark text-lg">AED {total.toFixed(2)}</dd>
           </div>
@@ -293,7 +293,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
 
       {/* Reorder */}
       {!isCancelled && items.length > 0 && (
-        <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm mb-5">
+        <div className="bg-white border border-stone-100 rounded-3xl p-6 shadow-sm mb-5">
           {reordered ? (
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <span className="text-forest-dark font-bold text-sm inline-flex items-center gap-2">
@@ -307,7 +307,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
           ) : (
             <button
               onClick={reorder}
-              className="w-full inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-700 text-white font-bold py-3 rounded-xl transition-colors text-sm"
+              className="w-full inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-700 text-white font-bold py-3 rounded-xl transition-colors text-sm"
             >
               <ShoppingCart size={16} aria-hidden="true" />
               {isAr ? 'إعادة الطلب' : 'Reorder these items'}
@@ -321,10 +321,10 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
         <div className="bg-white border border-rose-100 rounded-3xl p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-stone-900">
                 {isAr ? 'هل تحتاج إلى إلغاء هذا الطلب؟' : 'Need to cancel this order?'}
               </p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-stone-500 mt-0.5">
                 {isPaidCard
                   ? (isAr ? 'سيتم استرداد المبلغ إلى بطاقتك تلقائياً.' : 'A full refund will be issued to your card automatically.')
                   : (isAr ? 'يمكنك الإلغاء قبل بدء التحضير.' : 'You can cancel before preparation starts.')}

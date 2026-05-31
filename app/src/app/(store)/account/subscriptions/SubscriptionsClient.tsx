@@ -85,7 +85,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
@@ -98,7 +98,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
             <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
               {isAr ? 'الاشتراكات' : 'Subscriptions'}
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-stone-500">
               {isAr ? 'كرر طلباتك المفضلة تلقائياً.' : 'Have your favourites delivered on a schedule.'}
             </p>
           </div>
@@ -117,10 +117,10 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
       )}
 
       {subscriptions.length === 0 ? (
-        <div className="bg-white border border-gray-100 rounded-3xl p-10 text-center">
-          <Sparkles size={28} className="mx-auto mb-3 text-gray-300" aria-hidden="true" />
-          <p className="text-gray-700 font-bold mb-1">{isAr ? 'لا توجد اشتراكات بعد' : 'No subscriptions yet'}</p>
-          <p className="text-sm text-gray-500 mb-5">
+        <div className="bg-white border border-stone-100 rounded-3xl p-10 text-center">
+          <Sparkles size={28} className="mx-auto mb-3 text-stone-300" aria-hidden="true" />
+          <p className="text-stone-700 font-bold mb-1">{isAr ? 'لا توجد اشتراكات بعد' : 'No subscriptions yet'}</p>
+          <p className="text-sm text-stone-500 mb-5">
             {isAr ? 'اضبط طلباً متكرراً لتوفير الوقت كل أسبوع.' : 'Set up a recurring order to save time every week.'}
           </p>
           <Link
@@ -137,7 +137,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
             const total = itemsTotal(s.items)
             return (
               <li key={s.id} className={`bg-white border rounded-3xl shadow-sm overflow-hidden ${
-                s.status === 'cancelled' ? 'border-gray-200 opacity-60' : s.status === 'paused' ? 'border-amber-200' : 'border-gray-100'
+                s.status === 'cancelled' ? 'border-stone-200 opacity-60' : s.status === 'paused' ? 'border-amber-200' : 'border-stone-100'
               }`}>
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
@@ -152,12 +152,12 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
                           </span>
                         )}
                         {s.status === 'cancelled' && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 border border-gray-200 rounded px-1.5 py-0.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 bg-stone-100 border border-stone-200 rounded px-1.5 py-0.5">
                             {isAr ? 'ملغى' : 'Cancelled'}
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 flex-wrap text-xs text-gray-500">
+                      <div className="flex items-center gap-3 flex-wrap text-xs text-stone-500">
                         <span className="inline-flex items-center gap-1">
                           <Repeat size={11} aria-hidden="true" />
                           {FREQ_LABEL[s.frequency_days][isAr ? 'ar' : 'en']}
@@ -165,7 +165,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
                         {s.status !== 'cancelled' && (
                           <span className="inline-flex items-center gap-1">
                             <Calendar size={11} aria-hidden="true" />
-                            {isAr ? 'التالي:' : 'Next:'} <span className="font-bold text-gray-700">{fmtDate(s.next_delivery_date)}</span>
+                            {isAr ? 'التالي:' : 'Next:'} <span className="font-bold text-stone-700">{fmtDate(s.next_delivery_date)}</span>
                           </span>
                         )}
                         <span className="inline-flex items-center gap-1">
@@ -176,26 +176,26 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
                     </div>
                     <div className="text-right">
                       <p className="text-xl font-playfair font-bold text-stone-900 tabular-nums">AED {total.toFixed(2)}</p>
-                      <p className="text-[10px] text-gray-500">{isAr ? 'لكل طلب' : 'per order'}</p>
+                      <p className="text-[10px] text-stone-500">{isAr ? 'لكل طلب' : 'per order'}</p>
                     </div>
                   </div>
 
                   {/* Items */}
-                  <ul className="bg-gray-50 rounded-xl divide-y divide-gray-100 mb-4">
+                  <ul className="bg-stone-50 rounded-xl divide-y divide-stone-100 mb-4">
                     {s.items.map((it, i) => (
                       <li key={`${it.product_id}-${i}`} className="px-3 py-2 flex items-center justify-between gap-2 text-sm">
-                        <span className="text-gray-700 truncate">
+                        <span className="text-stone-700 truncate">
                           {it.emoji && <span className="mr-1.5">{it.emoji}</span>}
                           <span className="font-bold">{it.name}</span>
-                          <span className="text-gray-400 text-xs ml-1">× {it.quantity}</span>
+                          <span className="text-stone-400 text-xs ml-1">× {it.quantity}</span>
                         </span>
-                        <span className="text-gray-500 text-xs tabular-nums whitespace-nowrap">AED {(it.price_aed * it.quantity).toFixed(2)}</span>
+                        <span className="text-stone-500 text-xs tabular-nums whitespace-nowrap">AED {(it.price_aed * it.quantity).toFixed(2)}</span>
                       </li>
                     ))}
                   </ul>
 
                   {s.total_orders > 0 && (
-                    <p className="text-[11px] text-gray-500 mb-3">
+                    <p className="text-[11px] text-stone-500 mb-3">
                       {s.total_orders} {isAr ? 'طلب تم تسليمه' : `order${s.total_orders === 1 ? '' : 's'} delivered`}
                       {s.last_delivery_date && ` · ${isAr ? 'آخر:' : 'last:'} ${fmtDate(s.last_delivery_date)}`}
                     </p>
@@ -203,13 +203,13 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
 
                   {/* Actions */}
                   {s.status !== 'cancelled' && (
-                    <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                    <div className="flex flex-wrap gap-2 pt-3 border-t border-stone-100">
                       {s.status === 'active' && (
                         <>
                           <button
                             onClick={() => act(s.id, 'skip_next')}
                             disabled={busy === s.id}
-                            className="inline-flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
+                            className="inline-flex items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
                           >
                             {busy === s.id ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : <SkipForward size={11} aria-hidden="true" />}
                             {isAr ? 'تخطي التالي' : 'Skip next'}

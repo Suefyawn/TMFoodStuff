@@ -79,7 +79,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
@@ -87,15 +87,15 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
         <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
           {isAr ? 'التفضيلات' : 'Preferences'}
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-stone-500 mt-1">
           {isAr ? 'تحكّم في الإشعارات وبياناتك الشخصية.' : 'Control how we contact you and what we hold on you.'}
         </p>
       </header>
 
       {/* Marketing preferences */}
-      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
+      <section className="bg-white border border-stone-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
         <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'تواصل التسويق' : 'Marketing communications'}</h2>
-        <p className="text-xs text-gray-500 mb-4">
+        <p className="text-xs text-stone-500 mb-4">
           {isAr
             ? 'العروض والإعلانات. ستبقى إشعارات الطلبات (التأكيد، التسليم) قيد التشغيل دائماً.'
             : "Promotions and announcements. Order updates (confirmations, delivery) always stay on."}
@@ -131,9 +131,9 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
       {/* Billing — opens Stripe Customer Portal where the customer can
           manage saved payment methods + see past charges. The endpoint
           lazy-creates the Stripe Customer the first time it's needed. */}
-      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
+      <section className="bg-white border border-stone-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
         <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'الفوترة وبطاقات الدفع' : 'Billing & saved cards'}</h2>
-        <p className="text-xs text-gray-500 mb-4">
+        <p className="text-xs text-stone-500 mb-4">
           {isAr
             ? 'إدارة بطاقاتك المحفوظة وعرض الفواتير السابقة في صفحة Stripe الآمنة.'
             : "Manage your saved cards and see past charges on Stripe's secure page. We never touch card data ourselves."}
@@ -142,7 +142,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
           type="button"
           onClick={openBillingPortal}
           disabled={openingBilling}
-          className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-sm px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
+          className="inline-flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-sm px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
         >
           {openingBilling ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <CreditCard size={14} aria-hidden="true" />}
           {openingBilling ? (isAr ? 'جارٍ الفتح…' : 'Opening…') : (isAr ? 'إدارة طرق الدفع' : 'Manage payment methods')}
@@ -153,9 +153,9 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
       </section>
 
       {/* Privacy + data */}
-      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
+      <section className="bg-white border border-stone-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
         <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'بياناتك' : 'Your data'}</h2>
-        <p className="text-xs text-gray-500 mb-4">
+        <p className="text-xs text-stone-500 mb-4">
           {isAr
             ? 'يمكنك تنزيل نسخة من بياناتك في أي وقت.'
             : "Download a copy of everything we know about you at any time."}
@@ -163,7 +163,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
         <a
           href="/api/account/data-export"
           download
-          className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-sm px-4 py-2.5 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-sm px-4 py-2.5 rounded-xl transition-colors"
         >
           <Download size={14} aria-hidden="true" />
           {isAr ? 'تنزيل بياناتي (JSON)' : 'Download my data (JSON)'}
@@ -176,7 +176,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
           <AlertTriangle size={18} className="text-red-600 shrink-0 mt-0.5" aria-hidden="true" />
           <div>
             <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'حذف الحساب' : 'Delete account'}</h2>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-stone-600">
               {isAr
                 ? 'يتم حذف اسمك ورقم هاتفك وعناوينك وقائمة المفضلة. تبقى سجلات الطلبات لأغراض محاسبية وضريبية كما يتطلب القانون.'
                 : "Removes your name, phone, addresses, and wishlist. Order records are retained for accounting and tax purposes as required by law."}
@@ -209,12 +209,12 @@ function Toggle({
 }) {
   return (
     <li className="flex items-center gap-3 py-2">
-      <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
-        <Icon size={16} className="text-gray-600" aria-hidden="true" />
+      <div className="w-9 h-9 bg-stone-100 rounded-xl flex items-center justify-center shrink-0">
+        <Icon size={16} className="text-stone-600" aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-gray-900 text-sm">{label}</p>
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="font-bold text-stone-900 text-sm">{label}</p>
+        <p className="text-xs text-stone-500">{description}</p>
       </div>
       <button
         type="button"
@@ -223,7 +223,7 @@ function Toggle({
         onClick={() => onChange(!checked)}
         disabled={saving}
         className={`relative w-11 h-6 rounded-full transition-colors disabled:opacity-60 ${
-          checked ? 'bg-forest' : 'bg-gray-300'
+          checked ? 'bg-forest' : 'bg-stone-300'
         }`}
       >
         <span
