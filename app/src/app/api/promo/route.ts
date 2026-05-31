@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import { readJsonBody } from '@/lib/http'
 
 export async function POST(request: Request) {
   if (!rateLimit(`promo:${getClientIp(request)}`, 20, 60_000)) {
     return NextResponse.json({ valid: false, error: 'Too many attempts. Please try again shortly.' }, { status: 429 })
   }
 
-  const { code } = await request.json()
+  const body = await readJsonBody<{ code?: string }>(request)
+  if (!body) return NextResponse.json({ valid: false, error: 'Invalid request' }, { status: 400 })
+  const { code } = body
   if (!code) return NextResponse.json({ valid: false, error: 'No code provided' }, { status: 400 })
 
   const supabase = createClient(

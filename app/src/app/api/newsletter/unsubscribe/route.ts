@@ -4,6 +4,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import { readJsonBody } from '@/lib/http'
 import { SITE_URL } from '@/lib/site'
 import { isValidEmail } from '@/lib/validators'
 
@@ -32,7 +33,8 @@ export async function POST(request: Request) {
   if (!rateLimit(`unsubscribe-post:${getClientIp(request)}`, 5, 60_000)) {
     return NextResponse.json({ error: 'Too many requests.' }, { status: 429 })
   }
-  const { email } = await request.json()
+  const body = await readJsonBody<{ email?: string }>(request)
+  const email = body?.email
   if (!isValidEmail(email)) {
     return NextResponse.json({ error: 'Valid email required.' }, { status: 400 })
   }
