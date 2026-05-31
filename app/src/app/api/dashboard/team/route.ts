@@ -111,17 +111,25 @@ export async function POST(request: Request) {
 
   // Generate a Supabase action link so the invitee can actually get in: the
   // dashboard login is password-only with no self-signup, and a new member has
-  // no auth account yet. `invite` creates the auth user + returns a set-password
-  // link; if they already have an account, fall back to a `recovery` link.
-  // Landed on /dashboard/set-password where they choose a password.
+  // no auth account yet. `invite` creates the auth user; if they already have
+  // an account, fall back to `recovery`. We build our OWN link to
+  // /dashboard/set-password carrying the token_hash, and verify it there with
+  // verifyOtp — this is the @supabase/ssr-recommended flow and, unlike the raw
+  // action_link, isn't consumed by email link-scanners (a plain GET doesn't run
+  // verifyOtp, so the one-time token survives until the real click).
   let actionLink: string | null = null
   try {
     const redirectTo = `${SITE_URL}/dashboard/set-password`
+    let linkType: 'invite' | 'recovery' = 'invite'
     let gen = await supabase.auth.admin.generateLink({ type: 'invite', email, options: { redirectTo } })
     if (gen.error) {
+      linkType = 'recovery'
       gen = await supabase.auth.admin.generateLink({ type: 'recovery', email, options: { redirectTo } })
     }
-    actionLink = gen.data?.properties?.action_link ?? null
+    const tokenHash = gen.data?.properties?.hashed_token
+    if (tokenHash) {
+      actionLink = `${SITE_URL}/dashboard/set-password?token_hash=${encodeURIComponent(tokenHash)}&type=${linkType}`
+    }
   } catch (err) {
     console.error('[team] generateLink failed:', err)
   }
