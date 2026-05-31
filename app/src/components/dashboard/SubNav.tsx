@@ -35,7 +35,7 @@ export default function SubNav({ items }: { items: SubNavItem[] }) {
               {active && (
                 <span
                   aria-hidden="true"
-                  className="absolute bottom-0 left-3 right-3 sm:left-4 sm:right-4 h-0.5 bg-green-500 rounded-t"
+                  className="absolute bottom-0 left-3 right-3 sm:left-4 sm:right-4 h-0.5 bg-emerald-500 rounded-t"
                 />
               )}
             </Link>

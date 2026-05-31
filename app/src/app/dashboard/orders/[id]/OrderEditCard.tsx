@@ -45,7 +45,7 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
   // Settled orders can't be edited (matches the API). Render a passive note.
   if (status === 'delivered' || status === 'cancelled') {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center gap-2 text-gray-500 text-sm">
           <AlertCircle size={14} aria-hidden="true" />
           Order details are locked because the order is {status}.
@@ -79,9 +79,9 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
 
   if (!editing) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center justify-between">
-          <h3 className="text-white font-black">Edit details</h3>
+          <h3 className="text-white font-bold">Edit details</h3>
           <button
             onClick={() => setEditing(true)}
             className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm font-bold px-3 py-1.5 rounded-lg transition-colors"
@@ -97,8 +97,8 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-      <h3 className="text-white font-black mb-4">Edit details</h3>
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 className="text-white font-bold mb-4">Edit details</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Customer name" value={form.customer_name} onChange={v => setForm(f => ({ ...f, customer_name: v }))} />
         <Field label="Phone" value={form.customer_phone} onChange={v => setForm(f => ({ ...f, customer_phone: v }))} />
@@ -121,7 +121,7 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
             value={form.delivery_notes}
             onChange={e => setForm(f => ({ ...f, delivery_notes: e.target.value }))}
             rows={2}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
           />
         </div>
         <div className="sm:col-span-2">
@@ -140,7 +140,7 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
         <button
           onClick={save}
           disabled={busy}
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-60"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-60"
         >
           {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Save size={14} aria-hidden="true" />}
           {busy ? 'Saving…' : 'Save'}
@@ -169,7 +169,7 @@ function Field(props: { label: string; value: string; onChange: (v: string) => v
         // hurt the rest — keeps the calendar popup readable against the
         // dark dashboard background instead of forcing a white panel.
         style={props.type === 'date' || props.type === 'time' ? { colorScheme: 'dark' } : undefined}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
       />
     </div>
   )
@@ -182,7 +182,7 @@ function SelectField(props: { label: string; value: string; onChange: (v: string
       <select
         value={props.value}
         onChange={e => props.onChange(e.target.value)}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
       >
         <option value="">—</option>
         {props.options.map((o, i) => (

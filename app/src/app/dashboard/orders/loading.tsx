@@ -15,7 +15,7 @@ export default function OrdersLoading() {
         <div className="h-9 w-32 bg-gray-800 rounded-xl" />
         <div className="h-9 w-56 bg-gray-800 rounded-xl" />
       </div>
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="border-b border-gray-800 last:border-0 p-4 sm:p-5 flex items-center gap-4">
             <div className="h-4 w-24 bg-gray-800 rounded" />

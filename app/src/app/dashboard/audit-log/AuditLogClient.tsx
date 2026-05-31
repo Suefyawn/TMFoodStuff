@@ -17,7 +17,7 @@ const ACTION_COLORS: Record<string, string> = {
   'order.status_change': 'bg-blue-500/15 text-blue-300 border-blue-500/30',
   'order.refund':        'bg-rose-500/15 text-rose-300 border-rose-500/30',
   'order.update':        'bg-amber-500/15 text-amber-300 border-amber-500/30',
-  'product.create':      'bg-green-500/15 text-green-300 border-green-500/30',
+  'product.create':      'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
   'product.update':      'bg-blue-500/15 text-blue-300 border-blue-500/30',
   'product.delete':      'bg-rose-500/15 text-rose-300 border-rose-500/30',
   'settings.update':     'bg-purple-500/15 text-purple-300 border-purple-500/30',
@@ -66,7 +66,7 @@ export default function AuditLogClient({ initialRows }: { initialRows: AuditRow[
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-white inline-flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-white inline-flex items-center gap-2">
             <FileText size={20} className="text-gray-400" aria-hidden="true" />
             Audit Log
           </h1>
@@ -84,14 +84,14 @@ export default function AuditLogClient({ initialRows }: { initialRows: AuditRow[
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search entity, action, metadata…"
-            className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
           />
         </div>
-        <select value={actor} onChange={e => setActor(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={actor} onChange={e => setActor(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">All actors</option>
           {actors.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
-        <select value={action} onChange={e => setAction(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={action} onChange={e => setAction(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">All actions</option>
           {actions.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
@@ -103,7 +103,7 @@ export default function AuditLogClient({ initialRows }: { initialRows: AuditRow[
       </div>
 
       {/* Table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {filtered.length === 0 ? (
           <p className="p-12 text-center text-gray-600 text-sm">No audit events match these filters.</p>
         ) : (

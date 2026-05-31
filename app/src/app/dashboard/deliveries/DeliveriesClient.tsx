@@ -136,7 +136,7 @@ export default function DeliveriesClient({ initialOrders, errorMessage, canClaim
         <div className="flex items-center justify-between gap-3 mb-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Delivery queue</p>
-            <h1 className="text-white font-black text-lg leading-tight">{totalVisible} stop{totalVisible === 1 ? '' : 's'}</h1>
+            <h1 className="text-white font-bold text-lg leading-tight">{totalVisible} stop{totalVisible === 1 ? '' : 's'}</h1>
           </div>
           <Link href="/dashboard" className="text-xs text-gray-500 hover:text-white">← Dashboard</Link>
         </div>
@@ -145,7 +145,7 @@ export default function DeliveriesClient({ initialOrders, errorMessage, canClaim
             type="button"
             onClick={() => setFilter('today')}
             className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-lg py-2 border transition-colors ${
-              filter === 'today' ? 'bg-green-600 border-green-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
+              filter === 'today' ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
             }`}
           >
             Today ({todayCount})
@@ -154,7 +154,7 @@ export default function DeliveriesClient({ initialOrders, errorMessage, canClaim
             type="button"
             onClick={() => setFilter('all')}
             className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-lg py-2 border transition-colors ${
-              filter === 'all' ? 'bg-green-600 border-green-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
+              filter === 'all' ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
             }`}
           >
             All ({orders.length})
@@ -177,13 +177,13 @@ export default function DeliveriesClient({ initialOrders, errorMessage, canClaim
       <div className="px-3 sm:px-4 py-3 space-y-5">
         {totalVisible === 0 ? (
           <div className="text-center py-16 text-gray-500">
-            <Truck size={36} className="mx-auto mb-3 text-green-600/60" aria-hidden="true" />
+            <Truck size={36} className="mx-auto mb-3 text-emerald-600/60" aria-hidden="true" />
             <p className="text-sm">No deliveries waiting. Hand the driver a coffee.</p>
           </div>
         ) : (
           Object.entries(groups).map(([emirate, list]) => (
             <section key={emirate}>
-              <p className="text-[10px] font-black uppercase tracking-wider text-green-300 mb-2 px-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 mb-2 px-1">
                 {emirate} · {list.length} stop{list.length === 1 ? '' : 's'}
               </p>
               <div className="space-y-3">
@@ -205,11 +205,11 @@ function DeliveryCard({ order, busy, onAdvance, canClaim, onClaim }: { order: Or
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`
 
   return (
-    <article className={`bg-gray-900 border rounded-2xl overflow-hidden ${isOut ? 'border-amber-700' : 'border-gray-800'}`}>
+    <article className={`bg-gray-900 border rounded-xl overflow-hidden ${isOut ? 'border-amber-700' : 'border-gray-800'}`}>
       <div className="px-4 py-3 flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="font-mono font-black text-white text-sm">{order.order_number}</span>
+            <span className="font-mono font-bold text-white text-sm">{order.order_number}</span>
             {isOut && <span className="text-[9px] font-bold uppercase tracking-wider text-amber-200 bg-amber-900/50 border border-amber-700 rounded px-1.5 py-0.5">On the way</span>}
             {!order.driver_id && <span className="text-[9px] font-bold uppercase tracking-wider text-blue-200 bg-blue-900/40 border border-blue-700 rounded px-1.5 py-0.5" title="Not assigned to a specific driver — anyone can take it">Unassigned</span>}
             {order.delivery_slot && (
@@ -270,7 +270,7 @@ function DeliveryCard({ order, busy, onAdvance, canClaim, onClaim }: { order: Or
                 href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, this is TM FoodStuff. I'm on my way with your order ${order.order_number}.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-green-200 bg-green-900/40 hover:bg-green-900/60 border border-green-700 rounded-lg px-3 py-2"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-200 bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-700 rounded-lg px-3 py-2"
               >
                 <MessageCircle size={12} aria-hidden="true" /> WhatsApp
               </a>
@@ -282,7 +282,7 @@ function DeliveryCard({ order, busy, onAdvance, canClaim, onClaim }: { order: Or
         {collectCod && (
           <div className="mb-3 bg-amber-900/30 border border-amber-700/50 rounded-lg px-3 py-2 flex items-center justify-between">
             <span className="text-xs font-bold text-amber-200">Collect cash</span>
-            <span className="text-lg font-black text-amber-100 tabular-nums">AED {total.toFixed(2)}</span>
+            <span className="text-lg font-bold text-amber-100 tabular-nums">AED {total.toFixed(2)}</span>
           </div>
         )}
 
@@ -318,7 +318,7 @@ function DeliveryCard({ order, busy, onAdvance, canClaim, onClaim }: { order: Or
               type="button"
               onClick={() => onAdvance(order.id, 'delivered')}
               disabled={busy}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white text-sm font-bold rounded-xl py-3 transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-sm font-bold rounded-xl py-3 transition-colors"
             >
               {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <CheckCircle2 size={14} aria-hidden="true" />}
               {busy ? 'Updating…' : 'Mark delivered'}

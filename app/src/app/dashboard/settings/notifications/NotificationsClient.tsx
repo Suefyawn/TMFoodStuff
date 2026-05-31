@@ -102,17 +102,17 @@ export default function NotificationsClient() {
   return (
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-2">
-        <Bell size={20} className="text-green-400" />
-        <h1 className="text-xl font-black text-white">Notifications</h1>
+        <Bell size={20} className="text-emerald-400" />
+        <h1 className="text-xl font-bold text-white">Notifications</h1>
       </div>
 
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-sm rounded-xl px-4 py-3">{error}</div>}
 
       {/* Recipients */}
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="mb-1 flex items-center gap-2">
           <Mail size={16} className="text-gray-400" />
-          <h2 className="text-sm font-black text-white uppercase tracking-wide">Staff recipients</h2>
+          <h2 className="text-sm font-bold text-white uppercase tracking-wide">Staff recipients</h2>
         </div>
         <p className="text-xs text-gray-500 mb-4">Who receives operational emails, and which ones. Customer order emails always go to the customer.</p>
 
@@ -168,19 +168,19 @@ export default function NotificationsClient() {
             value={draft.email}
             onChange={e => setDraft(d => ({ ...d, email: e.target.value }))}
             placeholder="staff@email.com"
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-green-500 outline-none"
+            className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-emerald-500 outline-none"
           />
           <input
             type="text"
             value={draft.name}
             onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
             placeholder="Name (optional)"
-            className="sm:w-44 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-green-500 outline-none"
+            className="sm:w-44 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-emerald-500 outline-none"
           />
           <button
             onClick={addRecipient}
             disabled={adding}
-            className="inline-flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
           >
             {adding ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} Add
           </button>
@@ -188,8 +188,8 @@ export default function NotificationsClient() {
       </section>
 
       {/* Email logo */}
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-        <h2 className="text-sm font-black text-white uppercase tracking-wide mb-1">Email logo</h2>
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <h2 className="text-sm font-bold text-white uppercase tracking-wide mb-1">Email logo</h2>
         <p className="text-xs text-gray-500 mb-4">Shown in the header of every email. Use a white or transparent PNG (it sits on a coloured band). Leave empty to use the “TM FoodStuff” wordmark.</p>
         <div className="max-w-xs">
           <ImageUploader images={logoUrl ? [logoUrl] : []} onChange={saveLogo} maxImages={1} />
@@ -205,7 +205,7 @@ function CheckBox({ checked, onChange }: { checked: boolean; onChange: () => voi
       type="button"
       onClick={onChange}
       className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-        checked ? 'bg-green-600 border-green-600 text-white' : 'bg-gray-800 border-gray-600 text-transparent hover:border-gray-500'
+        checked ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-gray-800 border-gray-600 text-transparent hover:border-gray-500'
       }`}
       aria-pressed={checked}
     >

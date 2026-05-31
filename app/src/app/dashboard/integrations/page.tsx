@@ -17,7 +17,7 @@ interface Integration {
 
 function StatusBadge({ ok }: { ok: boolean }) {
   return ok ? (
-    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-400 bg-green-400/10 px-2.5 py-1 rounded-full border border-green-400/20">
+    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full border border-emerald-400/20">
       <CheckCircle size={12} /> Configured
     </span>
   ) : (
@@ -30,9 +30,9 @@ function StatusBadge({ ok }: { ok: boolean }) {
 function EnvVar({ envKey, present }: { envKey: string; present: boolean }) {
   return (
     <div className={`flex items-center gap-2 text-xs font-mono px-3 py-1.5 rounded-lg ${
-      present ? 'bg-green-900/20 text-green-300 border border-green-800/40' : 'bg-gray-800 text-gray-500 border border-gray-700'
+      present ? 'bg-emerald-900/20 text-emerald-300 border border-emerald-800/40' : 'bg-gray-800 text-gray-500 border border-gray-700'
     }`}>
-      <span className={present ? 'text-green-400' : 'text-gray-600'}>
+      <span className={present ? 'text-emerald-400' : 'text-gray-600'}>
         {present ? '✓' : '○'}
       </span>
       {envKey}
@@ -43,7 +43,7 @@ function EnvVar({ envKey, present }: { envKey: string; present: boolean }) {
 function IntegrationCard({ integration }: { integration: Integration }) {
   const Icon = integration.icon
   return (
-    <div className={`bg-gray-900 border rounded-2xl p-6 transition-all ${
+    <div className={`bg-gray-900 border rounded-xl p-6 transition-all ${
       integration.configured ? 'border-gray-700' : 'border-gray-800'
     }`}>
       <div className="flex items-start justify-between mb-4">
@@ -198,7 +198,7 @@ export default async function IntegrationsPage() {
     <div className="p-6 lg:p-8 max-w-5xl">
       <SubNav items={SETTINGS_SUBNAV} />
       <div className="mb-8">
-        <h1 className="text-2xl font-black text-white">Integrations</h1>
+        <h1 className="text-2xl font-bold text-white">Integrations</h1>
         <p className="text-gray-400 mt-1 text-sm">
           {configuredCount}/{integrations.length} services configured
         </p>
@@ -222,7 +222,7 @@ export default async function IntegrationsPage() {
         ))}
       </div>
 
-      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-6">
         <h2 className="font-bold text-white mb-2">Daily digest preview</h2>
         <p className="text-sm text-gray-400">
           Manually send the daily digest email so you can verify formatting and thresholds
@@ -231,7 +231,7 @@ export default async function IntegrationsPage() {
         <DigestPreviewButton />
       </div>
 
-      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-6">
         <h2 className="font-bold text-white mb-3">How to add environment variables</h2>
         <ol className="space-y-2 text-sm text-gray-400">
           <li className="flex gap-2"><span className="text-gray-600 font-mono">1.</span> Go to your Vercel project → Settings → Environment Variables</li>

@@ -33,7 +33,7 @@ interface Message {
 const STATUS_LABEL: Record<Thread['status'], { label: string; bg: string }> = {
   open:              { label: 'Open',              bg: 'bg-amber-900/40 text-amber-200 border-amber-700' },
   pending_customer:  { label: 'Awaiting customer', bg: 'bg-blue-900/40 text-blue-200 border-blue-700' },
-  resolved:          { label: 'Resolved',          bg: 'bg-green-900/40 text-green-200 border-green-700' },
+  resolved:          { label: 'Resolved',          bg: 'bg-emerald-900/40 text-emerald-200 border-emerald-700' },
   spam:              { label: 'Spam',              bg: 'bg-gray-800 text-gray-400 border-gray-700' },
 }
 
@@ -135,7 +135,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4 min-h-[60vh]">
       {/* Sidebar */}
-      <aside className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col">
+      <aside className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex flex-col">
         <div className="p-3 border-b border-gray-800 flex items-center gap-2">
           <select
             value={statusFilter}
@@ -167,7 +167,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
                 <button
                   type="button"
                   onClick={() => setActiveId(t.id)}
-                  className={`w-full text-left px-3 py-2.5 transition-colors ${isActive ? 'bg-green-900/30' : 'hover:bg-gray-800/40'}`}
+                  className={`w-full text-left px-3 py-2.5 transition-colors ${isActive ? 'bg-emerald-900/30' : 'hover:bg-gray-800/40'}`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-0.5">
                     <p className="text-sm font-bold text-white truncate">
@@ -193,7 +193,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
       </aside>
 
       {/* Detail pane */}
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col">
+      <section className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex flex-col">
         {!active ? (
           <div className="flex-1 flex items-center justify-center text-sm text-gray-500 p-12 text-center">
             {threads.length === 0
@@ -204,12 +204,12 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
           <>
             <header className="p-4 border-b border-gray-800 flex items-start justify-between gap-3 flex-wrap">
               <div className="min-w-0 flex-1">
-                <h2 className="font-black text-white truncate">{active.subject || '(no subject)'}</h2>
+                <h2 className="font-bold text-white truncate">{active.subject || '(no subject)'}</h2>
                 <p className="text-xs text-gray-400 truncate">
                   {active.customer_name ? <><span className="font-bold">{active.customer_name}</span> · </> : null}
                   {active.customer_email}
                   {active.customer_id && (
-                    <Link href={`/dashboard/customers/${active.customer_id}`} className="ml-2 text-green-400 hover:underline inline-flex items-center gap-0.5">
+                    <Link href={`/dashboard/customers/${active.customer_id}`} className="ml-2 text-emerald-400 hover:underline inline-flex items-center gap-0.5">
                       profile <ExternalLink size={9} aria-hidden="true" />
                     </Link>
                   )}
@@ -237,7 +237,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
                   </button>
                 )}
                 {active.assigned_to === currentUserEmail && (
-                  <span className="text-[10px] font-bold text-green-300 bg-green-900/30 border border-green-700 rounded px-2 py-1">Assigned to you</span>
+                  <span className="text-[10px] font-bold text-emerald-300 bg-emerald-900/30 border border-emerald-700 rounded px-2 py-1">Assigned to you</span>
                 )}
               </div>
             </header>
@@ -251,7 +251,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
               ) : (
                 messages.map(m => (
                   <article key={m.id} className={`max-w-2xl ${m.direction === 'in' ? 'mr-auto' : 'ml-auto'}`}>
-                    <div className={`rounded-2xl px-4 py-3 ${m.direction === 'in' ? 'bg-gray-800 text-gray-200' : 'bg-green-900/30 border border-green-700/40 text-green-50'}`}>
+                    <div className={`rounded-xl px-4 py-3 ${m.direction === 'in' ? 'bg-gray-800 text-gray-200' : 'bg-emerald-900/30 border border-emerald-700/40 text-emerald-50'}`}>
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-70">
                         {m.direction === 'in'
                           ? (m.from_name || m.from_email || 'Customer')
@@ -276,7 +276,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
                 onChange={e => setReply(e.target.value.slice(0, 8000))}
                 rows={4}
                 placeholder={`Write to ${active.customer_email}…`}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500 resize-none"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 resize-none"
               />
               <div className="flex items-center justify-between gap-2 mt-2 flex-wrap">
                 <label className="inline-flex items-center gap-2 text-xs text-gray-400">
@@ -284,7 +284,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
                     type="checkbox"
                     checked={resolvedToggle}
                     onChange={e => setResolvedToggle(e.target.checked)}
-                    className="w-3.5 h-3.5 accent-green-600"
+                    className="w-3.5 h-3.5 accent-emerald-600"
                   />
                   Mark resolved after sending
                 </label>
@@ -292,7 +292,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
                   type="button"
                   onClick={send}
                   disabled={sending || !reply.trim()}
-                  className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-lg disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-lg disabled:opacity-60"
                 >
                   {sending
                     ? <Loader2 size={14} className="animate-spin" aria-hidden="true" />

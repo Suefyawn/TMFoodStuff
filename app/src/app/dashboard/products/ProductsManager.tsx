@@ -350,14 +350,14 @@ export default function ProductsManager({ initialProducts, categories }: { initi
         </div>
       )}
       {saveSuccess && (
-        <div role="status" className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-xl flex items-center justify-between">
+        <div role="status" className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm px-4 py-3 rounded-xl flex items-center justify-between">
           <span>✓ {saveSuccess}</span>
-          <button onClick={() => setSaveSuccess('')} className="text-green-400 hover:text-green-300 ml-4 font-bold" aria-label="Dismiss">✕</button>
+          <button onClick={() => setSaveSuccess('')} className="text-emerald-400 hover:text-emerald-300 ml-4 font-bold" aria-label="Dismiss">✕</button>
         </div>
       )}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-white">Products</h1>
+          <h1 className="text-2xl font-bold text-white">Products</h1>
           <p className="text-gray-500 text-sm">{products.length} total · {filtered.length} shown</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -371,7 +371,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
             <Upload size={14} /> Import
           </button>
           <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileChange} />
-          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-xl transition-colors">
             <Plus size={16} /> Add Product
           </button>
         </div>
@@ -381,13 +381,13 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       <div className="flex gap-3 flex-wrap items-center">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500" />
         </div>
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">All Categories</option>
           {categories.map(c => <option key={c.id} value={c.slug}>{c.name}</option>)}
         </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
@@ -395,7 +395,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
         {selected.size > 0 && (
           <div className="flex items-center gap-2 ml-auto flex-wrap">
             <span className="text-sm text-gray-400">{selected.size} selected</span>
-            <button onClick={() => bulkAction('activate')} className="px-3 py-1.5 bg-green-600/20 text-green-400 text-xs font-bold rounded-lg hover:bg-green-600/30">Activate</button>
+            <button onClick={() => bulkAction('activate')} className="px-3 py-1.5 bg-emerald-600/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-600/30">Activate</button>
             <button onClick={() => bulkAction('deactivate')} className="px-3 py-1.5 bg-yellow-600/20 text-yellow-400 text-xs font-bold rounded-lg hover:bg-yellow-600/30">Deactivate</button>
             <button onClick={() => bulkAction('feature')} className="px-3 py-1.5 bg-amber-600/20 text-amber-300 text-xs font-bold rounded-lg hover:bg-amber-600/30">Feature</button>
             <button onClick={() => bulkAction('unfeature')} className="px-3 py-1.5 bg-gray-700 text-gray-300 text-xs font-bold rounded-lg hover:bg-gray-600">Unfeature</button>
@@ -407,8 +407,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Import preview modal */}
       {importRows && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-lg font-black text-white mb-2">Import Products</h2>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-lg font-bold text-white mb-2">Import Products</h2>
             <p className="text-gray-400 text-sm mb-4">
               Found <span className="text-white font-bold">{importRows.length}</span> row{importRows.length !== 1 ? 's' : ''}.
               Existing slugs will be updated; new slugs will be created.
@@ -426,7 +426,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
             </div>
             <div className="flex justify-end gap-3">
               <button onClick={() => setImportRows(null)} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
-              <button onClick={runImport} disabled={importing} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50 flex items-center gap-2">
+              <button onClick={runImport} disabled={importing} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-500 disabled:opacity-50 flex items-center gap-2">
                 <Upload size={14} /> {importing ? 'Importing...' : `Import ${importRows.length} rows`}
               </button>
             </div>
@@ -437,12 +437,12 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Import result modal */}
       {importResult && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-lg font-black text-white mb-4">Import Complete</h2>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-lg font-bold text-white mb-4">Import Complete</h2>
             <div className="space-y-2 mb-5">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Created</span>
-                <span className="text-green-400 font-bold">{importResult.imported} product{importResult.imported !== 1 ? 's' : ''}</span>
+                <span className="text-emerald-400 font-bold">{importResult.imported} product{importResult.imported !== 1 ? 's' : ''}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Updated</span>
@@ -459,7 +459,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                 </div>
               )}
             </div>
-            <button onClick={() => setImportResult(null)} className="w-full px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500">Done</button>
+            <button onClick={() => setImportResult(null)} className="w-full px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-500">Done</button>
           </div>
         </div>
       )}
@@ -467,9 +467,9 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Add Product Modal */}
       {showAdd && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-black text-white">Add New Product</h2>
+              <h2 className="text-lg font-bold text-white">Add New Product</h2>
               <button onClick={() => setShowAdd(false)} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -478,7 +478,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Slug *" value={newProduct.slug} onChange={v => setNewProduct({...newProduct, slug: v})} />
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Category</label>
-                <select value={newProduct.category_id} onChange={e => setNewProduct({...newProduct, category_id: Number(e.target.value)})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500">
+                <select value={newProduct.category_id} onChange={e => setNewProduct({...newProduct, category_id: Number(e.target.value)})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
                   <option value={0}>Select...</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -492,7 +492,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Emoji" value={newProduct.emoji} onChange={v => setNewProduct({...newProduct, emoji: v})} />
               <div className="col-span-1 sm:col-span-2">
                 <label className="text-xs text-gray-500 mb-1 block">Description</label>
-                <textarea value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
+                <textarea value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 h-20 resize-none" />
               </div>
               <div className="col-span-1 sm:col-span-2">
                 <label className="text-xs text-gray-500 mb-2 block">Product Images</label>
@@ -522,7 +522,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
             )}
             <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => setShowAdd(false)} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
-              <button onClick={addProduct} disabled={saving || !newProduct.name} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">
+              <button onClick={addProduct} disabled={saving || !newProduct.name} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-500 disabled:opacity-50">
                 {saving ? 'Saving...' : 'Add Product'}
               </button>
             </div>
@@ -533,9 +533,9 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Edit Product Modal */}
       {editing !== null && editData && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => { setEditing(null); setEditData(null) }}>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-black text-white">Edit Product</h2>
+              <h2 className="text-lg font-bold text-white">Edit Product</h2>
               <button onClick={() => { setEditing(null); setEditData(null) }} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -544,7 +544,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Slug" value={editData.slug || ''} onChange={v => setEditData({...editData, slug: v})} />
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Category</label>
-                <select value={editData.category_id || 0} onChange={e => setEditData({...editData, category_id: Number(e.target.value)})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500">
+                <select value={editData.category_id || 0} onChange={e => setEditData({...editData, category_id: Number(e.target.value)})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
@@ -561,7 +561,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                   href={`/dashboard/stock-history?product=${encodeURIComponent(editData.slug || '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-green-400 hover:text-green-300 underline pb-3"
+                  className="text-xs text-emerald-400 hover:text-emerald-300 underline pb-3"
                 >
                   View stock history →
                 </a>
@@ -570,7 +570,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               <Input label="Emoji" value={editData.emoji || ''} onChange={v => setEditData({...editData, emoji: v})} />
               <div className="col-span-1 sm:col-span-2">
                 <label className="text-xs text-gray-500 mb-1 block">Description</label>
-                <textarea value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
+                <textarea value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 h-20 resize-none" />
               </div>
               <div className="col-span-1 sm:col-span-2">
                 <label className="text-xs text-gray-500 mb-2 block">Product Images</label>
@@ -598,7 +598,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
             )}
             <div className="flex justify-end gap-3 mt-5">
               <button onClick={() => { setEditing(null); setEditData(null) }} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl hover:bg-gray-700">Cancel</button>
-              <button onClick={saveEdit} disabled={saving} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-500 disabled:opacity-50">
+              <button onClick={saveEdit} disabled={saving} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-500 disabled:opacity-50">
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
@@ -607,7 +607,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       )}
 
       {/* Products Table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
 
         {/* Mobile card view */}
         <div className="sm:hidden divide-y divide-gray-800">
@@ -624,14 +624,14 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                   <p className="text-white font-semibold text-sm truncate">{product.name}</p>
                   <p className="text-gray-500 text-xs">{product.categories?.name || '—'} · {product.unit}</p>
                 </div>
-                <span className="text-green-400 font-bold text-sm shrink-0">AED {Number(product.price_aed).toFixed(2)}</span>
+                <span className="text-emerald-400 font-bold text-sm shrink-0">AED {Number(product.price_aed).toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between pl-10">
                 <span className={`text-xs font-semibold ${product.stock > 10 ? 'text-gray-400' : product.stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>
                   {product.stock} in stock
                 </span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all ${product.is_active ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400'}`}>
+                  <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-all ${product.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
                     {product.is_active ? '● Active' : '○ Inactive'}
                   </button>
                   <button onClick={() => { setEditing(product.id); setEditData({...product}) }} className="text-xs px-2.5 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">
@@ -702,7 +702,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                       </div>
                     </td>
                     <td className="px-4 py-3 text-gray-400 text-xs">{product.categories?.name || '—'}</td>
-                    <td className="px-4 py-3 text-green-400 font-bold text-sm">AED {Number(product.price_aed).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-emerald-400 font-bold text-sm">AED {Number(product.price_aed).toFixed(2)}</td>
                     <td className="px-4 py-3">
                       <div className="inline-flex items-center gap-1">
                         <button
@@ -728,7 +728,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${product.is_active ? 'bg-green-500/15 text-green-400 hover:bg-red-500/15 hover:text-red-400' : 'bg-red-500/15 text-red-400 hover:bg-green-500/15 hover:text-green-400'}`}>
+                      <button onClick={() => toggleActive(product.id, product.is_active)} className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${product.is_active ? 'bg-emerald-500/15 text-emerald-400 hover:bg-red-500/15 hover:text-red-400' : 'bg-red-500/15 text-red-400 hover:bg-emerald-500/15 hover:text-emerald-400'}`}>
                         {product.is_active ? '● Active' : '○ Inactive'}
                       </button>
                     </td>
@@ -761,7 +761,7 @@ function Input({ label, value, onChange, type = 'text' }: { label: string; value
   return (
     <div>
       <label className="text-xs text-gray-500 mb-1 block">{label}</label>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} step={type === 'number' ? '0.01' : undefined} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} step={type === 'number' ? '0.01' : undefined} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
     </div>
   )
 }
@@ -769,7 +769,7 @@ function Input({ label, value, onChange, type = 'text' }: { label: string; value
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <div className="flex items-center gap-3">
-      <button onClick={() => onChange(!checked)} className={`w-10 h-6 rounded-full transition-colors flex items-center ${checked ? 'bg-green-600 justify-end' : 'bg-gray-700 justify-start'}`}>
+      <button onClick={() => onChange(!checked)} className={`w-10 h-6 rounded-full transition-colors flex items-center ${checked ? 'bg-emerald-600 justify-end' : 'bg-gray-700 justify-start'}`}>
         <div className="w-4 h-4 bg-white rounded-full mx-1 shadow" />
       </button>
       <span className="text-sm text-gray-300">{label}</span>

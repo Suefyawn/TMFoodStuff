@@ -56,7 +56,7 @@ export default function AccountingClient() {
         subtitle="CSV reports for the accountant. UAE timezone."
       />
 
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Period</p>
           <div className="flex items-end gap-3 flex-wrap">
@@ -68,7 +68,7 @@ export default function AccountingClient() {
                 value={from}
                 onChange={e => setFrom(e.target.value)}
                 style={{ colorScheme: 'dark' }}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
             <div>
@@ -79,7 +79,7 @@ export default function AccountingClient() {
                 value={to}
                 onChange={e => setTo(e.target.value)}
                 style={{ colorScheme: 'dark' }}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
             <span className="text-[10px] text-gray-600 self-center">inclusive · Asia/Dubai</span>
@@ -136,7 +136,7 @@ interface ExportCardProps {
 
 function ExportCard({ icon: Icon, color, title, description, href }: ExportCardProps) {
   const colorMap = {
-    green: { bg: 'bg-green-900/40', text: 'text-green-300', border: 'hover:border-green-600/40' },
+    green: { bg: 'bg-emerald-900/40', text: 'text-emerald-300', border: 'hover:border-emerald-600/40' },
     red: { bg: 'bg-red-900/40', text: 'text-red-300', border: 'hover:border-red-600/40' },
     amber: { bg: 'bg-amber-900/40', text: 'text-amber-300', border: 'hover:border-amber-600/40' },
   }
@@ -145,12 +145,12 @@ function ExportCard({ icon: Icon, color, title, description, href }: ExportCardP
     <a
       href={href}
       download
-      className={`block bg-gray-900 border border-gray-800 ${c.border} rounded-2xl p-5 transition-colors group`}
+      className={`block bg-gray-900 border border-gray-800 ${c.border} rounded-xl p-5 transition-colors group`}
     >
       <div className={`w-10 h-10 ${c.bg} rounded-xl flex items-center justify-center mb-3`}>
         <Icon size={20} className={c.text} aria-hidden="true" />
       </div>
-      <h3 className="text-white font-black mb-1.5">{title}</h3>
+      <h3 className="text-white font-bold mb-1.5">{title}</h3>
       <p className="text-xs text-gray-500 leading-relaxed mb-3">{description}</p>
       <span className="inline-flex items-center gap-1 text-xs font-bold text-gray-300 group-hover:text-white">
         <Download size={11} aria-hidden="true" /> Download CSV

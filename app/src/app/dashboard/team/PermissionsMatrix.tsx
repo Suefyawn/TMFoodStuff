@@ -15,7 +15,7 @@ const ROLES = [
 export default function PermissionsMatrix() {
   const [open, setOpen] = useState(false)
   return (
-    <section className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+    <section className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
@@ -59,7 +59,7 @@ export default function PermissionsMatrix() {
                         return (
                           <td key={role.key} className="text-center align-top py-1.5">
                             {ok
-                              ? <Check size={14} className="mx-auto text-green-400" aria-hidden="true" />
+                              ? <Check size={14} className="mx-auto text-emerald-400" aria-hidden="true" />
                               : <X size={14} className="mx-auto text-gray-700" aria-hidden="true" />}
                           </td>
                         )

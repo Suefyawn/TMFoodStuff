@@ -9,7 +9,7 @@ export default function StockHistoryLoading() {
         <div className="h-9 w-64 bg-gray-800 rounded-xl" />
         <div className="h-9 w-32 bg-gray-800 rounded-xl" />
       </div>
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="border-b border-gray-800 last:border-0 px-5 py-3 flex items-center gap-3">
             <div className="w-9 h-9 bg-gray-800 rounded-xl" />

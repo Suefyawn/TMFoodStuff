@@ -10,7 +10,7 @@ const statusColors: Record<string, string> = {
   confirmed: 'text-blue-400',
   processing: 'text-purple-400',
   out_for_delivery: 'text-orange-400',
-  delivered: 'text-green-400',
+  delivered: 'text-emerald-400',
   cancelled: 'text-red-400',
 }
 
@@ -67,22 +67,22 @@ export default function CustomersPage() {
     <div className="p-4 sm:p-6 space-y-4">
       <SubNav items={CUSTOMERS_SUBNAV} />
       <div>
-        <h1 className="text-2xl font-black text-white">Customers</h1>
+        <h1 className="text-2xl font-bold text-white">Customers</h1>
         <p className="text-gray-500 text-sm">{customers.length} unique customers</p>
       </div>
 
       <div className="flex gap-3 flex-wrap items-center">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, email..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, email..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500" />
         </div>
-        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">All tiers</option>
           {['bronze', 'silver', 'gold', 'platinum'].map(t => (
             <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)} ({tierCounts[t] || 0})</option>
           ))}
         </select>
-        <select value={orderFilter} onChange={e => setOrderFilter(e.target.value as typeof orderFilter)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={orderFilter} onChange={e => setOrderFilter(e.target.value as typeof orderFilter)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">Any order count</option>
           <option value="has_orders">Has ordered</option>
           <option value="repeat">Repeat customers</option>
@@ -102,7 +102,7 @@ export default function CustomersPage() {
         />
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {filtered.length === 0 ? (
           <p className="p-8 text-center text-gray-600">No customers found</p>
         ) : (
@@ -114,7 +114,7 @@ export default function CustomersPage() {
                 <div key={i}>
                   <div className="flex items-center justify-between px-5 py-4 hover:bg-gray-800/30 cursor-pointer transition-colors" onClick={() => setExpanded(isExpanded ? null : key)}>
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center text-base font-black text-gray-500 shrink-0">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center text-base font-bold text-gray-500 shrink-0">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
@@ -143,12 +143,12 @@ export default function CustomersPage() {
                       <button
                         onClick={(e) => { e.stopPropagation(); setMessageTarget({ email: customer.email, phone: customer.phone }) }}
                         title="Message this customer"
-                        className="p-2 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                        className="p-2 text-gray-500 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
                       >
                         <Send size={14} aria-hidden="true" />
                       </button>
                       <div className="text-right">
-                        <p className="text-green-400 font-bold text-sm">AED {customer.totalSpent.toFixed(2)}</p>
+                        <p className="text-emerald-400 font-bold text-sm">AED {customer.totalSpent.toFixed(2)}</p>
                         <p className="text-gray-600 text-xs">{customer.totalOrders} orders</p>
                       </div>
                       {isExpanded ? <ChevronUp size={16} className="text-gray-500" /> : <ChevronDown size={16} className="text-gray-500" />}
@@ -166,7 +166,7 @@ export default function CustomersPage() {
                             </div>
                             <div className="flex items-center gap-3">
                               <span className={`text-xs font-semibold ${statusColors[o.status] || 'text-gray-400'}`}>{o.status}</span>
-                              <span className="text-green-400 text-sm font-bold">AED {(o.total || 0).toFixed(2)}</span>
+                              <span className="text-emerald-400 text-sm font-bold">AED {(o.total || 0).toFixed(2)}</span>
                             </div>
                           </Link>
                         ))}

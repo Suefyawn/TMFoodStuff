@@ -35,7 +35,7 @@ export default function DigestPreviewButton() {
         Send daily digest now
       </button>
       {msg && (
-        <span className={`text-xs ${msg.type === 'ok' ? 'text-green-400' : 'text-red-400'}`}>{msg.text}</span>
+        <span className={`text-xs ${msg.type === 'ok' ? 'text-emerald-400' : 'text-red-400'}`}>{msg.text}</span>
       )}
     </div>
   )
