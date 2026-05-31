@@ -102,11 +102,14 @@ export async function POST(request: Request) {
     metadata: { email, role },
   })
 
-  // Fire the invitation email asynchronously — failures here shouldn't
-  // unwind the row insert. The admin can resend manually if it bounces.
+  // Await the invitation email so it actually completes — a fire-and-forget
+  // (`void`) send is unreliable on serverless, where the function can be
+  // frozen the moment the response returns, before the email goes out.
+  // sendInvitationEmail swallows its own errors, so this can't unwind the
+  // row insert.
   const session = await getDashboardSession()
   const invitedBy = session.state === 'ok' ? session.email : 'an administrator'
-  void sendInvitationEmail(email, role as 'admin' | 'staff' | 'driver', invitedBy)
+  await sendInvitationEmail(email, role as 'admin' | 'staff' | 'driver', invitedBy)
 
   return NextResponse.json({ row: data, invited: true })
 }
