@@ -41,7 +41,7 @@ export async function GET() {
     .from('delivery_slots')
     .select('*')
     .order('position', { ascending: true })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ slots: data || [] })
 }
 
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     })
     .select('*')
     .single()
-  if (error || !data) return NextResponse.json({ error: error?.message || 'Create failed' }, { status: 500 })
+  if (error || !data) return NextResponse.json({ error: 'Create failed' }, { status: 500 })
   await logAdminAction({ supabase, action: 'delivery_slot.created', entity: `slot:${data.id}`, metadata: { key } })
   return NextResponse.json({ slot: data })
 }
@@ -109,7 +109,7 @@ export async function PATCH(request: Request) {
     .eq('id', id)
     .select('*')
     .single()
-  if (error || !data) return NextResponse.json({ error: error?.message || 'Update failed' }, { status: 500 })
+  if (error || !data) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   await logAdminAction({ supabase, action: 'delivery_slot.updated', entity: `slot:${id}`, metadata: updates })
   return NextResponse.json({ slot: data })
 }
@@ -128,7 +128,7 @@ export async function DELETE(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
   const { error } = await supabase.from('delivery_slots').update({ is_active: false }).eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   await logAdminAction({ supabase, action: 'delivery_slot.deactivated', entity: `slot:${id}` })
   return NextResponse.json({ ok: true })
 }

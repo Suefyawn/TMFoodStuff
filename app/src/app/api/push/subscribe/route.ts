@@ -52,6 +52,6 @@ export async function POST(request: Request) {
       failure_count: 0,
     }, { onConflict: 'endpoint' })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ ok: true })
 }

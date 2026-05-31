@@ -26,6 +26,6 @@ export async function GET(request: Request) {
   if (status) query = query.eq('status', status)
 
   const { data, error } = await query
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ threads: data || [] })
 }

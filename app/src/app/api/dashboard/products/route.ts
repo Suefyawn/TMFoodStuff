@@ -73,7 +73,7 @@ export async function PATCH(request: Request) {
     .maybeSingle()
 
   const { error } = await supabase.from('products').update(dbUpdates).eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   // Stock history — only when the operator actually touched the stock value.
   if (snapshot && dbUpdates.stock !== undefined && Number(dbUpdates.stock) !== Number(snapshot.stock)) {
@@ -146,7 +146,7 @@ export async function POST(request: Request) {
     image_url: imageUrls[0] ?? null,
   }).select().single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   await logAdminAction({
     supabase,
@@ -184,7 +184,7 @@ export async function DELETE(request: Request) {
   const supabase = getSupabase()
 
   const { error } = await supabase.from('products').delete().in('id', idList)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   await logAdminAction({
     supabase,

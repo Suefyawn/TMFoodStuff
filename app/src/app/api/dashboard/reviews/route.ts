@@ -60,7 +60,7 @@ export async function PATCH(request: Request) {
     .maybeSingle()
 
   const { error } = await supabase.from('product_reviews').update(updates).eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   // Customer notification on first approval transition (pending → approved).
   // Best-effort — never fails the request.
@@ -87,7 +87,7 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
   const supabase = getSupabase()
   const { error } = await supabase.from('product_reviews').delete().eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   await logAdminAction({ supabase, action: 'review.delete', entity: `review:${id}` })
   return NextResponse.json({ ok: true })
 }

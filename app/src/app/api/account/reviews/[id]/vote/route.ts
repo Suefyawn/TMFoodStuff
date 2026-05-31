@@ -32,6 +32,6 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   const { error } = await supabase
     .from('product_review_votes')
     .insert({ review_id: reviewId, customer_id: customer.id })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ voted: true })
 }

@@ -132,7 +132,7 @@ export async function POST(request: Request) {
     .select('id')
     .single()
   if (error || !inserted) {
-    return NextResponse.json({ error: error?.message || 'Failed to create subscription' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true, id: inserted.id })

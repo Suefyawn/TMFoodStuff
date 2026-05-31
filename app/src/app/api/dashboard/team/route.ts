@@ -65,7 +65,7 @@ export async function GET() {
     .select('id, email, role, is_active, created_at')
     .order('role', { ascending: true })
     .order('created_at', { ascending: false })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ rows: data || [] })
 }
 
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     .upsert({ email, role, is_active: true }, { onConflict: 'email' })
     .select('id, email, role, is_active')
     .single()
-  if (error || !data) return NextResponse.json({ error: error?.message || 'Insert failed' }, { status: 500 })
+  if (error || !data) return NextResponse.json({ error: 'Insert failed' }, { status: 500 })
 
   await logAdminAction({
     supabase,
@@ -159,7 +159,7 @@ export async function PATCH(request: Request) {
     .eq('id', id)
     .select('id, email, role, is_active')
     .single()
-  if (error || !data) return NextResponse.json({ error: error?.message || 'Update failed' }, { status: 500 })
+  if (error || !data) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
 
   await logAdminAction({
     supabase,
@@ -193,7 +193,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "You can't remove your own account." }, { status: 400 })
   }
   const { error } = await supabase.from('admin_users').delete().eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   await logAdminAction({
     supabase,
     action: 'team.member_removed',

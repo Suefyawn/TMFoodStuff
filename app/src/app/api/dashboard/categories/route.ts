@@ -11,7 +11,7 @@ export async function GET() {
   if (!(await requirePermission('categories.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const supabase = getSupabase()
   const { data, error } = await supabase.from('categories').select('*').order('id')
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json(data)
 }
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     description: body.description || '',
   }).select().single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   await logAdminAction({
     supabase,
     action: 'category.create',
@@ -53,7 +53,7 @@ export async function PUT(request: Request) {
   const { data: before } = await supabase.from('categories').select('*').eq('id', parseInt(id)).maybeSingle()
 
   const { error } = await supabase.from('categories').update(allowed).eq('id', parseInt(id))
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   await logAdminAction({
     supabase,
@@ -76,7 +76,7 @@ export async function DELETE(request: Request) {
   await supabase.from('products').update({ category_id: null }).eq('category_id', parseInt(id))
 
   const { error } = await supabase.from('categories').delete().eq('id', parseInt(id))
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   await logAdminAction({
     supabase,

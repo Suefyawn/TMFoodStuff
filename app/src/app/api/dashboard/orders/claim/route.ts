@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     .is('driver_id', null)
     .select('id, driver_id')
     .maybeSingle()
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   if (!updated) {
     // Either the order doesn't exist or someone else claimed it first.
     return NextResponse.json({ error: 'Already claimed by another driver.' }, { status: 409 })

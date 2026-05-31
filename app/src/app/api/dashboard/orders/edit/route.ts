@@ -112,7 +112,7 @@ export async function PATCH(request: Request) {
     .from('orders')
     .update({ ...after, updated_at: new Date().toISOString() })
     .eq('id', orderId)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   await logAdminAction({
     supabase,

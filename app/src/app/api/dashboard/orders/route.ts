@@ -67,7 +67,7 @@ export async function PATCH(request: Request) {
   }
 
   const { error } = await supabase.from('orders').update(updates).eq('id', parseInt(id))
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   // Record the transition on the per-order timeline so the customer's
   // tracking page can show when each step happened. Skip no-op transitions
