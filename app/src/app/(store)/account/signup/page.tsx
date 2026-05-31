@@ -65,7 +65,7 @@ function SignupInner() {
           <Mail size={28} className="text-forest" strokeWidth={1.75} />
         </div>
         <h1 className="font-playfair text-2xl font-bold text-stone-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-stone-500 text-sm mb-6">
           {isAr
             ? `أرسلنا رابط تأكيد إلى ${email}. اضغط على الرابط لتفعيل حسابك.`
             : `We just sent a confirmation link to ${email}. Click it to activate your account.`}
@@ -79,17 +79,17 @@ function SignupInner() {
 
   return (
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
+      <div className="bg-white border border-stone-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
           <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'إنشاء حساب' : 'Create account'}</h1>
-          <p className="text-gray-500 text-sm">{isAr ? 'تتبّع الطلبات، احفظ العناوين، واطلب أسرع' : 'Track orders, save addresses, check out faster'}</p>
+          <p className="text-stone-500 text-sm">{isAr ? 'تتبّع الطلبات، احفظ العناوين، واطلب أسرع' : 'Track orders, save addresses, check out faster'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="name" className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{isAr ? 'الاسم الكامل' : 'Full name'}</label>
+            <label htmlFor="name" className="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">{isAr ? 'الاسم الكامل' : 'Full name'}</label>
             <div className="relative">
-              <User size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-gray-400`} />
+              <User size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-stone-400`} />
               <input
                 id="name"
                 type="text"
@@ -97,14 +97,14 @@ function SignupInner() {
                 onChange={e => setName(e.target.value)}
                 placeholder={isAr ? 'أحمد المنصوري' : 'Ahmed Al Mansouri'}
                 autoComplete="name"
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-stone-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
           <div>
-            <label htmlFor="email" className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{isAr ? 'البريد الإلكتروني' : 'Email'}</label>
+            <label htmlFor="email" className="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">{isAr ? 'البريد الإلكتروني' : 'Email'}</label>
             <div className="relative">
-              <Mail size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-gray-400`} />
+              <Mail size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-stone-400`} />
               <input
                 id="email"
                 type="email"
@@ -113,14 +113,14 @@ function SignupInner() {
                 placeholder="you@example.com"
                 autoComplete="email"
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-stone-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
           <div>
-            <label htmlFor="password" className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{isAr ? 'كلمة المرور' : 'Password'}</label>
+            <label htmlFor="password" className="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">{isAr ? 'كلمة المرور' : 'Password'}</label>
             <div className="relative">
-              <Lock size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-gray-400`} />
+              <Lock size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-stone-400`} />
               <input
                 id="password"
                 type="password"
@@ -130,7 +130,7 @@ function SignupInner() {
                 autoComplete="new-password"
                 minLength={8}
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-stone-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -144,7 +144,7 @@ function SignupInner() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-stone-500">
           {isAr ? 'لديك حساب؟ ' : 'Already have an account? '}
           <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-forest-dark font-bold hover:underline">
             {isAr ? 'سجّل دخول' : 'Sign in'}

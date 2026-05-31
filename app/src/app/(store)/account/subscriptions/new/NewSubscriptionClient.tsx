@@ -162,7 +162,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account/subscriptions" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
+      <Link href="/account/subscriptions" className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'الاشتراكات' : 'Subscriptions'}
       </Link>
 
@@ -174,35 +174,35 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
           <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
             {isAr ? 'اشتراك جديد' : 'New subscription'}
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-stone-500">
             {isAr ? 'دفع عند الاستلام، تقدر تلغي وقت ما تحب.' : 'Cash on delivery, cancel anytime.'}
           </p>
         </div>
       </header>
 
       {/* 1. Name (optional) */}
-      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 mb-4">
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">{isAr ? 'اسم الاشتراك (اختياري)' : 'Subscription name (optional)'}</p>
+      <section className="bg-white border border-stone-100 rounded-3xl shadow-sm p-5 mb-4">
+        <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">{isAr ? 'اسم الاشتراك (اختياري)' : 'Subscription name (optional)'}</p>
         <input
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder={isAr ? 'مثلاً: صندوق فواكه أسبوعي' : 'e.g. Weekly fruit box'}
-          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
+          className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
         />
       </section>
 
       {/* 2. Items */}
-      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 mb-4">
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-3">{isAr ? 'المنتجات' : 'Items'}</p>
+      <section className="bg-white border border-stone-100 rounded-3xl shadow-sm p-5 mb-4">
+        <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-3">{isAr ? 'المنتجات' : 'Items'}</p>
         <div className="relative mb-3">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" aria-hidden="true" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={isAr ? 'ابحث عن منتج…' : 'Search products…'}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
+            className="w-full bg-stone-50 border border-stone-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
           />
         </div>
 
@@ -214,19 +214,19 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
             <ul className="space-y-1.5">
               {pickedItems.map(it => (
                 <li key={it.product.id} className="flex items-center justify-between gap-2 text-sm">
-                  <span className="truncate font-bold text-gray-800">
+                  <span className="truncate font-bold text-stone-800">
                     {it.product.emoji && <span className="mr-1">{it.product.emoji}</span>}
                     {(isAr ? it.product.name_ar : it.product.name_en) || `#${it.product.id}`}
                   </span>
                   <span className="inline-flex items-center gap-1 shrink-0">
-                    <button type="button" onClick={() => bump(it.product.id, -1)} className="w-6 h-6 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"><Minus size={10} className="mx-auto" aria-hidden="true" /></button>
+                    <button type="button" onClick={() => bump(it.product.id, -1)} className="w-6 h-6 bg-white border border-stone-300 rounded-md text-stone-700 hover:bg-stone-50"><Minus size={10} className="mx-auto" aria-hidden="true" /></button>
                     <span className="w-7 text-center font-mono font-bold tabular-nums">{it.quantity}</span>
-                    <button type="button" onClick={() => bump(it.product.id, 1)} className="w-6 h-6 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"><Plus size={10} className="mx-auto" aria-hidden="true" /></button>
+                    <button type="button" onClick={() => bump(it.product.id, 1)} className="w-6 h-6 bg-white border border-stone-300 rounded-md text-stone-700 hover:bg-stone-50"><Plus size={10} className="mx-auto" aria-hidden="true" /></button>
                   </span>
                 </li>
               ))}
             </ul>
-            <p className="text-right text-xs text-gray-600 mt-2">
+            <p className="text-right text-xs text-stone-600 mt-2">
               {isAr ? 'المجموع لكل طلب:' : 'Per order:'} <span className="font-playfair font-bold text-stone-900">AED {subtotal.toFixed(2)}</span>
             </p>
           </div>
@@ -237,23 +237,23 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
             {filtered.map(p => {
               const qty = picks[p.id] || 0
               return (
-                <li key={p.id} className="flex items-center justify-between gap-2 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2">
+                <li key={p.id} className="flex items-center justify-between gap-2 bg-stone-50 hover:bg-stone-100 rounded-lg px-3 py-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-gray-800 truncate">
+                    <p className="text-sm font-bold text-stone-800 truncate">
                       {p.emoji && <span className="mr-1">{p.emoji}</span>}
                       {(isAr ? p.name_ar : p.name_en) || `#${p.id}`}
                     </p>
-                    <p className="text-[10px] text-gray-500">AED {Number(p.price_aed || 0).toFixed(2)} / {p.unit}</p>
+                    <p className="text-[10px] text-stone-500">AED {Number(p.price_aed || 0).toFixed(2)} / {p.unit}</p>
                   </div>
                   {qty === 0 ? (
-                    <button type="button" onClick={() => bump(p.id, 1)} className="shrink-0 bg-white border border-gray-300 text-gray-700 text-xs font-bold px-2.5 py-1.5 rounded-md hover:bg-gray-50">
+                    <button type="button" onClick={() => bump(p.id, 1)} className="shrink-0 bg-white border border-stone-300 text-stone-700 text-xs font-bold px-2.5 py-1.5 rounded-md hover:bg-stone-50">
                       {isAr ? '+ أضف' : '+ Add'}
                     </button>
                   ) : (
                     <span className="inline-flex items-center gap-1 shrink-0">
-                      <button type="button" onClick={() => bump(p.id, -1)} className="w-6 h-6 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"><Minus size={10} className="mx-auto" aria-hidden="true" /></button>
+                      <button type="button" onClick={() => bump(p.id, -1)} className="w-6 h-6 bg-white border border-stone-300 rounded-md text-stone-700 hover:bg-stone-50"><Minus size={10} className="mx-auto" aria-hidden="true" /></button>
                       <span className="w-7 text-center font-mono font-bold tabular-nums text-sm">{qty}</span>
-                      <button type="button" onClick={() => bump(p.id, 1)} className="w-6 h-6 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"><Plus size={10} className="mx-auto" aria-hidden="true" /></button>
+                      <button type="button" onClick={() => bump(p.id, 1)} className="w-6 h-6 bg-white border border-stone-300 rounded-md text-stone-700 hover:bg-stone-50"><Plus size={10} className="mx-auto" aria-hidden="true" /></button>
                     </span>
                   )}
                 </li>
@@ -264,8 +264,8 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
       </section>
 
       {/* 3. Frequency */}
-      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 mb-4">
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-3">{isAr ? 'التكرار' : 'Frequency'}</p>
+      <section className="bg-white border border-stone-100 rounded-3xl shadow-sm p-5 mb-4">
+        <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-3">{isAr ? 'التكرار' : 'Frequency'}</p>
         <div className="grid grid-cols-3 gap-2">
           {FREQ_OPTIONS.map(opt => (
             <button
@@ -275,24 +275,24 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
               className={`text-left rounded-xl border-2 p-3 transition-colors ${
                 frequencyDays === opt.days
                   ? 'border-forest bg-green-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  : 'border-stone-200 hover:border-stone-300'
               }`}
             >
-              <p className="text-sm font-bold text-gray-900">{isAr ? opt.ar : opt.en}</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">{opt.desc[isAr ? 'ar' : 'en']}</p>
+              <p className="text-sm font-bold text-stone-900">{isAr ? opt.ar : opt.en}</p>
+              <p className="text-[10px] text-stone-500 mt-0.5">{opt.desc[isAr ? 'ar' : 'en']}</p>
             </button>
           ))}
         </div>
       </section>
 
       {/* 4. Slot + Address */}
-      <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 mb-4 space-y-4">
+      <section className="bg-white border border-stone-100 rounded-3xl shadow-sm p-5 mb-4 space-y-4">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">{isAr ? 'وقت التسليم' : 'Delivery slot'}</p>
+          <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">{isAr ? 'وقت التسليم' : 'Delivery slot'}</p>
           <select
             value={slot}
             onChange={e => setSlot(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
+            className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
           >
             {slotOptions.map(s => (
               <option key={s.key} value={s.key}>
@@ -304,31 +304,31 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الإمارة' : 'Emirate'}</p>
-            <input type="text" required value={emirate} onChange={e => setEmirate(e.target.value)} placeholder="Dubai" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'الإمارة' : 'Emirate'}</p>
+            <input type="text" required value={emirate} onChange={e => setEmirate(e.target.value)} placeholder="Dubai" className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'المنطقة' : 'Area'}</p>
-            <input type="text" required value={area} onChange={e => setArea(e.target.value)} placeholder="JBR" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'المنطقة' : 'Area'}</p>
+            <input type="text" required value={area} onChange={e => setArea(e.target.value)} placeholder="JBR" className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'المبنى' : 'Building'}</p>
-            <input type="text" value={building} onChange={e => setBuilding(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'المبنى' : 'Building'}</p>
+            <input type="text" value={building} onChange={e => setBuilding(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">Makani</p>
-            <input type="text" value={makani} onChange={e => setMakani(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light font-mono" />
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">Makani</p>
+            <input type="text" value={makani} onChange={e => setMakani(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light font-mono" />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الاسم' : 'Name'}</p>
-            <input type="text" required value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'الاسم' : 'Name'}</p>
+            <input type="text" required value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الهاتف' : 'Phone'}</p>
-            <input type="tel" required value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="0501234567" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'الهاتف' : 'Phone'}</p>
+            <input type="tel" required value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="0501234567" className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
         </div>
       </section>
@@ -348,7 +348,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
         {busy ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Repeat size={16} aria-hidden="true" />}
         {busy ? (isAr ? 'جارٍ الإنشاء…' : 'Creating…') : (isAr ? `إنشاء الاشتراك (AED ${subtotal.toFixed(2)} لكل طلب)` : `Start subscription (AED ${subtotal.toFixed(2)} per order)`)}
       </button>
-      <p className="text-[11px] text-gray-500 mt-2 text-center">
+      <p className="text-[11px] text-stone-500 mt-2 text-center">
         {isAr ? 'أول توصيلة بعد ' : 'First delivery in '}{frequencyDays} {isAr ? 'يوم. الدفع نقداً عند الاستلام.' : 'days. Cash on delivery.'}
       </p>
     </div>

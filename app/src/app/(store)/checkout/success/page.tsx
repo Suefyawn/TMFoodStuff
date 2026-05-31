@@ -21,11 +21,11 @@ export default async function CheckoutSuccessPage({
       <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-3">
         {isAr ? 'تم الدفع بنجاح!' : 'Payment successful!'}
       </h1>
-      <p className="text-gray-500 mb-2 text-lg">
+      <p className="text-stone-500 mb-2 text-lg">
         {isAr ? 'شكراً لك — تم تأكيد طلبك.' : 'Thank you — your order is confirmed.'}
       </p>
       {order && <p className="text-forest-dark font-black text-2xl mb-3 font-mono">#{order}</p>}
-      <p className="text-gray-500 mb-8 text-sm max-w-md mx-auto">
+      <p className="text-stone-500 mb-8 text-sm max-w-md mx-auto">
         {isAr
           ? 'أرسلنا إيصالاً عبر البريد الإلكتروني وسنتواصل معك قبل التوصيل.'
           : "We've emailed a receipt and will contact you before delivery."}
@@ -40,7 +40,7 @@ export default async function CheckoutSuccessPage({
         </Link>
         <Link
           href="/shop"
-          className="inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-700 text-white font-bold px-6 py-3 rounded-xl transition-colors"
+          className="inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-700 text-white font-bold px-6 py-3 rounded-xl transition-colors"
         >
           <ShoppingBag size={18} aria-hidden="true" />
           {isAr ? 'متابعة التسوق' : 'Continue shopping'}

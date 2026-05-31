@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
           <Mail size={26} className="text-forest-dark" aria-hidden="true" />
         </div>
         <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
-        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+        <p className="text-stone-500 text-sm mb-6 leading-relaxed">
           {isAr
             ? `إذا كان لدينا حساب مرتبط بـ ${email}، فقد أرسلنا رابط إعادة تعيين كلمة المرور. تحقق من بريدك الإلكتروني (وملف الرسائل غير المرغوبة).`
             : `If we have an account for ${email}, we've sent a password reset link. Check your inbox (and spam folder).`}
@@ -65,19 +65,19 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
+      <div className="bg-white border border-stone-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
           <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?'}</h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-stone-500 text-sm">
             {isAr ? 'سنرسل لك رابط إعادة تعيين.' : "We'll send you a reset link."}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="email" className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{isAr ? 'البريد الإلكتروني' : 'Email'}</label>
+            <label htmlFor="email" className="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">{isAr ? 'البريد الإلكتروني' : 'Email'}</label>
             <div className="relative">
-              <Mail size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-gray-400`} />
+              <Mail size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-stone-400`} />
               <input
                 id="email"
                 type="email"
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
                 autoComplete="email"
                 required
                 autoFocus
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-stone-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-stone-500">
           <Link href="/account/login" className="text-forest-dark font-bold hover:underline inline-flex items-center gap-1.5">
             <ArrowLeft size={13} aria-hidden="true" />
             {isAr ? 'العودة لتسجيل الدخول' : 'Back to sign in'}

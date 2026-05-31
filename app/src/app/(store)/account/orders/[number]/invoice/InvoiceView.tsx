@@ -69,13 +69,13 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
   const dueLabel = order.payment_method === 'card' && order.payment_status === 'paid' ? 'Paid' : 'Due on delivery'
 
   return (
-    <div className="bg-gray-100 min-h-screen print:bg-white">
+    <div className="bg-stone-100 min-h-screen print:bg-white">
       {/* Action bar (hidden when printing) */}
-      <div className="print:hidden bg-white border-b border-gray-200 shadow-sm">
+      <div className="print:hidden bg-white border-b border-stone-200 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-3">
           <Link
             href={backHref}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-forest-dark transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-600 hover:text-forest-dark transition-colors"
           >
             <ArrowLeft size={14} aria-hidden="true" /> {backLabel}
           </Link>
@@ -111,13 +111,13 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
 
         <div className="p-8 md:p-12">
           {/* Company + invoice meta */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-stone-200">
             <div>
               {settings.company_address && (
-                <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">{settings.company_address}</p>
+                <p className="text-sm text-stone-600 whitespace-pre-line leading-relaxed">{settings.company_address}</p>
               )}
               {settings.vat_trn && (
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs text-stone-500 mt-3">
                   <span className="font-bold">VAT TRN:</span> {settings.vat_trn}
                 </p>
               )}
@@ -125,19 +125,19 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
             <div className="text-right">
               <dl className="space-y-1 text-sm">
                 <div className="flex justify-end gap-3">
-                  <dt className="text-gray-500">Invoice date</dt>
-                  <dd className="font-semibold text-gray-900 tabular-nums">
+                  <dt className="text-stone-500">Invoice date</dt>
+                  <dd className="font-semibold text-stone-900 tabular-nums">
                     {invoiceDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </dd>
                 </div>
                 <div className="flex justify-end gap-3">
-                  <dt className="text-gray-500">Status</dt>
-                  <dd className="font-semibold text-gray-900 uppercase text-xs tracking-wider">
+                  <dt className="text-stone-500">Status</dt>
+                  <dd className="font-semibold text-stone-900 uppercase text-xs tracking-wider">
                     {order.status.replace(/_/g, ' ')}
                   </dd>
                 </div>
                 <div className="flex justify-end gap-3">
-                  <dt className="text-gray-500">Payment</dt>
+                  <dt className="text-stone-500">Payment</dt>
                   <dd className={`font-semibold text-xs uppercase tracking-wider ${dueLabel === 'Paid' ? 'text-forest-dark' : 'text-amber-700'}`}>
                     {dueLabel}
                   </dd>
@@ -147,33 +147,33 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
           </div>
 
           {/* Bill to + Deliver to + QR */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6 border-b border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6 border-b border-stone-200">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5">Billed to</p>
-              <p className="text-sm font-bold text-gray-900">{order.customer_name}</p>
-              <p className="text-xs text-gray-600 mt-0.5 break-all">{order.customer_email}</p>
-              <p className="text-xs text-gray-600">{order.customer_phone}</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1.5">Billed to</p>
+              <p className="text-sm font-bold text-stone-900">{order.customer_name}</p>
+              <p className="text-xs text-stone-600 mt-0.5 break-all">{order.customer_email}</p>
+              <p className="text-xs text-stone-600">{order.customer_phone}</p>
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5">Deliver to</p>
-              {order.delivery_building && <p className="text-xs text-gray-700">{order.delivery_building}</p>}
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1.5">Deliver to</p>
+              {order.delivery_building && <p className="text-xs text-stone-700">{order.delivery_building}</p>}
+              <p className="text-sm font-bold text-stone-900">
                 {order.delivery_area}{order.delivery_emirate ? `, ${order.delivery_emirate}` : ''}
               </p>
-              {order.delivery_makani && <p className="text-xs text-gray-500 mt-0.5">Makani: {order.delivery_makani}</p>}
+              {order.delivery_makani && <p className="text-xs text-stone-500 mt-0.5">Makani: {order.delivery_makani}</p>}
               {order.delivery_date && (
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-stone-500 mt-0.5">
                   {order.delivery_slot} · {new Date(order.delivery_date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                 </p>
               )}
             </div>
             {qrSvg && (
               <div className="text-center md:text-right">
-                <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5">Track this order</p>
-                <div className="inline-block bg-white p-1.5 border border-gray-200 rounded-lg">
+                <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1.5">Track this order</p>
+                <div className="inline-block bg-white p-1.5 border border-stone-200 rounded-lg">
                   <div className="w-24 h-24" dangerouslySetInnerHTML={{ __html: qrSvg }} />
                 </div>
-                <p className="text-[10px] text-gray-500 mt-1">tmfoodstuff.ae/track</p>
+                <p className="text-[10px] text-stone-500 mt-1">tmfoodstuff.ae/track</p>
               </div>
             )}
           </div>
@@ -181,7 +181,7 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
           {/* Line items */}
           <table className="w-full text-sm mt-6">
             <thead>
-              <tr className="text-left text-[10px] font-black uppercase tracking-wider text-gray-500 bg-gray-50 border-y border-gray-200">
+              <tr className="text-left text-[10px] font-black uppercase tracking-wider text-stone-500 bg-stone-50 border-y border-stone-200">
                 <th className="py-3 pl-3 pr-2">Description</th>
                 <th className="py-3 px-2 text-right w-16">Qty</th>
                 <th className="py-3 px-2 text-right w-28">Unit price</th>
@@ -192,13 +192,13 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
               {items.map((item, i) => {
                 const lineTotal = Number(item.price_aed) * item.quantity
                 return (
-                  <tr key={i} className="border-b border-gray-100">
-                    <td className="py-2.5 pl-3 pr-2 text-gray-800">
+                  <tr key={i} className="border-b border-stone-100">
+                    <td className="py-2.5 pl-3 pr-2 text-stone-800">
                       {item.name}{item.unit ? ` (${item.unit})` : ''}
                     </td>
-                    <td className="py-2.5 px-2 text-right text-gray-600 tabular-nums">{item.quantity}</td>
-                    <td className="py-2.5 px-2 text-right text-gray-600 tabular-nums">AED {Number(item.price_aed).toFixed(2)}</td>
-                    <td className="py-2.5 pl-2 pr-3 text-right font-semibold text-gray-900 tabular-nums">AED {lineTotal.toFixed(2)}</td>
+                    <td className="py-2.5 px-2 text-right text-stone-600 tabular-nums">{item.quantity}</td>
+                    <td className="py-2.5 px-2 text-right text-stone-600 tabular-nums">AED {Number(item.price_aed).toFixed(2)}</td>
+                    <td className="py-2.5 pl-2 pr-3 text-right font-semibold text-stone-900 tabular-nums">AED {lineTotal.toFixed(2)}</td>
                   </tr>
                 )
               })}
@@ -229,11 +229,11 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
                   accent="text-forest-dark"
                 />
               )}
-              <div className="pt-3 mt-2 border-t-2 border-gray-900 flex justify-between text-base font-playfair font-bold text-stone-900">
+              <div className="pt-3 mt-2 border-t-2 border-stone-900 flex justify-between text-base font-playfair font-bold text-stone-900">
                 <dt>Total payable</dt>
                 <dd className="tabular-nums">AED {total.toFixed(2)}</dd>
               </div>
-              <p className="text-xs text-gray-500 text-right pt-1">
+              <p className="text-xs text-stone-500 text-right pt-1">
                 Paid by: {order.payment_method === 'card'
                   ? (order.payment_status === 'paid' ? 'Card (paid online)' : `Card (${order.payment_status})`)
                   : 'Cash on Delivery'}
@@ -242,11 +242,11 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
           </div>
 
           {/* Thank-you footer */}
-          <div className="mt-10 pt-6 border-t border-gray-200">
+          <div className="mt-10 pt-6 border-t border-stone-200">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
-                <p className="text-sm font-bold text-gray-900">Thank you for choosing {company}.</p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-sm font-bold text-stone-900">Thank you for choosing {company}.</p>
+                <p className="text-xs text-stone-500 mt-0.5">
                   Need help? Message us on WhatsApp or visit {SITE_URL.replace(/^https?:\/\//, '')}/track
                 </p>
               </div>
@@ -262,7 +262,7 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
             </div>
 
             {settings.invoice_footer_note && (
-              <p className="mt-4 text-xs text-gray-500 text-center leading-relaxed border-t border-gray-100 pt-4">
+              <p className="mt-4 text-xs text-stone-500 text-center leading-relaxed border-t border-stone-100 pt-4">
                 {settings.invoice_footer_note}
               </p>
             )}
@@ -283,8 +283,8 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
 function Row({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="flex justify-between">
-      <dt className="text-gray-600">{label}</dt>
-      <dd className={`tabular-nums ${accent || 'text-gray-900'}`}>{value}</dd>
+      <dt className="text-stone-600">{label}</dt>
+      <dd className={`tabular-nums ${accent || 'text-stone-900'}`}>{value}</dd>
     </div>
   )
 }

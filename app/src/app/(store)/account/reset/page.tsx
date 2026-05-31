@@ -63,14 +63,14 @@ export default function ResetPasswordPage() {
   }
 
   if (ready === 'checking') {
-    return <div className="max-w-md mx-auto px-4 py-20 text-center text-gray-400 text-sm">…</div>
+    return <div className="max-w-md mx-auto px-4 py-20 text-center text-stone-400 text-sm">…</div>
   }
 
   if (ready === 'expired') {
     return (
       <div className="max-w-md mx-auto px-4 py-16 md:py-24 text-center" dir={isAr ? 'rtl' : 'ltr'}>
         <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'الرابط منتهي' : 'Link expired'}</h1>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-stone-500 text-sm mb-6">
           {isAr
             ? 'هذا الرابط لإعادة تعيين كلمة المرور لم يعد صالحاً. اطلب رابطاً جديداً.'
             : 'This password-reset link is no longer valid. Request a new one.'}
@@ -92,24 +92,24 @@ export default function ResetPasswordPage() {
           <CheckCircle2 size={28} className="text-forest-dark" aria-hidden="true" />
         </div>
         <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'تم التحديث' : 'Password updated'}</h1>
-        <p className="text-gray-500 text-sm">{isAr ? 'جاري التحويل إلى حسابك…' : 'Redirecting to your account…'}</p>
+        <p className="text-stone-500 text-sm">{isAr ? 'جاري التحويل إلى حسابك…' : 'Redirecting to your account…'}</p>
       </div>
     )
   }
 
   return (
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
+      <div className="bg-white border border-stone-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
           <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'كلمة مرور جديدة' : 'New password'}</h1>
-          <p className="text-gray-500 text-sm">{isAr ? 'اختر كلمة مرور قوية لحسابك.' : 'Choose a strong password for your account.'}</p>
+          <p className="text-stone-500 text-sm">{isAr ? 'اختر كلمة مرور قوية لحسابك.' : 'Choose a strong password for your account.'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="password" className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{isAr ? 'كلمة المرور الجديدة' : 'New password'}</label>
+            <label htmlFor="password" className="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">{isAr ? 'كلمة المرور الجديدة' : 'New password'}</label>
             <div className="relative">
-              <Lock size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-gray-400`} />
+              <Lock size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-stone-400`} />
               <input
                 id="password"
                 type="password"
@@ -120,15 +120,15 @@ export default function ResetPasswordPage() {
                 minLength={8}
                 required
                 autoFocus
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-stone-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="confirm" className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{isAr ? 'تأكيد كلمة المرور' : 'Confirm password'}</label>
+            <label htmlFor="confirm" className="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">{isAr ? 'تأكيد كلمة المرور' : 'Confirm password'}</label>
             <div className="relative">
-              <Lock size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-gray-400`} />
+              <Lock size={15} aria-hidden="true" className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-stone-400`} />
               <input
                 id="confirm"
                 type="password"
@@ -138,7 +138,7 @@ export default function ResetPasswordPage() {
                 autoComplete="new-password"
                 minLength={8}
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-stone-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>

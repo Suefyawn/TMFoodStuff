@@ -25,7 +25,7 @@ export default function FaqContent() {
         <h1 className="text-4xl md:text-5xl font-playfair font-bold text-stone-900 mb-3">
           {isAr ? 'الأسئلة الشائعة' : 'Frequently asked questions'}
         </h1>
-        <p className="text-gray-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
+        <p className="text-stone-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
           {isAr
             ? 'إجابات سريعة على الأسئلة الأكثر شيوعاً. لم تجد ما تبحث عنه؟ تواصل معنا على واتساب.'
             : "Quick answers to the things customers ask most. Can't find what you're looking for? Reach us on WhatsApp."}
@@ -38,7 +38,7 @@ export default function FaqContent() {
             <h2 className="text-xs font-black uppercase tracking-wider text-forest-dark mb-3 px-2">
               {groupLabel}
             </h2>
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-100">
+            <div className="bg-white border border-stone-100 rounded-2xl shadow-sm overflow-hidden divide-y divide-stone-100">
               {groups[groupLabel].map((f, i) => {
                 const id = `${groupLabel}-${i}`
                 const isOpen = open === id
@@ -51,19 +51,19 @@ export default function FaqContent() {
                       aria-expanded={isOpen}
                       aria-controls={`faq-panel-${id}`}
                       onClick={() => setOpen(isOpen ? null : id)}
-                      className="w-full text-left flex items-center justify-between gap-3 px-5 py-4 hover:bg-gray-50 transition-colors"
+                      className="w-full text-left flex items-center justify-between gap-3 px-5 py-4 hover:bg-stone-50 transition-colors"
                     >
-                      <span className="font-bold text-gray-900 text-base leading-snug">{q}</span>
+                      <span className="font-bold text-stone-900 text-base leading-snug">{q}</span>
                       <ChevronDown
                         size={18}
-                        className={`text-gray-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        className={`text-stone-400 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                         aria-hidden="true"
                       />
                     </button>
                     <div
                       id={`faq-panel-${id}`}
                       hidden={!isOpen}
-                      className="px-5 pb-5 text-gray-600 text-sm leading-relaxed"
+                      className="px-5 pb-5 text-stone-600 text-sm leading-relaxed"
                     >
                       {a}
                     </div>
@@ -79,7 +79,7 @@ export default function FaqContent() {
         <h2 className="text-2xl font-playfair font-bold text-stone-900 mb-2">
           {isAr ? 'لا تزال لديك أسئلة؟' : 'Still have a question?'}
         </h2>
-        <p className="text-gray-600 text-sm mb-5">
+        <p className="text-stone-600 text-sm mb-5">
           {isAr
             ? 'تواصل معنا مباشرة على واتساب وسنرد عادةً خلال دقائق.'
             : "Message us on WhatsApp — we usually reply within minutes."}
@@ -93,7 +93,7 @@ export default function FaqContent() {
           <MessageCircle size={16} aria-hidden="true" />
           {isAr ? 'تواصل عبر واتساب' : 'WhatsApp us'}
         </a>
-        <p className="mt-4 text-xs text-gray-500">
+        <p className="mt-4 text-xs text-stone-500">
           {isAr ? 'أو زر ' : 'Or visit our '}
           <Link href="/contact" className="text-forest-dark font-bold hover:underline">
             {isAr ? 'صفحة الاتصال' : 'contact page'}

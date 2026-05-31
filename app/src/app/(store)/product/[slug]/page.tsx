@@ -124,13 +124,13 @@ export default async function ProductPage({ params }: Props) {
     <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 scroll-mt-20">
       <Link
         href="/shop"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-forest transition-colors mb-4 md:mb-6 group min-h-[44px]"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-stone-600 hover:text-forest transition-colors mb-4 md:mb-6 group min-h-[44px]"
       >
         <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform rtl-flip" aria-hidden="true" />
         {isAr ? 'العودة للمتجر' : 'Back to shop'}
       </Link>
 
-      <nav className="hidden md:flex items-center gap-2 text-sm text-gray-500 mb-8">
+      <nav className="hidden md:flex items-center gap-2 text-sm text-stone-500 mb-8">
         <Link href="/" className="hover:text-forest transition-colors">{isAr ? 'الرئيسية' : 'Home'}</Link>
         <span>/</span>
         <Link href="/shop" className="hover:text-forest transition-colors">{isAr ? 'المتجر' : 'Shop'}</Link>
@@ -141,7 +141,7 @@ export default async function ProductPage({ params }: Props) {
             <span>/</span>
           </>
         )}
-        <span className="text-gray-800 font-medium">{isAr && product.nameAr ? product.nameAr : product.name}</span>
+        <span className="text-stone-800 font-medium">{isAr && product.nameAr ? product.nameAr : product.name}</span>
       </nav>
 
       <div className="grid md:grid-cols-2 gap-6 md:gap-10 mb-12 md:mb-16">
@@ -167,24 +167,24 @@ export default async function ProductPage({ params }: Props) {
           <ProductDescription
             description={product.description}
             descriptionAr={product.descriptionAr}
-            className="text-gray-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base"
+            className="text-stone-600 leading-relaxed mb-5 md:mb-6 text-sm md:text-base"
           />
 
-          <div className="bg-gray-50 rounded-2xl p-4 md:p-5 mb-5 md:mb-6">
+          <div className="bg-stone-50 rounded-2xl p-4 md:p-5 mb-5 md:mb-6">
             <div className="flex items-baseline gap-3 mb-2 flex-wrap">
               <span className="text-3xl md:text-4xl font-black text-forest-dark">{formatAED(product.priceAED)}</span>
               {product.compareAtPrice && product.compareAtPrice > product.priceAED && (
                 <>
-                  <span className="text-lg text-gray-400 line-through">{formatAED(product.compareAtPrice)}</span>
+                  <span className="text-lg text-stone-400 line-through">{formatAED(product.compareAtPrice)}</span>
                   <span className="bg-red-500 text-white text-sm font-black px-2.5 py-0.5 rounded-full">-{discountPct}%</span>
                 </>
               )}
-              <span className="text-gray-500 text-sm">{isAr ? `لكل ${product.unit}` : `per ${product.unit}`}</span>
+              <span className="text-stone-500 text-sm">{isAr ? `لكل ${product.unit}` : `per ${product.unit}`}</span>
             </div>
-            <div className="text-xs text-gray-400 space-y-1">
+            <div className="text-xs text-stone-400 space-y-1">
               <div className="flex justify-between"><span>{isAr ? 'السعر بدون ضريبة' : 'Price excl. VAT'}</span><span>{formatAED(product.priceAED)}</span></div>
               <div className="flex justify-between"><span>{isAr ? 'ضريبة القيمة المضافة (٥٪)' : 'VAT (5%)'}</span><span>{formatAED(vatAmount)}</span></div>
-              <div className="flex justify-between font-bold text-gray-600 border-t pt-1 mt-1"><span>{isAr ? 'الإجمالي شامل الضريبة' : 'Total incl. VAT'}</span><span>{formatAED(totalWithVAT)}</span></div>
+              <div className="flex justify-between font-bold text-stone-600 border-t pt-1 mt-1"><span>{isAr ? 'الإجمالي شامل الضريبة' : 'Total incl. VAT'}</span><span>{formatAED(totalWithVAT)}</span></div>
             </div>
           </div>
 
@@ -209,22 +209,22 @@ export default async function ProductPage({ params }: Props) {
 
           <div className="mt-5 md:mt-6 grid grid-cols-2 gap-2 md:gap-3 text-sm">
             {product.origin && (
-              <div className="flex items-center gap-2 text-gray-500">
-                <Globe size={14} className="text-gray-400 shrink-0" aria-hidden="true" />
-                <span>{isAr ? 'المصدر:' : 'Origin:'} <span className="font-semibold text-gray-700">{product.origin}</span></span>
+              <div className="flex items-center gap-2 text-stone-500">
+                <Globe size={14} className="text-stone-400 shrink-0" aria-hidden="true" />
+                <span>{isAr ? 'المصدر:' : 'Origin:'} <span className="font-semibold text-stone-700">{product.origin}</span></span>
               </div>
             )}
             {product.isOrganic && (
-              <div className="flex items-center gap-2 text-gray-500">
+              <div className="flex items-center gap-2 text-stone-500">
                 <Leaf size={14} className="text-forest shrink-0" aria-hidden="true" />
                 <span className="font-semibold text-forest-dark">{isAr ? 'عضوي معتمد' : 'Certified organic'}</span>
               </div>
             )}
-            <div className="flex items-center gap-2 text-gray-500">
-              <Package size={14} className="text-gray-400 shrink-0" aria-hidden="true" />
-              <span>{isAr ? 'يُباع لكل' : 'Sold per'} <span className="font-semibold text-gray-700">{product.unit}</span></span>
+            <div className="flex items-center gap-2 text-stone-500">
+              <Package size={14} className="text-stone-400 shrink-0" aria-hidden="true" />
+              <span>{isAr ? 'يُباع لكل' : 'Sold per'} <span className="font-semibold text-stone-700">{product.unit}</span></span>
             </div>
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className="flex items-center gap-2 text-stone-500">
               <Truck size={14} className="text-forest shrink-0" aria-hidden="true" />
               <span className="font-semibold text-forest-dark">{isAr ? 'توصيل في نفس اليوم' : 'Same-day delivery'}</span>
             </div>
@@ -249,16 +249,16 @@ export default async function ProductPage({ params }: Props) {
           client component. */}
       {product.bundleItems && product.bundleItems.length > 0 && (
         <div className="mb-8 md:mb-12">
-          <section className="bg-white border border-gray-100 rounded-2xl p-5 md:p-7 shadow-sm">
+          <section className="bg-white border border-stone-100 rounded-2xl p-5 md:p-7 shadow-sm">
             <h2 className="text-xl font-playfair font-bold text-stone-900 mb-4">What&apos;s inside</h2>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {product.bundleItems.map((it, i) => (
-                <li key={`${it.product_id}-${i}`} className="flex items-center justify-between gap-2 bg-gray-50 rounded-xl px-3 py-2.5 text-sm">
-                  <span className="text-gray-800 truncate">
+                <li key={`${it.product_id}-${i}`} className="flex items-center justify-between gap-2 bg-stone-50 rounded-xl px-3 py-2.5 text-sm">
+                  <span className="text-stone-800 truncate">
                     {it.emoji && <span className="mr-1.5">{it.emoji}</span>}
                     <span className="font-bold">{it.name}</span>
                   </span>
-                  <span className="text-xs font-bold text-gray-500 tabular-nums shrink-0">× {it.quantity}</span>
+                  <span className="text-xs font-bold text-stone-500 tabular-nums shrink-0">× {it.quantity}</span>
                 </li>
               ))}
             </ul>

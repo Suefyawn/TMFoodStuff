@@ -43,7 +43,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
@@ -56,7 +56,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
             <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
               {isAr ? 'ادعُ صديقاً، اكسبا معاً' : 'Refer a friend, you both win'}
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-stone-500">
               {isAr ? '50 نقطة لك و50 لصديقك على طلبهم الأول.' : '50 points for you and 50 for your friend on their first order.'}
             </p>
           </div>
@@ -71,8 +71,8 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
       </div>
 
       {/* Share card */}
-      <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6 md:p-7 mb-6">
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">
+      <div className="bg-white border border-stone-100 rounded-3xl shadow-sm p-6 md:p-7 mb-6">
+        <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">
           {isAr ? 'رمزك' : 'Your code'}
         </p>
         <div className="flex items-center justify-between gap-3 mb-5 bg-green-50 border-2 border-dashed border-green-300 rounded-2xl px-4 py-3">
@@ -80,7 +80,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
           <button
             type="button"
             onClick={() => copy(code, 'code')}
-            className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors"
           >
             {copied === 'code'
               ? <><Check size={12} aria-hidden="true" /> {isAr ? 'تم' : 'Copied'}</>
@@ -88,21 +88,21 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
           </button>
         </div>
 
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">
+        <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">
           {isAr ? 'رابط المشاركة' : 'Share link'}
         </p>
-        <div className="flex items-center justify-between gap-2 mb-5 bg-gray-50 border border-gray-200 rounded-2xl px-3 py-2.5">
+        <div className="flex items-center justify-between gap-2 mb-5 bg-stone-50 border border-stone-200 rounded-2xl px-3 py-2.5">
           <input
             type="text"
             readOnly
             value={shareUrl}
             onClick={e => e.currentTarget.select()}
-            className="flex-1 min-w-0 bg-transparent text-sm font-mono text-gray-700 outline-none"
+            className="flex-1 min-w-0 bg-transparent text-sm font-mono text-stone-700 outline-none"
           />
           <button
             type="button"
             onClick={() => copy(shareUrl, 'link')}
-            className="inline-flex items-center gap-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors shrink-0"
           >
             {copied === 'link'
               ? <><Check size={12} aria-hidden="true" /> {isAr ? 'تم' : 'Copied'}</>
@@ -122,11 +122,11 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
       </div>
 
       {/* How it works */}
-      <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5 mb-6">
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-500 mb-3">
+      <div className="bg-stone-50 border border-stone-100 rounded-2xl p-5 mb-6">
+        <p className="text-[10px] font-black uppercase tracking-wider text-stone-500 mb-3">
           {isAr ? 'كيف يعمل' : 'How it works'}
         </p>
-        <ol className="space-y-2 text-sm text-gray-700">
+        <ol className="space-y-2 text-sm text-stone-700">
           <Step n={1} text={isAr ? 'شارك رمزك أو الرابط مع صديق.' : 'Share your code or link with a friend.'} />
           <Step n={2} text={isAr ? 'يطلب صديقك أول طلب على TM FoodStuff.' : 'Your friend places their first order on TM FoodStuff.'} />
           <Step n={3} text={isAr ? 'عند تسليم طلبهم، نضيف 50 نقطة لكليكما (تعادل تقريباً 2.5 درهم لكل واحد).' : 'When their order is delivered, we credit 50 points to each of you (~AED 2.50 each).'} />
@@ -136,26 +136,26 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
       {/* Referrals list */}
       <section>
         <h2 className="font-playfair font-bold text-stone-900 text-lg mb-3 flex items-center gap-2">
-          <Users size={16} className="text-gray-400" aria-hidden="true" />
+          <Users size={16} className="text-stone-400" aria-hidden="true" />
           {isAr ? 'إحالاتك' : 'Your referrals'}
-          <span className="text-xs font-bold text-gray-400">({referrals.length})</span>
+          <span className="text-xs font-bold text-stone-400">({referrals.length})</span>
         </h2>
         {referrals.length === 0 ? (
-          <div className="bg-white border border-gray-100 rounded-2xl p-7 text-center">
-            <Sparkles size={24} className="mx-auto mb-2 text-gray-300" aria-hidden="true" />
-            <p className="text-sm text-gray-500">
+          <div className="bg-white border border-stone-100 rounded-2xl p-7 text-center">
+            <Sparkles size={24} className="mx-auto mb-2 text-stone-300" aria-hidden="true" />
+            <p className="text-sm text-stone-500">
               {isAr ? 'لا توجد إحالات بعد. شارك رمزك للبدء!' : "No referrals yet. Share your code to get started!"}
             </p>
           </div>
         ) : (
-          <ul className="bg-white border border-gray-100 rounded-2xl divide-y divide-gray-100">
+          <ul className="bg-white border border-stone-100 rounded-2xl divide-y divide-stone-100">
             {referrals.map(r => (
               <li key={r.id} className="px-4 py-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-gray-900 truncate">
+                  <p className="text-sm font-bold text-stone-900 truncate">
                     {r.referred?.full_name || maskEmail(r.referred?.email)}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-stone-500">
                     {new Date(r.created_at).toLocaleDateString(isAr ? 'ar-AE' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
@@ -168,7 +168,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
                     {isAr ? 'بانتظار التوصيل' : 'Pending delivery'}
                   </span>
                 ) : (
-                  <span className="text-xs font-bold text-gray-500 bg-gray-50 border border-gray-200 px-2 py-1 rounded-lg">
+                  <span className="text-xs font-bold text-stone-500 bg-stone-50 border border-stone-200 px-2 py-1 rounded-lg">
                     {isAr ? 'ملغى' : 'Cancelled'}
                   </span>
                 )}
@@ -183,9 +183,9 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
 
 function Stat({ label, value, accent }: { label: string; value: string; accent: string }) {
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl p-3 sm:p-4 text-center">
+    <div className="bg-white border border-stone-100 rounded-2xl p-3 sm:p-4 text-center">
       <p className={`text-2xl sm:text-3xl font-black ${accent} tabular-nums leading-none`}>{value}</p>
-      <p className="text-[10px] sm:text-xs text-gray-500 font-bold uppercase tracking-wider mt-1.5">{label}</p>
+      <p className="text-[10px] sm:text-xs text-stone-500 font-bold uppercase tracking-wider mt-1.5">{label}</p>
     </div>
   )
 }
