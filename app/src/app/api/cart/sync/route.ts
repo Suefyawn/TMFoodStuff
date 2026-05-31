@@ -10,6 +10,7 @@
 //   Returns the items the storefront should restore into local cart state.
 import { NextResponse } from 'next/server'
 import { getCurrentCustomer, getServiceRoleClient } from '@/lib/customer'
+import { readJsonBody } from '@/lib/http'
 import type { CartItemSnapshot } from '@/lib/cart-recovery'
 
 export const dynamic = 'force-dynamic'
@@ -23,8 +24,8 @@ export async function POST(request: Request) {
   const customer = await getCurrentCustomer()
   if (!customer) return NextResponse.json({ ok: true, skipped: 'not_signed_in' })
 
-  const body = (await request.json()) as SyncBody
-  if (!Array.isArray(body.items)) {
+  const body = await readJsonBody<SyncBody>(request)
+  if (!body || !Array.isArray(body.items)) {
     return NextResponse.json({ error: 'items required' }, { status: 400 })
   }
 
@@ -45,7 +46,10 @@ export async function POST(request: Request) {
       recovered_at: itemCount === 0 ? new Date().toISOString() : null,
     }, { onConflict: 'customer_id' })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    console.error('[cart/sync] upsert failed:', error)
+    return NextResponse.json({ error: 'Could not save cart.' }, { status: 500 })
+  }
   return NextResponse.json({ ok: true })
 }
 

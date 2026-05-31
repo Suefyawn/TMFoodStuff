@@ -23,7 +23,10 @@ export async function POST(request: Request) {
       { onConflict: 'product_id,email', ignoreDuplicates: true }
     )
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+      console.error('[notify-stock] upsert failed:', error)
+      return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
+    }
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
