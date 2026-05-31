@@ -2,20 +2,17 @@
 // testing — the actual scheduled run piggybacks on cleanup-abandoned-orders
 // so we don't blow Vercel Hobby's 2-cron limit.
 //
-// Auth: Vercel cron signature OR Bearer CRON_SECRET.
+// Auth: Bearer CRON_SECRET (Vercel injects it automatically on scheduled runs).
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sweepAbandonedCarts } from '@/lib/cart-recovery'
+import { checkCronAuth } from '@/lib/cron-auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  const provided = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
-  const isVercelCron = !!request.headers.get('x-vercel-cron-signature')
-  const secret = process.env.CRON_SECRET
-  if (!isVercelCron && !(secret && provided === secret)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = checkCronAuth(request)
+  if (denied) return denied
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

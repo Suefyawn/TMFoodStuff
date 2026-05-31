@@ -14,18 +14,15 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendDailyDigest } from '@/lib/daily-digest'
 import { dispatchDueSubscriptions } from '@/lib/subscriptions'
+import { checkCronAuth } from '@/lib/cron-auth'
 
 export const dynamic = 'force-dynamic'
 
 const BATCH = 500
 
 export async function GET(request: Request) {
-  const provided = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
-  const isVercelCron = !!request.headers.get('x-vercel-cron-signature')
-  const secret = process.env.CRON_SECRET
-  if (!isVercelCron && !(secret && provided === secret)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = checkCronAuth(request)
+  if (denied) return denied
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

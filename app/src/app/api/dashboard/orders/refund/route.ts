@@ -13,7 +13,7 @@
 // per-order refund history shown on the admin order detail page.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAdminAuthed, getDashboardSession } from '@/lib/admin-auth'
+import { requirePermission, getDashboardSession } from '@/lib/admin-auth'
 import { getStripe } from '@/lib/stripe'
 import { reverseOrderPoints } from '@/lib/loyalty'
 import { logAdminAction } from '@/lib/audit'
@@ -35,7 +35,7 @@ interface OrderItem {
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('orders.refund'))) {
     return NextResponse.json({ error: 'Only admins can issue refunds.' }, { status: 403 })
   }
   const body = (await request.json()) as RefundBody
@@ -141,23 +141,20 @@ export async function POST(request: Request) {
   }
 
   // ── Optional restock ──────────────────────────────────────────────────
+  // Atomic per-item increment via the increment_stock RPC. (Previously this
+  // read/wrote a non-existent `stock_quantity` column, so restock silently
+  // never returned inventory while the audit log claimed it did.)
   if (body.restock) {
     const items = Array.isArray(order.items) ? (order.items as OrderItem[]) : []
     for (const it of items) {
       const productId = it.product_id ?? it.id
       const qty = Number(it.quantity) || 0
       if (!productId || qty <= 0) continue
-      const { data: product } = await supabase
-        .from('products')
-        .select('stock_quantity')
-        .eq('id', productId)
-        .maybeSingle()
-      if (product) {
-        await supabase
-          .from('products')
-          .update({ stock_quantity: (Number(product.stock_quantity) || 0) + qty })
-          .eq('id', productId)
-      }
+      const { error: restockErr } = await supabase.rpc('increment_stock', {
+        p_id: Number(productId),
+        p_qty: qty,
+      })
+      if (restockErr) console.error('[refund] restock failed for product', productId, restockErr)
     }
   }
 

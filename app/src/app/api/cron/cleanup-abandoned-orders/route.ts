@@ -13,22 +13,15 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sweepAbandonedCarts } from '@/lib/cart-recovery'
+import { checkCronAuth } from '@/lib/cron-auth'
 
 export const dynamic = 'force-dynamic'
 
 const ABANDONED_AFTER_MS = 24 * 60 * 60 * 1000
 
 export async function GET(request: Request) {
-  // Require *some* form of authentication. Refusing all calls when no method
-  // is configured prevents the route being a free pingable side-effect when
-  // CRON_SECRET hasn't been set in the environment yet.
-  const provided = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
-  const isVercelCron = !!request.headers.get('x-vercel-cron-signature')
-  const secret = process.env.CRON_SECRET
-  const secretOk = !!secret && provided === secret
-  if (!isVercelCron && !secretOk) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = checkCronAuth(request)
+  if (denied) return denied
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -3,7 +3,7 @@
 // but can't grant access to others).
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAdminAuthed, getDashboardSession } from '@/lib/admin-auth'
+import { requirePermission, getDashboardSession } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import { SITE_URL } from '@/lib/site'
@@ -53,7 +53,7 @@ function isRole(v: unknown): v is Role {
 }
 
 export async function GET() {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('team.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const supabase = createClient(
@@ -72,7 +72,7 @@ export async function GET() {
 interface CreateBody { email?: string; role?: string }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('team.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as CreateBody
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 interface PatchBody { id?: number; role?: string; is_active?: boolean }
 
 export async function PATCH(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('team.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as PatchBody
@@ -170,7 +170,7 @@ export async function PATCH(request: Request) {
 interface DeleteBody { id?: number }
 
 export async function DELETE(request: Request) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('team.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as DeleteBody

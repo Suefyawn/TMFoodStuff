@@ -8,6 +8,7 @@
 // unset, the endpoint accepts all requests but logs a warning — useful
 // for local dev / first-time integration before the secret is rotated.
 import { NextResponse } from 'next/server'
+import { timingSafeEqual } from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { recordInboundMessage, type IncomingMessage } from '@/lib/support-inbox'
 
@@ -41,6 +42,12 @@ export async function POST(request: Request) {
     if (!svixId || !svixTimestamp || !svixSignature) {
       return NextResponse.json({ error: 'Missing svix headers' }, { status: 401 })
     }
+    // Reject stale/replayed deliveries: the signed timestamp must be within a
+    // 5-minute window of now.
+    const tsSec = Number(svixTimestamp)
+    if (!Number.isFinite(tsSec) || Math.abs(Date.now() / 1000 - tsSec) > 300) {
+      return NextResponse.json({ error: 'Timestamp outside tolerance' }, { status: 401 })
+    }
     const ok = await verifySvixSignature({
       id: svixId,
       timestamp: svixTimestamp,
@@ -49,8 +56,13 @@ export async function POST(request: Request) {
       secret,
     })
     if (!ok) return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+  } else if (process.env.NODE_ENV === 'production') {
+    // Fail closed: never accept unsigned inbound mail in production, where it
+    // would let anyone write attacker-controlled rows into the support inbox.
+    console.error('[inbound/email] RESEND_WEBHOOK_SECRET not set in production — rejecting unsigned webhook.')
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 })
   } else {
-    console.warn('[inbound/email] RESEND_WEBHOOK_SECRET not set — accepting unsigned webhook. Configure the secret before production traffic.')
+    console.warn('[inbound/email] RESEND_WEBHOOK_SECRET not set — accepting unsigned webhook (non-production only).')
   }
 
   let payload: ResendInboundPayload
@@ -115,10 +127,16 @@ async function verifySvixSignature(args: {
   )
   const sig = await crypto.subtle.sign('HMAC', key, enc.encode(signedPayload))
   const expected = btoa(String.fromCharCode(...new Uint8Array(sig)))
+  const expectedBuf = Buffer.from(expected)
 
-  // Header is space-separated list of "v1,<sig>" pairs.
+  // Header is a space-separated list of "v1,<sig>" pairs. Compare in
+  // constant time to avoid leaking the signature via timing.
   return args.signature
     .split(' ')
     .map(s => s.trim())
-    .some(s => s.startsWith('v1,') && s.slice(3) === expected)
+    .some(s => {
+      if (!s.startsWith('v1,')) return false
+      const provided = Buffer.from(s.slice(3))
+      return provided.length === expectedBuf.length && timingSafeEqual(provided, expectedBuf)
+    })
 }

@@ -53,8 +53,9 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
     setLoading(true)
     const qs = filter ? `?filter=${filter}` : ''
     fetch(`/api/products/${productSlug}/reviews${qs}`)
-      .then(r => r.json())
+      .then(r => (r.ok ? r.json() : Promise.reject(new Error(`reviews ${r.status}`))))
       .then(setData)
+      .catch(err => console.error('[reviews] load failed:', err))
       .finally(() => setLoading(false))
     // Only fetch the auth state once.
     if (!signedIn) {

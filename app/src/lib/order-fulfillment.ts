@@ -14,6 +14,7 @@ import {
   type OrderEmailData,
 } from './email'
 import { notifyOrderConfirmation, notifyAdminNewOrder } from './notify'
+import { logError } from './log'
 import type { Locale } from './locale'
 
 const LOW_STOCK_THRESHOLD = 5
@@ -113,10 +114,10 @@ export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
             p_qty: item.quantity,
           })
           if (error || ok === false) {
-            console.error(
-              `[fulfillOrder] Stock decrement failed for product ${item.id} on order ${input.orderNumber}`,
-              error,
-            )
+            logError('fulfillOrder.decrement_stock', error ?? new Error('decrement returned false'), {
+              orderNumber: input.orderNumber,
+              productId: item.id,
+            })
             return
           }
           // Fire a low-stock alert when this order pushed the product BELOW
@@ -147,5 +148,15 @@ export async function fulfillOrder(input: FulfillOrderInput): Promise<void> {
     }
   }
 
-  await Promise.allSettled(tasks)
+  const results = await Promise.allSettled(tasks)
+  const failures = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+  if (failures.length > 0) {
+    // Notifications/SMS swallow their own errors internally, so a rejection
+    // here is unexpected — surface it (console + Sentry) rather than dropping
+    // it, so a fulfilment-path regression doesn't go unnoticed.
+    logError('fulfillOrder.tasks', new Error(`${failures.length} fulfilment task(s) rejected`), {
+      orderNumber: input.orderNumber,
+      reasons: failures.map(f => String(f.reason)).slice(0, 5),
+    })
+  }
 }

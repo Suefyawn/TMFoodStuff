@@ -2,7 +2,7 @@
 // Audit-logged on every change so we can see who promoted whom.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
@@ -12,7 +12,7 @@ const VALID_TIERS = new Set(['bronze', 'silver', 'gold', 'platinum'])
 interface PatchBody { admin_notes?: string; tier?: string }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await isAdminAdminAuthed())) {
+  if (!(await requirePermission('customers.notes'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const { id: idParam } = await params

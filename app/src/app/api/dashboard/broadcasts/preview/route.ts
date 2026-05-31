@@ -3,7 +3,7 @@
 // fires the actual send.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { resolveAudience, type BroadcastAudience } from '@/lib/broadcast-audience'
 
 export const dynamic = 'force-dynamic'
@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 interface PreviewBody { audience: BroadcastAudience; channel: 'email' | 'sms' | 'both' }
 
 export async function POST(request: Request) {
-  if (!(await isAdminAuthed())) {
+  if (!(await requirePermission('broadcasts.send'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as PreviewBody

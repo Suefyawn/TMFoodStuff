@@ -5,7 +5,7 @@
 // they know their review is now live. Best-effort.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed, getDashboardSession } from '@/lib/admin-auth'
+import { requirePermission, getDashboardSession } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import { SITE_URL } from '@/lib/site'
@@ -24,7 +24,7 @@ interface PatchBody {
 interface DeleteBody { id?: number | string }
 
 export async function PATCH(request: Request) {
-  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('reviews.moderate'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const body = (await request.json()) as PatchBody
   const id = Number(body.id)
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
@@ -81,7 +81,7 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('reviews.delete'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const body = (await request.json()) as DeleteBody
   const id = Number(body.id)
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })

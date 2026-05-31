@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { getDashboardSession, isAdminAuthed, isAdminAdminAuthed } from '@/lib/admin-auth'
+import { getDashboardSession, requirePermission } from '@/lib/admin-auth'
 import { sendBackInStockEmail } from '@/lib/email'
 import { logAdminAction } from '@/lib/audit'
 import { parseJsonBody } from '@/lib/validate-body'
@@ -12,7 +12,7 @@ function getSupabase() {
 
 // UPDATE product
 export async function PATCH(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('products.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const parsed = await parseJsonBody(request, ProductUpdateSchema)
   if (!parsed.ok) return parsed.response
@@ -104,7 +104,7 @@ export async function PATCH(request: Request) {
 
 // CREATE product
 export async function POST(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('products.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const parsed = await parseJsonBody(request, ProductCreateSchema)
   if (!parsed.ok) return parsed.response
@@ -175,7 +175,7 @@ export async function POST(request: Request) {
 // DELETE product(s) — admin role only; staff can deactivate via PATCH but
 // can't permanently delete a product (and lose its history).
 export async function DELETE(request: Request) {
-  if (!await isAdminAdminAuthed()) {
+  if (!await requirePermission('products.delete')) {
     return NextResponse.json({ error: 'Only admins can delete products.' }, { status: 403 })
   }
   const parsed = await parseJsonBody(request, ProductDeleteSchema)

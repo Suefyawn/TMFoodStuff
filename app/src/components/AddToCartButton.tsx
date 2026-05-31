@@ -11,6 +11,7 @@ interface Props {
   product: {
     id: string
     name: string
+    nameAr?: string
     slug: string
     priceAED: number
     unit: string

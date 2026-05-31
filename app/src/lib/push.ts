@@ -1,4 +1,5 @@
 // Web push helpers. VAPID keys live in the `settings` table so they're
+import { logError } from './log'
 // generated once at runtime — no env config required from the operator.
 //
 // First call to `getVapidKeys()` lazily generates a pair via web-push and
@@ -135,7 +136,7 @@ export async function sendPushToCustomer(
     }
     return { sent, failed, removed }
   } catch (err) {
-    console.error('[push] sendPushToCustomer failed:', err)
+    logError('push.sendPushToCustomer', err)
     return { sent: 0, failed: 0, removed: 0 }
   }
 }

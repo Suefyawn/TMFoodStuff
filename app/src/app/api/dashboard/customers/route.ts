@@ -3,7 +3,7 @@
 // link to /dashboard/customers/[id] with the full profile.
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +20,7 @@ interface AggregatedCustomer {
 }
 
 export async function GET() {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('customers.view'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   const [{ data: orders }, { data: registered }] = await Promise.all([

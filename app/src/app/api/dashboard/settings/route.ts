@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
 
 function getSupabase() {
@@ -17,7 +17,7 @@ const DEFAULTS: Record<string, string> = {
 }
 
 export async function GET() {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('settings.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const supabase = getSupabase()
   const { data, error } = await supabase.from('settings').select('*')
@@ -32,7 +32,7 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  if (!await isAdminAuthed()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('settings.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { settings, promoCodes } = await request.json()
   const supabase = getSupabase()

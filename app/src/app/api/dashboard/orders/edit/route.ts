@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { isAdminAuthed } from '@/lib/admin-auth'
+import { requirePermission } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
@@ -33,7 +33,7 @@ interface EditBody {
 // audit story gets weird if we let them change. Customer-facing notification
 // is deliberately NOT fired (the admin owns that communication out-of-band).
 export async function PATCH(request: Request) {
-  if (!(await isAdminAuthed())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await requirePermission('orders.edit'))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json()) as EditBody
   const orderId = Number(body.id)
