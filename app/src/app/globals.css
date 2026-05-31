@@ -11,6 +11,9 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: contain;
+    /* Warm cream canvas for the premium-grocer look (replaces flat white). */
+    background-color: #f7f5f0;
+    color: #1c1917;
   }
 }
 
@@ -29,11 +32,28 @@
   }
 
   .btn-primary {
-    @apply bg-green-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-700 active:scale-[0.98] transition-all duration-150 shadow-sm;
+    @apply bg-forest text-white font-semibold px-6 py-3 rounded-lg hover:bg-forest-dark active:scale-[0.98] transition-all duration-150 shadow-sm;
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  /* Premium-grocer building blocks ----------------------------------------- */
+
+  /* Small uppercase eyebrow label used above section headings. */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-forest;
+  }
+
+  /* Refined product/content surface: warm border, calm radius, soft lift. */
+  .surface-card {
+    @apply bg-white border border-sand rounded-2xl shadow-[0_1px_2px_rgba(28,25,23,0.04)] transition-all duration-300;
+  }
+
+  /* Subtle outlined tag (e.g. Organic) — replaces the neon pill badges. */
+  .tag-outline {
+    @apply inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md border;
   }
 }
 

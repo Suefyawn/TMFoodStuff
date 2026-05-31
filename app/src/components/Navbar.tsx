@@ -23,13 +23,13 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-cream/90 backdrop-blur-md border-b border-sand">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-1.5 group flex-shrink-0">
-            <Leaf size={20} className="text-green-700 group-hover:text-green-600 transition-colors" />
-            <span className="tracking-tight font-black text-green-700 text-lg md:text-xl">
+            <Leaf size={18} className="text-forest group-hover:text-forest-light transition-colors" strokeWidth={1.75} />
+            <span className="font-playfair font-bold text-forest text-lg md:text-xl tracking-tight">
               TM FoodStuff
             </span>
           </Link>
@@ -67,10 +67,10 @@ export default function Navbar() {
             </div>
             <Link
               href="/cart"
-              className={`relative flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${
+              className={`relative flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm ${
                 pathname === '/cart'
-                  ? 'bg-green-700 text-white'
-                  : 'bg-green-600 text-white hover:bg-green-700'
+                  ? 'bg-forest-dark text-white'
+                  : 'bg-forest text-white hover:bg-forest-dark'
               }`}
             >
               <ShoppingCart size={16} />
