@@ -18,7 +18,7 @@ async function getAdminCustomerIds(supabase: SupabaseClient): Promise<number[]> 
     .from('admin_users')
     .select('email')
     .eq('is_active', true)
-    .in('role', ['admin', 'staff'])
+    .in('role', ['super_admin', 'admin', 'staff'])
   const emails = (admins || []).map(a => a.email).filter(Boolean)
   if (emails.length === 0) return []
 
