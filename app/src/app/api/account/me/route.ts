@@ -56,6 +56,6 @@ export async function PATCH(request: Request) {
   if (Object.keys(updates).length === 0) return NextResponse.json({ ok: true })
   const supabase = getServiceRoleClient()
   const { error } = await supabase.from('customers').update(updates).eq('id', customer.id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ ok: true })
 }

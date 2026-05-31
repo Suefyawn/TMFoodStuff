@@ -36,7 +36,7 @@ export async function GET() {
     .eq('customer_id', customer.id)
     .order('is_default', { ascending: false })
     .order('created_at', { ascending: false })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ addresses: data || [] })
 }
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     .insert({ ...payload, customer_id: customer.id })
     .select('id')
     .single()
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ ok: true, id: data.id })
 }
 
@@ -84,7 +84,7 @@ export async function PATCH(request: Request) {
     .update(payload)
     .eq('id', body.id)
     .eq('customer_id', customer.id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ ok: true })
 }
 
@@ -99,6 +99,6 @@ export async function DELETE(request: Request) {
     .delete()
     .eq('id', Number(id))
     .eq('customer_id', customer.id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ ok: true })
 }

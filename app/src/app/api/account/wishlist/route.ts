@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       { customer_id: customer.id, product_id: productId },
       { onConflict: 'customer_id,product_id', ignoreDuplicates: true },
     )
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ ok: true })
 }
 
@@ -76,6 +76,6 @@ export async function DELETE(request: Request) {
     .delete()
     .eq('customer_id', customer.id)
     .eq('product_id', productId)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ ok: true })
 }

@@ -47,7 +47,10 @@ export async function middleware(request: NextRequest) {
   const isDashboardProtected =
     pathname.startsWith('/dashboard') &&
     !pathname.startsWith('/dashboard/login') &&
-    !pathname.startsWith('/dashboard/logout')
+    !pathname.startsWith('/dashboard/logout') &&
+    // Invite / set-password lands here as a guest; the session arrives in the
+    // URL and is applied client-side, so it must not be redirected to login.
+    !pathname.startsWith('/dashboard/set-password')
 
   if (isDashboardProtected && !user) {
     const url = request.nextUrl.clone()

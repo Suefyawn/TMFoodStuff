@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     .from('orders')
     .update({ driver_id: driverId, updated_at: new Date().toISOString() })
     .eq('id', orderId)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
 
   await logAdminAction({
     supabase,

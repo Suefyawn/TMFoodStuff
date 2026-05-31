@@ -269,7 +269,7 @@ async function dispatchOne(
 
   // Customer notification — optional, best-effort.
   if (sub.customer?.email) {
-    void sendDispatchEmail({
+    await sendDispatchEmail({
       toEmail: sub.customer.email,
       toName: sub.customer.full_name,
       orderNumber,

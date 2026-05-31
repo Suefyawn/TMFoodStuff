@@ -8,7 +8,7 @@ import { logAdminAction } from '@/lib/audit'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import { SITE_URL } from '@/lib/site'
 
-async function sendInvitationEmail(email: string, role: 'admin' | 'staff' | 'driver', invitedBy: string) {
+async function sendInvitationEmail(email: string, role: 'admin' | 'staff' | 'driver', invitedBy: string, actionLink: string | null) {
   const resend = getResend()
   if (!resend) return
   const roleLabels: Record<string, string> = {
@@ -16,7 +16,14 @@ async function sendInvitationEmail(email: string, role: 'admin' | 'staff' | 'dri
     staff: 'Staff (orders, products, customers)',
     driver: 'Driver (delivery queue only)',
   }
-  const loginUrl = `${SITE_URL}/dashboard/login`
+  // When we have a Supabase action link, the CTA takes the invitee straight to
+  // set their password (they have no account/password otherwise). Fall back to
+  // the plain login URL only if link generation failed.
+  const cta = actionLink || `${SITE_URL}/dashboard/login`
+  const ctaText = actionLink ? 'Set your password &amp; open the dashboard' : 'Open the dashboard'
+  const intro = actionLink
+    ? 'Click below to set your password and access the dashboard. The link expires in 24 hours.'
+    : "Sign in at the link below with this email address. If you don't have an account yet, you'll be able to create one on the same page."
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
@@ -29,9 +36,9 @@ async function sendInvitationEmail(email: string, role: 'admin' | 'staff' | 'dri
             <tr><td style="padding:28px;color:#374151;font-size:15px;line-height:1.65">
               <p style="margin:0 0 14px;font-size:16px;color:#111827">You're invited to the team</p>
               <p style="margin:0 0 14px"><strong>${invitedBy.replace(/[<>&]/g, '')}</strong> has added you to the TM FoodStuff dashboard as <strong>${roleLabels[role]}</strong>.</p>
-              <p style="margin:0 0 18px">Sign in at the link below with this email address. If you don't have an account yet, you'll be able to create one on the same page.</p>
+              <p style="margin:0 0 18px">${intro}</p>
               <p style="margin:18px 0;text-align:center">
-                <a href="${loginUrl}" style="display:inline-block;background:#16a34a;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:12px;font-weight:800;font-size:14px">Open the dashboard →</a>
+                <a href="${cta}" style="display:inline-block;background:#16a34a;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:12px;font-weight:800;font-size:14px">${ctaText} →</a>
               </p>
               <p style="margin:24px 0 0;color:#9ca3af;font-size:12px">If you weren't expecting this email, you can safely ignore it — without signing in, no access is granted.</p>
             </td></tr>
@@ -65,7 +72,7 @@ export async function GET() {
     .select('id, email, role, is_active, created_at')
     .order('role', { ascending: true })
     .order('created_at', { ascending: false })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   return NextResponse.json({ rows: data || [] })
 }
 
@@ -93,7 +100,7 @@ export async function POST(request: Request) {
     .upsert({ email, role, is_active: true }, { onConflict: 'email' })
     .select('id, email, role, is_active')
     .single()
-  if (error || !data) return NextResponse.json({ error: error?.message || 'Insert failed' }, { status: 500 })
+  if (error || !data) return NextResponse.json({ error: 'Insert failed' }, { status: 500 })
 
   await logAdminAction({
     supabase,
@@ -102,11 +109,29 @@ export async function POST(request: Request) {
     metadata: { email, role },
   })
 
-  // Fire the invitation email asynchronously — failures here shouldn't
-  // unwind the row insert. The admin can resend manually if it bounces.
+  // Generate a Supabase action link so the invitee can actually get in: the
+  // dashboard login is password-only with no self-signup, and a new member has
+  // no auth account yet. `invite` creates the auth user + returns a set-password
+  // link; if they already have an account, fall back to a `recovery` link.
+  // Landed on /dashboard/set-password where they choose a password.
+  let actionLink: string | null = null
+  try {
+    const redirectTo = `${SITE_URL}/dashboard/set-password`
+    let gen = await supabase.auth.admin.generateLink({ type: 'invite', email, options: { redirectTo } })
+    if (gen.error) {
+      gen = await supabase.auth.admin.generateLink({ type: 'recovery', email, options: { redirectTo } })
+    }
+    actionLink = gen.data?.properties?.action_link ?? null
+  } catch (err) {
+    console.error('[team] generateLink failed:', err)
+  }
+
+  // Await the invitation email so it actually completes — a fire-and-forget
+  // send is unreliable on serverless, where the function can be frozen the
+  // moment the response returns. sendInvitationEmail swallows its own errors.
   const session = await getDashboardSession()
   const invitedBy = session.state === 'ok' ? session.email : 'an administrator'
-  void sendInvitationEmail(email, role as 'admin' | 'staff' | 'driver', invitedBy)
+  await sendInvitationEmail(email, role as 'admin' | 'staff' | 'driver', invitedBy, actionLink)
 
   return NextResponse.json({ row: data, invited: true })
 }
@@ -156,7 +181,7 @@ export async function PATCH(request: Request) {
     .eq('id', id)
     .select('id, email, role, is_active')
     .single()
-  if (error || !data) return NextResponse.json({ error: error?.message || 'Update failed' }, { status: 500 })
+  if (error || !data) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
 
   await logAdminAction({
     supabase,
@@ -190,7 +215,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "You can't remove your own account." }, { status: 400 })
   }
   const { error } = await supabase.from('admin_users').delete().eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
   await logAdminAction({
     supabase,
     action: 'team.member_removed',
