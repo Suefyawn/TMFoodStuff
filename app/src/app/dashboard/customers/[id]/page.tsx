@@ -56,7 +56,7 @@ interface ReviewRow {
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getDashboardSession()
   if (session.state !== 'ok') redirect('/dashboard/login')
-  const isAdmin = session.role === 'admin'
+  const isAdmin = (session.role === 'admin' || session.role === 'super_admin')
 
   const { id } = await params
   const customerId = Number(id)

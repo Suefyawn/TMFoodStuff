@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function SettingsPage() {
   const session = await getDashboardSession()
-  if (session.state !== 'ok' || session.role !== 'admin') {
+  if (session.state !== 'ok' || (session.role !== 'admin' && session.role !== 'super_admin')) {
     redirect('/dashboard')
   }
   return <SettingsClient />
