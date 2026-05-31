@@ -7,6 +7,10 @@ import type { Locale } from './locale'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'orders@tmfoodstuff.ae'
+// Address support-inbox replies are sent from. Defaults to the main sending
+// address; set SUPPORT_FROM_EMAIL (e.g. support@tmfoodstuff.ae) once that
+// inbox is receiving so replies come from the support address customers wrote to.
+export const SUPPORT_FROM_EMAIL = process.env.SUPPORT_FROM_EMAIL || FROM_EMAIL
 
 export function getResend() {
   if (!RESEND_API_KEY) return null
