@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Search, X, ArrowRight } from 'lucide-react'
+import { Search, X, ArrowRight, Leaf, Tag } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 interface Suggestion {
@@ -209,11 +209,11 @@ export default function SearchAutocomplete({
                         onMouseEnter={() => setActive(idx)}
                         className={`flex items-center gap-3 px-2 py-2 rounded-lg transition-colors ${isActive ? 'bg-green-50' : 'hover:bg-gray-50'}`}
                       >
-                        <div className="relative w-10 h-10 bg-gray-100 rounded-lg shrink-0 overflow-hidden flex items-center justify-center text-xl">
+                        <div className="relative w-10 h-10 bg-stone-100 rounded-lg shrink-0 overflow-hidden flex items-center justify-center">
                           {p.image_url ? (
                             <Image src={p.image_url} alt="" fill sizes="40px" className="object-cover" />
                           ) : (
-                            <span aria-hidden="true">{p.emoji || '🥦'}</span>
+                            <Leaf size={16} className="text-stone-300" aria-hidden="true" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -249,7 +249,7 @@ export default function SearchAutocomplete({
                         onMouseEnter={() => setActive(idx)}
                         className={`flex items-center gap-3 px-2 py-2 rounded-lg transition-colors ${isActive ? 'bg-green-50' : 'hover:bg-gray-50'}`}
                       >
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg shrink-0 flex items-center justify-center text-xl" aria-hidden="true">{c.emoji || '🏷️'}</div>
+                        <div className="w-10 h-10 bg-stone-100 rounded-lg shrink-0 flex items-center justify-center" aria-hidden="true"><Tag size={16} className="text-stone-400" /></div>
                         <p className="text-sm font-semibold text-gray-900 truncate flex-1">{label}</p>
                         <ArrowRight size={14} className="text-gray-400" aria-hidden="true" />
                       </Link>

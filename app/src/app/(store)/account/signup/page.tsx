@@ -61,8 +61,10 @@ function SignupInner() {
   if (needsConfirmation) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 md:py-24 text-center" dir={isAr ? 'rtl' : 'ltr'}>
-        <div className="text-5xl mb-4" aria-hidden="true">📬</div>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-forest/10 flex items-center justify-center" aria-hidden="true">
+          <Mail size={28} className="text-forest" strokeWidth={1.75} />
+        </div>
+        <h1 className="font-playfair text-2xl font-bold text-stone-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
         <p className="text-gray-500 text-sm mb-6">
           {isAr
             ? `أرسلنا رابط تأكيد إلى ${email}. اضغط على الرابط لتفعيل حسابك.`
