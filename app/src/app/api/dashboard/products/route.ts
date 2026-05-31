@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getDashboardSession, requirePermission } from '@/lib/admin-auth'
 import { sendBackInStockEmail } from '@/lib/email'
@@ -53,9 +53,14 @@ export async function PATCH(request: Request) {
         .is('notified_at', null)
       if (notifications && notifications.length > 0) {
         const now = new Date().toISOString()
-        for (const n of notifications) {
-          sendBackInStockEmail(n.email, current.name, current.slug).catch(console.error)
-        }
+        // Run the sends after the response so they aren't dropped by the
+        // serverless freeze (we mark notified_at below, so a dropped send would
+        // never be retried). after() keeps the function alive until they finish.
+        const recipients = notifications.map(n => n.email)
+        const pname = current.name, pslug = current.slug
+        after(() => Promise.allSettled(
+          recipients.map(e => sendBackInStockEmail(e, pname, pslug).catch(console.error)),
+        ))
         await supabase.from('low_stock_subscriptions')
           .update({ notified_at: now })
           .eq('product_id', id)
