@@ -53,7 +53,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
             <Gift size={22} aria-hidden="true" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
               {isAr ? 'ادعُ صديقاً، اكسبا معاً' : 'Refer a friend, you both win'}
             </h1>
             <p className="text-sm text-gray-500">
@@ -135,7 +135,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
 
       {/* Referrals list */}
       <section>
-        <h2 className="font-black text-gray-900 text-lg mb-3 flex items-center gap-2">
+        <h2 className="font-playfair font-bold text-stone-900 text-lg mb-3 flex items-center gap-2">
           <Users size={16} className="text-gray-400" aria-hidden="true" />
           {isAr ? 'إحالاتك' : 'Your referrals'}
           <span className="text-xs font-bold text-gray-400">({referrals.length})</span>

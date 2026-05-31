@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
   if (ready === 'expired') {
     return (
       <div className="max-w-md mx-auto px-4 py-16 md:py-24 text-center" dir={isAr ? 'rtl' : 'ltr'}>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'الرابط منتهي' : 'Link expired'}</h1>
+        <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'الرابط منتهي' : 'Link expired'}</h1>
         <p className="text-gray-500 text-sm mb-6">
           {isAr
             ? 'هذا الرابط لإعادة تعيين كلمة المرور لم يعد صالحاً. اطلب رابطاً جديداً.'
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
         <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-5">
           <CheckCircle2 size={28} className="text-forest-dark" aria-hidden="true" />
         </div>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'تم التحديث' : 'Password updated'}</h1>
+        <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'تم التحديث' : 'Password updated'}</h1>
         <p className="text-gray-500 text-sm">{isAr ? 'جاري التحويل إلى حسابك…' : 'Redirecting to your account…'}</p>
       </div>
     )
@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
-          <h1 className="text-3xl font-black text-gray-900 mb-1">{isAr ? 'كلمة مرور جديدة' : 'New password'}</h1>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'كلمة مرور جديدة' : 'New password'}</h1>
           <p className="text-gray-500 text-sm">{isAr ? 'اختر كلمة مرور قوية لحسابك.' : 'Choose a strong password for your account.'}</p>
         </div>
 

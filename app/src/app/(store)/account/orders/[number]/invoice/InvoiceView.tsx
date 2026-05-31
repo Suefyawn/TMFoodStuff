@@ -229,7 +229,7 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
                   accent="text-forest-dark"
                 />
               )}
-              <div className="pt-3 mt-2 border-t-2 border-gray-900 flex justify-between text-base font-black text-gray-900">
+              <div className="pt-3 mt-2 border-t-2 border-gray-900 flex justify-between text-base font-playfair font-bold text-stone-900">
                 <dt>Total payable</dt>
                 <dd className="tabular-nums">AED {total.toFixed(2)}</dd>
               </div>

@@ -134,7 +134,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
                 </div>
               ) : (
                 <>
-                  <h1 className="text-xl md:text-2xl font-black text-gray-900 truncate">
+                  <h1 className="text-xl md:text-2xl font-playfair font-bold text-stone-900 truncate">
                     {displayName || (isAr ? 'مرحباً' : 'Welcome')}
                   </h1>
                   <p className="text-sm text-gray-500 truncate">{email}</p>
@@ -250,7 +250,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm">
         <div className="flex items-center gap-2 mb-5">
           <Package size={18} className="text-gray-400" aria-hidden="true" />
-          <h2 className="text-lg font-black text-gray-900">
+          <h2 className="text-lg font-playfair font-bold text-stone-900">
             {isAr ? 'طلباتي' : 'My Orders'} ({orders.length})
           </h2>
         </div>

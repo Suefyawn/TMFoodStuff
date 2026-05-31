@@ -34,7 +34,7 @@ function CartPageInner() {
         <div className="w-32 h-32 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
           <ShoppingCart size={52} className="text-green-300" strokeWidth={1.5} />
         </div>
-        <h1 className="text-3xl font-black text-gray-900 mb-3">{tr.cartEmpty}</h1>
+        <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-3">{tr.cartEmpty}</h1>
         <p className="text-gray-500 mb-8 text-lg">{lang === 'ar' ? 'يبدو أنك لم تضف أي شيء بعد.' : "Looks like you haven't added anything yet."}</p>
         <Link href="/shop" className="btn-primary inline-flex items-center gap-2">
           {tr.startShopping} <ArrowRight size={16} />
@@ -46,7 +46,7 @@ function CartPageInner() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
       <div className="flex items-center justify-between mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-2 md:gap-3">
+        <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 flex items-center gap-2 md:gap-3">
           <ShoppingCart className="text-forest" size={24} />
           {tr.yourCart}
           <span className="text-base md:text-lg font-normal text-gray-400">({items.length} {lang === 'ar' ? 'عناصر' : 'items'})</span>
@@ -93,7 +93,7 @@ function CartPageInner() {
                     >
                       <Minus size={13} />
                     </button>
-                    <span className="w-8 text-center font-black text-gray-900 text-sm">{item.quantity}</span>
+                    <span className="w-8 text-center font-playfair font-bold text-stone-900 text-sm">{item.quantity}</span>
                     <button
                       onClick={() => updateQty(item.id, item.quantity + 1)}
                       className="w-10 h-10 md:w-8 md:h-8 rounded-lg bg-forest text-white shadow-sm flex items-center justify-center hover:bg-forest-dark transition-colors"
@@ -120,7 +120,7 @@ function CartPageInner() {
         {/* Order summary */}
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
-            <h2 className="font-black text-gray-900 text-xl mb-4">{lang === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h2>
+            <h2 className="font-playfair font-bold text-stone-900 text-xl mb-4">{lang === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h2>
             <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-forest-dark font-semibold flex items-center gap-2">
               <Sparkles size={14} className="text-forest-dark shrink-0" aria-hidden="true" />
               <span>
@@ -143,7 +143,7 @@ function CartPageInner() {
                 <span>{tr.delivery}</span>
                 <span>{deliveryFee === 0 ? <span className="text-forest font-semibold">{tr.freeDelivery}</span> : formatAED(deliveryFee)}</span>
               </div>
-              <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
+              <div className="border-t-2 pt-4 flex justify-between font-playfair font-bold text-stone-900 text-lg">
                 <span>{tr.total}</span>
                 <span className="text-forest-dark">{formatAED(total)}</span>
               </div>

@@ -35,7 +35,7 @@ export default function WishlistClient({ initialItems }: { initialItems: Wishlis
           <Heart size={22} className="text-rose-600 fill-rose-600" aria-hidden="true" />
         </div>
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900">{isAr ? 'قائمة المفضلة' : 'My Wishlist'}</h1>
+          <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900">{isAr ? 'قائمة المفضلة' : 'My Wishlist'}</h1>
           <p className="text-sm text-gray-500">
             {initialItems.length} {isAr ? 'منتج' : initialItems.length === 1 ? 'item' : 'items'}
           </p>

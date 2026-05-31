@@ -22,7 +22,7 @@ export default function FaqContent() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
       <header className="text-center mb-10 md:mb-14">
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">
+        <h1 className="text-4xl md:text-5xl font-playfair font-bold text-stone-900 mb-3">
           {isAr ? 'الأسئلة الشائعة' : 'Frequently asked questions'}
         </h1>
         <p className="text-gray-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
@@ -76,7 +76,7 @@ export default function FaqContent() {
       </div>
 
       <div className="mt-12 md:mt-16 bg-green-50 border border-green-100 rounded-3xl p-7 md:p-9 text-center">
-        <h2 className="text-2xl font-black text-gray-900 mb-2">
+        <h2 className="text-2xl font-playfair font-bold text-stone-900 mb-2">
           {isAr ? 'لا تزال لديك أسئلة؟' : 'Still have a question?'}
         </h2>
         <p className="text-gray-600 text-sm mb-5">

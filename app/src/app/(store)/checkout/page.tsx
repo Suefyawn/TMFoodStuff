@@ -320,7 +320,7 @@ export default function CheckoutPage() {
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle size={48} className="text-forest" />
         </div>
-        <h1 className="text-3xl font-black text-gray-900 mb-3">{tr.orderPlaced}</h1>
+        <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-3">{tr.orderPlaced}</h1>
         <p className="text-gray-500 mb-2 text-lg">{tr.thankYou}, {form.fullName}!</p>
         {orderNumber && (
           <p className="text-forest-dark font-black text-2xl mb-3">#{orderNumber}</p>
@@ -357,7 +357,7 @@ export default function CheckoutPage() {
         <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <ShoppingBag size={40} className="text-gray-300" strokeWidth={1.5} />
         </div>
-        <h2 className="text-2xl font-black text-gray-900 mb-3">
+        <h2 className="text-2xl font-playfair font-bold text-stone-900 mb-3">
           {lang === 'ar' ? 'لا يوجد شيء للدفع' : 'Nothing to checkout'}
         </h2>
         <p className="text-gray-500 mb-8">
@@ -372,7 +372,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
-      <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-6 md:mb-8">{tr.checkout}</h1>
+      <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 mb-6 md:mb-8">{tr.checkout}</h1>
 
       <CartValidationBanner result={validation} />
 
@@ -383,7 +383,7 @@ export default function CheckoutPage() {
             {signedIn && savedAddresses.length > 0 && (
               <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-                  <h2 className="font-black text-gray-900 text-base md:text-lg inline-flex items-center gap-2">
+                  <h2 className="font-playfair font-bold text-stone-900 text-base md:text-lg inline-flex items-center gap-2">
                     <MapPin size={16} className="text-forest" aria-hidden="true" />
                     {lang === 'ar' ? 'العنوان المحفوظ' : 'Saved address'}
                   </h2>
@@ -427,7 +427,7 @@ export default function CheckoutPage() {
 
             {/* Delivery Details */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
-              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5 md:mb-6">{tr.deliveryDetails}</h2>
+              <h2 className="font-playfair font-bold text-stone-900 text-lg md:text-xl mb-5 md:mb-6">{tr.deliveryDetails}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.fullName} *</label>
@@ -537,7 +537,7 @@ export default function CheckoutPage() {
 
             {/* Delivery Date + Slot */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
-              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-4 md:mb-5">
+              <h2 className="font-playfair font-bold text-stone-900 text-lg md:text-xl mb-4 md:mb-5">
                 {lang === 'ar' ? 'موعد التوصيل' : 'Delivery Date & Slot'}
               </h2>
 
@@ -617,7 +617,7 @@ export default function CheckoutPage() {
 
             {/* Payment Method */}
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
-              <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5">{tr.paymentMethod}</h2>
+              <h2 className="font-playfair font-bold text-stone-900 text-lg md:text-xl mb-5">{tr.paymentMethod}</h2>
               <div className="space-y-3">
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
                   paymentMethod === 'cod' ? 'border-forest-light bg-green-50' : 'border-gray-200 hover:border-gray-300'
@@ -652,7 +652,7 @@ export default function CheckoutPage() {
           {/* Order Summary sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm lg:sticky lg:top-24">
-              <h2 className="font-black text-gray-900 text-xl mb-4">{tr.orderSummary}</h2>
+              <h2 className="font-playfair font-bold text-stone-900 text-xl mb-4">{tr.orderSummary}</h2>
 
               {/* Cart items */}
               <div className="space-y-3 mb-5 max-h-48 md:max-h-60 overflow-y-auto">
@@ -790,7 +790,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
+                <div className="border-t-2 pt-4 flex justify-between font-playfair font-bold text-stone-900 text-lg">
                   <span>{tr.total}</span>
                   <span className="text-forest-dark">{formatAED(finalTotal)}</span>
                 </div>

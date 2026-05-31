@@ -171,7 +171,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
           <Repeat size={22} aria-hidden="true" />
         </div>
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
             {isAr ? 'اشتراك جديد' : 'New subscription'}
           </h1>
           <p className="text-sm text-gray-500">
@@ -227,7 +227,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
               ))}
             </ul>
             <p className="text-right text-xs text-gray-600 mt-2">
-              {isAr ? 'المجموع لكل طلب:' : 'Per order:'} <span className="font-black text-gray-900">AED {subtotal.toFixed(2)}</span>
+              {isAr ? 'المجموع لكل طلب:' : 'Per order:'} <span className="font-playfair font-bold text-stone-900">AED {subtotal.toFixed(2)}</span>
             </p>
           </div>
         )}

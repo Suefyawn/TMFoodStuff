@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
         <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-5">
           <Mail size={26} className="text-forest-dark" aria-hidden="true" />
         </div>
-        <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
+        <h1 className="text-2xl font-playfair font-bold text-stone-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
         <p className="text-gray-500 text-sm mb-6 leading-relaxed">
           {isAr
             ? `إذا كان لدينا حساب مرتبط بـ ${email}، فقد أرسلنا رابط إعادة تعيين كلمة المرور. تحقق من بريدك الإلكتروني (وملف الرسائل غير المرغوبة).`
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
-          <h1 className="text-3xl font-black text-gray-900 mb-1">{isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?'}</h1>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?'}</h1>
           <p className="text-gray-500 text-sm">
             {isAr ? 'سنرسل لك رابط إعادة تعيين.' : "We'll send you a reset link."}
           </p>

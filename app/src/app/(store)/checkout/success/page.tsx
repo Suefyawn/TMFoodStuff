@@ -18,7 +18,7 @@ export default async function CheckoutSuccessPage({
       <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
         <CheckCircle size={48} className="text-forest" aria-hidden="true" />
       </div>
-      <h1 className="text-3xl font-black text-gray-900 mb-3">
+      <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-3">
         {isAr ? 'تم الدفع بنجاح!' : 'Payment successful!'}
       </h1>
       <p className="text-gray-500 mb-2 text-lg">

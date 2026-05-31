@@ -31,7 +31,7 @@ export default function Footer() {
         <div className="border-b border-white/10 bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-white font-black text-xl mb-1 flex items-center gap-2">
+              <h3 className="text-white font-playfair font-bold text-xl mb-1 flex items-center gap-2">
                 <Leaf size={20} className="text-forest-light" />
                 {tr.newsletterTitle}
               </h3>
@@ -47,7 +47,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-5">
               <Leaf size={20} className="text-forest-light" />
-              <span className="font-black text-white text-xl tracking-tight">
+              <span className="font-playfair font-bold text-white text-xl tracking-tight">
                 TM FoodStuff
               </span>
             </div>
@@ -70,7 +70,7 @@ export default function Footer() {
 
           {/* Shop */}
           <div>
-            <h4 className="font-black text-white mb-5">{lang === 'ar' ? 'تسوق' : 'Shop'}</h4>
+            <h4 className="font-playfair font-bold text-white mb-5">{lang === 'ar' ? 'تسوق' : 'Shop'}</h4>
             <ul className="space-y-2.5 text-sm">
               {shopLinks.map(item => (
                 <li key={item.href}>
@@ -85,7 +85,7 @@ export default function Footer() {
 
           {/* Delivery Areas */}
           <div>
-            <h4 className="font-black text-white mb-5 flex items-center gap-2">
+            <h4 className="font-playfair font-bold text-white mb-5 flex items-center gap-2">
               <MapPin size={16} className="text-forest-light" />
               {tr.deliveryAreas}
             </h4>
@@ -100,7 +100,7 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-black text-white mb-5">{tr.company}</h4>
+            <h4 className="font-playfair font-bold text-white mb-5">{tr.company}</h4>
             <ul className="space-y-2.5 text-sm">
               {companyLinks.map(([label, href]) => (
                 <li key={label}>

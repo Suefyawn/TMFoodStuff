@@ -151,7 +151,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
         <div className="flex items-start justify-between gap-3 flex-wrap mb-5">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الطلب' : 'Order'}</p>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 font-mono">#{order.order_number}</h1>
+            <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 font-mono">#{order.order_number}</h1>
             <p className="text-xs text-gray-500 mt-1">
               {new Date(order.created_at).toLocaleString(isAr ? 'ar-AE' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </p>
@@ -220,7 +220,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-5">
         <div className="flex items-center gap-2 mb-4">
           <Package size={16} className="text-gray-400" aria-hidden="true" />
-          <h2 className="font-black text-gray-900">{isAr ? 'المنتجات' : 'Items'} ({items.length})</h2>
+          <h2 className="font-playfair font-bold text-stone-900">{isAr ? 'المنتجات' : 'Items'} ({items.length})</h2>
         </div>
         <ul className="divide-y divide-gray-100">
           {items.map((item, i) => (
@@ -284,7 +284,7 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
               <dd>-AED {promoDiscount.toFixed(2)}</dd>
             </div>
           )}
-          <div className="flex justify-between font-black text-gray-900 pt-2 border-t border-gray-100">
+          <div className="flex justify-between font-playfair font-bold text-stone-900 pt-2 border-t border-gray-100">
             <dt>{isAr ? 'الإجمالي' : 'Total'}</dt>
             <dd className="text-forest-dark text-lg">AED {total.toFixed(2)}</dd>
           </div>

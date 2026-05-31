@@ -84,7 +84,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
       </Link>
 
       <header className="mb-7">
-        <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
+        <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
           {isAr ? 'التفضيلات' : 'Preferences'}
         </h1>
         <p className="text-sm text-gray-500 mt-1">
@@ -94,7 +94,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
 
       {/* Marketing preferences */}
       <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
-        <h2 className="font-black text-gray-900 mb-1">{isAr ? 'تواصل التسويق' : 'Marketing communications'}</h2>
+        <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'تواصل التسويق' : 'Marketing communications'}</h2>
         <p className="text-xs text-gray-500 mb-4">
           {isAr
             ? 'العروض والإعلانات. ستبقى إشعارات الطلبات (التأكيد، التسليم) قيد التشغيل دائماً.'
@@ -132,7 +132,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
           manage saved payment methods + see past charges. The endpoint
           lazy-creates the Stripe Customer the first time it's needed. */}
       <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
-        <h2 className="font-black text-gray-900 mb-1">{isAr ? 'الفوترة وبطاقات الدفع' : 'Billing & saved cards'}</h2>
+        <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'الفوترة وبطاقات الدفع' : 'Billing & saved cards'}</h2>
         <p className="text-xs text-gray-500 mb-4">
           {isAr
             ? 'إدارة بطاقاتك المحفوظة وعرض الفواتير السابقة في صفحة Stripe الآمنة.'
@@ -154,7 +154,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
 
       {/* Privacy + data */}
       <section className="bg-white border border-gray-100 rounded-3xl shadow-sm p-5 md:p-6 mb-5">
-        <h2 className="font-black text-gray-900 mb-1">{isAr ? 'بياناتك' : 'Your data'}</h2>
+        <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'بياناتك' : 'Your data'}</h2>
         <p className="text-xs text-gray-500 mb-4">
           {isAr
             ? 'يمكنك تنزيل نسخة من بياناتك في أي وقت.'
@@ -175,7 +175,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
         <div className="flex items-start gap-3 mb-3">
           <AlertTriangle size={18} className="text-red-600 shrink-0 mt-0.5" aria-hidden="true" />
           <div>
-            <h2 className="font-black text-gray-900 mb-1">{isAr ? 'حذف الحساب' : 'Delete account'}</h2>
+            <h2 className="font-playfair font-bold text-stone-900 mb-1">{isAr ? 'حذف الحساب' : 'Delete account'}</h2>
             <p className="text-xs text-gray-600">
               {isAr
                 ? 'يتم حذف اسمك ورقم هاتفك وعناوينك وقائمة المفضلة. تبقى سجلات الطلبات لأغراض محاسبية وضريبية كما يتطلب القانون.'

@@ -22,7 +22,7 @@ export default async function UnsubscribePage({ searchParams }: Params) {
             ? <AlertCircle size={32} className="text-amber-600" aria-hidden="true" />
             : <Mail size={32} className="text-gray-400" aria-hidden="true" />}
       </div>
-      <h1 className="text-3xl font-black text-gray-900 mb-2">
+      <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-2">
         {ok ? "You're unsubscribed" : invalid ? 'Invalid request' : 'Email preferences'}
       </h1>
       <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">

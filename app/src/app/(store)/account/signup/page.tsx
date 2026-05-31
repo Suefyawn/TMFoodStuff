@@ -81,7 +81,7 @@ function SignupInner() {
     <div className="max-w-md mx-auto px-4 py-12 md:py-20" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-7 md:p-9">
         <div className="text-center mb-7">
-          <h1 className="text-3xl font-black text-gray-900 mb-1">{isAr ? 'إنشاء حساب' : 'Create account'}</h1>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-1">{isAr ? 'إنشاء حساب' : 'Create account'}</h1>
           <p className="text-gray-500 text-sm">{isAr ? 'تتبّع الطلبات، احفظ العناوين، واطلب أسرع' : 'Track orders, save addresses, check out faster'}</p>
         </div>
 

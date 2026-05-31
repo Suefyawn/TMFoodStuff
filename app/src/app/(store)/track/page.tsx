@@ -94,7 +94,7 @@ function TrackInner() {
         <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Package size={28} className="text-forest" aria-hidden="true" />
         </div>
-        <h1 className="text-3xl font-black text-gray-900 mb-2">
+        <h1 className="text-3xl font-playfair font-bold text-stone-900 mb-2">
           {isAr ? 'تتبع طلبك' : 'Track Your Order'}
         </h1>
         <p className="text-gray-500 text-sm">
@@ -156,7 +156,7 @@ function TrackInner() {
             <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">
               {isAr ? 'الطلب' : 'Order'}
             </p>
-            <p className="text-xl font-black text-gray-900 font-mono">{order.order_number}</p>
+            <p className="text-xl font-playfair font-bold text-stone-900 font-mono">{order.order_number}</p>
             {order.customer_name && (
               <p className="text-sm text-gray-500 mt-0.5">
                 {isAr ? `مرحباً، ${order.customer_name}!` : `Hi, ${order.customer_name}!`}
@@ -238,7 +238,7 @@ function TrackInner() {
               </div>
             )}
             <div className="flex justify-between items-center">
-              <span className="font-black text-gray-900">{isAr ? 'الإجمالي' : 'Total'}</span>
+              <span className="font-playfair font-bold text-stone-900">{isAr ? 'الإجمالي' : 'Total'}</span>
               <span className="text-lg font-black text-forest-dark">AED {Number(order.total).toFixed(2)}</span>
             </div>
           </div>

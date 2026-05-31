@@ -111,7 +111,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
       </Link>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900">{isAr ? 'العناوين المحفوظة' : 'Saved addresses'}</h1>
+          <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900">{isAr ? 'العناوين المحفوظة' : 'Saved addresses'}</h1>
           <p className="text-sm text-gray-500 mt-1">
             {isAr ? 'يتم استخدامها لتعبئة بيانات التوصيل تلقائياً عند الدفع.' : 'Used to auto-fill delivery details at checkout.'}
           </p>
@@ -128,7 +128,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
 
       {editingId !== null && (
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm mb-5">
-          <h2 className="font-black text-gray-900 mb-4">
+          <h2 className="font-playfair font-bold text-stone-900 mb-4">
             {editingId === 'new' ? (isAr ? 'عنوان جديد' : 'New address') : (isAr ? 'تعديل العنوان' : 'Edit address')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

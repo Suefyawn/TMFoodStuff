@@ -188,7 +188,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
       {/* Page header */}
       <div className="bg-white border-b border-gray-100 px-4 py-8 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-black text-gray-900 mb-1">{tr.shopTitle}</h1>
+          <h1 className="text-4xl font-playfair font-bold text-stone-900 mb-1">{tr.shopTitle}</h1>
           <p className="text-gray-500">{tr.shopSubtitle}</p>
         </div>
       </div>

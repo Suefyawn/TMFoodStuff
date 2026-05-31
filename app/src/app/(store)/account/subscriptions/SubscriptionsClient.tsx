@@ -95,7 +95,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
             <Repeat size={22} aria-hidden="true" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-playfair font-bold text-stone-900 leading-tight">
               {isAr ? 'الاشتراكات' : 'Subscriptions'}
             </h1>
             <p className="text-sm text-gray-500">
@@ -143,7 +143,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
                   <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h2 className="font-black text-gray-900 text-lg leading-tight">
+                        <h2 className="font-playfair font-bold text-stone-900 text-lg leading-tight">
                           {s.name || (isAr ? 'اشتراك' : 'Subscription')}
                         </h2>
                         {s.status === 'paused' && (
@@ -175,7 +175,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-black text-gray-900 tabular-nums">AED {total.toFixed(2)}</p>
+                      <p className="text-xl font-playfair font-bold text-stone-900 tabular-nums">AED {total.toFixed(2)}</p>
                       <p className="text-[10px] text-gray-500">{isAr ? 'لكل طلب' : 'per order'}</p>
                     </div>
                   </div>

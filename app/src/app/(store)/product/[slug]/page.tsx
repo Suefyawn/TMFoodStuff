@@ -250,7 +250,7 @@ export default async function ProductPage({ params }: Props) {
       {product.bundleItems && product.bundleItems.length > 0 && (
         <div className="mb-8 md:mb-12">
           <section className="bg-white border border-gray-100 rounded-2xl p-5 md:p-7 shadow-sm">
-            <h2 className="text-xl font-black text-gray-900 mb-4">What&apos;s inside</h2>
+            <h2 className="text-xl font-playfair font-bold text-stone-900 mb-4">What&apos;s inside</h2>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {product.bundleItems.map((it, i) => (
                 <li key={`${it.product_id}-${i}`} className="flex items-center justify-between gap-2 bg-gray-50 rounded-xl px-3 py-2.5 text-sm">
@@ -276,7 +276,7 @@ export default async function ProductPage({ params }: Props) {
 
       {related.length > 0 && (
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-5 md:mb-6">
+          <h2 className="text-xl md:text-2xl font-playfair font-bold text-stone-900 mb-5 md:mb-6">
             {isAr ? `المزيد من ${categoryName}` : `More ${categoryName}`}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">

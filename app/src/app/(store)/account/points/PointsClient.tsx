@@ -83,23 +83,23 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
 
       {/* How it works */}
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
-        <h2 className="font-black text-gray-900 mb-4 inline-flex items-center gap-2">
+        <h2 className="font-playfair font-bold text-stone-900 mb-4 inline-flex items-center gap-2">
           <Gift size={16} className="text-gray-400" aria-hidden="true" />
           {isAr ? 'كيف يعمل' : 'How it works'}
         </h2>
         <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
           <li className="bg-gray-50 rounded-2xl p-4">
-            <p className="font-black text-gray-900 text-base mb-1">{rules.earnPerAed} {isAr ? 'نقطة' : 'pt'}</p>
+            <p className="font-playfair font-bold text-stone-900 text-base mb-1">{rules.earnPerAed} {isAr ? 'نقطة' : 'pt'}</p>
             <p className="text-gray-500">{isAr ? 'لكل درهم على المجموع الفرعي' : 'for every AED you spend on subtotal'}</p>
           </li>
           <li className="bg-gray-50 rounded-2xl p-4">
-            <p className="font-black text-gray-900 text-base mb-1">{rules.minRedeem} {isAr ? 'نقطة' : 'pts'}</p>
+            <p className="font-playfair font-bold text-stone-900 text-base mb-1">{rules.minRedeem} {isAr ? 'نقطة' : 'pts'}</p>
             <p className="text-gray-500">
               {isAr ? `الحد الأدنى للاستبدال (AED ${rules.aedAtMinRedeem})` : `minimum to redeem (AED ${rules.aedAtMinRedeem})`}
             </p>
           </li>
           <li className="bg-gray-50 rounded-2xl p-4">
-            <p className="font-black text-gray-900 text-base mb-1">12 {isAr ? 'شهر' : 'mo'}</p>
+            <p className="font-playfair font-bold text-stone-900 text-base mb-1">12 {isAr ? 'شهر' : 'mo'}</p>
             <p className="text-gray-500">{isAr ? 'تنتهي صلاحية النقاط بعدها' : 'before earned points expire'}</p>
           </li>
         </ul>
@@ -107,7 +107,7 @@ export default function PointsClient({ balance, history, rules }: PointsClientPr
 
       {/* History */}
       <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm">
-        <h2 className="font-black text-gray-900 mb-4 inline-flex items-center gap-2">
+        <h2 className="font-playfair font-bold text-stone-900 mb-4 inline-flex items-center gap-2">
           <Clock size={16} className="text-gray-400" aria-hidden="true" />
           {isAr ? 'السجل' : 'History'}
         </h2>
