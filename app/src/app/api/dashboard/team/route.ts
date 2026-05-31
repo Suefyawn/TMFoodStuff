@@ -111,14 +111,14 @@ export async function POST(request: Request) {
   return NextResponse.json({ row: data, invited: true })
 }
 
-interface PatchBody { id?: number; role?: string; is_active?: boolean }
+interface PatchBody { id?: string; role?: string; is_active?: boolean }
 
 export async function PATCH(request: Request) {
   if (!(await requirePermission('team.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as PatchBody
-  const id = Number(body.id)
+  const id = typeof body.id === 'string' ? body.id.trim() : ''
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
   const updates: Record<string, unknown> = {}
@@ -167,14 +167,14 @@ export async function PATCH(request: Request) {
   return NextResponse.json({ row: data })
 }
 
-interface DeleteBody { id?: number }
+interface DeleteBody { id?: string }
 
 export async function DELETE(request: Request) {
   if (!(await requirePermission('team.manage'))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = (await request.json()) as DeleteBody
-  const id = Number(body.id)
+  const id = typeof body.id === 'string' ? body.id.trim() : ''
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

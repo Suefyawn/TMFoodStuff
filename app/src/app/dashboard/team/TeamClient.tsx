@@ -4,7 +4,7 @@ import { UserPlus, Loader2, AlertCircle, Trash2, Shield, ShieldCheck, Truck, Cir
 import { useConfirm } from '@/components/ConfirmDialog'
 
 interface TeamMember {
-  id: number
+  id: string
   email: string
   role: 'admin' | 'staff' | 'driver'
   is_active: boolean
@@ -70,7 +70,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
     }
   }
 
-  async function update(id: number, patch: Partial<Pick<TeamMember, 'role' | 'is_active'>>) {
+  async function update(id: string, patch: Partial<Pick<TeamMember, 'role' | 'is_active'>>) {
     setError('')
     const prev = rows
     setRows(rs => rs.map(r => r.id === id ? { ...r, ...patch } : r))
@@ -91,7 +91,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
     }
   }
 
-  async function remove(id: number, who: string) {
+  async function remove(id: string, who: string) {
     const ok = await confirm({
       title: `Remove ${who}?`,
       message: 'They will lose dashboard access immediately. You can re-invite by email any time.',
