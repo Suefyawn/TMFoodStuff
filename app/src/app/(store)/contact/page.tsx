@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { MessageCircle, Mail, Clock, MapPin } from 'lucide-react'
+import ContactForm from './ContactForm'
 
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'
 const STORE_EMAIL = process.env.NEXT_PUBLIC_STORE_EMAIL || 'hello@tmfoodstuff.ae'
@@ -60,6 +61,10 @@ export default function ContactPage() {
             <div className="text-sm text-stone-500">All UAE Emirates</div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8 max-w-xl mx-auto">
+        <ContactForm />
       </div>
     </div>
   )
