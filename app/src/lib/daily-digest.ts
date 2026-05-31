@@ -9,9 +9,9 @@
 // so they don't take down the cron handler.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getResend, FROM_EMAIL } from './email'
+import { getNotificationRecipients } from './notifications'
 import { SITE_URL } from './site'
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'orders@tmfoodstuff.ae'
 const LOW_STOCK_THRESHOLD = 10
 
 interface OrderRow {
@@ -236,10 +236,12 @@ export async function sendDailyDigest(supabase: SupabaseClient): Promise<DigestR
   </table>
 </body></html>`
 
+  const to = await getNotificationRecipients('daily_digest')
+  if (to.length === 0) return { sent: false, reason: 'no_recipients' }
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
-      to: ADMIN_EMAIL,
+      to,
       subject: `Daily digest · ${dateStr} · AED ${fmt(revenue)} · ${completedOrders.length} orders`,
       html,
     })
