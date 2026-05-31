@@ -113,7 +113,7 @@ export default function CategoriesPage() {
           <h1 className="text-2xl font-bold text-white">Categories</h1>
           <p className="text-gray-500 text-sm">{categories.length} categories</p>
         </div>
-        <button onClick={() => { setShowAdd(true); setApiError('') }} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
+        <button onClick={() => { setShowAdd(true); setApiError('') }} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-xl transition-colors">
           <Plus size={16} /> Add Category
         </button>
       </div>
@@ -133,15 +133,15 @@ export default function CategoriesPage() {
               <button onClick={() => setShowAdd(false)} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
             <div className="space-y-3">
-              <input placeholder="Name" value={newCat.name} onChange={e => setNewCat({...newCat, name: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g,'-')})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-              <input placeholder="Arabic Name" value={newCat.name_ar} onChange={e => setNewCat({...newCat, name_ar: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-              <input placeholder="Slug" value={newCat.slug} onChange={e => setNewCat({...newCat, slug: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-              <input placeholder="Emoji" value={newCat.emoji} onChange={e => setNewCat({...newCat, emoji: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-              <textarea placeholder="Description" value={newCat.description} onChange={e => setNewCat({...newCat, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
+              <input placeholder="Name" value={newCat.name} onChange={e => setNewCat({...newCat, name: e.target.value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g,'-')})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+              <input placeholder="Arabic Name" value={newCat.name_ar} onChange={e => setNewCat({...newCat, name_ar: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+              <input placeholder="Slug" value={newCat.slug} onChange={e => setNewCat({...newCat, slug: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+              <input placeholder="Emoji" value={newCat.emoji} onChange={e => setNewCat({...newCat, emoji: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+              <textarea placeholder="Description" value={newCat.description} onChange={e => setNewCat({...newCat, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 h-20 resize-none" />
             </div>
             <div className="flex justify-end gap-3 mt-4">
               <button onClick={() => setShowAdd(false)} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl">Cancel</button>
-              <button onClick={addCategory} disabled={saving || !newCat.name} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl disabled:opacity-50">{saving ? 'Saving...' : 'Add'}</button>
+              <button onClick={addCategory} disabled={saving || !newCat.name} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl disabled:opacity-50">{saving ? 'Saving...' : 'Add'}</button>
             </div>
           </div>
         </div>
@@ -153,14 +153,14 @@ export default function CategoriesPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-white mb-4">Edit Category</h2>
             <div className="space-y-3">
-              <input placeholder="Name" value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-              <input placeholder="Arabic Name" value={editData.name_ar || ''} onChange={e => setEditData({...editData, name_ar: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-              <input placeholder="Emoji" value={editData.emoji || ''} onChange={e => setEditData({...editData, emoji: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
-              <textarea placeholder="Description" value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 h-20 resize-none" />
+              <input placeholder="Name" value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+              <input placeholder="Arabic Name" value={editData.name_ar || ''} onChange={e => setEditData({...editData, name_ar: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+              <input placeholder="Emoji" value={editData.emoji || ''} onChange={e => setEditData({...editData, emoji: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
+              <textarea placeholder="Description" value={editData.description || ''} onChange={e => setEditData({...editData, description: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 h-20 resize-none" />
             </div>
             <div className="flex justify-end gap-3 mt-4">
               <button onClick={() => {setEditing(null); setEditData(null)}} className="px-4 py-2 bg-gray-800 text-gray-300 text-sm rounded-xl">Cancel</button>
-              <button onClick={saveEdit} disabled={saving} className="px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-xl disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
+              <button onClick={saveEdit} disabled={saving} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
             </div>
           </div>
         </div>

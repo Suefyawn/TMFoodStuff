@@ -36,21 +36,21 @@ export default function CustomerNotesEditor({ customerId, initial }: { customerI
         onChange={e => setValue(e.target.value)}
         rows={3}
         placeholder="VIP, prefers afternoon delivery, allergic to nuts, etc."
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
       />
       {dirty && (
         <button
           type="button"
           onClick={save}
           disabled={saving}
-          className="mt-2 inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
+          className="mt-2 inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
         >
           {saving ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : null}
           Save notes
         </button>
       )}
       {!dirty && savedAt && Date.now() - savedAt < 5000 && (
-        <p className="mt-2 text-xs text-green-400 inline-flex items-center gap-1"><Check size={11} aria-hidden="true" /> Saved</p>
+        <p className="mt-2 text-xs text-emerald-400 inline-flex items-center gap-1"><Check size={11} aria-hidden="true" /> Saved</p>
       )}
     </section>
   )

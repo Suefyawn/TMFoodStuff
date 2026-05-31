@@ -145,7 +145,7 @@ export default function DeliveriesClient({ initialOrders, errorMessage, canClaim
             type="button"
             onClick={() => setFilter('today')}
             className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-lg py-2 border transition-colors ${
-              filter === 'today' ? 'bg-green-600 border-green-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
+              filter === 'today' ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
             }`}
           >
             Today ({todayCount})
@@ -154,7 +154,7 @@ export default function DeliveriesClient({ initialOrders, errorMessage, canClaim
             type="button"
             onClick={() => setFilter('all')}
             className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-lg py-2 border transition-colors ${
-              filter === 'all' ? 'bg-green-600 border-green-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
+              filter === 'all' ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-gray-800 border-gray-700 text-gray-300'
             }`}
           >
             All ({orders.length})
@@ -177,13 +177,13 @@ export default function DeliveriesClient({ initialOrders, errorMessage, canClaim
       <div className="px-3 sm:px-4 py-3 space-y-5">
         {totalVisible === 0 ? (
           <div className="text-center py-16 text-gray-500">
-            <Truck size={36} className="mx-auto mb-3 text-green-600/60" aria-hidden="true" />
+            <Truck size={36} className="mx-auto mb-3 text-emerald-600/60" aria-hidden="true" />
             <p className="text-sm">No deliveries waiting. Hand the driver a coffee.</p>
           </div>
         ) : (
           Object.entries(groups).map(([emirate, list]) => (
             <section key={emirate}>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-green-300 mb-2 px-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 mb-2 px-1">
                 {emirate} · {list.length} stop{list.length === 1 ? '' : 's'}
               </p>
               <div className="space-y-3">
@@ -270,7 +270,7 @@ function DeliveryCard({ order, busy, onAdvance, canClaim, onClaim }: { order: Or
                 href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi, this is TM FoodStuff. I'm on my way with your order ${order.order_number}.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-green-200 bg-green-900/40 hover:bg-green-900/60 border border-green-700 rounded-lg px-3 py-2"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-200 bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-700 rounded-lg px-3 py-2"
               >
                 <MessageCircle size={12} aria-hidden="true" /> WhatsApp
               </a>
@@ -318,7 +318,7 @@ function DeliveryCard({ order, busy, onAdvance, canClaim, onClaim }: { order: Or
               type="button"
               onClick={() => onAdvance(order.id, 'delivered')}
               disabled={busy}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white text-sm font-bold rounded-xl py-3 transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-sm font-bold rounded-xl py-3 transition-colors"
             >
               {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <CheckCircle2 size={14} aria-hidden="true" />}
               {busy ? 'Updating…' : 'Mark delivered'}

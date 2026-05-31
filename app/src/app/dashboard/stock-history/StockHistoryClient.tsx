@@ -19,7 +19,7 @@ interface Row {
 
 const REASON_BADGE: Record<string, string> = {
   admin_set:        'bg-blue-500/15 text-blue-300 border-blue-500/30',
-  admin_restock:    'bg-green-500/15 text-green-300 border-green-500/30',
+  admin_restock:    'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
   order_decrement:  'bg-amber-500/15 text-amber-300 border-amber-500/30',
 }
 
@@ -66,10 +66,10 @@ export default function StockHistoryClient({ initialRows }: { initialRows: Row[]
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search product, slug, actor email…"
-            className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
           />
         </div>
-        <select value={reason} onChange={e => setReason(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={reason} onChange={e => setReason(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">All reasons</option>
           {reasons.map(r => <option key={r} value={r}>{r.replace(/_/g, ' ')}</option>)}
         </select>
@@ -88,7 +88,7 @@ export default function StockHistoryClient({ initialRows }: { initialRows: Row[]
             {filtered.map(r => (
               <li key={r.id} className="px-4 sm:px-5 py-3 flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                  r.delta > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                  r.delta > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
                 }`}>
                   {r.delta > 0 ? <ArrowUpRight size={16} aria-hidden="true" /> : <ArrowDownRight size={16} aria-hidden="true" />}
                 </div>
@@ -107,7 +107,7 @@ export default function StockHistoryClient({ initialRows }: { initialRows: Row[]
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className={`text-sm font-bold ${r.delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span className={`text-sm font-bold ${r.delta > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                     {r.delta > 0 ? '+' : ''}{r.delta}
                   </span>
                   <p className="text-[10px] text-gray-600 mt-0.5">

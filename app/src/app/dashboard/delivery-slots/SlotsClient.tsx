@@ -235,7 +235,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
             <button type="button" onClick={onEdit} className="text-xs font-bold text-gray-300 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg px-3 py-1.5">Edit</button>
             {slot.is_active
               ? <button type="button" onClick={onDeactivate} disabled={busy} className="text-xs font-bold text-red-300 bg-red-900/20 hover:bg-red-900/40 border border-red-800/50 rounded-lg px-3 py-1.5"><Trash2 size={11} className="inline mr-1" aria-hidden="true" />Hide</button>
-              : <button type="button" onClick={onActivate} disabled={busy} className="text-xs font-bold text-green-300 bg-green-900/20 hover:bg-green-900/40 border border-green-700/50 rounded-lg px-3 py-1.5"><CheckCircle2 size={11} className="inline mr-1" aria-hidden="true" />Show</button>}
+              : <button type="button" onClick={onActivate} disabled={busy} className="text-xs font-bold text-emerald-300 bg-emerald-900/20 hover:bg-emerald-900/40 border border-emerald-700/50 rounded-lg px-3 py-1.5"><CheckCircle2 size={11} className="inline mr-1" aria-hidden="true" />Show</button>}
           </div>
         </div>
       </article>
@@ -243,7 +243,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
   }
 
   return (
-    <article className="bg-gray-900 border-2 border-green-700/60 rounded-xl p-5 space-y-4">
+    <article className="bg-gray-900 border-2 border-emerald-700/60 rounded-xl p-5 space-y-4">
       {isNew && (
         <div>
           <label htmlFor={`key-${slot.id}`} className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Slot key (immutable)</label>
@@ -253,7 +253,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
             value={draft.key}
             onChange={e => setDraft({ ...draft, key: e.target.value })}
             placeholder="e.g. express_1h"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 font-mono"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono"
           />
           <p className="text-[10px] text-gray-500 mt-1">Lowercase, digits, underscores. Used in orders + subscriptions and never changes after creation.</p>
         </div>
@@ -276,7 +276,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
             value={draft.cutoff_hour ?? ''}
             onChange={e => setDraft({ ...draft, cutoff_hour: e.target.value === '' ? null : Number(e.target.value) })}
             placeholder="e.g. 7 = same-day only if ordered before 7AM"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
           />
           <p className="text-[10px] text-gray-500 mt-1">Leave blank to disable same-day delivery on this slot.</p>
         </div>
@@ -289,7 +289,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
             value={draft.max_orders_per_day ?? ''}
             onChange={e => setDraft({ ...draft, max_orders_per_day: e.target.value === '' ? null : Number(e.target.value) })}
             placeholder="Leave blank for unlimited"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
           />
         </div>
       </div>
@@ -305,7 +305,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
                 type="button"
                 onClick={() => toggleDay(d.idx)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
-                  on ? 'bg-green-900/40 border-green-600 text-green-200' : 'bg-gray-800 border-gray-700 text-gray-500'
+                  on ? 'bg-emerald-900/40 border-emerald-600 text-emerald-200' : 'bg-gray-800 border-gray-700 text-gray-500'
                 }`}
               >
                 {d.label}
@@ -320,7 +320,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
           type="checkbox"
           checked={draft.is_active}
           onChange={e => setDraft({ ...draft, is_active: e.target.checked })}
-          className="w-4 h-4 accent-green-600"
+          className="w-4 h-4 accent-emerald-600"
         />
         Show this slot at checkout
       </label>
@@ -330,7 +330,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
           type="button"
           onClick={submit}
           disabled={busy}
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl disabled:opacity-60"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-xl disabled:opacity-60"
         >
           {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : null}
           {isNew ? 'Create slot' : 'Save changes'}
@@ -350,7 +350,7 @@ function FieldInput({ label, value, onChange, placeholder }: { label: string; va
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
       />
     </div>
   )

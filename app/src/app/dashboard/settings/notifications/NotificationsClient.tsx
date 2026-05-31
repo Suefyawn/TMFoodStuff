@@ -102,7 +102,7 @@ export default function NotificationsClient() {
   return (
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-2">
-        <Bell size={20} className="text-green-400" />
+        <Bell size={20} className="text-emerald-400" />
         <h1 className="text-xl font-bold text-white">Notifications</h1>
       </div>
 
@@ -168,19 +168,19 @@ export default function NotificationsClient() {
             value={draft.email}
             onChange={e => setDraft(d => ({ ...d, email: e.target.value }))}
             placeholder="staff@email.com"
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-green-500 outline-none"
+            className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-emerald-500 outline-none"
           />
           <input
             type="text"
             value={draft.name}
             onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
             placeholder="Name (optional)"
-            className="sm:w-44 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-green-500 outline-none"
+            className="sm:w-44 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-emerald-500 outline-none"
           />
           <button
             onClick={addRecipient}
             disabled={adding}
-            className="inline-flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
           >
             {adding ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />} Add
           </button>
@@ -205,7 +205,7 @@ function CheckBox({ checked, onChange }: { checked: boolean; onChange: () => voi
       type="button"
       onClick={onChange}
       className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-        checked ? 'bg-green-600 border-green-600 text-white' : 'bg-gray-800 border-gray-600 text-transparent hover:border-gray-500'
+        checked ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-gray-800 border-gray-600 text-transparent hover:border-gray-500'
       }`}
       aria-pressed={checked}
     >

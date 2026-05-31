@@ -17,7 +17,7 @@ interface Integration {
 
 function StatusBadge({ ok }: { ok: boolean }) {
   return ok ? (
-    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-400 bg-green-400/10 px-2.5 py-1 rounded-full border border-green-400/20">
+    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full border border-emerald-400/20">
       <CheckCircle size={12} /> Configured
     </span>
   ) : (
@@ -30,9 +30,9 @@ function StatusBadge({ ok }: { ok: boolean }) {
 function EnvVar({ envKey, present }: { envKey: string; present: boolean }) {
   return (
     <div className={`flex items-center gap-2 text-xs font-mono px-3 py-1.5 rounded-lg ${
-      present ? 'bg-green-900/20 text-green-300 border border-green-800/40' : 'bg-gray-800 text-gray-500 border border-gray-700'
+      present ? 'bg-emerald-900/20 text-emerald-300 border border-emerald-800/40' : 'bg-gray-800 text-gray-500 border border-gray-700'
     }`}>
-      <span className={present ? 'text-green-400' : 'text-gray-600'}>
+      <span className={present ? 'text-emerald-400' : 'text-gray-600'}>
         {present ? '✓' : '○'}
       </span>
       {envKey}

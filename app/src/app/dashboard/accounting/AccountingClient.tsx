@@ -68,7 +68,7 @@ export default function AccountingClient() {
                 value={from}
                 onChange={e => setFrom(e.target.value)}
                 style={{ colorScheme: 'dark' }}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
             <div>
@@ -79,7 +79,7 @@ export default function AccountingClient() {
                 value={to}
                 onChange={e => setTo(e.target.value)}
                 style={{ colorScheme: 'dark' }}
-                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
             <span className="text-[10px] text-gray-600 self-center">inclusive · Asia/Dubai</span>
@@ -136,7 +136,7 @@ interface ExportCardProps {
 
 function ExportCard({ icon: Icon, color, title, description, href }: ExportCardProps) {
   const colorMap = {
-    green: { bg: 'bg-green-900/40', text: 'text-green-300', border: 'hover:border-green-600/40' },
+    green: { bg: 'bg-emerald-900/40', text: 'text-emerald-300', border: 'hover:border-emerald-600/40' },
     red: { bg: 'bg-red-900/40', text: 'text-red-300', border: 'hover:border-red-600/40' },
     amber: { bg: 'bg-amber-900/40', text: 'text-amber-300', border: 'hover:border-amber-600/40' },
   }

@@ -171,7 +171,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
             onClick={() => setFilter('today')}
             className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-lg py-2 border transition-colors ${
               filter === 'today'
-                ? 'bg-green-600 border-green-500 text-white'
+                ? 'bg-emerald-600 border-emerald-500 text-white'
                 : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
             }`}
           >
@@ -182,7 +182,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
             onClick={() => setFilter('all')}
             className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-lg py-2 border transition-colors ${
               filter === 'all'
-                ? 'bg-green-600 border-green-500 text-white'
+                ? 'bg-emerald-600 border-emerald-500 text-white'
                 : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'
             }`}
           >
@@ -206,7 +206,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
       <div className="px-3 sm:px-4 py-3 space-y-3">
         {visibleOrders.length === 0 ? (
           <div className="text-center py-16 text-gray-500">
-            <CheckCircle2 size={36} className="mx-auto mb-3 text-green-600/60" aria-hidden="true" />
+            <CheckCircle2 size={36} className="mx-auto mb-3 text-emerald-600/60" aria-hidden="true" />
             <p className="text-sm">Nothing left to pick — nice work.</p>
           </div>
         ) : (
@@ -223,7 +223,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
               <article
                 key={o.id}
                 className={`bg-gray-900 border rounded-xl overflow-hidden ${
-                  allPicked ? 'border-green-700' : 'border-gray-800'
+                  allPicked ? 'border-emerald-700' : 'border-gray-800'
                 }`}
               >
                 <button
@@ -234,7 +234,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-mono font-bold text-white text-sm">{o.order_number}</span>
-                      {isToday && <span className="text-[9px] font-bold uppercase tracking-wider text-green-300 bg-green-900/40 border border-green-700 rounded px-1.5 py-0.5">Today</span>}
+                      {isToday && <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-900/40 border border-emerald-700 rounded px-1.5 py-0.5">Today</span>}
                       {o.delivery_slot && (
                         <span className="inline-flex items-center gap-1 text-[10px] text-gray-400">
                           <Clock size={10} aria-hidden="true" />
@@ -246,7 +246,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                     <p className="text-xs text-gray-500 truncate">{o.delivery_area}{o.delivery_emirate ? `, ${o.delivery_emirate}` : ''}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className={`text-xs font-bold ${allPicked ? 'text-green-400' : 'text-gray-400'}`}>
+                    <div className={`text-xs font-bold ${allPicked ? 'text-emerald-400' : 'text-gray-400'}`}>
                       {pickedCount}/{total}
                     </div>
                     {isExpanded
@@ -270,7 +270,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                               key={key}
                               className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                                 checked
-                                  ? 'bg-green-900/30 border-green-700 text-green-100'
+                                  ? 'bg-emerald-900/30 border-emerald-700 text-emerald-100'
                                   : 'bg-gray-900 border-gray-800 text-gray-200 hover:bg-gray-800/60'
                               }`}
                             >
@@ -278,7 +278,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                                 type="checkbox"
                                 checked={checked}
                                 onChange={() => toggleItem(o.id, key)}
-                                className="w-5 h-5 accent-green-600 shrink-0"
+                                className="w-5 h-5 accent-emerald-600 shrink-0"
                               />
                               <div className="flex-1 min-w-0">
                                 <p className={`font-bold text-sm leading-tight ${checked ? 'line-through opacity-70' : ''}`}>{name}</p>
@@ -288,7 +288,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                                   </p>
                                 )}
                               </div>
-                              {checked && <CheckCircle2 size={16} className="text-green-400 shrink-0" aria-hidden="true" />}
+                              {checked && <CheckCircle2 size={16} className="text-emerald-400 shrink-0" aria-hidden="true" />}
                             </label>
                           )
                         })
@@ -317,7 +317,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                             href={`https://wa.me/${o.customer_phone.replace(/\D/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-bold text-green-300 bg-green-900/40 hover:bg-green-900/60 border border-green-700 rounded-lg px-3 py-1.5 inline-flex items-center gap-1.5"
+                            className="text-xs font-bold text-emerald-300 bg-emerald-900/40 hover:bg-emerald-900/60 border border-emerald-700 rounded-lg px-3 py-1.5 inline-flex items-center gap-1.5"
                           >
                             WhatsApp
                           </a>
@@ -337,7 +337,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                       disabled={!allPicked || busyOrderId === o.id}
                       className={`w-full inline-flex items-center justify-center gap-2 rounded-xl font-bold text-sm py-3 transition-colors ${
                         allPicked
-                          ? 'bg-green-600 hover:bg-green-500 text-white'
+                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                           : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                       } ${busyOrderId === o.id ? 'opacity-60' : ''}`}
                     >

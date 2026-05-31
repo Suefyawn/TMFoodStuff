@@ -62,7 +62,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </p>
           <Link
             href="/dashboard/logout"
-            className="inline-block w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-xl transition-colors"
+            className="inline-block w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-colors"
           >
             Sign out
           </Link>

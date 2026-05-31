@@ -37,7 +37,7 @@ export default function CustomerTierEditor({ customerId, current }: { customerId
         value={tier}
         disabled={saving}
         onChange={e => update(e.target.value)}
-        className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-green-500 disabled:opacity-60 capitalize"
+        className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-500 disabled:opacity-60 capitalize"
       >
         {TIERS.map(t => <option key={t} value={t}>{t}</option>)}
       </select>

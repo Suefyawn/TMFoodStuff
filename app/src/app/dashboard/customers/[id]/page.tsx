@@ -202,7 +202,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 {(addresses as Address[]).map(a => (
                   <li key={a.id} className="text-xs">
                     <p className="text-gray-300 font-bold">
-                      {a.label || 'Unnamed'} {a.is_default && <span className="text-green-400 ml-1">(default)</span>}
+                      {a.label || 'Unnamed'} {a.is_default && <span className="text-emerald-400 ml-1">(default)</span>}
                     </p>
                     <p className="text-gray-500">{[a.building, a.area, a.emirate].filter(Boolean).join(', ')}</p>
                   </li>
@@ -240,7 +240,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 {((ledger || []) as LedgerEntry[]).map((l, i) => (
                   <li key={i} className="flex items-center justify-between gap-2 text-xs">
                     <span className="text-gray-400 truncate">{l.reason.replace(/_/g, ' ')}</span>
-                    <span className={`font-mono font-bold tabular-nums shrink-0 ${l.delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-mono font-bold tabular-nums shrink-0 ${l.delta > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                       {l.delta > 0 ? '+' : ''}{l.delta}
                     </span>
                   </li>
@@ -268,8 +268,8 @@ function Stat({ icon: Icon, label, value, sub }: { icon: typeof ShoppingBag; lab
 
 function Pref({ label, on }: { label: string; on: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-1 ${on ? 'text-green-300' : 'text-gray-500'}`}>
-      <span className={`w-2 h-2 rounded-full ${on ? 'bg-green-500' : 'bg-gray-600'}`} />
+    <span className={`inline-flex items-center gap-1 ${on ? 'text-emerald-300' : 'text-gray-500'}`}>
+      <span className={`w-2 h-2 rounded-full ${on ? 'bg-emerald-500' : 'bg-gray-600'}`} />
       {label}
     </span>
   )

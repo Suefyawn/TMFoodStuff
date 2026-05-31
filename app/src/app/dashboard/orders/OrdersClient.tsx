@@ -10,7 +10,7 @@ const statusColors: Record<string, string> = {
   confirmed: 'bg-blue-500/15 text-blue-400 border-blue-500/20',
   processing: 'bg-purple-500/15 text-purple-400 border-purple-500/20',
   out_for_delivery: 'bg-orange-500/15 text-orange-400 border-orange-500/20',
-  delivered: 'bg-green-500/15 text-green-400 border-green-500/20',
+  delivered: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
   cancelled: 'bg-red-500/15 text-red-400 border-red-500/20',
 }
 
@@ -153,7 +153,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
         <button
           onClick={exportCsv}
           disabled={filtered.length === 0}
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
         >
           <Download size={14} aria-hidden="true" /> Export CSV
         </button>
@@ -163,14 +163,14 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       <div className="flex gap-3 flex-wrap items-center">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} aria-hidden="true" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search order #, name, phone..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search order #, name, phone..." className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-800 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500" />
         </div>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
           <option value="">All Statuses</option>
           {statuses.filter(Boolean).map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
         </select>
         {emirates.length > 0 && (
-          <select value={filterEmirate} onChange={e => setFilterEmirate(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500">
+          <select value={filterEmirate} onChange={e => setFilterEmirate(e.target.value)} className="bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-emerald-500">
             <option value="">All Emirates</option>
             {emirates.map(em => <option key={em} value={em}>{em}</option>)}
           </select>
@@ -208,8 +208,8 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       {/* Bulk action bar — appears when rows are checked. Sticky-ish:
           inside the page flow but visually prominent. */}
       {selected.size > 0 && (
-        <div className="bg-green-900/20 border border-green-600/40 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
-          <p className="text-sm font-bold text-green-200">
+        <div className="bg-emerald-900/20 border border-emerald-600/40 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
+          <p className="text-sm font-bold text-emerald-200">
             {selected.size} order{selected.size === 1 ? '' : 's'} selected
           </p>
           <div className="flex gap-1.5 flex-wrap">
@@ -233,7 +233,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
               Cancel
             </button>
           </div>
-          {bulkBusy && <Loader2 size={14} className="animate-spin text-green-400 ml-auto" aria-hidden="true" />}
+          {bulkBusy && <Loader2 size={14} className="animate-spin text-emerald-400 ml-auto" aria-hidden="true" />}
           <button
             type="button"
             onClick={() => setSelected(new Set())}
@@ -267,7 +267,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                   <div key={order.id} className="p-4 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-green-400 text-sm">{order.order_number}</Link>
+                        <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-emerald-400 text-sm">{order.order_number}</Link>
                         <p className="text-gray-600 text-xs mt-0.5">
                           {order.created_at ? new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
                         </p>
@@ -281,7 +281,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                         <p className="text-white text-sm font-semibold">{order.customer_name || '—'}</p>
                         <p className="text-gray-500 text-xs">{order.customer_phone}</p>
                       </div>
-                      <span className="text-green-400 font-bold text-sm">AED {(order.total || 0).toFixed(2)}</span>
+                      <span className="text-emerald-400 font-bold text-sm">AED {(order.total || 0).toFixed(2)}</span>
                     </div>
                     <p className="text-gray-500 text-xs">
                       {order.delivery_area || '—'}, {order.delivery_emirate} · {slotMap[order.delivery_slot] || order.delivery_slot || '—'} · {items.length} items
@@ -289,7 +289,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                     <div className="flex items-center gap-2 pt-1">
                       <Link href={`/dashboard/orders/${order.id}`} className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">View</Link>
                       {order.customer_phone && (
-                        <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="text-xs px-3 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-colors">WhatsApp</a>
+                        <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="text-xs px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-lg transition-colors">WhatsApp</a>
                       )}
                     </div>
                   </div>
@@ -305,7 +305,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                     <th className="px-3 py-3 w-10">
                       <button type="button" onClick={toggleAll} aria-label="Toggle all" className="text-gray-500 hover:text-white">
                         {selected.size === filtered.length && filtered.length > 0
-                          ? <CheckSquare size={16} className="text-green-400" aria-hidden="true" />
+                          ? <CheckSquare size={16} className="text-emerald-400" aria-hidden="true" />
                           : <Square size={16} aria-hidden="true" />}
                       </button>
                     </th>
@@ -331,16 +331,16 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                       `We'll be in touch shortly. Thank you! 🥦`
                     )
                     return (
-                      <tr key={order.id} className={`hover:bg-gray-800/30 transition-colors ${selected.has(order.id) ? 'bg-green-900/10' : ''}`}>
+                      <tr key={order.id} className={`hover:bg-gray-800/30 transition-colors ${selected.has(order.id) ? 'bg-emerald-900/10' : ''}`}>
                         <td className="px-3 py-4 w-10">
                           <button type="button" onClick={() => toggleOne(order.id)} aria-label="Select order" className="text-gray-500 hover:text-white">
                             {selected.has(order.id)
-                              ? <CheckSquare size={16} className="text-green-400" aria-hidden="true" />
+                              ? <CheckSquare size={16} className="text-emerald-400" aria-hidden="true" />
                               : <Square size={16} aria-hidden="true" />}
                           </button>
                         </td>
                         <td className="px-5 py-4">
-                          <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-green-400 text-sm">{order.order_number}</Link>
+                          <Link href={`/dashboard/orders/${order.id}`} className="text-white font-bold hover:text-emerald-400 text-sm">{order.order_number}</Link>
                           <p className="text-gray-600 text-xs mt-0.5">
                             {order.created_at ? new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
                           </p>
@@ -355,7 +355,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                         </td>
                         <td className="px-5 py-4 text-gray-400 text-sm capitalize">{order.delivery_slot || '—'}</td>
                         <td className="px-5 py-4 text-gray-400 text-sm">{items.length} items</td>
-                        <td className="px-5 py-4 text-green-400 font-bold text-sm">AED {(order.total || 0).toFixed(2)}</td>
+                        <td className="px-5 py-4 text-emerald-400 font-bold text-sm">AED {(order.total || 0).toFixed(2)}</td>
                         <td className="px-5 py-4">
                           <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${statusColors[order.status] || 'bg-gray-700 text-gray-400 border-gray-600'}`}>
                             {(order.status || 'pending').replace(/_/g, ' ')}
@@ -365,7 +365,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                           <div className="flex items-center gap-2">
                             <Link href={`/dashboard/orders/${order.id}`} className="text-xs px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">View</Link>
                             {order.customer_phone && (
-                              <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition-colors">WA</a>
+                              <a href={`https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="text-xs px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded-lg transition-colors">WA</a>
                             )}
                           </div>
                         </td>

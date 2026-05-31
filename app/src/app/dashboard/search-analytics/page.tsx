@@ -101,7 +101,7 @@ export default async function SearchAnalyticsPage() {
         {/* Top queries overall */}
         <section className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-800 flex items-center gap-2">
-            <TrendingUp size={16} className="text-green-300" aria-hidden="true" />
+            <TrendingUp size={16} className="text-emerald-300" aria-hidden="true" />
             <h2 className="text-white font-bold">Top searches</h2>
           </div>
           {allTop.length === 0 ? (
@@ -111,7 +111,7 @@ export default async function SearchAnalyticsPage() {
               {allTop.map(r => (
                 <li key={r.query} className="px-5 py-2.5 flex items-center justify-between gap-2 hover:bg-gray-800/30 transition-colors">
                   <span className="font-mono text-sm text-gray-200 truncate">{r.query}</span>
-                  <span className="text-xs font-bold text-green-300 tabular-nums">{r.cnt}×</span>
+                  <span className="text-xs font-bold text-emerald-300 tabular-nums">{r.cnt}×</span>
                 </li>
               ))}
             </ul>

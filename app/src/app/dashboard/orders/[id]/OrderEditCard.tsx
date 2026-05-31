@@ -121,7 +121,7 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
             value={form.delivery_notes}
             onChange={e => setForm(f => ({ ...f, delivery_notes: e.target.value }))}
             rows={2}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
           />
         </div>
         <div className="sm:col-span-2">
@@ -140,7 +140,7 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
         <button
           onClick={save}
           disabled={busy}
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-60"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-60"
         >
           {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Save size={14} aria-hidden="true" />}
           {busy ? 'Saving…' : 'Save'}
@@ -169,7 +169,7 @@ function Field(props: { label: string; value: string; onChange: (v: string) => v
         // hurt the rest — keeps the calendar popup readable against the
         // dark dashboard background instead of forcing a white panel.
         style={props.type === 'date' || props.type === 'time' ? { colorScheme: 'dark' } : undefined}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
       />
     </div>
   )
@@ -182,7 +182,7 @@ function SelectField(props: { label: string; value: string; onChange: (v: string
       <select
         value={props.value}
         onChange={e => props.onChange(e.target.value)}
-        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
       >
         <option value="">—</option>
         {props.options.map((o, i) => (

@@ -130,7 +130,7 @@ export default function RefundButton({
                 step={0.01}
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
               />
               <div className="flex gap-2 mt-1">
                 <button
@@ -157,7 +157,7 @@ export default function RefundButton({
                 id="refund-reason"
                 value={reason}
                 onChange={e => setReason(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
               >
                 <option value="">Select a reason…</option>
                 <option value="Customer requested">Customer requested</option>
@@ -181,7 +181,7 @@ export default function RefundButton({
               value={notes}
               onChange={e => setNotes(e.target.value)}
               placeholder="e.g. 2 mangoes bruised, customer kept the rest"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
             />
           </div>
 
@@ -190,7 +190,7 @@ export default function RefundButton({
               type="checkbox"
               checked={restock}
               onChange={e => setRestock(e.target.checked)}
-              className="w-4 h-4 accent-green-600"
+              className="w-4 h-4 accent-emerald-600"
             />
             Restock the order's items
           </label>
@@ -212,7 +212,7 @@ export default function RefundButton({
           {error}
         </p>
       )}
-      {done && <p className="mt-3 text-sm text-green-400">{done}</p>}
+      {done && <p className="mt-3 text-sm text-emerald-400">{done}</p>}
     </div>
   )
 }

@@ -83,7 +83,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           {phone && (
             <a href={`https://wa.me/${phone.replace(/\D/g, '')}?text=${waMsg}`}
               target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-xl transition-colors">
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-3 sm:px-4 py-2 rounded-xl transition-colors">
               <span className="hidden sm:inline">WhatsApp Customer</span><span className="sm:hidden">WhatsApp</span>
             </a>
           )}
@@ -161,7 +161,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                         {r.refund_type}
                       </span>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{r.payment_method}</span>
-                      {r.restocked && <span className="text-[10px] font-bold uppercase tracking-wider text-green-300 bg-green-900/40 border border-green-800 rounded px-1.5 py-0.5">restocked</span>}
+                      {r.restocked && <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-900/40 border border-emerald-800 rounded px-1.5 py-0.5">restocked</span>}
                       <span className="text-[10px] text-gray-500">{new Date(r.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                     {r.reason && <p className="text-sm text-gray-300">{r.reason}</p>}
@@ -229,15 +229,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   <p className="text-white font-semibold text-sm">{item.name}</p>
                   <p className="text-gray-500 text-xs">x{item.quantity} {item.unit}</p>
                 </div>
-                <span className="text-green-400 font-bold text-sm">AED {((item.price_aed || item.priceAED || 0) * item.quantity).toFixed(2)}</span>
+                <span className="text-emerald-400 font-bold text-sm">AED {((item.price_aed || item.priceAED || 0) * item.quantity).toFixed(2)}</span>
               </div>
             ))}
           </div>
           <div className="p-5 border-t border-gray-800 space-y-2 text-sm">
             <div className="flex justify-between text-gray-400"><span>Subtotal</span><span>AED {(order.subtotal || 0).toFixed(2)}</span></div>
             <div className="flex justify-between text-gray-400"><span>VAT 5%</span><span>AED {(order.vat || 0).toFixed(2)}</span></div>
-            {(order.promo_discount || 0) > 0 && <div className="flex justify-between text-green-400"><span>Promo ({order.promo_code})</span><span>-AED {(order.promo_discount || 0).toFixed(2)}</span></div>}
-            <div className="flex justify-between text-white font-bold text-base border-t border-gray-700 pt-2"><span>Total</span><span className="text-green-400">AED {(order.total || 0).toFixed(2)}</span></div>
+            {(order.promo_discount || 0) > 0 && <div className="flex justify-between text-emerald-400"><span>Promo ({order.promo_code})</span><span>-AED {(order.promo_discount || 0).toFixed(2)}</span></div>}
+            <div className="flex justify-between text-white font-bold text-base border-t border-gray-700 pt-2"><span>Total</span><span className="text-emerald-400">AED {(order.total || 0).toFixed(2)}</span></div>
           </div>
         </div>
       </main>

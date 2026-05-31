@@ -130,12 +130,12 @@ export default function TeamClient({ initial, currentEmail }: Props) {
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="name@example.com"
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
           />
           <select
             value={role}
             onChange={e => setRole(e.target.value as TeamMember['role'])}
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-green-500"
+            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
           >
             <option value="admin">Admin</option>
             <option value="staff">Staff</option>
@@ -144,7 +144,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
           <button
             type="submit"
             disabled={busy || !email}
-            className="inline-flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white font-bold px-4 py-2.5 rounded-lg text-sm"
+            className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white font-bold px-4 py-2.5 rounded-lg text-sm"
           >
             {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <UserPlus size={14} aria-hidden="true" />}
             Invite
@@ -174,7 +174,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-0.5">
                     <p className="text-sm font-bold text-white truncate">{m.email}</p>
-                    {isSelf && <span className="text-[10px] font-bold uppercase tracking-wider text-green-300 bg-green-900/30 border border-green-700 rounded px-1.5 py-0.5">you</span>}
+                    {isSelf && <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-900/30 border border-emerald-700 rounded px-1.5 py-0.5">you</span>}
                     {!m.is_active && <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">inactive</span>}
                   </div>
                   <p className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 border ${badge.bg}`}>
@@ -186,7 +186,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
                     value={m.role}
                     disabled={isSelf}
                     onChange={e => update(m.id, { role: e.target.value as TeamMember['role'] })}
-                    className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-green-500 disabled:opacity-50"
+                    className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 disabled:opacity-50"
                   >
                     <option value="admin">Admin</option>
                     <option value="staff">Staff</option>
@@ -197,7 +197,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
                     onClick={() => update(m.id, { is_active: !m.is_active })}
                     disabled={isSelf}
                     title={m.is_active ? 'Deactivate' : 'Reactivate'}
-                    className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 ${m.is_active ? 'border-gray-700 hover:bg-gray-800 text-gray-400' : 'border-green-700 hover:bg-green-900/30 text-green-300'}`}
+                    className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 ${m.is_active ? 'border-gray-700 hover:bg-gray-800 text-gray-400' : 'border-emerald-700 hover:bg-emerald-900/30 text-emerald-300'}`}
                   >
                     <CircleSlash size={14} aria-hidden="true" />
                   </button>

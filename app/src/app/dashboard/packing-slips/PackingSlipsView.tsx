@@ -63,7 +63,7 @@ export default function PackingSlipsView({ date, orders, qrs, settings, bundleMa
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-3">
           <Link
             href="/dashboard/orders"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-green-700"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-emerald-700"
           >
             <ArrowLeft size={14} aria-hidden="true" /> Back to orders
           </Link>
@@ -76,7 +76,7 @@ export default function PackingSlipsView({ date, orders, qrs, settings, bundleMa
                 value={date}
                 onChange={e => changeDate(e.target.value)}
                 style={{ colorScheme: 'light' }}
-                className="text-sm font-semibold border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-green-500"
+                className="text-sm font-semibold border-2 border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500"
               />
             </div>
             <label className="inline-flex items-center gap-2 text-xs text-gray-600">
@@ -84,7 +84,7 @@ export default function PackingSlipsView({ date, orders, qrs, settings, bundleMa
                 type="checkbox"
                 checked={statusAll}
                 onChange={e => router.replace(`/dashboard/packing-slips?date=${date}${e.target.checked ? '&status=all' : ''}`)}
-                className="w-4 h-4 accent-green-600"
+                className="w-4 h-4 accent-emerald-600"
               />
               Include processing &amp; out-for-delivery (re-print)
             </label>
@@ -92,7 +92,7 @@ export default function PackingSlipsView({ date, orders, qrs, settings, bundleMa
             <button
               onClick={() => window.print()}
               disabled={orders.length === 0}
-              className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
             >
               <Printer size={14} aria-hidden="true" /> Print stack
             </button>
@@ -135,7 +135,7 @@ function Slip({ order, qrSvg, company, settings, bundleMap }: { order: OrderRow;
   return (
     <div className="packing-slip mx-auto mb-6 print:mb-0 max-w-2xl bg-white shadow-md print:shadow-none rounded-lg print:rounded-none overflow-hidden">
       {/* Brand stripe */}
-      <div className="bg-green-600 text-white px-6 py-3 flex items-center justify-between gap-3">
+      <div className="bg-emerald-600 text-white px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Leaf size={18} aria-hidden="true" />
           <span className="font-bold text-base">{company} · Packing Slip</span>
@@ -181,7 +181,7 @@ function Slip({ order, qrSvg, company, settings, bundleMap }: { order: OrderRow;
           </div>
           <div className="text-sm">
             <span className="text-[10px] uppercase tracking-wider font-bold text-gray-500 mr-2">Payment</span>
-            <span className={`font-bold ${order.payment_method === 'card' && order.payment_status === 'paid' ? 'text-green-700' : 'text-amber-700'}`}>
+            <span className={`font-bold ${order.payment_method === 'card' && order.payment_status === 'paid' ? 'text-emerald-700' : 'text-amber-700'}`}>
               {paymentLabel}
             </span>
           </div>

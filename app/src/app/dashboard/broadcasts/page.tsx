@@ -54,7 +54,7 @@ export default async function BroadcastsPage() {
         actions={
           <Link
             href="/dashboard/broadcasts/new"
-            className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl"
+            className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-xl"
           >
             <Send size={14} aria-hidden="true" /> New broadcast
           </Link>
@@ -95,14 +95,14 @@ export default async function BroadcastsPage() {
                     <div className="mt-1 space-y-0.5 text-[10px]">
                       {(b.email_sent + b.email_failed) > 0 && (
                         <p className="text-gray-400">
-                          <span className="text-green-400">{b.email_sent}</span>
+                          <span className="text-emerald-400">{b.email_sent}</span>
                           {b.email_failed > 0 && <span className="text-red-400"> / {b.email_failed} failed</span>}
                           {' '}email
                         </p>
                       )}
                       {(b.sms_sent + b.sms_failed) > 0 && (
                         <p className="text-gray-400">
-                          <span className="text-green-400">{b.sms_sent}</span>
+                          <span className="text-emerald-400">{b.sms_sent}</span>
                           {b.sms_failed > 0 && <span className="text-red-400"> / {b.sms_failed} failed</span>}
                           {' '}SMS
                         </p>

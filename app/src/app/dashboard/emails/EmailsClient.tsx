@@ -15,7 +15,7 @@ interface EmailEvent {
 // Visual treatment per Resend event type.
 const STYLES: Record<string, { label: string; cls: string }> = {
   'email.sent': { label: 'Sent', cls: 'bg-gray-700 text-gray-200' },
-  'email.delivered': { label: 'Delivered', cls: 'bg-green-600/20 text-green-300 border border-green-600/40' },
+  'email.delivered': { label: 'Delivered', cls: 'bg-emerald-600/20 text-emerald-300 border border-emerald-600/40' },
   'email.delivery_delayed': { label: 'Delayed', cls: 'bg-amber-600/20 text-amber-300 border border-amber-600/40' },
   'email.opened': { label: 'Opened', cls: 'bg-blue-600/20 text-blue-300 border border-blue-600/40' },
   'email.clicked': { label: 'Clicked', cls: 'bg-indigo-600/20 text-indigo-300 border border-indigo-600/40' },
@@ -31,7 +31,7 @@ function badge(type: string) {
 }
 
 const HEADLINE = [
-  { key: 'email.delivered', label: 'Delivered', color: 'text-green-400' },
+  { key: 'email.delivered', label: 'Delivered', color: 'text-emerald-400' },
   { key: 'email.opened', label: 'Opened', color: 'text-blue-400' },
   { key: 'email.bounced', label: 'Bounced', color: 'text-red-400' },
   { key: 'email.complained', label: 'Complaints', color: 'text-orange-400' },
@@ -66,7 +66,7 @@ export default function EmailsClient() {
     <div className="max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Mail size={20} className="text-green-400" />
+          <Mail size={20} className="text-emerald-400" />
           <h1 className="text-xl font-bold text-white">Email status</h1>
         </div>
         <button onClick={load} className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors">
@@ -86,9 +86,9 @@ export default function EmailsClient() {
 
       {/* Filter */}
       <div className="flex items-center gap-2 flex-wrap">
-        <button onClick={() => setFilter('')} className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors ${filter === '' ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>All</button>
+        <button onClick={() => setFilter('')} className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors ${filter === '' ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>All</button>
         {Object.keys(STYLES).map(t => (
-          <button key={t} onClick={() => setFilter(t)} className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors ${filter === t ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
+          <button key={t} onClick={() => setFilter(t)} className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors ${filter === t ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
             {badge(t).label}
           </button>
         ))}

@@ -113,16 +113,16 @@ function NavLink({
       onClick={onClick}
       className={`group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
         active
-          ? 'bg-green-600/15 text-green-300'
+          ? 'bg-emerald-600/15 text-emerald-300'
           : 'text-gray-400 hover:text-white hover:bg-gray-800/60'
       }`}
     >
-      <item.icon size={16} className={active ? 'text-green-400' : ''} aria-hidden="true" />
+      <item.icon size={16} className={active ? 'text-emerald-400' : ''} aria-hidden="true" />
       <span className="flex-1">{item.label}</span>
       {badge > 0 && (
         <span
           className={`text-[10px] font-bold tabular-nums leading-none rounded-full px-1.5 py-0.5 min-w-[18px] text-center ${
-            active ? 'bg-green-600 text-white' : 'bg-amber-500/20 text-amber-300'
+            active ? 'bg-emerald-600 text-white' : 'bg-amber-500/20 text-amber-300'
           }`}
           aria-label={`${badge} ${item.label} need attention`}
         >
@@ -190,8 +190,8 @@ export default function DashboardShell({
             href="/dashboard"
             className="flex items-center gap-2 px-5 py-4 border-b border-gray-800 hover:bg-gray-800/30 transition-colors"
           >
-            <span className="w-8 h-8 rounded-lg bg-green-600/20 flex items-center justify-center shrink-0">
-              <Leaf size={16} className="text-green-400" aria-hidden="true" />
+            <span className="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center shrink-0">
+              <Leaf size={16} className="text-emerald-400" aria-hidden="true" />
             </span>
             <div className="min-w-0">
               <span className="font-bold text-sm text-white block leading-tight">TMFoodStuff</span>
@@ -219,8 +219,8 @@ export default function DashboardShell({
         <header className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-gray-900 border-b border-gray-800">
           <div className="flex items-center justify-between px-4 py-2.5">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <span className="w-7 h-7 rounded-md bg-green-600/20 flex items-center justify-center">
-                <Leaf size={14} className="text-green-400" aria-hidden="true" />
+              <span className="w-7 h-7 rounded-md bg-emerald-600/20 flex items-center justify-center">
+                <Leaf size={14} className="text-emerald-400" aria-hidden="true" />
               </span>
               <span className="font-bold text-white">TMFoodStuff</span>
             </Link>
@@ -310,7 +310,7 @@ function UserBlock({
         aria-expanded={open}
         className="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-800/60 transition-colors text-left"
       >
-        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
+        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
           {userEmail.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">

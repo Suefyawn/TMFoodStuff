@@ -139,12 +139,12 @@ export default async function WishlistInsightsPage() {
                 if (oos && popular) { signal = 'Restock urgent'; signalCls = 'text-red-300' }
                 else if (oos) { signal = 'Restock'; signalCls = 'text-amber-300' }
                 else if (popular && r.sold === 0) { signal = 'Price check?'; signalCls = 'text-amber-200' }
-                else if (popular) { signal = 'Hot'; signalCls = 'text-green-300' }
+                else if (popular) { signal = 'Hot'; signalCls = 'text-emerald-300' }
                 else if (lowStock) { signal = 'Low stock'; signalCls = 'text-amber-200' }
                 return (
                   <tr key={r.id} className="hover:bg-gray-800/30 transition-colors">
                     <td className="px-5 py-3">
-                      <Link href={`/product/${i?.slug || ''}`} target="_blank" className="text-white font-bold hover:text-green-400 inline-flex items-center gap-2">
+                      <Link href={`/product/${i?.slug || ''}`} target="_blank" className="text-white font-bold hover:text-emerald-400 inline-flex items-center gap-2">
                         {i?.emoji && <span>{i.emoji}</span>}
                         {i?.name || `#${r.id}`}
                       </Link>
@@ -167,7 +167,7 @@ export default async function WishlistInsightsPage() {
       <p className="text-[11px] text-gray-500">
         Signal hints: <span className="text-red-300">Restock urgent</span> = high wishes + zero stock.
         <span className="text-amber-200 ml-2">Price check?</span> = many customers wished but nobody ordered in 30 days.
-        <span className="text-green-300 ml-2">Hot</span> = high wishes + healthy sales.
+        <span className="text-emerald-300 ml-2">Hot</span> = high wishes + healthy sales.
       </p>
     </div>
   )

@@ -77,25 +77,25 @@ export default function MessageComposer({ email, phone, onClose }: Props) {
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Send via</p>
             <div className="flex flex-col gap-2">
-              <label className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${channels.email ? 'border-green-600/50 bg-green-600/10' : 'border-gray-700 bg-gray-800'} ${!email ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              <label className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${channels.email ? 'border-emerald-600/50 bg-emerald-600/10' : 'border-gray-700 bg-gray-800'} ${!email ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 <input
                   type="checkbox"
                   checked={channels.email}
                   onChange={e => setChannels(c => ({ ...c, email: e.target.checked }))}
                   disabled={!email}
-                  className="w-4 h-4 accent-green-600"
+                  className="w-4 h-4 accent-emerald-600"
                 />
                 <Mail size={14} className="text-gray-400" aria-hidden="true" />
                 <span className="text-sm text-gray-200">Email</span>
                 <span className="text-xs text-gray-500 ml-auto truncate max-w-[200px]">{email || 'no address on file'}</span>
               </label>
-              <label className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${channels.sms ? 'border-green-600/50 bg-green-600/10' : 'border-gray-700 bg-gray-800'} ${!phone ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              <label className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${channels.sms ? 'border-emerald-600/50 bg-emerald-600/10' : 'border-gray-700 bg-gray-800'} ${!phone ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 <input
                   type="checkbox"
                   checked={channels.sms}
                   onChange={e => setChannels(c => ({ ...c, sms: e.target.checked }))}
                   disabled={!phone}
-                  className="w-4 h-4 accent-green-600"
+                  className="w-4 h-4 accent-emerald-600"
                 />
                 <MessageCircle size={14} className="text-gray-400" aria-hidden="true" />
                 <span className="text-sm text-gray-200">SMS / WhatsApp</span>
@@ -113,7 +113,7 @@ export default function MessageComposer({ email, phone, onClose }: Props) {
                 value={subject}
                 onChange={e => setSubject(e.target.value.slice(0, 140))}
                 placeholder="A note from TM FoodStuff"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
               />
             </div>
           )}
@@ -127,7 +127,7 @@ export default function MessageComposer({ email, phone, onClose }: Props) {
               onChange={e => setBody(e.target.value.slice(0, 4000))}
               rows={6}
               placeholder="Hi {customer}, …"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
             />
             <p className="text-[10px] text-gray-500 mt-1 text-right">{body.length}/4000</p>
           </div>
@@ -139,7 +139,7 @@ export default function MessageComposer({ email, phone, onClose }: Props) {
                 <div key={k} className="flex items-center justify-between">
                   <span className="uppercase tracking-wider text-[10px] font-bold text-gray-500">{k}</span>
                   <span className={
-                    v === 'sent' ? 'text-green-400' :
+                    v === 'sent' ? 'text-emerald-400' :
                     v === 'skipped' ? 'text-yellow-400' : 'text-red-400'
                   }>{v}</span>
                 </div>
@@ -153,7 +153,7 @@ export default function MessageComposer({ email, phone, onClose }: Props) {
           <button
             onClick={send}
             disabled={busy}
-            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-60"
           >
             {busy ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Send size={14} aria-hidden="true" />}
             {busy ? 'Sending…' : 'Send'}

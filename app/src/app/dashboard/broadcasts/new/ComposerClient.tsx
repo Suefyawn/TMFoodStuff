@@ -94,22 +94,22 @@ export default function ComposerClient() {
     const fail = result.email.fail + result.sms.fail
     return (
       <div className="p-6 max-w-2xl mx-auto text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
-          <CheckCircle2 size={28} className="text-green-700" aria-hidden="true" />
+        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
+          <CheckCircle2 size={28} className="text-emerald-700" aria-hidden="true" />
         </div>
         <h1 className="text-2xl font-bold text-white mb-2">Broadcast sent</h1>
         <p className="text-gray-400 text-sm mb-6">{ok} sent · {fail} failed · {result.total_targeted} targeted</p>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-left text-sm text-gray-300 space-y-2 mb-6">
           {(result.email.ok + result.email.fail) > 0 && (
-            <div className="flex justify-between"><span>Email</span><span className="font-mono"><span className="text-green-400">{result.email.ok}</span>{result.email.fail > 0 && <span className="text-red-400"> / {result.email.fail} failed</span>}</span></div>
+            <div className="flex justify-between"><span>Email</span><span className="font-mono"><span className="text-emerald-400">{result.email.ok}</span>{result.email.fail > 0 && <span className="text-red-400"> / {result.email.fail} failed</span>}</span></div>
           )}
           {(result.sms.ok + result.sms.fail) > 0 && (
-            <div className="flex justify-between"><span>SMS / WhatsApp</span><span className="font-mono"><span className="text-green-400">{result.sms.ok}</span>{result.sms.fail > 0 && <span className="text-red-400"> / {result.sms.fail} failed</span>}</span></div>
+            <div className="flex justify-between"><span>SMS / WhatsApp</span><span className="font-mono"><span className="text-emerald-400">{result.sms.ok}</span>{result.sms.fail > 0 && <span className="text-red-400"> / {result.sms.fail} failed</span>}</span></div>
           )}
         </div>
         <div className="flex gap-2 justify-center">
           <Link href="/dashboard/broadcasts" className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-xl">View history</Link>
-          <button onClick={() => router.refresh()} className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl">Send another</button>
+          <button onClick={() => router.refresh()} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-xl">Send another</button>
         </div>
       </div>
     )
@@ -138,7 +138,7 @@ export default function ComposerClient() {
               type="button"
               onClick={() => setChannel(c)}
               className={`flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-xs font-bold transition-colors ${
-                channel === c ? 'border-green-600 bg-green-900/30 text-green-200' : 'border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                channel === c ? 'border-emerald-600 bg-emerald-900/30 text-emerald-200' : 'border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               {c === 'email' && <Mail size={16} aria-hidden="true" />}
@@ -169,7 +169,7 @@ export default function ComposerClient() {
               type="button"
               onClick={() => setAudience(val)}
               className={`text-left rounded-xl border-2 p-3 transition-colors ${
-                audience === val ? 'border-green-600 bg-green-900/30' : 'border-gray-700 bg-gray-800 hover:bg-gray-700'
+                audience === val ? 'border-emerald-600 bg-emerald-900/30' : 'border-gray-700 bg-gray-800 hover:bg-gray-700'
               }`}
             >
               <p className="text-sm font-bold text-white">{label}</p>
@@ -209,7 +209,7 @@ export default function ComposerClient() {
               value={subject}
               onChange={e => setSubject(e.target.value.slice(0, 140))}
               placeholder="A note from TM FoodStuff"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
             />
           </div>
         )}
@@ -221,7 +221,7 @@ export default function ComposerClient() {
             onChange={e => setBody(e.target.value.slice(0, 4000))}
             rows={8}
             placeholder="Hi! We're running a special weekend offer…"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
           />
           <p className="text-[10px] text-gray-500 mt-1 text-right">{body.length}/4000</p>
         </div>
@@ -240,7 +240,7 @@ export default function ComposerClient() {
           type="button"
           onClick={() => setConfirmOpen(true)}
           disabled={!!validationError}
-          className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold px-4 py-2 rounded-xl"
+          className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold px-4 py-2 rounded-xl"
         >
           <Send size={14} aria-hidden="true" /> Review &amp; send
         </button>
@@ -283,7 +283,7 @@ export default function ComposerClient() {
                 type="button"
                 onClick={doSend}
                 disabled={sending}
-                className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl"
+                className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-sm font-bold px-4 py-2 rounded-xl"
               >
                 {sending ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <Send size={14} aria-hidden="true" />}
                 {sending ? 'Sending…' : `Send to ${reachable}`}

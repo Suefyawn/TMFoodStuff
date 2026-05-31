@@ -20,7 +20,7 @@ interface PageHeaderProps {
 }
 
 const TONES: Record<NonNullable<PageHeaderProps['iconTone']>, { bg: string; text: string }> = {
-  green:  { bg: 'bg-green-900/40',  text: 'text-green-300'  },
+  green:  { bg: 'bg-emerald-900/40',  text: 'text-emerald-300'  },
   blue:   { bg: 'bg-blue-900/40',   text: 'text-blue-300'   },
   purple: { bg: 'bg-purple-900/40', text: 'text-purple-300' },
   amber:  { bg: 'bg-amber-900/40',  text: 'text-amber-300'  },

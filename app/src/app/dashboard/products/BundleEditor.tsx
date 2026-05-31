@@ -108,7 +108,7 @@ export default function BundleEditor({
         <div className="text-[11px] text-gray-400 flex justify-between gap-2 pt-2 border-t border-gray-700">
           <span>Sum of parts: <span className="text-gray-200 font-mono">AED {componentsTotal.toFixed(2)}</span></span>
           {savings > 0
-            ? <span className="text-green-400">Saves <span className="font-bold">AED {savings.toFixed(2)} ({savingsPct.toFixed(0)}%)</span></span>
+            ? <span className="text-emerald-400">Saves <span className="font-bold">AED {savings.toFixed(2)} ({savingsPct.toFixed(0)}%)</span></span>
             : savings < 0
               ? <span className="text-red-400">Costs <span className="font-bold">AED {(-savings).toFixed(2)}</span> more than parts</span>
               : <span className="text-gray-500">Equals parts</span>}
@@ -123,7 +123,7 @@ export default function BundleEditor({
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search a product to add…"
-          className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-7 pr-3 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-green-500"
+          className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-7 pr-3 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
         />
         {search && filtered.length > 0 && (
           <ul className="absolute z-10 mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg shadow-lg max-h-44 overflow-y-auto">

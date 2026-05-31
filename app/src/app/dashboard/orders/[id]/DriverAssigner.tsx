@@ -72,7 +72,7 @@ export default function DriverAssigner({
       ) : drivers.length === 0 ? (
         <p className="text-xs text-gray-500">
           No drivers configured. Invite one from{' '}
-          <a href="/dashboard/team" className="text-green-400 hover:underline">Team</a>.
+          <a href="/dashboard/team" className="text-emerald-400 hover:underline">Team</a>.
         </p>
       ) : (
         <div className="flex items-center gap-2 flex-wrap">
@@ -80,7 +80,7 @@ export default function DriverAssigner({
             value={driverId}
             onChange={e => save(e.target.value)}
             disabled={saving}
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500 disabled:opacity-60"
+            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 disabled:opacity-60"
           >
             <option value="">Unassigned (any driver can claim)</option>
             {drivers.map(d => (
