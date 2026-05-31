@@ -33,8 +33,8 @@ export default function StockNotifyForm({ productId, productName }: { productId:
   if (status === 'done') {
     return (
       <div className="w-full flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl px-5 py-4">
-        <Bell size={20} className="text-green-600 shrink-0" />
-        <p className="text-green-700 font-semibold text-sm">
+        <Bell size={20} className="text-forest shrink-0" />
+        <p className="text-forest-dark font-semibold text-sm">
           {lang === 'ar'
             ? `سنرسل لك بريداً إلكترونياً عندما يعود ${productName} إلى المخزون!`
             : `We'll email you when ${productName} is back in stock!`}
@@ -60,12 +60,12 @@ export default function StockNotifyForm({ productId, productName }: { productId:
           aria-invalid={emailError ? 'true' : undefined}
           aria-describedby={emailError ? 'stock-notify-email-error' : undefined}
           required
-          className={`flex-1 border-2 rounded-xl px-4 py-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition-colors min-h-[52px] ${emailError ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-green-500'}`}
+          className={`flex-1 border-2 rounded-xl px-4 py-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light transition-colors min-h-[52px] ${emailError ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-forest-light'}`}
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold px-4 py-3 rounded-xl transition-colors disabled:opacity-60 min-h-[52px] shrink-0 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+          className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold px-4 py-3 rounded-xl transition-colors disabled:opacity-60 min-h-[52px] shrink-0 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
         >
           <Bell size={16} aria-hidden="true" />
           {status === 'loading' ? '…' : buttonText}

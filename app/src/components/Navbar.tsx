@@ -45,7 +45,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`nav-link px-3 py-2 ${pathname.startsWith('/shop') ? 'text-green-600' : ''}`}
+                className={`nav-link px-3 py-2 ${pathname.startsWith('/shop') ? 'text-forest' : ''}`}
               >
                 {link.label}
               </Link>
@@ -54,11 +54,11 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Link href="/track" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
+            <Link href="/track" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-forest transition-colors px-2">
               <Package size={16} aria-hidden="true" />
               <span>{lang === 'ar' ? 'تتبع الطلب' : 'Track order'}</span>
             </Link>
-            <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors px-2">
+            <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-forest transition-colors px-2">
               <User size={16} />
               <span>{tr.signIn}</span>
             </Link>
@@ -112,8 +112,8 @@ export default function Navbar() {
                 href={link.href}
                 className={`flex items-center px-3 py-3 min-h-[44px] text-sm font-medium rounded-lg transition-colors ${
                   pathname.startsWith('/shop')
-                    ? 'text-green-600 bg-green-50'
-                    : 'text-gray-700 hover:text-green-600 hover:bg-green-50'
+                    ? 'text-forest bg-green-50'
+                    : 'text-gray-700 hover:text-forest hover:bg-green-50'
                 }`}
                 onClick={() => setOpen(false)}
               >
@@ -123,7 +123,7 @@ export default function Navbar() {
             <div className="border-t border-gray-100 pt-2 mt-1">
               <Link
                 href="/track"
-                className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-forest hover:bg-green-50 rounded-lg transition-colors"
                 onClick={() => setOpen(false)}
               >
                 <Package size={16} aria-hidden="true" />
@@ -131,7 +131,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/account"
-                className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-forest hover:bg-green-50 rounded-lg transition-colors"
               >
                 <User size={16} />
                 {tr.signIn}

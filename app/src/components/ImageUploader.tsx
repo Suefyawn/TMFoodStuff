@@ -93,7 +93,7 @@ export default function ImageUploader({ images, onChange, maxImages = 6 }: Image
                 onError={e => { (e.target as HTMLImageElement).src = '' }}
               />
               {idx === 0 && (
-                <div className="absolute top-1.5 left-1.5 bg-green-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
+                <div className="absolute top-1.5 left-1.5 bg-forest text-white text-[10px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
                   <Star size={8} fill="currentColor" /> Primary
                 </div>
               )}
@@ -102,7 +102,7 @@ export default function ImageUploader({ images, onChange, maxImages = 6 }: Image
                   <button
                     type="button"
                     onClick={() => makePrimary(idx)}
-                    className="bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg hover:bg-green-500"
+                    className="bg-forest text-white text-[10px] font-bold px-2 py-1 rounded-lg hover:bg-forest-light"
                     title="Set as primary"
                   >
                     Set Primary
@@ -126,7 +126,7 @@ export default function ImageUploader({ images, onChange, maxImages = 6 }: Image
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={uploading}
-              className="aspect-square rounded-xl border-2 border-dashed border-gray-600 hover:border-green-500 flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-green-400 transition-colors disabled:opacity-50"
+              className="aspect-square rounded-xl border-2 border-dashed border-gray-600 hover:border-forest-light flex flex-col items-center justify-center gap-1 text-gray-500 hover:text-green-400 transition-colors disabled:opacity-50"
             >
               {uploading ? <Loader2 size={20} className="animate-spin" /> : <Upload size={20} />}
               <span className="text-[10px] font-semibold">{uploading ? 'Uploading...' : 'Add more'}</span>
@@ -144,8 +144,8 @@ export default function ImageUploader({ images, onChange, maxImages = 6 }: Image
           onClick={() => inputRef.current?.click()}
           className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center gap-3 cursor-pointer transition-all ${
             dragOver
-              ? 'border-green-500 bg-green-500/10'
-              : 'border-gray-600 hover:border-green-500 hover:bg-green-500/5'
+              ? 'border-forest-light bg-forest-light/10'
+              : 'border-gray-600 hover:border-forest-light hover:bg-forest-light/5'
           }`}
         >
           {uploading ? (

@@ -31,7 +31,7 @@ const STATUS_COLOR: Record<string, string> = {
   confirmed: 'bg-blue-100 text-blue-700',
   processing: 'bg-purple-100 text-purple-700',
   out_for_delivery: 'bg-orange-100 text-orange-700',
-  delivered: 'bg-green-100 text-green-700',
+  delivered: 'bg-green-100 text-forest-dark',
   cancelled: 'bg-gray-200 text-gray-600',
 }
 
@@ -101,7 +101,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4 min-w-0 flex-1">
             <div className="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center shrink-0">
-              <UserIcon size={22} className="text-green-700" aria-hidden="true" />
+              <UserIcon size={22} className="text-forest-dark" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
               {editing ? (
@@ -111,7 +111,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
                     onChange={e => setFormName(e.target.value)}
                     placeholder={isAr ? 'الاسم الكامل' : 'Full name'}
                     aria-label={isAr ? 'الاسم الكامل' : 'Full name'}
-                    className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500"
+                    className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-forest-light"
                   />
                   <input
                     value={formPhone}
@@ -119,11 +119,11 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
                     placeholder={isAr ? '+971 50 000 0000' : '+971 50 000 0000'}
                     aria-label={isAr ? 'رقم الهاتف' : 'Phone number'}
                     type="tel"
-                    className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500"
+                    className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-forest-light"
                   />
                   {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
                   <div className="flex items-center gap-2">
-                    <button onClick={saveProfile} disabled={saving} className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60">
+                    <button onClick={saveProfile} disabled={saving} className="inline-flex items-center gap-1.5 bg-forest hover:bg-forest-dark text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60">
                       {saving ? <Loader2 size={12} className="animate-spin" aria-hidden="true" /> : <Check size={12} aria-hidden="true" />}
                       {isAr ? 'حفظ' : 'Save'}
                     </button>
@@ -147,7 +147,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setEditing(true)}
-                className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-green-700 transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-forest-dark transition-colors"
               >
                 <Pencil size={14} aria-hidden="true" />
                 {isAr ? 'تعديل' : 'Edit'}
@@ -177,20 +177,20 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
             <p className="font-bold text-gray-900 text-sm">{isAr ? 'النقاط' : 'Points'}</p>
             <p className="text-xs text-gray-500">{isAr ? 'الرصيد والمكافآت' : 'Balance & rewards'}</p>
           </div>
-          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-forest-dark ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
         </Link>
         <Link
           href="/account/addresses"
           className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-3 hover:border-green-300 hover:bg-green-50/30 transition-colors group"
         >
           <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center shrink-0">
-            <MapPin size={18} className="text-green-700" aria-hidden="true" />
+            <MapPin size={18} className="text-forest-dark" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-gray-900 text-sm">{isAr ? 'العناوين' : 'Addresses'}</p>
             <p className="text-xs text-gray-500">{isAr ? 'حفظ عناوين التوصيل' : 'Save delivery addresses'}</p>
           </div>
-          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-forest-dark ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
         </Link>
         <Link
           href="/account/wishlist"
@@ -203,7 +203,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
             <p className="font-bold text-gray-900 text-sm">{isAr ? 'قائمة المفضلة' : 'Wishlist'}</p>
             <p className="text-xs text-gray-500">{isAr ? 'المنتجات التي حفظتها' : 'Products you saved'}</p>
           </div>
-          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-forest-dark ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
         </Link>
         <Link
           href="/account/referrals"
@@ -216,7 +216,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
             <p className="font-bold text-gray-900 text-sm">{isAr ? 'ادعُ صديقاً' : 'Refer & earn'}</p>
             <p className="text-xs text-gray-500">{isAr ? '50 نقطة لكل من تدعوه' : '50 pts each, win-win'}</p>
           </div>
-          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-forest-dark ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
         </Link>
         <Link
           href="/account/subscriptions"
@@ -229,7 +229,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
             <p className="font-bold text-gray-900 text-sm">{isAr ? 'الاشتراكات' : 'Subscriptions'}</p>
             <p className="text-xs text-gray-500">{isAr ? 'طلبات متكررة' : 'Recurring orders'}</p>
           </div>
-          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-forest-dark ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
         </Link>
         <Link
           href="/account/preferences"
@@ -242,7 +242,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
             <p className="font-bold text-gray-900 text-sm">{isAr ? 'التفضيلات' : 'Preferences'}</p>
             <p className="text-xs text-gray-500">{isAr ? 'الإشعارات والخصوصية' : 'Notifications & privacy'}</p>
           </div>
-          <ChevronRight size={16} className={`text-gray-300 group-hover:text-green-700 ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronRight size={16} className={`text-gray-300 group-hover:text-forest-dark ${isAr ? 'rotate-180' : ''}`} aria-hidden="true" />
         </Link>
       </div>
 
@@ -268,7 +268,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
             </p>
             <Link
               href="/shop"
-              className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-forest hover:bg-forest-dark text-white font-bold px-5 py-2.5 rounded-xl transition-colors"
             >
               {isAr ? 'تصفّح المنتجات' : 'Browse products'}
             </Link>
@@ -290,7 +290,7 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
                           {statusLabel(o.status, isAr)}
                         </span>
                         {o.payment_status === 'paid' && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-forest-dark">
                             {isAr ? 'مدفوع' : 'PAID'}
                           </span>
                         )}
@@ -305,10 +305,10 @@ export default function AccountClient({ email, fullName, phone, orders }: Accoun
                       )}
                     </div>
                     <div className={`text-${isAr ? 'left' : 'right'} flex flex-col items-end shrink-0`}>
-                      <span className="text-sm font-black text-green-700">AED {total.toFixed(2)}</span>
+                      <span className="text-sm font-black text-forest-dark">AED {total.toFixed(2)}</span>
                       <Link
                         href={`/account/orders/${o.order_number}`}
-                        className="text-xs font-bold text-gray-500 hover:text-green-700 mt-1"
+                        className="text-xs font-bold text-gray-500 hover:text-forest-dark mt-1"
                       >
                         {isAr ? 'التفاصيل' : 'View'} →
                       </Link>

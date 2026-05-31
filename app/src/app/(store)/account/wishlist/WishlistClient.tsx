@@ -26,7 +26,7 @@ export default function WishlistClient({ initialItems }: { initialItems: Wishlis
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
@@ -53,7 +53,7 @@ export default function WishlistClient({ initialItems }: { initialItems: Wishlis
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-forest hover:bg-forest-dark text-white font-bold px-5 py-2.5 rounded-xl transition-colors"
           >
             <ShoppingBag size={16} aria-hidden="true" />
             {isAr ? 'تصفّح المنتجات' : 'Browse products'}

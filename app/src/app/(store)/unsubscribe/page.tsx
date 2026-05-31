@@ -17,7 +17,7 @@ export default async function UnsubscribePage({ searchParams }: Params) {
     <div className="max-w-md mx-auto px-4 py-20 text-center">
       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 ${ok ? 'bg-green-100' : invalid ? 'bg-amber-100' : 'bg-gray-100'}`}>
         {ok
-          ? <CheckCircle size={32} className="text-green-600" aria-hidden="true" />
+          ? <CheckCircle size={32} className="text-forest" aria-hidden="true" />
           : invalid
             ? <AlertCircle size={32} className="text-amber-600" aria-hidden="true" />
             : <Mail size={32} className="text-gray-400" aria-hidden="true" />}

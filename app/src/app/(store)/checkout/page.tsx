@@ -36,7 +36,7 @@ interface SavedAddress {
   is_default: boolean
 }
 
-const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:border-green-500 transition-colors"
+const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:border-forest-light transition-colors"
 
 export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCartStore()
@@ -318,12 +318,12 @@ export default function CheckoutPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle size={48} className="text-green-600" />
+          <CheckCircle size={48} className="text-forest" />
         </div>
         <h1 className="text-3xl font-black text-gray-900 mb-3">{tr.orderPlaced}</h1>
         <p className="text-gray-500 mb-2 text-lg">{tr.thankYou}, {form.fullName}!</p>
         {orderNumber && (
-          <p className="text-green-700 font-black text-2xl mb-3">#{orderNumber}</p>
+          <p className="text-forest-dark font-black text-2xl mb-3">#{orderNumber}</p>
         )}
         <p className="text-gray-500 mb-8 text-sm max-w-md mx-auto">
           {lang === 'ar'
@@ -336,7 +336,7 @@ export default function CheckoutPage() {
               href={`https://wa.me/${waNumber}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-black px-6 py-3 rounded-xl transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-forest-light hover:bg-forest text-white font-black px-6 py-3 rounded-xl transition-colors"
             >
               <MessageCircle size={18} fill="currentColor" />
               {lang === 'ar' ? 'تأكيد عبر واتساب' : 'Confirm on WhatsApp'}
@@ -384,10 +384,10 @@ export default function CheckoutPage() {
               <div className="bg-white border border-gray-100 rounded-2xl p-5 md:p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                   <h2 className="font-black text-gray-900 text-base md:text-lg inline-flex items-center gap-2">
-                    <MapPin size={16} className="text-green-600" aria-hidden="true" />
+                    <MapPin size={16} className="text-forest" aria-hidden="true" />
                     {lang === 'ar' ? 'العنوان المحفوظ' : 'Saved address'}
                   </h2>
-                  <Link href="/account/addresses" className="text-xs font-bold text-green-700 hover:underline">
+                  <Link href="/account/addresses" className="text-xs font-bold text-forest-dark hover:underline">
                     {lang === 'ar' ? 'إدارة' : 'Manage'} →
                   </Link>
                 </div>
@@ -400,7 +400,7 @@ export default function CheckoutPage() {
                         type="button"
                         onClick={() => applyAddress(a)}
                         className={`flex-shrink-0 text-left rounded-xl border-2 px-4 py-2.5 text-xs transition-colors min-w-[160px] ${
-                          active ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'
+                          active ? 'border-forest-light bg-green-50' : 'border-gray-200 hover:border-green-300'
                         }`}
                       >
                         <div className="font-bold text-gray-900 truncate">
@@ -416,10 +416,10 @@ export default function CheckoutPage() {
             {!signedIn && (
               <div className="bg-green-50 border border-green-100 rounded-2xl p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
                 <span className="inline-flex items-center gap-2 text-gray-700">
-                  <User size={14} className="text-green-700" aria-hidden="true" />
+                  <User size={14} className="text-forest-dark" aria-hidden="true" />
                   {lang === 'ar' ? 'لديك حساب؟ سجّل الدخول لتعبئة بياناتك تلقائياً.' : 'Have an account? Sign in to auto-fill your details.'}
                 </span>
-                <Link href="/account/login?next=/checkout" className="font-bold text-green-700 hover:underline">
+                <Link href="/account/login?next=/checkout" className="font-bold text-forest-dark hover:underline">
                   {lang === 'ar' ? 'تسجيل الدخول' : 'Sign in'} →
                 </Link>
               </div>
@@ -546,13 +546,13 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-3 gap-2 md:gap-3 mb-5">
                 {DELIVERY_DATES.map(({ iso, label }) => (
                   <label key={iso} className={`flex flex-col items-center p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
-                    form.deliveryDate === iso ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                    form.deliveryDate === iso ? 'border-forest-light bg-green-50' : 'border-gray-200 hover:border-gray-300'
                   }`}>
                     <input type="radio" name="deliveryDate" value={iso} checked={form.deliveryDate === iso}
                       onChange={() => setForm(f => ({ ...f, deliveryDate: iso }))} className="sr-only" />
                     <span className="font-bold text-gray-900 text-xs md:text-sm">{label}</span>
                     <span className="text-xs text-gray-400 mt-0.5">{new Date(iso + 'T00:00:00').toLocaleDateString(lang === 'ar' ? 'ar-AE' : 'en-AE', { day: 'numeric', month: 'short' })}</span>
-                    {form.deliveryDate === iso && <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />}
+                    {form.deliveryDate === iso && <CheckCircle size={14} className="text-forest mt-1" aria-hidden="true" />}
                   </label>
                 ))}
               </div>
@@ -576,7 +576,7 @@ export default function CheckoutPage() {
                         !slot.available
                           ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
                           : form.deliverySlot === slot.id
-                            ? 'border-green-500 bg-green-50 cursor-pointer'
+                            ? 'border-forest-light bg-green-50 cursor-pointer'
                             : 'border-gray-200 hover:border-gray-300 cursor-pointer'
                       }`}
                     >
@@ -589,7 +589,7 @@ export default function CheckoutPage() {
                         disabled={!slot.available}
                         className="sr-only"
                       />
-                      <slot.Icon size={22} className={`mb-1.5 ${form.deliverySlot === slot.id ? 'text-green-600' : 'text-gray-400'}`} aria-hidden="true" />
+                      <slot.Icon size={22} className={`mb-1.5 ${form.deliverySlot === slot.id ? 'text-forest' : 'text-gray-400'}`} aria-hidden="true" />
                       <span className="font-bold text-gray-900 text-xs md:text-sm">{slot.label}</span>
                       {slot.available && slot.spotsLeft != null && (
                         <span className="absolute top-1 right-1 text-[9px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 rounded px-1 py-0.5" title={lang === 'ar' ? `${slot.spotsLeft} مكان متبقي` : `${slot.spotsLeft} spots left today`}>
@@ -603,7 +603,7 @@ export default function CheckoutPage() {
                         </span>
                       )}
                       {form.deliverySlot === slot.id && slot.available && (
-                        <CheckCircle size={14} className="text-green-600 mt-1" aria-hidden="true" />
+                        <CheckCircle size={14} className="text-forest mt-1" aria-hidden="true" />
                       )}
                     </label>
                   )
@@ -620,30 +620,30 @@ export default function CheckoutPage() {
               <h2 className="font-black text-gray-900 text-lg md:text-xl mb-5">{tr.paymentMethod}</h2>
               <div className="space-y-3">
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
-                  paymentMethod === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                  paymentMethod === 'cod' ? 'border-forest-light bg-green-50' : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="sr-only" />
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'cod' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'cod' ? 'bg-green-100 text-forest-dark' : 'bg-gray-100 text-gray-500'}`}>
                     <Wallet size={20} aria-hidden="true" />
                   </div>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.cashOnDelivery}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{tr.cashOnDeliverySub}</div>
                   </div>
-                  {paymentMethod === 'cod' && <CheckCircle size={20} className="text-green-600" aria-hidden="true" />}
+                  {paymentMethod === 'cod' && <CheckCircle size={20} className="text-forest" aria-hidden="true" />}
                 </label>
                 <label className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
-                  paymentMethod === 'card' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'
+                  paymentMethod === 'card' ? 'border-forest-light bg-green-50' : 'border-gray-200 hover:border-gray-300'
                 }`}>
                   <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="sr-only" />
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'card' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === 'card' ? 'bg-green-100 text-forest-dark' : 'bg-gray-100 text-gray-500'}`}>
                     <CreditCard size={20} aria-hidden="true" />
                   </div>
                   <div className="flex-1">
                     <div className="font-bold text-gray-900">{tr.payOnline}</div>
                     <div className="text-xs text-gray-500 mt-0.5">{lang === 'ar' ? 'بطاقة فيزا أو ماستركارد · دفع آمن' : 'Visa or Mastercard · Secure checkout'}</div>
                   </div>
-                  {paymentMethod === 'card' && <CheckCircle size={20} className="text-green-600" aria-hidden="true" />}
+                  {paymentMethod === 'card' && <CheckCircle size={20} className="text-forest" aria-hidden="true" />}
                 </label>
               </div>
             </div>
@@ -689,13 +689,13 @@ export default function CheckoutPage() {
                   <span>{tr.delivery}</span>
                   <span>
                     {deliveryFee === 0
-                      ? <span className="text-green-600 font-bold">{tr.freeDelivery}</span>
+                      ? <span className="text-forest font-bold">{tr.freeDelivery}</span>
                       : formatAED(deliveryFee)
                     }
                   </span>
                 </div>
-                <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-green-800 font-semibold flex items-center gap-2">
-                  <Truck size={14} className="text-green-700 shrink-0" aria-hidden="true" />
+                <div className="p-3 bg-green-50 rounded-xl border border-green-100 text-xs text-forest-dark font-semibold flex items-center gap-2">
+                  <Truck size={14} className="text-forest-dark shrink-0" aria-hidden="true" />
                   <span>{lang === 'ar' ? 'توصيل مجاني — عرض الإطلاق!' : 'Free delivery — Grand Launch Offer!'}</span>
                 </div>
 
@@ -703,7 +703,7 @@ export default function CheckoutPage() {
                 <div className="border-t pt-4 mt-3">
                   <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">{tr.promoCode}</label>
                   {promoApplied ? (
-                    <div className="flex items-center gap-2 text-green-600 font-semibold text-sm">
+                    <div className="flex items-center gap-2 text-forest font-semibold text-sm">
                       <CheckCircle size={16} />
                       {tr.promoApplied} — AED {promoDiscount.toFixed(2)} off!
                     </div>
@@ -714,7 +714,7 @@ export default function CheckoutPage() {
                         value={promoCode}
                         onChange={e => setPromoCode(e.target.value.toUpperCase())}
                         placeholder={lang === 'ar' ? 'أدخل كود الخصم' : 'Enter promo code'}
-                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-base md:text-sm focus:outline-none focus:border-green-500"
+                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-base md:text-sm focus:outline-none focus:border-forest-light"
                       />
                       <button
                         type="button"
@@ -732,7 +732,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {promoApplied && (
-                  <div className="flex justify-between text-green-600 font-semibold">
+                  <div className="flex justify-between text-forest font-semibold">
                     <span>Promo ({promoCode})</span>
                     <span>-{formatAED(promoDiscount)}</span>
                   </div>
@@ -792,7 +792,7 @@ export default function CheckoutPage() {
 
                 <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                   <span>{tr.total}</span>
-                  <span className="text-green-700">{formatAED(finalTotal)}</span>
+                  <span className="text-forest-dark">{formatAED(finalTotal)}</span>
                 </div>
               </div>
 
@@ -808,7 +808,7 @@ export default function CheckoutPage() {
                 title={checkoutBlocked
                   ? (lang === 'ar' ? 'يرجى حل المشكلات في السلة قبل المتابعة' : 'Please resolve the issues above before continuing')
                   : undefined}
-                className="w-full mt-4 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg min-h-[52px] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-forest text-white font-black py-4 rounded-xl hover:bg-forest-dark transition-colors text-lg shadow-lg min-h-[52px] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>

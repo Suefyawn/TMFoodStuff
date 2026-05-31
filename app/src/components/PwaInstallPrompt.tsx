@@ -59,7 +59,7 @@ export default function PwaInstallPrompt() {
       dir={isAr ? 'rtl' : 'ltr'}
     >
       <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
-        <Download size={18} className="text-green-700" aria-hidden="true" />
+        <Download size={18} className="text-forest-dark" aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-bold text-gray-900 truncate">
@@ -71,7 +71,7 @@ export default function PwaInstallPrompt() {
       </div>
       <button
         onClick={handleInstall}
-        className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+        className="bg-forest hover:bg-forest-dark text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
       >
         {isAr ? 'تثبيت' : 'Install'}
       </button>

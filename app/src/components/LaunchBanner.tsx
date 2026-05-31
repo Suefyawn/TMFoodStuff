@@ -20,7 +20,7 @@ export default function LaunchBanner() {
     : <>Grand Launch Offer — <strong>FREE DELIVERY</strong> on all orders! Use code <span className="bg-white/20 px-2 py-0.5 rounded font-mono font-black">{promoCode}</span> for 10% off too</>
 
   return (
-    <div className="bg-green-700 text-white py-2.5 px-4 text-center text-sm font-semibold relative">
+    <div className="bg-forest-dark text-white py-2.5 px-4 text-center text-sm font-semibold relative">
       <div className="flex items-center justify-center gap-2">
         <Truck size={15} className="flex-shrink-0" />
         <span className="md:hidden">{bannerTextMobile}</span>

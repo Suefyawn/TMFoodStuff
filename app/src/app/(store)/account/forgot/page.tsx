@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
     return (
       <div className="max-w-md mx-auto px-4 py-16 md:py-24 text-center" dir={isAr ? 'rtl' : 'ltr'}>
         <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-5">
-          <Mail size={26} className="text-green-700" aria-hidden="true" />
+          <Mail size={26} className="text-forest-dark" aria-hidden="true" />
         </div>
         <h1 className="text-2xl font-black text-gray-900 mb-2">{isAr ? 'تحقق من بريدك' : 'Check your inbox'}</h1>
         <p className="text-gray-500 text-sm mb-6 leading-relaxed">
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
             ? `إذا كان لدينا حساب مرتبط بـ ${email}، فقد أرسلنا رابط إعادة تعيين كلمة المرور. تحقق من بريدك الإلكتروني (وملف الرسائل غير المرغوبة).`
             : `If we have an account for ${email}, we've sent a password reset link. Check your inbox (and spam folder).`}
         </p>
-        <Link href="/account/login" className="inline-flex items-center gap-1.5 text-green-700 font-bold hover:underline">
+        <Link href="/account/login" className="inline-flex items-center gap-1.5 text-forest-dark font-bold hover:underline">
           <ArrowLeft size={14} aria-hidden="true" />
           {isAr ? 'العودة لتسجيل الدخول' : 'Back to sign in'}
         </Link>
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
                 autoComplete="email"
                 required
                 autoFocus
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -97,14 +97,14 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            className="w-full bg-forest hover:bg-forest-dark text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
           >
             {loading ? (isAr ? 'جاري الإرسال…' : 'Sending…') : (isAr ? 'إرسال رابط الإعادة' : 'Send reset link')}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
-          <Link href="/account/login" className="text-green-700 font-bold hover:underline inline-flex items-center gap-1.5">
+          <Link href="/account/login" className="text-forest-dark font-bold hover:underline inline-flex items-center gap-1.5">
             <ArrowLeft size={13} aria-hidden="true" />
             {isAr ? 'العودة لتسجيل الدخول' : 'Back to sign in'}
           </Link>

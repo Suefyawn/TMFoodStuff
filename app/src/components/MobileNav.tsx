@@ -32,7 +32,7 @@ export default function MobileNav() {
               key={href}
               href={href}
               className={`flex flex-col items-center justify-center gap-1 relative transition-colors ${
-                isActive ? 'text-green-600' : 'text-gray-400 hover:text-gray-600'
+                isActive ? 'text-forest' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
               <div className="relative">

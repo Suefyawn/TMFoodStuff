@@ -75,13 +75,13 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-3">
           <Link
             href={backHref}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-green-700 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-forest-dark transition-colors"
           >
             <ArrowLeft size={14} aria-hidden="true" /> {backLabel}
           </Link>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 bg-forest hover:bg-forest-dark text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
           >
             <Printer size={14} aria-hidden="true" /> Print / Save as PDF
           </button>
@@ -91,7 +91,7 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
       {/* Invoice canvas */}
       <div className="max-w-3xl mx-auto bg-white print:max-w-none print:mx-0 my-6 print:my-0 shadow-md print:shadow-none rounded-lg print:rounded-none overflow-hidden">
         {/* Brand stripe */}
-        <div className="bg-green-600 text-white px-8 md:px-12 py-5 flex items-center justify-between gap-4">
+        <div className="bg-forest text-white px-8 md:px-12 py-5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 bg-white/15 rounded-lg flex items-center justify-center">
               <Leaf size={20} aria-hidden="true" />
@@ -138,7 +138,7 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
                 </div>
                 <div className="flex justify-end gap-3">
                   <dt className="text-gray-500">Payment</dt>
-                  <dd className={`font-semibold text-xs uppercase tracking-wider ${dueLabel === 'Paid' ? 'text-green-700' : 'text-amber-700'}`}>
+                  <dd className={`font-semibold text-xs uppercase tracking-wider ${dueLabel === 'Paid' ? 'text-forest-dark' : 'text-amber-700'}`}>
                     {dueLabel}
                   </dd>
                 </div>
@@ -213,20 +213,20 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
               <Row
                 label="Delivery"
                 value={deliveryFee === 0 ? 'FREE' : `AED ${deliveryFee.toFixed(2)}`}
-                accent={deliveryFee === 0 ? 'text-green-700' : ''}
+                accent={deliveryFee === 0 ? 'text-forest-dark' : ''}
               />
               {promoDiscount > 0 && (
                 <Row
                   label={`Promo (${order.promo_code})`}
                   value={`−AED ${promoDiscount.toFixed(2)}`}
-                  accent="text-green-700"
+                  accent="text-forest-dark"
                 />
               )}
               {pointsValue > 0 && (
                 <Row
                   label={`Loyalty points (${order.points_redeemed} pts)`}
                   value={`−AED ${pointsValue.toFixed(2)}`}
-                  accent="text-green-700"
+                  accent="text-forest-dark"
                 />
               )}
               <div className="pt-3 mt-2 border-t-2 border-gray-900 flex justify-between text-base font-black text-gray-900">
@@ -254,7 +254,7 @@ export default function InvoiceView({ order, settings, qrSvg, backHref, backLabe
                 href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}?text=${encodeURIComponent(`Hi, I have a question about order ${order.order_number}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="print:hidden inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 hover:bg-green-100 text-xs font-bold px-3 py-2 rounded-lg transition-colors w-fit"
+                className="print:hidden inline-flex items-center gap-2 bg-green-50 border border-green-200 text-forest-dark hover:bg-green-100 text-xs font-bold px-3 py-2 rounded-lg transition-colors w-fit"
               >
                 <MessageCircle size={12} aria-hidden="true" />
                 Contact support

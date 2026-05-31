@@ -47,7 +47,7 @@ function CartPageInner() {
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10">
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-2 md:gap-3">
-          <ShoppingCart className="text-green-600" size={24} />
+          <ShoppingCart className="text-forest" size={24} />
           {tr.yourCart}
           <span className="text-base md:text-lg font-normal text-gray-400">({items.length} {lang === 'ar' ? 'عناصر' : 'items'})</span>
         </h1>
@@ -70,16 +70,14 @@ function CartPageInner() {
               <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center">
                 {item.imageUrl ? (
                   <Image src={item.imageUrl} alt={item.name} fill sizes="80px" className="object-cover" />
-                ) : item.emoji ? (
-                  <span className="text-3xl md:text-4xl">{item.emoji}</span>
                 ) : (
-                  <Package size={28} className="text-gray-300" />
+                  <Package size={28} className="text-stone-300" />
                 )}
               </div>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <Link href={`/product/${item.slug}`} className="font-bold text-gray-900 hover:text-green-600 transition-colors line-clamp-1 text-sm md:text-base">
+                <Link href={`/product/${item.slug}`} className="font-bold text-gray-900 hover:text-forest transition-colors line-clamp-1 text-sm md:text-base">
                   {lang === 'ar' && item.nameAr ? item.nameAr : item.name}
                 </Link>
                 <p className="text-xs text-gray-400 mb-2 md:mb-3">
@@ -98,14 +96,14 @@ function CartPageInner() {
                     <span className="w-8 text-center font-black text-gray-900 text-sm">{item.quantity}</span>
                     <button
                       onClick={() => updateQty(item.id, item.quantity + 1)}
-                      className="w-10 h-10 md:w-8 md:h-8 rounded-lg bg-green-600 text-white shadow-sm flex items-center justify-center hover:bg-green-700 transition-colors"
+                      className="w-10 h-10 md:w-8 md:h-8 rounded-lg bg-forest text-white shadow-sm flex items-center justify-center hover:bg-forest-dark transition-colors"
                     >
                       <Plus size={13} />
                     </button>
                   </div>
 
                   <div className="flex items-center gap-2 md:gap-3">
-                    <span className="font-black text-green-700 text-base md:text-lg">{formatAED(item.priceAED * item.quantity)}</span>
+                    <span className="font-black text-forest-dark text-base md:text-lg">{formatAED(item.priceAED * item.quantity)}</span>
                     <button
                       onClick={() => removeItem(item.id)}
                       className="w-10 h-10 md:w-8 md:h-8 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors"
@@ -123,8 +121,8 @@ function CartPageInner() {
         <div className="lg:col-span-1">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
             <h2 className="font-black text-gray-900 text-xl mb-4">{lang === 'ar' ? 'ملخص الطلب' : 'Order Summary'}</h2>
-            <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-800 font-semibold flex items-center gap-2">
-              <Sparkles size={14} className="text-green-700 shrink-0" aria-hidden="true" />
+            <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-forest-dark font-semibold flex items-center gap-2">
+              <Sparkles size={14} className="text-forest-dark shrink-0" aria-hidden="true" />
               <span>
                 {lang === 'ar'
                   ? <><span className="font-black">التوصيل مجاني</span> — عرض الإطلاق!</>
@@ -143,11 +141,11 @@ function CartPageInner() {
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>{tr.delivery}</span>
-                <span>{deliveryFee === 0 ? <span className="text-green-600 font-semibold">{tr.freeDelivery}</span> : formatAED(deliveryFee)}</span>
+                <span>{deliveryFee === 0 ? <span className="text-forest font-semibold">{tr.freeDelivery}</span> : formatAED(deliveryFee)}</span>
               </div>
               <div className="border-t-2 pt-4 flex justify-between font-black text-gray-900 text-lg">
                 <span>{tr.total}</span>
-                <span className="text-green-700">{formatAED(total)}</span>
+                <span className="text-forest-dark">{formatAED(total)}</span>
               </div>
             </div>
             {checkoutBlocked ? (
@@ -163,12 +161,12 @@ function CartPageInner() {
             ) : (
               <Link
                 href="/checkout"
-                className="w-full mt-6 bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition-colors text-lg shadow-lg flex items-center justify-center gap-2"
+                className="w-full mt-6 bg-forest text-white font-black py-4 rounded-xl hover:bg-forest-dark transition-colors text-lg shadow-lg flex items-center justify-center gap-2"
               >
                 {tr.proceedCheckout} <ArrowRight size={18} />
               </Link>
             )}
-            <Link href="/shop" className="w-full mt-3 text-center text-sm text-gray-500 hover:text-green-600 transition-colors block">
+            <Link href="/shop" className="w-full mt-3 text-center text-sm text-gray-500 hover:text-forest transition-colors block">
               ← {tr.continueShopping}
             </Link>
             <p className="text-xs text-gray-400 text-center mt-4">
@@ -196,7 +194,7 @@ function CartPageInner() {
         ) : (
           <Link
             href="/checkout"
-            className="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-colors"
+            className="w-full bg-forest text-white font-black py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-lg hover:bg-forest-dark transition-colors"
           >
             {tr.checkout} · {formatAED(total)} <ArrowRight size={18} />
           </Link>

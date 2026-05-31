@@ -116,7 +116,7 @@ export default function PushPermissionPrompt() {
         <X size={14} aria-hidden="true" />
       </button>
       <div className="flex items-start gap-3">
-        <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center text-green-700 shrink-0">
+        <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center text-forest-dark shrink-0">
           <Bell size={16} aria-hidden="true" />
         </div>
         <div className="min-w-0">
@@ -131,7 +131,7 @@ export default function PushPermissionPrompt() {
               type="button"
               onClick={subscribe}
               disabled={busy}
-              className="bg-green-600 hover:bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
+              className="bg-forest hover:bg-forest-light text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
             >
               {busy ? (isAr ? 'جارٍ…' : 'Enabling…') : (isAr ? 'تفعيل' : 'Enable')}
             </button>

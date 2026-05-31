@@ -116,7 +116,7 @@ export default function ProductImageGallery({ images, emoji, name, isOrganic, is
               key={i}
               onClick={() => setActive(i)}
               className={`relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
-                i === active ? 'border-green-500 shadow-md' : 'border-gray-200 hover:border-gray-400'
+                i === active ? 'border-forest-light shadow-md' : 'border-gray-200 hover:border-gray-400'
               }`}
             >
               <Image src={url} alt={`${name} ${i + 1}`} fill sizes="64px" className="object-cover" />
@@ -183,7 +183,7 @@ function Badges({ isOrganic, isFeatured }: { isOrganic?: boolean; isFeatured?: b
   return (
     <div className="absolute top-3 left-3 md:top-4 md:left-4 flex flex-col gap-2">
       {isOrganic && (
-        <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow">
+        <span className="inline-flex items-center gap-1 bg-forest-light text-white text-xs font-black px-3 py-1.5 rounded-full shadow">
           <Leaf size={11} aria-hidden="true" /> Organic
         </span>
       )}

@@ -233,7 +233,7 @@ export function CartValidationOk({ result }: CartValidationOkProps) {
   const hasIssues = result.items.some(i => i.status !== 'ok' && i.status !== 'low_stock')
   if (hasIssues) return null
   return (
-    <div className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold text-green-700">
+    <div className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold text-forest-dark">
       <CheckCircle size={12} aria-hidden="true" />
       {lang === 'ar' ? 'الأسعار والمخزون محدّثة' : 'Prices and stock are up to date'}
     </div>

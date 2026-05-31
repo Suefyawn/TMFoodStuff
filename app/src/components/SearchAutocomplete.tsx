@@ -260,7 +260,7 @@ export default function SearchAutocomplete({
               <button
                 type="button"
                 onClick={submitFullSearch}
-                className="w-full px-4 py-2.5 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 border-t border-gray-100 transition-colors flex items-center justify-center gap-1"
+                className="w-full px-4 py-2.5 text-xs font-bold text-forest-dark bg-green-50 hover:bg-green-100 border-t border-gray-100 transition-colors flex items-center justify-center gap-1"
               >
                 {isAr ? `كل النتائج عن "${q.trim()}"` : `See all results for "${q.trim()}"`}
                 <ArrowRight size={12} aria-hidden="true" className={isAr ? 'rotate-180' : ''} />

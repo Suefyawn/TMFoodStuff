@@ -161,13 +161,13 @@ function TimelineRow({ status, state, isLast, when, locale, variant, event, hint
 
   const ringClasses =
     status === 'cancelled' ? 'bg-red-500 text-white ring-red-100' :
-    state === 'done' ? 'bg-green-600 text-white ring-green-100' :
-    state === 'active' ? 'bg-green-600 text-white ring-green-100 shadow-md shadow-green-500/30' :
+    state === 'done' ? 'bg-forest text-white ring-green-100' :
+    state === 'active' ? 'bg-forest text-white ring-green-100 shadow-md shadow-forest-light/30' :
     'bg-gray-100 text-gray-400 ring-gray-50'
 
   const lineClasses =
-    state === 'done' ? 'bg-green-600' :
-    state === 'active' ? 'bg-gradient-to-b from-green-600 to-gray-200' :
+    state === 'done' ? 'bg-forest' :
+    state === 'active' ? 'bg-gradient-to-b from-forest to-gray-200' :
     'bg-gray-200'
 
   const labelClasses =
@@ -190,7 +190,7 @@ function TimelineRow({ status, state, isLast, when, locale, variant, event, hint
         <div className={`relative z-10 w-9 h-9 rounded-full ring-4 flex items-center justify-center ${ringClasses}`}>
           <Icon size={16} aria-hidden={true} />
           {state === 'active' && status !== 'cancelled' && (
-            <span aria-hidden="true" className="absolute -inset-1 rounded-full bg-green-500/30 animate-ping" />
+            <span aria-hidden="true" className="absolute -inset-1 rounded-full bg-forest-light/30 animate-ping" />
           )}
         </div>
       </div>

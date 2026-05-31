@@ -68,7 +68,7 @@ function SignupInner() {
             ? `أرسلنا رابط تأكيد إلى ${email}. اضغط على الرابط لتفعيل حسابك.`
             : `We just sent a confirmation link to ${email}. Click it to activate your account.`}
         </p>
-        <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-green-700 font-bold hover:underline">
+        <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-forest-dark font-bold hover:underline">
           {isAr ? 'العودة لتسجيل الدخول' : 'Back to sign in'}
         </Link>
       </div>
@@ -95,7 +95,7 @@ function SignupInner() {
                 onChange={e => setName(e.target.value)}
                 placeholder={isAr ? 'أحمد المنصوري' : 'Ahmed Al Mansouri'}
                 autoComplete="name"
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -111,7 +111,7 @@ function SignupInner() {
                 placeholder="you@example.com"
                 autoComplete="email"
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -128,7 +128,7 @@ function SignupInner() {
                 autoComplete="new-password"
                 minLength={8}
                 required
-                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus:border-green-500 transition-colors`}
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-light focus:border-forest-light transition-colors`}
               />
             </div>
           </div>
@@ -136,7 +136,7 @@ function SignupInner() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            className="w-full bg-forest hover:bg-forest-dark text-white font-black py-3.5 rounded-xl transition-colors disabled:opacity-60 focus-visible:ring-2 focus-visible:ring-forest-light focus-visible:ring-offset-2"
           >
             {loading ? (isAr ? 'جاري إنشاء الحساب…' : 'Creating account…') : (isAr ? 'إنشاء الحساب' : 'Create account')}
           </button>
@@ -144,7 +144,7 @@ function SignupInner() {
 
         <p className="mt-6 text-center text-sm text-gray-500">
           {isAr ? 'لديك حساب؟ ' : 'Already have an account? '}
-          <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-green-700 font-bold hover:underline">
+          <Link href={`/account/login?next=${encodeURIComponent(next)}`} className="text-forest-dark font-bold hover:underline">
             {isAr ? 'سجّل دخول' : 'Sign in'}
           </Link>
         </p>

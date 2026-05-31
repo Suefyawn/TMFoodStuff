@@ -35,7 +35,7 @@ export default function FaqContent() {
       <div className="space-y-10">
         {groupOrder.map(groupLabel => (
           <section key={groupLabel}>
-            <h2 className="text-xs font-black uppercase tracking-wider text-green-700 mb-3 px-2">
+            <h2 className="text-xs font-black uppercase tracking-wider text-forest-dark mb-3 px-2">
               {groupLabel}
             </h2>
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-100">
@@ -88,14 +88,14 @@ export default function FaqContent() {
           href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '971544408411'}?text=${encodeURIComponent('Hi TMFoodStuff, I have a question')}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-2xl transition-colors"
+          className="inline-flex items-center gap-2 bg-forest hover:bg-forest-dark text-white font-bold px-6 py-3 rounded-2xl transition-colors"
         >
           <MessageCircle size={16} aria-hidden="true" />
           {isAr ? 'تواصل عبر واتساب' : 'WhatsApp us'}
         </a>
         <p className="mt-4 text-xs text-gray-500">
           {isAr ? 'أو زر ' : 'Or visit our '}
-          <Link href="/contact" className="text-green-700 font-bold hover:underline">
+          <Link href="/contact" className="text-forest-dark font-bold hover:underline">
             {isAr ? 'صفحة الاتصال' : 'contact page'}
           </Link>
         </p>

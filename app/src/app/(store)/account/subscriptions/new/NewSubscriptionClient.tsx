@@ -162,12 +162,12 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account/subscriptions" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account/subscriptions" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'الاشتراكات' : 'Subscriptions'}
       </Link>
 
       <header className="mb-7 flex items-center gap-3">
-        <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center">
+        <div className="w-11 h-11 rounded-2xl bg-green-100 text-forest-dark flex items-center justify-center">
           <Repeat size={22} aria-hidden="true" />
         </div>
         <div>
@@ -188,7 +188,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder={isAr ? 'مثلاً: صندوق فواكه أسبوعي' : 'e.g. Weekly fruit box'}
-          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500"
+          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
         />
       </section>
 
@@ -202,13 +202,13 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={isAr ? 'ابحث عن منتج…' : 'Search products…'}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-green-500"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
           />
         </div>
 
         {pickedItems.length > 0 && (
           <div className="mb-3 bg-green-50/50 border border-green-200 rounded-xl p-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-green-700 mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-forest-dark mb-2">
               {isAr ? 'منتجاتك المختارة' : 'Your picks'} ({pickedItems.length})
             </p>
             <ul className="space-y-1.5">
@@ -274,7 +274,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
               onClick={() => setFrequencyDays(opt.days)}
               className={`text-left rounded-xl border-2 p-3 transition-colors ${
                 frequencyDays === opt.days
-                  ? 'border-green-600 bg-green-50'
+                  ? 'border-forest bg-green-50'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
@@ -292,7 +292,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
           <select
             value={slot}
             onChange={e => setSlot(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light"
           >
             {slotOptions.map(s => (
               <option key={s.key} value={s.key}>
@@ -305,30 +305,30 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الإمارة' : 'Emirate'}</p>
-            <input type="text" required value={emirate} onChange={e => setEmirate(e.target.value)} placeholder="Dubai" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+            <input type="text" required value={emirate} onChange={e => setEmirate(e.target.value)} placeholder="Dubai" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'المنطقة' : 'Area'}</p>
-            <input type="text" required value={area} onChange={e => setArea(e.target.value)} placeholder="JBR" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+            <input type="text" required value={area} onChange={e => setArea(e.target.value)} placeholder="JBR" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'المبنى' : 'Building'}</p>
-            <input type="text" value={building} onChange={e => setBuilding(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+            <input type="text" value={building} onChange={e => setBuilding(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">Makani</p>
-            <input type="text" value={makani} onChange={e => setMakani(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 font-mono" />
+            <input type="text" value={makani} onChange={e => setMakani(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light font-mono" />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الاسم' : 'Name'}</p>
-            <input type="text" required value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+            <input type="text" required value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">{isAr ? 'الهاتف' : 'Phone'}</p>
-            <input type="tel" required value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="0501234567" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500" />
+            <input type="tel" required value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="0501234567" className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
           </div>
         </div>
       </section>
@@ -343,7 +343,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
         type="button"
         onClick={submit}
         disabled={busy || pickedItems.length === 0}
-        className="w-full inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-black px-4 py-4 rounded-2xl text-base"
+        className="w-full inline-flex items-center justify-center gap-2 bg-forest hover:bg-forest-light disabled:opacity-60 disabled:cursor-not-allowed text-white font-black px-4 py-4 rounded-2xl text-base"
       >
         {busy ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Repeat size={16} aria-hidden="true" />}
         {busy ? (isAr ? 'جارٍ الإنشاء…' : 'Creating…') : (isAr ? `إنشاء الاشتراك (AED ${subtotal.toFixed(2)} لكل طلب)` : `Start subscription (AED ${subtotal.toFixed(2)} per order)`)}

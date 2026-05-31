@@ -79,7 +79,7 @@ export default function PreferencesClient({ initial }: { initial: Initial }) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
@@ -223,7 +223,7 @@ function Toggle({
         onClick={() => onChange(!checked)}
         disabled={saving}
         className={`relative w-11 h-6 rounded-full transition-colors disabled:opacity-60 ${
-          checked ? 'bg-green-600' : 'bg-gray-300'
+          checked ? 'bg-forest' : 'bg-gray-300'
         }`}
       >
         <span

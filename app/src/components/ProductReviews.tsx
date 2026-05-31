@@ -223,14 +223,14 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
             value={title}
             onChange={e => setTitle(e.target.value.slice(0, 120))}
             placeholder={isAr ? 'عنوان قصير (اختياري)' : 'Short title (optional)'}
-            className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500 mb-2"
+            className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-forest-light mb-2"
           />
           <textarea
             value={body}
             onChange={e => setBody(e.target.value.slice(0, 2000))}
             rows={3}
             placeholder={isAr ? 'شارك تجربتك مع هذا المنتج (اختياري)' : 'Share your experience with this product (optional)'}
-            className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500"
+            className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-forest-light"
           />
           {/* Image upload */}
           <div className="flex gap-2 mt-2 flex-wrap">
@@ -248,7 +248,7 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
               </div>
             ))}
             {images.length < 3 && (
-              <label className="w-16 h-16 border-2 border-dashed border-gray-300 hover:border-green-500 rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+              <label className="w-16 h-16 border-2 border-dashed border-gray-300 hover:border-forest-light rounded-lg flex items-center justify-center cursor-pointer transition-colors">
                 {uploadingImage
                   ? <Loader2 size={16} className="animate-spin text-gray-400" aria-hidden="true" />
                   : <Camera size={16} className="text-gray-400" aria-hidden="true" />}
@@ -269,7 +269,7 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
           <button
             onClick={submit}
             disabled={submitting || uploadingImage}
-            className="mt-3 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors disabled:opacity-60"
+            className="mt-3 inline-flex items-center gap-2 bg-forest hover:bg-forest-dark text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors disabled:opacity-60"
           >
             {submitting && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {submitting ? (isAr ? 'جاري الإرسال…' : 'Submitting…') : (isAr ? 'إرسال التقييم' : 'Submit review')}
@@ -277,7 +277,7 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
         </div>
       )}
       {submitDone && (
-        <div className="bg-green-50 border border-green-100 rounded-xl p-4 mb-5 text-sm text-green-800">
+        <div className="bg-green-50 border border-green-100 rounded-xl p-4 mb-5 text-sm text-forest-dark">
           {isAr ? 'شكراً! تم نشر تقييمك.' : 'Thanks! Your review is live.'}
         </div>
       )}
@@ -304,7 +304,7 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
                 <Stars value={r.rating} size={14} />
                 <span className="text-xs font-bold text-gray-700">{r.author}</span>
                 {r.verified_purchase && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-green-700 bg-green-50 border border-green-200 rounded px-1.5 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-forest-dark bg-green-50 border border-green-200 rounded px-1.5 py-0.5">
                     <ShieldCheck size={9} aria-hidden="true" /> {isAr ? 'مشتري موثّق' : 'Verified buyer'}
                   </span>
                 )}
@@ -324,8 +324,8 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
                 </div>
               )}
               {r.admin_reply && (
-                <div className={`mt-3 ${isAr ? 'border-r-2 pr-3' : 'border-l-2 pl-3'} border-green-500 bg-green-50/50 rounded ${isAr ? 'rounded-r-none' : 'rounded-l-none'} py-2 px-3`}>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-green-700 mb-0.5 inline-flex items-center gap-1">
+                <div className={`mt-3 ${isAr ? 'border-r-2 pr-3' : 'border-l-2 pl-3'} border-forest-light bg-green-50/50 rounded ${isAr ? 'rounded-r-none' : 'rounded-l-none'} py-2 px-3`}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-forest-dark mb-0.5 inline-flex items-center gap-1">
                     <MessageCircle size={9} aria-hidden="true" /> {isAr ? 'رد من TM FoodStuff' : 'Response from TM FoodStuff'}
                   </p>
                   <p className="text-sm text-gray-700 whitespace-pre-line">{r.admin_reply}</p>
@@ -338,7 +338,7 @@ export default function ProductReviews({ productId, productSlug }: { productId: 
                 disabled={!signedIn}
                 className={`mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-lg border transition-colors ${
                   votedIds.has(r.id)
-                    ? 'bg-green-50 border-green-300 text-green-700'
+                    ? 'bg-green-50 border-green-300 text-forest-dark'
                     : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
                 } ${!signedIn ? 'opacity-60 cursor-not-allowed' : ''}`}
                 title={!signedIn ? (isAr ? 'سجّل الدخول للتصويت' : 'Sign in to vote') : undefined}
@@ -360,7 +360,7 @@ function FilterChip({ active, onClick, label, icon: Icon }: { active: boolean; o
       type="button"
       onClick={onClick}
       className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
-        active ? 'bg-green-50 border-green-500 text-green-700' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+        active ? 'bg-green-50 border-forest-light text-forest-dark' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
       }`}
     >
       {Icon && <Icon size={11} aria-hidden="true" />}

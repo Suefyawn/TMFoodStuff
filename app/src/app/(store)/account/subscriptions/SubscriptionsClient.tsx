@@ -85,13 +85,13 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>
-      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-green-700 mb-4">
+      <Link href="/account" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-forest-dark mb-4">
         <ArrowLeft size={14} aria-hidden="true" /> {isAr ? 'العودة إلى الحساب' : 'Back to account'}
       </Link>
 
       <header className="flex items-start justify-between gap-3 mb-7 flex-wrap">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-green-100 text-green-700 flex items-center justify-center">
+          <div className="w-11 h-11 rounded-2xl bg-green-100 text-forest-dark flex items-center justify-center">
             <Repeat size={22} aria-hidden="true" />
           </div>
           <div>
@@ -105,7 +105,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
         </div>
         <Link
           href="/account/subscriptions/new"
-          className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl"
+          className="inline-flex items-center gap-1.5 bg-forest hover:bg-forest-light text-white text-sm font-bold px-4 py-2.5 rounded-xl"
         >
           <Plus size={14} aria-hidden="true" />
           {isAr ? 'اشتراك جديد' : 'New subscription'}
@@ -125,7 +125,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
           </p>
           <Link
             href="/account/subscriptions/new"
-            className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl"
+            className="inline-flex items-center gap-1.5 bg-forest hover:bg-forest-light text-white text-sm font-bold px-4 py-2.5 rounded-xl"
           >
             <Plus size={14} aria-hidden="true" />
             {isAr ? 'إنشاء اشتراك' : 'Create one'}
@@ -228,7 +228,7 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
                         <button
                           onClick={() => act(s.id, 'resume')}
                           disabled={busy === s.id}
-                          className="inline-flex items-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
+                          className="inline-flex items-center gap-1.5 bg-green-50 hover:bg-green-100 text-forest-dark border border-green-200 text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-60"
                         >
                           {busy === s.id ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : <Play size={11} aria-hidden="true" />}
                           {isAr ? 'استئناف' : 'Resume'}
