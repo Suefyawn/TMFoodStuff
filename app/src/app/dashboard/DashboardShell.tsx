@@ -167,7 +167,7 @@ export default function DashboardShell({
     setUserMenuOpen(false)
   }, [pathname])
 
-  if (pathname === '/dashboard/login' || pathname === '/dashboard/logout') {
+  if (pathname === '/dashboard/login' || pathname === '/dashboard/logout' || pathname === '/dashboard/set-password') {
     return <>{children}</>
   }
 
