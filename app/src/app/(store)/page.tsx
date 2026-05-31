@@ -1,6 +1,7 @@
 import HomeContent from './HomeContent'
 import { getFeaturedProducts } from '@/lib/products-api'
 import { SITE_URL } from '@/lib/site'
+import { jsonLdHtml } from '@/lib/json-ld'
 
 export const revalidate = 60 // Revalidate every 60 seconds
 
@@ -32,7 +33,7 @@ export default async function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(STORE_JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(STORE_JSON_LD) }}
       />
       <HomeContent featuredProducts={featured} />
     </>

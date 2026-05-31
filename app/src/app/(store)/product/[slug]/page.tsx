@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { jsonLdHtml } from '@/lib/json-ld'
 import Link from 'next/link'
 import { ArrowLeft, Globe, Leaf, Package, Truck } from 'lucide-react'
 import { getProductBySlug, getProducts, getCategories, getAllProductSlugs } from '@/lib/products-api'
@@ -120,7 +121,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <>
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
     <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 scroll-mt-20">
       <Link
         href="/shop"
