@@ -16,14 +16,14 @@ export const dynamic = 'force-dynamic'
 interface TeamMember {
   id: string
   email: string
-  role: 'admin' | 'staff' | 'driver'
+  role: 'super_admin' | 'admin' | 'staff' | 'driver'
   is_active: boolean
   created_at: string
 }
 
 export default async function TeamPage() {
   const session = await getDashboardSession()
-  if (session.state !== 'ok' || session.role !== 'admin') {
+  if (session.state !== 'ok' || (session.role !== 'admin' && session.role !== 'super_admin')) {
     redirect('/dashboard')
   }
 
@@ -50,6 +50,7 @@ export default async function TeamPage() {
       <TeamClient
         initial={(data || []) as TeamMember[]}
         currentEmail={session.email}
+        currentRole={session.role}
       />
 
       <PermissionsMatrix />

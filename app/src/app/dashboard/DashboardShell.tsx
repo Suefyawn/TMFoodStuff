@@ -22,7 +22,7 @@ import { ConfirmProvider } from '@/components/ConfirmDialog'
 // passed in via props — orders/inbox/reviews are the only ones that
 // move meaningfully day-to-day.
 
-type Role = 'admin' | 'staff' | 'driver'
+type Role = 'super_admin' | 'admin' | 'staff' | 'driver'
 type BadgeKey = 'orders' | 'inbox' | 'reviews'
 
 interface NavItem {
@@ -138,7 +138,7 @@ function filterSections(role: Role): NavSection[] {
     .map(section => ({
       ...section,
       items: section.items.filter(it => {
-        if (it.adminOnly && role !== 'admin') return false
+        if (it.adminOnly && role !== 'admin' && role !== 'super_admin') return false
         if (it.staffOnly && role !== 'staff') return false
         return true
       }),

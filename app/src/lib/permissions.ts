@@ -77,6 +77,9 @@ const STAFF_PERMISSIONS: Permission[] = [
 const DRIVER_PERMISSIONS: Permission[] = ['deliveries.view']
 
 export const PERMISSIONS_BY_ROLE: Record<AdminRole, Set<Permission>> = {
+  // super_admin has the same catalog permissions as admin; its extra power
+  // (managing other admins/super_admins) is enforced directly in the team route.
+  super_admin: new Set(ADMIN_PERMISSIONS),
   admin: new Set(ADMIN_PERMISSIONS),
   staff: new Set(STAFF_PERMISSIONS),
   driver: new Set(DRIVER_PERMISSIONS),

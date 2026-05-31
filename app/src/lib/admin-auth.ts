@@ -1,11 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 import { createSupabaseServerClient } from './supabase-server'
 
-// 'driver' is a scoped role that only sees the delivery queue + their own
-// shifts. They use the same /dashboard/login but the dashboard layout
-// auto-routes them to /dashboard/deliveries on entry and blocks everything
-// else. Admin/staff retain full or near-full access.
-export type AdminRole = 'admin' | 'staff' | 'driver'
+// 'super_admin' is the protected owner tier: same capabilities as 'admin'
+// everywhere, but only a super_admin can create, modify, deactivate, or remove
+// another admin/super_admin (enforced in /api/dashboard/team). 'driver' is a
+// scoped role that only sees the delivery queue + their own shifts.
+export type AdminRole = 'super_admin' | 'admin' | 'staff' | 'driver'
+
+// True for the admin tier (admin or super_admin). Use for gates that should
+// admit both — super_admin must never be locked out of an admin-only surface.
+export function isAdminLevel(role: AdminRole | undefined): boolean {
+  return role === 'admin' || role === 'super_admin'
+}
 
 // Allowlist of paths a driver can navigate to. Everything else under
 // /dashboard/* redirects to /dashboard/deliveries.
@@ -36,7 +42,11 @@ async function getAllowlistRow(email: string): Promise<{ role: AdminRole } | nul
     .eq('email', email.toLowerCase())
     .maybeSingle()
   if (!data || data.is_active === false) return null
-  const role: AdminRole = data.role === 'admin' ? 'admin' : data.role === 'driver' ? 'driver' : 'staff'
+  const role: AdminRole =
+    data.role === 'super_admin' ? 'super_admin'
+    : data.role === 'admin' ? 'admin'
+    : data.role === 'driver' ? 'driver'
+    : 'staff'
   return { role }
 }
 
@@ -74,7 +84,7 @@ export async function isAdminAuthed(): Promise<boolean> {
 // that pre-date the permission catalog.
 export async function isAdminAdminAuthed(): Promise<boolean> {
   const session = await getDashboardSession()
-  return session.state === 'ok' && session.role === 'admin'
+  return session.state === 'ok' && isAdminLevel(session.role)
 }
 
 // Returns the session if it has the given permission, otherwise returns

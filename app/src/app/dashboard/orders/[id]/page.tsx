@@ -40,7 +40,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const { id } = await params
   const order = await getOrder(id)
   const session = await getDashboardSession()
-  const isAdmin = session.state === 'ok' && session.role === 'admin'
+  const isAdmin = session.state === 'ok' && (session.role === 'admin' || session.role === 'super_admin')
 
   if (!order) return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center">

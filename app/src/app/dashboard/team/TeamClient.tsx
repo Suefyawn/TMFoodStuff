@@ -1,12 +1,14 @@
 'use client'
 import { useState } from 'react'
-import { UserPlus, Loader2, AlertCircle, Trash2, Shield, ShieldCheck, Truck, CircleSlash } from 'lucide-react'
+import { UserPlus, Loader2, AlertCircle, Trash2, Shield, ShieldCheck, Truck, CircleSlash, Crown, Lock } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
+
+type Role = 'super_admin' | 'admin' | 'staff' | 'driver'
 
 interface TeamMember {
   id: string
   email: string
-  role: 'admin' | 'staff' | 'driver'
+  role: Role
   is_active: boolean
   created_at: string
 }
@@ -14,21 +16,25 @@ interface TeamMember {
 interface Props {
   initial: TeamMember[]
   currentEmail: string
+  currentRole: Role
 }
 
-const ROLE_LABEL: Record<TeamMember['role'], string> = {
+const ROLE_LABEL: Record<Role, string> = {
+  super_admin: 'Super Admin — full access + manages admins',
   admin: 'Admin — full access incl. refunds & team',
   staff: 'Staff — orders, products, customers, reviews',
   driver: 'Driver — delivery queue only',
 }
 
-const ROLE_BADGE: Record<TeamMember['role'], { bg: string; text: string; icon: typeof Shield }> = {
+const ROLE_BADGE: Record<Role, { bg: string; text: string; icon: typeof Shield }> = {
+  super_admin: { bg: 'bg-amber-500/15 border-amber-500/50 text-amber-300', text: 'super admin', icon: Crown },
   admin: { bg: 'bg-purple-900/40 border-purple-700 text-purple-200', text: 'admin', icon: ShieldCheck },
   staff: { bg: 'bg-blue-900/40 border-blue-700 text-blue-200', text: 'staff', icon: Shield },
   driver: { bg: 'bg-amber-900/40 border-amber-700 text-amber-200', text: 'driver', icon: Truck },
 }
 
-export default function TeamClient({ initial, currentEmail }: Props) {
+export default function TeamClient({ initial, currentEmail, currentRole }: Props) {
+  const canSuper = currentRole === 'super_admin'
   const [rows, setRows] = useState(initial)
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<TeamMember['role']>('staff')
@@ -137,6 +143,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
             onChange={e => setRole(e.target.value as TeamMember['role'])}
             className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
           >
+            {canSuper && <option value="super_admin">Super Admin</option>}
             <option value="admin">Admin</option>
             <option value="staff">Staff</option>
             <option value="driver">Driver</option>
@@ -169,6 +176,9 @@ export default function TeamClient({ initial, currentEmail }: Props) {
           {rows.map(m => {
             const isSelf = m.email === currentEmail
             const badge = ROLE_BADGE[m.role]
+            // A super admin row is protected from everyone who isn't a super admin.
+            const locked = !canSuper && m.role === 'super_admin'
+            const noTouch = isSelf || locked
             return (
               <li key={m.id} className="px-5 py-3 flex items-center justify-between gap-3 flex-wrap">
                 <div className="min-w-0 flex-1">
@@ -182,12 +192,14 @@ export default function TeamClient({ initial, currentEmail }: Props) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
+                  {locked && <Lock size={13} className="text-amber-400/70" aria-label="Protected — super admins can only be managed by another super admin" />}
                   <select
                     value={m.role}
-                    disabled={isSelf}
-                    onChange={e => update(m.id, { role: e.target.value as TeamMember['role'] })}
+                    disabled={noTouch}
+                    onChange={e => update(m.id, { role: e.target.value as Role })}
                     className="bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 disabled:opacity-50"
                   >
+                    {(canSuper || m.role === 'super_admin') && <option value="super_admin">Super Admin</option>}
                     <option value="admin">Admin</option>
                     <option value="staff">Staff</option>
                     <option value="driver">Driver</option>
@@ -195,7 +207,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
                   <button
                     type="button"
                     onClick={() => update(m.id, { is_active: !m.is_active })}
-                    disabled={isSelf}
+                    disabled={noTouch}
                     title={m.is_active ? 'Deactivate' : 'Reactivate'}
                     className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 ${m.is_active ? 'border-gray-700 hover:bg-gray-800 text-gray-400' : 'border-emerald-700 hover:bg-emerald-900/30 text-emerald-300'}`}
                   >
@@ -204,7 +216,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
                   <button
                     type="button"
                     onClick={() => remove(m.id, m.email)}
-                    disabled={isSelf}
+                    disabled={noTouch}
                     title="Remove from team"
                     className="p-1.5 rounded-lg border border-red-700/50 hover:bg-red-900/30 text-red-300 transition-colors disabled:opacity-50"
                   >

@@ -53,10 +53,10 @@ async function sendInvitationEmail(email: string, role: 'admin' | 'staff' | 'dri
 
 export const dynamic = 'force-dynamic'
 
-type Role = 'admin' | 'staff' | 'driver'
+type Role = 'super_admin' | 'admin' | 'staff' | 'driver'
 
 function isRole(v: unknown): v is Role {
-  return v === 'admin' || v === 'staff' || v === 'driver'
+  return v === 'super_admin' || v === 'admin' || v === 'staff' || v === 'driver'
 }
 
 export async function GET() {
@@ -90,6 +90,11 @@ export async function POST(request: Request) {
   }
   if (!isRole(role)) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+  }
+  // Only a super admin can mint another super admin.
+  const session = await getDashboardSession()
+  if (role === 'super_admin' && (session.state !== 'ok' || session.role !== 'super_admin')) {
+    return NextResponse.json({ error: 'Only a super admin can grant the super admin role.' }, { status: 403 })
   }
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -137,7 +142,6 @@ export async function POST(request: Request) {
   // Await the invitation email so it actually completes — a fire-and-forget
   // send is unreliable on serverless, where the function can be frozen the
   // moment the response returns. sendInvitationEmail swallows its own errors.
-  const session = await getDashboardSession()
   const invitedBy = session.state === 'ok' ? session.email : 'an administrator'
   await sendInvitationEmail(email, role as 'admin' | 'staff' | 'driver', invitedBy, actionLink)
 
@@ -174,8 +178,26 @@ export async function PATCH(request: Request) {
     .select('email, role')
     .eq('id', id)
     .maybeSingle()
+  const actorIsSuper = session.state === 'ok' && session.role === 'super_admin'
+  // Only a super admin may modify a super admin, or promote anyone to one.
+  if (target && !actorIsSuper) {
+    if (target.role === 'super_admin') {
+      return NextResponse.json({ error: 'Only a super admin can modify a super admin.' }, { status: 403 })
+    }
+    if (updates.role === 'super_admin') {
+      return NextResponse.json({ error: 'Only a super admin can grant the super admin role.' }, { status: 403 })
+    }
+  }
+  // Never strip the last active super admin (lockout protection).
+  if (target?.role === 'super_admin' && (updates.is_active === false || (typeof updates.role === 'string' && updates.role !== 'super_admin'))) {
+    const { count } = await supabase.from('admin_users').select('id', { count: 'exact', head: true })
+      .eq('role', 'super_admin').eq('is_active', true)
+    if ((count ?? 0) <= 1) {
+      return NextResponse.json({ error: "You can't deactivate or demote the last super admin." }, { status: 400 })
+    }
+  }
   if (target && session.state === 'ok' && target.email === session.email) {
-    if (updates.role && updates.role !== 'admin') {
+    if (updates.role && updates.role !== 'admin' && updates.role !== 'super_admin') {
       return NextResponse.json({ error: "You can't demote your own account." }, { status: 400 })
     }
     if (updates.is_active === false) {
@@ -216,11 +238,22 @@ export async function DELETE(request: Request) {
   const session = await getDashboardSession()
   const { data: target } = await supabase
     .from('admin_users')
-    .select('email')
+    .select('email, role')
     .eq('id', id)
     .maybeSingle()
   if (target && session.state === 'ok' && target.email === session.email) {
     return NextResponse.json({ error: "You can't remove your own account." }, { status: 400 })
+  }
+  // Super admins can only be removed by another super admin, and never the last one.
+  if (target?.role === 'super_admin') {
+    if (!(session.state === 'ok' && session.role === 'super_admin')) {
+      return NextResponse.json({ error: 'Only a super admin can remove a super admin.' }, { status: 403 })
+    }
+    const { count } = await supabase.from('admin_users').select('id', { count: 'exact', head: true })
+      .eq('role', 'super_admin').eq('is_active', true)
+    if ((count ?? 0) <= 1) {
+      return NextResponse.json({ error: "You can't remove the last super admin." }, { status: 400 })
+    }
   }
   const { error } = await supabase.from('admin_users').delete().eq('id', id)
   if (error) { console.error('[api]', error); return NextResponse.json({ error: 'Request failed. Please try again.' }, { status: 500 }) }
