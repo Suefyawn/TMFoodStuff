@@ -1,12 +1,10 @@
 'use client'
-import { useState } from 'react'
 import Link from 'next/link'
 import { formatAED } from '@/lib/utils'
 import AddToCartButton from './AddToCartButton'
 import { ProductImage } from './ProductImage'
 import WishlistButton from './WishlistButton'
-import QuickViewModal from './QuickViewModal'
-import { Eye, Leaf, MapPin } from 'lucide-react'
+import { Leaf, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 interface ProductCardProps {
@@ -32,7 +30,6 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const inStock = product.stock > 0
   const { lang, tr } = useLang()
-  const [quickView, setQuickView] = useState(false)
 
   const displayName = lang === 'ar' && product.nameAr ? product.nameAr : product.name
   const perUnit = lang === 'ar' ? `لكل ${product.unit}` : `per ${product.unit}`
@@ -68,29 +65,13 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             </div>
           )}
-          {/* Wishlist heart — bottom-right of image so it doesn't clash with
-              the sale badge. WishlistButton stops click propagation so it
-              doesn't trigger the parent Link. */}
+          {/* Wishlist heart — bottom-right of image. WishlistButton stops
+              click propagation so it doesn't trigger the parent Link. */}
           <div className="absolute bottom-2 right-2">
             <WishlistButton productId={product.id} size="sm" />
           </div>
-          {/* Quick view — appears on hover (desktop), always visible on touch.
-              Anchored bottom-left of the image, sibling to the wishlist heart. */}
-          <button
-            type="button"
-            onClick={e => { e.preventDefault(); e.stopPropagation(); setQuickView(true) }}
-            aria-label={lang === 'ar' ? 'عرض سريع' : 'Quick view'}
-            className="absolute bottom-2 left-2 inline-flex items-center gap-1 bg-white/95 hover:bg-white text-gray-700 text-[11px] font-bold px-2 py-1 rounded-full shadow-md border border-gray-200 opacity-0 group-hover:opacity-100 sm:opacity-0 transition-opacity"
-          >
-            <Eye size={11} aria-hidden="true" />
-            <span className="hidden sm:inline">{lang === 'ar' ? 'عرض' : 'Quick view'}</span>
-          </button>
         </div>
       </Link>
-
-      {quickView && (
-        <QuickViewModal product={product} onClose={() => setQuickView(false)} />
-      )}
 
       <div className="p-3 md:p-4 flex flex-col flex-1">
         <Link href={`/product/${product.slug}`}>
