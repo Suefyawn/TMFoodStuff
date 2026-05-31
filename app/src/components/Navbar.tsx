@@ -1,18 +1,28 @@
 'use client'
 import Link from 'next/link'
 import { ShoppingCart, Menu, X, Leaf, User, Package } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCartStore } from '@/lib/store'
 import { usePathname } from 'next/navigation'
 import LangToggle from '@/components/LangToggle'
 import { useLang } from '@/lib/use-lang'
 import SearchAutocomplete from '@/components/SearchAutocomplete'
+import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const totalItems = useCartStore(state => state.totalItems())
   const pathname = usePathname()
   const { lang, tr } = useLang()
+  // Reflect auth state in the account link (Sign in → My account).
+  const [loggedIn, setLoggedIn] = useState(false)
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient()
+    supabase.auth.getSession().then(({ data }) => setLoggedIn(!!data.session))
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setLoggedIn(!!session))
+    return () => sub.subscription.unsubscribe()
+  }, [])
+  const accountLabel = loggedIn ? (lang === 'ar' ? 'حسابي' : 'My account') : tr.signIn
 
   const navLinks = [
     { label: tr.fruits, href: '/shop?category=fruits' },
@@ -60,7 +70,7 @@ export default function Navbar() {
             </Link>
             <Link href="/account" className="hidden md:flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-forest transition-colors px-2">
               <User size={16} />
-              <span>{tr.signIn}</span>
+              <span>{accountLabel}</span>
             </Link>
             <div className="hidden md:block">
               <LangToggle />
@@ -134,7 +144,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-3 min-h-[44px] text-sm font-medium text-gray-700 hover:text-forest hover:bg-green-50 rounded-lg transition-colors"
               >
                 <User size={16} />
-                {tr.signIn}
+                {accountLabel}
               </Link>
             </div>
           </div>
