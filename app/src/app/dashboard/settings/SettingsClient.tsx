@@ -68,7 +68,7 @@ export default function SettingsPage() {
       <SubNav items={SETTINGS_SUBNAV} />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-white">Settings</h1>
+          <h1 className="text-2xl font-bold text-white">Settings</h1>
           <p className="text-gray-500 text-sm">Store configuration</p>
         </div>
         <button onClick={saveSettings} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-50">
@@ -100,8 +100,8 @@ export default function SettingsPage() {
 
       {/* Store Info */}
       {tab === 'store' && (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black inline-flex items-center gap-2"><Store size={16} className="text-gray-400" aria-hidden="true" /> Store Info</h3>
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+        <h3 className="text-white font-bold inline-flex items-center gap-2"><Store size={16} className="text-gray-400" aria-hidden="true" /> Store Info</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SettingInput label="Store Name" value={settings.store_name || ''} onChange={v => setSettings({...settings, store_name: v})} />
           <SettingInput label="WhatsApp Number" value={settings.whatsapp_number || ''} onChange={v => setSettings({...settings, whatsapp_number: v})} />
@@ -111,8 +111,8 @@ export default function SettingsPage() {
 
       {/* Delivery & Pricing */}
       {tab === 'delivery' && (<>
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black inline-flex items-center gap-2"><Truck size={16} className="text-gray-400" aria-hidden="true" /> Delivery & Pricing</h3>
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+        <h3 className="text-white font-bold inline-flex items-center gap-2"><Truck size={16} className="text-gray-400" aria-hidden="true" /> Delivery & Pricing</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SettingInput label="Delivery Fee (AED)" value={settings.delivery_fee || '0'} onChange={v => setSettings({...settings, delivery_fee: v})} type="number" />
           <SettingInput label="VAT Rate (%)" value={settings.vat_rate || '5'} onChange={v => setSettings({...settings, vat_rate: v})} type="number" />
@@ -130,8 +130,8 @@ export default function SettingsPage() {
 
       {/* Tax invoice settings */}
       {tab === 'invoice' && (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black inline-flex items-center gap-2"><Receipt size={16} className="text-gray-400" aria-hidden="true" /> Tax Invoice</h3>
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+        <h3 className="text-white font-bold inline-flex items-center gap-2"><Receipt size={16} className="text-gray-400" aria-hidden="true" /> Tax Invoice</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SettingInput label="VAT TRN" value={settings.vat_trn || ''} onChange={v => setSettings({...settings, vat_trn: v})} />
           <SettingInput label="Company name" value={settings.company_name || ''} onChange={v => setSettings({...settings, company_name: v})} />
@@ -159,8 +159,8 @@ export default function SettingsPage() {
 
       {/* Promo Codes */}
       {tab === 'promos' && (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-        <h3 className="text-white font-black inline-flex items-center gap-2"><Ticket size={16} className="text-gray-400" aria-hidden="true" /> Promo Codes</h3>
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+        <h3 className="text-white font-bold inline-flex items-center gap-2"><Ticket size={16} className="text-gray-400" aria-hidden="true" /> Promo Codes</h3>
 
         {promoCodes.length > 0 && (
           <div className="space-y-2">

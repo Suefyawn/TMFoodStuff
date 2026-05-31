@@ -103,16 +103,16 @@ export default function NotificationsClient() {
     <div className="max-w-4xl space-y-6">
       <div className="flex items-center gap-2">
         <Bell size={20} className="text-green-400" />
-        <h1 className="text-xl font-black text-white">Notifications</h1>
+        <h1 className="text-xl font-bold text-white">Notifications</h1>
       </div>
 
       {error && <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-sm rounded-xl px-4 py-3">{error}</div>}
 
       {/* Recipients */}
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="mb-1 flex items-center gap-2">
           <Mail size={16} className="text-gray-400" />
-          <h2 className="text-sm font-black text-white uppercase tracking-wide">Staff recipients</h2>
+          <h2 className="text-sm font-bold text-white uppercase tracking-wide">Staff recipients</h2>
         </div>
         <p className="text-xs text-gray-500 mb-4">Who receives operational emails, and which ones. Customer order emails always go to the customer.</p>
 
@@ -188,8 +188,8 @@ export default function NotificationsClient() {
       </section>
 
       {/* Email logo */}
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-        <h2 className="text-sm font-black text-white uppercase tracking-wide mb-1">Email logo</h2>
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+        <h2 className="text-sm font-bold text-white uppercase tracking-wide mb-1">Email logo</h2>
         <p className="text-xs text-gray-500 mb-4">Shown in the header of every email. Use a white or transparent PNG (it sits on a coloured band). Leave empty to use the “TM FoodStuff” wordmark.</p>
         <div className="max-w-xs">
           <ImageUploader images={logoUrl ? [logoUrl] : []} onChange={saveLogo} maxImages={1} />

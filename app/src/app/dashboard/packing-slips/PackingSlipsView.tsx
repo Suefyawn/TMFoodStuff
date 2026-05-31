@@ -138,9 +138,9 @@ function Slip({ order, qrSvg, company, settings, bundleMap }: { order: OrderRow;
       <div className="bg-green-600 text-white px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Leaf size={18} aria-hidden="true" />
-          <span className="font-black text-base">{company} · Packing Slip</span>
+          <span className="font-bold text-base">{company} · Packing Slip</span>
         </div>
-        <p className="font-mono font-black">#{order.order_number}</p>
+        <p className="font-mono font-bold">#{order.order_number}</p>
       </div>
 
       <div className="p-6">
@@ -148,7 +148,7 @@ function Slip({ order, qrSvg, company, settings, bundleMap }: { order: OrderRow;
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="col-span-2">
             <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-0.5">Deliver to</p>
-            <p className="text-lg font-black text-gray-900">{order.customer_name || '—'}</p>
+            <p className="text-lg font-bold text-gray-900">{order.customer_name || '—'}</p>
             <p className="text-sm text-gray-700 font-bold leading-snug">
               {order.delivery_building && <>{order.delivery_building}<br /></>}
               {order.delivery_area}{order.delivery_emirate ? `, ${order.delivery_emirate}` : ''}
@@ -258,7 +258,7 @@ function Slip({ order, qrSvg, company, settings, bundleMap }: { order: OrderRow;
           </div>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-wider font-bold text-gray-500">Total</p>
-            <p className="text-2xl font-black text-gray-900 tabular-nums">AED {total.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-gray-900 tabular-nums">AED {total.toFixed(2)}</p>
           </div>
         </div>
 

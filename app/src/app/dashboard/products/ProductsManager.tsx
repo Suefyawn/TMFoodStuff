@@ -357,7 +357,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       )}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-white">Products</h1>
+          <h1 className="text-2xl font-bold text-white">Products</h1>
           <p className="text-gray-500 text-sm">{products.length} total · {filtered.length} shown</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -407,8 +407,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Import preview modal */}
       {importRows && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-lg font-black text-white mb-2">Import Products</h2>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-lg font-bold text-white mb-2">Import Products</h2>
             <p className="text-gray-400 text-sm mb-4">
               Found <span className="text-white font-bold">{importRows.length}</span> row{importRows.length !== 1 ? 's' : ''}.
               Existing slugs will be updated; new slugs will be created.
@@ -437,8 +437,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Import result modal */}
       {importResult && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-lg font-black text-white mb-4">Import Complete</h2>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-lg font-bold text-white mb-4">Import Complete</h2>
             <div className="space-y-2 mb-5">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Created</span>
@@ -467,9 +467,9 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Add Product Modal */}
       {showAdd && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-black text-white">Add New Product</h2>
+              <h2 className="text-lg font-bold text-white">Add New Product</h2>
               <button onClick={() => setShowAdd(false)} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -533,9 +533,9 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       {/* Edit Product Modal */}
       {editing !== null && editData && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => { setEditing(null); setEditData(null) }}>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-black text-white">Edit Product</h2>
+              <h2 className="text-lg font-bold text-white">Edit Product</h2>
               <button onClick={() => { setEditing(null); setEditData(null) }} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -607,7 +607,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       )}
 
       {/* Products Table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
 
         {/* Mobile card view */}
         <div className="sm:hidden divide-y divide-gray-800">

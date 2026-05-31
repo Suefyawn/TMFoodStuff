@@ -110,7 +110,7 @@ export default function CategoriesPage() {
       <SubNav items={CATALOG_SUBNAV} />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-white">Categories</h1>
+          <h1 className="text-2xl font-bold text-white">Categories</h1>
           <p className="text-gray-500 text-sm">{categories.length} categories</p>
         </div>
         <button onClick={() => { setShowAdd(true); setApiError('') }} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-xl transition-colors">
@@ -127,9 +127,9 @@ export default function CategoriesPage() {
       {/* Add Modal */}
       {showAdd && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-black text-white">Add Category</h2>
+              <h2 className="text-lg font-bold text-white">Add Category</h2>
               <button onClick={() => setShowAdd(false)} className="text-gray-500 hover:text-white"><X size={20} /></button>
             </div>
             <div className="space-y-3">
@@ -150,8 +150,8 @@ export default function CategoriesPage() {
       {/* Edit Modal */}
       {editing !== null && editData && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => {setEditing(null); setEditData(null)}}>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <h2 className="text-lg font-black text-white mb-4">Edit Category</h2>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-bold text-white mb-4">Edit Category</h2>
             <div className="space-y-3">
               <input placeholder="Name" value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
               <input placeholder="Arabic Name" value={editData.name_ar || ''} onChange={e => setEditData({...editData, name_ar: e.target.value})} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500" />
@@ -167,7 +167,7 @@ export default function CategoriesPage() {
       )}
 
       {/* Categories list */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
 
         {/* Mobile card view */}
         <div className="sm:hidden divide-y divide-gray-800">

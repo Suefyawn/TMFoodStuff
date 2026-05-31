@@ -115,11 +115,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
       </Link>
 
       {/* Header */}
-      <header className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <header className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h1 className="text-2xl font-black text-white">{customer.full_name || 'Unnamed customer'}</h1>
+              <h1 className="text-2xl font-bold text-white">{customer.full_name || 'Unnamed customer'}</h1>
               <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider rounded px-2 py-0.5 border ${tier.color}`}>
                 <Shield size={9} aria-hidden="true" /> {tier.label}
               </span>
@@ -162,9 +162,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Orders */}
-        <section className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+        <section className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-800">
-            <h2 className="text-white font-black inline-flex items-center gap-2"><ShoppingBag size={14} className="text-gray-400" aria-hidden="true" /> Orders</h2>
+            <h2 className="text-white font-bold inline-flex items-center gap-2"><ShoppingBag size={14} className="text-gray-400" aria-hidden="true" /> Orders</h2>
           </div>
           {orderList.length === 0 ? (
             <p className="p-6 text-sm text-gray-500">No orders yet.</p>
@@ -193,8 +193,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
         {/* Side rail: addresses + reviews + recent points */}
         <aside className="space-y-4">
-          <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h2 className="text-white font-black mb-3 inline-flex items-center gap-2"><MapPin size={14} className="text-gray-400" aria-hidden="true" /> Addresses</h2>
+          <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <h2 className="text-white font-bold mb-3 inline-flex items-center gap-2"><MapPin size={14} className="text-gray-400" aria-hidden="true" /> Addresses</h2>
             {(addresses || []).length === 0 ? (
               <p className="text-xs text-gray-500">No saved addresses.</p>
             ) : (
@@ -211,8 +211,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             )}
           </section>
 
-          <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h2 className="text-white font-black mb-3 inline-flex items-center gap-2"><Star size={14} className="text-gray-400" aria-hidden="true" /> Recent reviews</h2>
+          <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <h2 className="text-white font-bold mb-3 inline-flex items-center gap-2"><Star size={14} className="text-gray-400" aria-hidden="true" /> Recent reviews</h2>
             {(reviews || []).length === 0 ? (
               <p className="text-xs text-gray-500">No reviews yet.</p>
             ) : (
@@ -231,8 +231,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             )}
           </section>
 
-          <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h2 className="text-white font-black mb-3 inline-flex items-center gap-2"><Sparkles size={14} className="text-gray-400" aria-hidden="true" /> Recent points</h2>
+          <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <h2 className="text-white font-bold mb-3 inline-flex items-center gap-2"><Sparkles size={14} className="text-gray-400" aria-hidden="true" /> Recent points</h2>
             {(ledger || []).length === 0 ? (
               <p className="text-xs text-gray-500">No activity.</p>
             ) : (
@@ -260,7 +260,7 @@ function Stat({ icon: Icon, label, value, sub }: { icon: typeof ShoppingBag; lab
       <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
         <Icon size={10} aria-hidden="true" /> {label}
       </div>
-      <p className="text-lg font-black text-white tabular-nums">{value}</p>
+      <p className="text-lg font-bold text-white tabular-nums">{value}</p>
       {sub && <p className="text-[10px] text-gray-500 mt-0.5">{sub}</p>}
     </div>
   )

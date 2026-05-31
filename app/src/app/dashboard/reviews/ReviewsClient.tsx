@@ -129,7 +129,7 @@ export default function ReviewsClient({ initialRows }: { initialRows: Row[] }) {
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-white inline-flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-white inline-flex items-center gap-2">
             <MessageSquare size={20} className="text-gray-400" aria-hidden="true" /> Reviews
           </h1>
           <p className="text-gray-500 text-sm">
@@ -162,7 +162,7 @@ export default function ReviewsClient({ initialRows }: { initialRows: Row[] }) {
         <div role="alert" className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-2.5 rounded-xl">{error}</div>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {filtered.length === 0 ? (
           <p className="p-12 text-center text-gray-600 text-sm">No reviews match this filter.</p>
         ) : (

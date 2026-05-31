@@ -121,7 +121,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
   return (
     <>
       {/* Invite form */}
-      <form onSubmit={add} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <form onSubmit={add} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-3">Invite team member</p>
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_220px_auto] gap-2">
           <input
@@ -163,7 +163,7 @@ export default function TeamClient({ initial, currentEmail }: Props) {
       </form>
 
       {/* Members list */}
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <section className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         <p className="px-5 pt-4 pb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">{rows.length} member{rows.length === 1 ? '' : 's'}</p>
         <ul className="divide-y divide-gray-800">
           {rows.map(m => {

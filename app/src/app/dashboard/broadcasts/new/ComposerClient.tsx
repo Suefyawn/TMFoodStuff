@@ -97,9 +97,9 @@ export default function ComposerClient() {
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
           <CheckCircle2 size={28} className="text-green-700" aria-hidden="true" />
         </div>
-        <h1 className="text-2xl font-black text-white mb-2">Broadcast sent</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">Broadcast sent</h1>
         <p className="text-gray-400 text-sm mb-6">{ok} sent · {fail} failed · {result.total_targeted} targeted</p>
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 text-left text-sm text-gray-300 space-y-2 mb-6">
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 text-left text-sm text-gray-300 space-y-2 mb-6">
           {(result.email.ok + result.email.fail) > 0 && (
             <div className="flex justify-between"><span>Email</span><span className="font-mono"><span className="text-green-400">{result.email.ok}</span>{result.email.fail > 0 && <span className="text-red-400"> / {result.email.fail} failed</span>}</span></div>
           )}
@@ -124,12 +124,12 @@ export default function ComposerClient() {
       </Link>
 
       <header>
-        <h1 className="text-2xl font-black text-white">New broadcast</h1>
+        <h1 className="text-2xl font-bold text-white">New broadcast</h1>
         <p className="text-gray-500 text-sm">Send an announcement to customers via email and/or SMS.</p>
       </header>
 
       {/* Channel */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-3">Channels</p>
         <div className="grid grid-cols-3 gap-2">
           {(['email', 'sms', 'both'] as Channel[]).map(c => (
@@ -156,7 +156,7 @@ export default function ComposerClient() {
       </div>
 
       {/* Audience */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-3">Audience</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {([
@@ -199,7 +199,7 @@ export default function ComposerClient() {
       </div>
 
       {/* Composer */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
         {wantsEmail && (
           <div>
             <label htmlFor="subject" className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Email subject</label>
@@ -254,13 +254,13 @@ export default function ComposerClient() {
           onClick={() => !sending && setConfirmOpen(false)}
           className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
         >
-          <div onClick={e => e.stopPropagation()} className="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div onClick={e => e.stopPropagation()} className="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6">
             <div className="flex items-start gap-3 mb-4">
               <div className="w-10 h-10 bg-amber-900/40 rounded-xl flex items-center justify-center shrink-0">
                 <Users size={18} className="text-amber-300" aria-hidden="true" />
               </div>
               <div>
-                <h2 className="text-white font-black text-lg leading-tight">Send broadcast?</h2>
+                <h2 className="text-white font-bold text-lg leading-tight">Send broadcast?</h2>
                 <p className="text-sm text-gray-400 mt-1">
                   Will message <span className="text-white font-bold">{reachable}</span> customer{reachable === 1 ? '' : 's'} via {wantsEmail && 'email'}{wantsEmail && wantsSms && ' + '}{wantsSms && 'SMS'}. This cannot be undone.
                 </p>

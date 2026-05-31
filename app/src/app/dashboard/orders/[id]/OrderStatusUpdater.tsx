@@ -86,8 +86,8 @@ export default function OrderStatusUpdater({ orderId, currentStatus }: { orderId
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-      <h3 className="text-white font-black mb-4">Order Status</h3>
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 className="text-white font-bold mb-4">Order Status</h3>
       <div className="flex flex-wrap gap-2">
         {statuses.map(s => {
           const active = status === s.value

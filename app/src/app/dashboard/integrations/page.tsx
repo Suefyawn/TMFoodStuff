@@ -43,7 +43,7 @@ function EnvVar({ envKey, present }: { envKey: string; present: boolean }) {
 function IntegrationCard({ integration }: { integration: Integration }) {
   const Icon = integration.icon
   return (
-    <div className={`bg-gray-900 border rounded-2xl p-6 transition-all ${
+    <div className={`bg-gray-900 border rounded-xl p-6 transition-all ${
       integration.configured ? 'border-gray-700' : 'border-gray-800'
     }`}>
       <div className="flex items-start justify-between mb-4">
@@ -198,7 +198,7 @@ export default async function IntegrationsPage() {
     <div className="p-6 lg:p-8 max-w-5xl">
       <SubNav items={SETTINGS_SUBNAV} />
       <div className="mb-8">
-        <h1 className="text-2xl font-black text-white">Integrations</h1>
+        <h1 className="text-2xl font-bold text-white">Integrations</h1>
         <p className="text-gray-400 mt-1 text-sm">
           {configuredCount}/{integrations.length} services configured
         </p>
@@ -222,7 +222,7 @@ export default async function IntegrationsPage() {
         ))}
       </div>
 
-      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-6">
         <h2 className="font-bold text-white mb-2">Daily digest preview</h2>
         <p className="text-sm text-gray-400">
           Manually send the daily digest email so you can verify formatting and thresholds
@@ -231,7 +231,7 @@ export default async function IntegrationsPage() {
         <DigestPreviewButton />
       </div>
 
-      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+      <div className="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-6">
         <h2 className="font-bold text-white mb-3">How to add environment variables</h2>
         <ol className="space-y-2 text-sm text-gray-400">
           <li className="flex gap-2"><span className="text-gray-600 font-mono">1.</span> Go to your Vercel project → Settings → Environment Variables</li>

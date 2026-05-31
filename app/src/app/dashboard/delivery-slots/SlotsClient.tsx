@@ -212,7 +212,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
 
   if (!editing) {
     return (
-      <article className={`bg-gray-900 border rounded-2xl p-4 ${slot.is_active ? 'border-gray-800' : 'border-gray-800 opacity-60'}`}>
+      <article className={`bg-gray-900 border rounded-xl p-4 ${slot.is_active ? 'border-gray-800' : 'border-gray-800 opacity-60'}`}>
         <div className="flex items-start gap-3">
           <div className="flex flex-col gap-1 shrink-0">
             <button type="button" onClick={onMoveUp} disabled={!onMoveUp} className="text-gray-600 hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"><ChevronUp size={14} aria-hidden="true" /></button>
@@ -220,7 +220,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className="font-black text-white text-base">{slot.label_en}</h3>
+              <h3 className="font-bold text-white text-base">{slot.label_en}</h3>
               <span className="text-xs text-gray-500 font-mono">{slot.key}</span>
               {!slot.is_active && <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">inactive</span>}
             </div>
@@ -243,7 +243,7 @@ function SlotCard({ slot, editing, busy, isNew, onEdit, onCancel, onSave, onDeac
   }
 
   return (
-    <article className="bg-gray-900 border-2 border-green-700/60 rounded-2xl p-5 space-y-4">
+    <article className="bg-gray-900 border-2 border-green-700/60 rounded-xl p-5 space-y-4">
       {isNew && (
         <div>
           <label htmlFor={`key-${slot.id}`} className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Slot key (immutable)</label>

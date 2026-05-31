@@ -68,7 +68,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="flex items-center gap-3 min-w-0">
           <Link href="/dashboard/orders" className="text-gray-500 hover:text-white text-sm transition-colors shrink-0">← Orders</Link>
           <span className="text-gray-700">/</span>
-          <h1 className="text-white font-black truncate">{order.order_number}</h1>
+          <h1 className="text-white font-bold truncate">{order.order_number}</h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Link
@@ -95,9 +95,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             captured a reason. Reads-only here; the reason was set at the
             time of cancellation. */}
         {order.status === 'cancelled' && order.cancellation_reason && (
-          <div className="bg-red-900/20 border border-red-700/40 rounded-2xl p-4 flex items-start gap-3">
+          <div className="bg-red-900/20 border border-red-700/40 rounded-xl p-4 flex items-start gap-3">
             <div className="w-8 h-8 bg-red-900/40 rounded-lg flex items-center justify-center shrink-0">
-              <span className="text-red-300 text-sm font-black">✕</span>
+              <span className="text-red-300 text-sm font-bold">✕</span>
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-wider text-red-300 mb-0.5">Cancellation reason</p>
@@ -119,8 +119,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         {/* Full status timeline with actor + note so admins can see who
             changed what and when — same component the customer sees, with
             the `full` variant turned on. */}
-        <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5 sm:p-6">
-          <h2 className="text-[10px] font-black uppercase tracking-wider text-gray-500 mb-4">Status timeline</h2>
+        <section className="bg-gray-900 border border-gray-800 rounded-xl p-5 sm:p-6">
+          <h2 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-4">Status timeline</h2>
           <div className="[&_p]:!text-gray-300 [&_p.font-bold]:!text-white [&_li_p:not(.font-bold)]:!text-gray-500">
             <OrderStatusTimeline
               history={statusHistory}
@@ -145,8 +145,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         )}
 
         {refunds.length > 0 && (
-          <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-white font-black mb-3 flex items-center gap-2">
+          <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <h3 className="text-white font-bold mb-3 flex items-center gap-2">
               Refunds
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-900/30 border border-amber-800 rounded px-1.5 py-0.5">
                 AED {refundedTotal.toFixed(2)} of {orderTotal.toFixed(2)} refunded
@@ -170,7 +170,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     {r.created_by && <p className="text-[10px] text-gray-600 mt-0.5">by {r.created_by}</p>}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-black text-red-400 tabular-nums">AED {Number(r.amount_aed).toFixed(2)}</p>
+                    <p className="text-sm font-bold text-red-400 tabular-nums">AED {Number(r.amount_aed).toFixed(2)}</p>
                   </div>
                 </li>
               ))}
@@ -197,8 +197,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         />
 
         <div className="grid md:grid-cols-2 gap-5">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><User size={16} className="text-gray-400" aria-hidden="true" /> Customer</h3>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <h3 className="text-white font-bold mb-4 inline-flex items-center gap-2"><User size={16} className="text-gray-400" aria-hidden="true" /> Customer</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">Name</span><span className="text-white font-semibold">{order.customer_name || '—'}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Phone</span><span className="text-white">{phone || '—'}</span></div>
@@ -206,8 +206,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             </div>
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><MapPin size={16} className="text-gray-400" aria-hidden="true" /> Delivery</h3>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+            <h3 className="text-white font-bold mb-4 inline-flex items-center gap-2"><MapPin size={16} className="text-gray-400" aria-hidden="true" /> Delivery</h3>
             <div className="space-y-2 text-sm">
               {order.delivery_date && <div className="flex justify-between"><span className="text-gray-500">Date</span><span className="text-white font-semibold">{new Date(order.delivery_date + 'T00:00:00').toLocaleDateString('en-AE', { weekday: 'short', day: 'numeric', month: 'short' })}</span></div>}
               <div className="flex justify-between"><span className="text-gray-500">Slot</span><span className="text-white font-semibold capitalize">{order.delivery_slot || '—'}</span></div>
@@ -220,8 +220,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-          <h3 className="text-white font-black p-5 border-b border-gray-800 inline-flex items-center gap-2"><ShoppingBag size={16} className="text-gray-400" aria-hidden="true" /> Order Items</h3>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+          <h3 className="text-white font-bold p-5 border-b border-gray-800 inline-flex items-center gap-2"><ShoppingBag size={16} className="text-gray-400" aria-hidden="true" /> Order Items</h3>
           <div className="divide-y divide-gray-800">
             {items.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between px-5 py-3">
@@ -237,7 +237,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <div className="flex justify-between text-gray-400"><span>Subtotal</span><span>AED {(order.subtotal || 0).toFixed(2)}</span></div>
             <div className="flex justify-between text-gray-400"><span>VAT 5%</span><span>AED {(order.vat || 0).toFixed(2)}</span></div>
             {(order.promo_discount || 0) > 0 && <div className="flex justify-between text-green-400"><span>Promo ({order.promo_code})</span><span>-AED {(order.promo_discount || 0).toFixed(2)}</span></div>}
-            <div className="flex justify-between text-white font-black text-base border-t border-gray-700 pt-2"><span>Total</span><span className="text-green-400">AED {(order.total || 0).toFixed(2)}</span></div>
+            <div className="flex justify-between text-white font-bold text-base border-t border-gray-700 pt-2"><span>Total</span><span className="text-green-400">AED {(order.total || 0).toFixed(2)}</span></div>
           </div>
         </div>
       </main>

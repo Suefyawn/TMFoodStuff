@@ -52,7 +52,7 @@ export default function StockHistoryClient({ initialRows }: { initialRows: Row[]
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-white inline-flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-white inline-flex items-center gap-2">
             <Boxes size={20} className="text-gray-400" aria-hidden="true" /> Stock History
           </h1>
           <p className="text-gray-500 text-sm">{filtered.length} of {initialRows.length} entries · last 500</p>
@@ -80,7 +80,7 @@ export default function StockHistoryClient({ initialRows }: { initialRows: Row[]
         )}
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {filtered.length === 0 ? (
           <p className="p-12 text-center text-gray-600 text-sm">No stock changes match these filters.</p>
         ) : (
@@ -107,7 +107,7 @@ export default function StockHistoryClient({ initialRows }: { initialRows: Row[]
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className={`text-sm font-black ${r.delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span className={`text-sm font-bold ${r.delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {r.delta > 0 ? '+' : ''}{r.delta}
                   </span>
                   <p className="text-[10px] text-gray-600 mt-0.5">

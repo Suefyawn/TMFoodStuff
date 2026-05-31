@@ -135,7 +135,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4 min-h-[60vh]">
       {/* Sidebar */}
-      <aside className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col">
+      <aside className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex flex-col">
         <div className="p-3 border-b border-gray-800 flex items-center gap-2">
           <select
             value={statusFilter}
@@ -193,7 +193,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
       </aside>
 
       {/* Detail pane */}
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden flex flex-col">
+      <section className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex flex-col">
         {!active ? (
           <div className="flex-1 flex items-center justify-center text-sm text-gray-500 p-12 text-center">
             {threads.length === 0
@@ -204,7 +204,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
           <>
             <header className="p-4 border-b border-gray-800 flex items-start justify-between gap-3 flex-wrap">
               <div className="min-w-0 flex-1">
-                <h2 className="font-black text-white truncate">{active.subject || '(no subject)'}</h2>
+                <h2 className="font-bold text-white truncate">{active.subject || '(no subject)'}</h2>
                 <p className="text-xs text-gray-400 truncate">
                   {active.customer_name ? <><span className="font-bold">{active.customer_name}</span> · </> : null}
                   {active.customer_email}
@@ -251,7 +251,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
               ) : (
                 messages.map(m => (
                   <article key={m.id} className={`max-w-2xl ${m.direction === 'in' ? 'mr-auto' : 'ml-auto'}`}>
-                    <div className={`rounded-2xl px-4 py-3 ${m.direction === 'in' ? 'bg-gray-800 text-gray-200' : 'bg-green-900/30 border border-green-700/40 text-green-50'}`}>
+                    <div className={`rounded-xl px-4 py-3 ${m.direction === 'in' ? 'bg-gray-800 text-gray-200' : 'bg-green-900/30 border border-green-700/40 text-green-50'}`}>
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-70">
                         {m.direction === 'in'
                           ? (m.from_name || m.from_email || 'Customer')

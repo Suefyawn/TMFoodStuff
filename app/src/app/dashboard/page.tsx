@@ -222,7 +222,7 @@ export default async function DashboardPage() {
               href={b.href}
               className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 transition-colors ${briefingTones[b.tone]}`}
             >
-              <span className="font-black tabular-nums text-base leading-none">{b.count}</span>
+              <span className="font-bold tabular-nums text-base leading-none">{b.count}</span>
               <span className="text-xs font-bold leading-none">{b.label}</span>
             </Link>
           ))}
@@ -235,7 +235,7 @@ export default async function DashboardPage() {
       {stats.lowStock.length > 0 && (
         <Link
           href="/dashboard/products?filter=low-stock"
-          className="block bg-amber-900/30 border border-amber-700/60 hover:border-amber-500 rounded-2xl px-4 py-3 transition-colors"
+          className="block bg-amber-900/30 border border-amber-700/60 hover:border-amber-500 rounded-xl px-4 py-3 transition-colors"
         >
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 min-w-0">
@@ -256,9 +256,9 @@ export default async function DashboardPage() {
           the urgency-now items get attention first. Velocity-based so
           we don't nag about slow-movers that happen to be below threshold. */}
       {stats.reorderHints.length > 0 && (
-        <div className="bg-blue-900/15 border border-blue-700/40 rounded-2xl p-4">
+        <div className="bg-blue-900/15 border border-blue-700/40 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-blue-900/40 rounded-lg flex items-center justify-center text-blue-300 shrink-0 mt-0.5 text-sm font-black">↻</div>
+            <div className="w-8 h-8 bg-blue-900/40 rounded-lg flex items-center justify-center text-blue-300 shrink-0 mt-0.5 text-sm font-bold">↻</div>
             <div className="min-w-0 flex-1">
               <p className="text-blue-100 font-bold text-sm mb-2">Suggested reorders (velocity-based)</p>
               <ul className="space-y-1.5">
@@ -285,7 +285,7 @@ export default async function DashboardPage() {
 
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-white">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-gray-500 text-sm">TMFoodStuff Admin Overview</p>
         </div>
         <div className="flex gap-2 shrink-0 flex-wrap">
@@ -312,9 +312,9 @@ export default async function DashboardPage() {
           { label: 'Pending Orders', value: String(stats.pendingOrders), sub: `${stats.totalOrders} total`, color: stats.pendingOrders > 0 ? 'text-yellow-400' : 'text-gray-400' },
           { label: 'Active Products', value: String(stats.totalProducts), sub: 'in catalog', color: 'text-purple-400' },
         ].map(card => (
-          <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+          <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">{card.label}</p>
-            <p className={`text-2xl font-black ${card.color}`}>{card.value}</p>
+            <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
             <p className="text-gray-600 text-xs mt-1">{card.sub}</p>
           </div>
         ))}
@@ -329,9 +329,9 @@ export default async function DashboardPage() {
           { label: 'Repeat Rate', value: `${stats.repeatRate.toFixed(0)}%`, sub: `${stats.totalBuyers} unique buyers`, color: stats.repeatRate >= 30 ? 'text-green-400' : 'text-amber-400' },
           { label: 'Customers', value: String(stats.customersCount), sub: 'registered accounts', color: 'text-indigo-400' },
         ].map(card => (
-          <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+          <div key={card.label} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">{card.label}</p>
-            <p className={`text-2xl font-black ${card.color}`}>{card.value}</p>
+            <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
             <p className="text-gray-600 text-xs mt-1">{card.sub}</p>
           </div>
         ))}
@@ -342,9 +342,9 @@ export default async function DashboardPage() {
             (horizontal dashed lines) at 25/50/75/100% of max revenue so
             the team can eyeball "is today's bar bigger than last week's
             best day" without hovering for the tooltip. */}
-        <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-5">
+        <div className="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h3 className="text-white font-black inline-flex items-center gap-2"><TrendingUp size={16} className="text-green-400" aria-hidden="true" /> Revenue (last 30 days)</h3>
+            <h3 className="text-white font-bold inline-flex items-center gap-2"><TrendingUp size={16} className="text-green-400" aria-hidden="true" /> Revenue (last 30 days)</h3>
             <p className="text-xs text-gray-500">Peak: <span className="text-gray-300 font-bold">AED {maxRevenue.toFixed(0)}</span></p>
           </div>
           <div className="flex gap-2">
@@ -386,8 +386,8 @@ export default async function DashboardPage() {
         </div>
 
         {/* Low stock alerts */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <h3 className="text-white font-black mb-4 inline-flex items-center gap-2"><AlertTriangle size={16} className="text-amber-400" aria-hidden="true" /> Low Stock Alerts</h3>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <h3 className="text-white font-bold mb-4 inline-flex items-center gap-2"><AlertTriangle size={16} className="text-amber-400" aria-hidden="true" /> Low Stock Alerts</h3>
           {stats.lowStock.length === 0 ? (
             <p className="text-gray-600 text-sm inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-green-500" aria-hidden="true" /> All products well stocked</p>
           ) : (
@@ -409,9 +409,9 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent orders */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
-          <h3 className="text-white font-black inline-flex items-center gap-2"><ShoppingCart size={16} className="text-green-400" aria-hidden="true" /> Recent Orders</h3>
+          <h3 className="text-white font-bold inline-flex items-center gap-2"><ShoppingCart size={16} className="text-green-400" aria-hidden="true" /> Recent Orders</h3>
           <Link href="/dashboard/orders" className="text-green-400 text-sm font-bold hover:underline">View all →</Link>
         </div>
         {stats.recentOrders.length === 0 ? (

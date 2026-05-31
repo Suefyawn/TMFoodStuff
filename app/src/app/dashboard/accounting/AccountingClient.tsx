@@ -56,7 +56,7 @@ export default function AccountingClient() {
         subtitle="CSV reports for the accountant. UAE timezone."
       />
 
-      <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+      <section className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Period</p>
           <div className="flex items-end gap-3 flex-wrap">
@@ -145,12 +145,12 @@ function ExportCard({ icon: Icon, color, title, description, href }: ExportCardP
     <a
       href={href}
       download
-      className={`block bg-gray-900 border border-gray-800 ${c.border} rounded-2xl p-5 transition-colors group`}
+      className={`block bg-gray-900 border border-gray-800 ${c.border} rounded-xl p-5 transition-colors group`}
     >
       <div className={`w-10 h-10 ${c.bg} rounded-xl flex items-center justify-center mb-3`}>
         <Icon size={20} className={c.text} aria-hidden="true" />
       </div>
-      <h3 className="text-white font-black mb-1.5">{title}</h3>
+      <h3 className="text-white font-bold mb-1.5">{title}</h3>
       <p className="text-xs text-gray-500 leading-relaxed mb-3">{description}</p>
       <span className="inline-flex items-center gap-1 text-xs font-bold text-gray-300 group-hover:text-white">
         <Download size={11} aria-hidden="true" /> Download CSV

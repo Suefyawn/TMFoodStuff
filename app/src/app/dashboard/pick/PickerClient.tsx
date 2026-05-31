@@ -156,7 +156,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
         <div className="flex items-center justify-between gap-3 mb-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Picking queue</p>
-            <h1 className="text-white font-black text-lg leading-tight">{visibleOrders.length} order{visibleOrders.length === 1 ? '' : 's'}</h1>
+            <h1 className="text-white font-bold text-lg leading-tight">{visibleOrders.length} order{visibleOrders.length === 1 ? '' : 's'}</h1>
           </div>
           <Link
             href="/dashboard"
@@ -222,7 +222,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
             return (
               <article
                 key={o.id}
-                className={`bg-gray-900 border rounded-2xl overflow-hidden ${
+                className={`bg-gray-900 border rounded-xl overflow-hidden ${
                   allPicked ? 'border-green-700' : 'border-gray-800'
                 }`}
               >
@@ -233,7 +233,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono font-black text-white text-sm">{o.order_number}</span>
+                      <span className="font-mono font-bold text-white text-sm">{o.order_number}</span>
                       {isToday && <span className="text-[9px] font-bold uppercase tracking-wider text-green-300 bg-green-900/40 border border-green-700 rounded px-1.5 py-0.5">Today</span>}
                       {o.delivery_slot && (
                         <span className="inline-flex items-center gap-1 text-[10px] text-gray-400">
@@ -246,7 +246,7 @@ export default function PickerClient({ initialOrders, errorMessage }: Props) {
                     <p className="text-xs text-gray-500 truncate">{o.delivery_area}{o.delivery_emirate ? `, ${o.delivery_emirate}` : ''}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className={`text-xs font-black ${allPicked ? 'text-green-400' : 'text-gray-400'}`}>
+                    <div className={`text-xs font-bold ${allPicked ? 'text-green-400' : 'text-gray-400'}`}>
                       {pickedCount}/{total}
                     </div>
                     {isExpanded

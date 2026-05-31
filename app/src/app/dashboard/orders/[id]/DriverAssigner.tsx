@@ -62,10 +62,10 @@ export default function DriverAssigner({
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
       <div className="flex items-center gap-2 mb-3">
         <Truck size={14} className="text-amber-400" aria-hidden="true" />
-        <h3 className="text-white font-black">Driver assignment</h3>
+        <h3 className="text-white font-bold">Driver assignment</h3>
       </div>
       {loading ? (
         <p className="text-xs text-gray-500">Loading drivers…</p>

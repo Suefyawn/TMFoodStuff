@@ -147,7 +147,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
     <div className="p-4 sm:p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-black text-white">Orders</h1>
+          <h1 className="text-2xl font-bold text-white">Orders</h1>
           <p className="text-gray-500 text-sm">{filtered.length} of {initialOrders.length} orders · Revenue: AED {totalRevenue.toFixed(2)}</p>
         </div>
         <button
@@ -208,7 +208,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       {/* Bulk action bar — appears when rows are checked. Sticky-ish:
           inside the page flow but visually prominent. */}
       {selected.size > 0 && (
-        <div className="bg-green-900/20 border border-green-600/40 rounded-2xl px-4 py-3 flex items-center gap-3 flex-wrap">
+        <div className="bg-green-900/20 border border-green-600/40 rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap">
           <p className="text-sm font-bold text-green-200">
             {selected.size} order{selected.size === 1 ? '' : 's'} selected
           </p>
@@ -246,7 +246,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
       )}
 
       {/* Table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {filtered.length === 0 ? (
           <p className="p-16 text-center text-gray-600">No orders found</p>
         ) : (
@@ -281,7 +281,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                         <p className="text-white text-sm font-semibold">{order.customer_name || '—'}</p>
                         <p className="text-gray-500 text-xs">{order.customer_phone}</p>
                       </div>
-                      <span className="text-green-400 font-black text-sm">AED {(order.total || 0).toFixed(2)}</span>
+                      <span className="text-green-400 font-bold text-sm">AED {(order.total || 0).toFixed(2)}</span>
                     </div>
                     <p className="text-gray-500 text-xs">
                       {order.delivery_area || '—'}, {order.delivery_emirate} · {slotMap[order.delivery_slot] || order.delivery_slot || '—'} · {items.length} items
@@ -355,7 +355,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
                         </td>
                         <td className="px-5 py-4 text-gray-400 text-sm capitalize">{order.delivery_slot || '—'}</td>
                         <td className="px-5 py-4 text-gray-400 text-sm">{items.length} items</td>
-                        <td className="px-5 py-4 text-green-400 font-black text-sm">AED {(order.total || 0).toFixed(2)}</td>
+                        <td className="px-5 py-4 text-green-400 font-bold text-sm">AED {(order.total || 0).toFixed(2)}</td>
                         <td className="px-5 py-4">
                           <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${statusColors[order.status] || 'bg-gray-700 text-gray-400 border-gray-600'}`}>
                             {(order.status || 'pending').replace(/_/g, ' ')}

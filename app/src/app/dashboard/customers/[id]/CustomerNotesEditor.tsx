@@ -24,9 +24,9 @@ export default function CustomerNotesEditor({ customerId, initial }: { customerI
   }
 
   return (
-    <section className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+    <section className="bg-gray-900 border border-gray-800 rounded-xl p-5">
       <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
-        <h2 className="text-white font-black inline-flex items-center gap-2">
+        <h2 className="text-white font-bold inline-flex items-center gap-2">
           <StickyNote size={14} className="text-amber-400" aria-hidden="true" /> Internal notes
         </h2>
         <p className="text-[10px] text-gray-500">Only visible to team members.</p>

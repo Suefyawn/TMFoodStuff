@@ -61,7 +61,7 @@ export default async function BroadcastsPage() {
         }
       />
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {rows.length === 0 ? (
           <p className="p-10 text-center text-gray-600 text-sm">No broadcasts sent yet.</p>
         ) : (

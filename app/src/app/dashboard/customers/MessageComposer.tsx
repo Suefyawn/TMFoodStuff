@@ -64,9 +64,9 @@ export default function MessageComposer({ email, phone, onClose }: Props) {
       onClick={onClose}
       className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
     >
-      <div onClick={e => e.stopPropagation()} className="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div onClick={e => e.stopPropagation()} className="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-5 border-b border-gray-800">
-          <h2 className="text-white font-black text-lg">Message customer</h2>
+          <h2 className="text-white font-bold text-lg">Message customer</h2>
           <button onClick={onClose} aria-label="Close" className="text-gray-500 hover:text-white">
             <X size={18} aria-hidden="true" />
           </button>

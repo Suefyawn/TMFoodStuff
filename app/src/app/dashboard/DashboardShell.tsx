@@ -121,7 +121,7 @@ function NavLink({
       <span className="flex-1">{item.label}</span>
       {badge > 0 && (
         <span
-          className={`text-[10px] font-black tabular-nums leading-none rounded-full px-1.5 py-0.5 min-w-[18px] text-center ${
+          className={`text-[10px] font-bold tabular-nums leading-none rounded-full px-1.5 py-0.5 min-w-[18px] text-center ${
             active ? 'bg-green-600 text-white' : 'bg-amber-500/20 text-amber-300'
           }`}
           aria-label={`${badge} ${item.label} need attention`}
@@ -194,7 +194,7 @@ export default function DashboardShell({
               <Leaf size={16} className="text-green-400" aria-hidden="true" />
             </span>
             <div className="min-w-0">
-              <span className="font-black text-sm text-white block leading-tight">TMFoodStuff</span>
+              <span className="font-bold text-sm text-white block leading-tight">TMFoodStuff</span>
               <span className="text-[10px] text-gray-500 uppercase tracking-wider">{role}</span>
             </div>
           </Link>
@@ -222,7 +222,7 @@ export default function DashboardShell({
               <span className="w-7 h-7 rounded-md bg-green-600/20 flex items-center justify-center">
                 <Leaf size={14} className="text-green-400" aria-hidden="true" />
               </span>
-              <span className="font-black text-white">TMFoodStuff</span>
+              <span className="font-bold text-white">TMFoodStuff</span>
             </Link>
             <button
               type="button"
@@ -248,7 +248,7 @@ export default function DashboardShell({
             />
             <aside className="relative ml-auto w-72 max-w-[85vw] h-full bg-gray-900 border-l border-gray-800 flex flex-col animate-in slide-in-from-right duration-200">
               <div className="flex items-center justify-between px-5 py-3 border-b border-gray-800">
-                <span className="font-black text-sm text-white">Menu</span>
+                <span className="font-bold text-sm text-white">Menu</span>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
@@ -310,7 +310,7 @@ function UserBlock({
         aria-expanded={open}
         className="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-800/60 transition-colors text-left"
       >
-        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center text-white text-xs font-black shrink-0">
+        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
           {userEmail.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">

@@ -67,7 +67,7 @@ export default function CustomersPage() {
     <div className="p-4 sm:p-6 space-y-4">
       <SubNav items={CUSTOMERS_SUBNAV} />
       <div>
-        <h1 className="text-2xl font-black text-white">Customers</h1>
+        <h1 className="text-2xl font-bold text-white">Customers</h1>
         <p className="text-gray-500 text-sm">{customers.length} unique customers</p>
       </div>
 
@@ -102,7 +102,7 @@ export default function CustomersPage() {
         />
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {filtered.length === 0 ? (
           <p className="p-8 text-center text-gray-600">No customers found</p>
         ) : (
@@ -114,7 +114,7 @@ export default function CustomersPage() {
                 <div key={i}>
                   <div className="flex items-center justify-between px-5 py-4 hover:bg-gray-800/30 cursor-pointer transition-colors" onClick={() => setExpanded(isExpanded ? null : key)}>
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center text-base font-black text-gray-500 shrink-0">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-full flex items-center justify-center text-base font-bold text-gray-500 shrink-0">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">

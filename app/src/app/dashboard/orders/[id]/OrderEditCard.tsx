@@ -45,7 +45,7 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
   // Settled orders can't be edited (matches the API). Render a passive note.
   if (status === 'delivered' || status === 'cancelled') {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center gap-2 text-gray-500 text-sm">
           <AlertCircle size={14} aria-hidden="true" />
           Order details are locked because the order is {status}.
@@ -79,9 +79,9 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
 
   if (!editing) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center justify-between">
-          <h3 className="text-white font-black">Edit details</h3>
+          <h3 className="text-white font-bold">Edit details</h3>
           <button
             onClick={() => setEditing(true)}
             className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm font-bold px-3 py-1.5 rounded-lg transition-colors"
@@ -97,8 +97,8 @@ export default function OrderEditCard({ orderId, status, initial }: OrderEditCar
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-      <h3 className="text-white font-black mb-4">Edit details</h3>
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 className="text-white font-bold mb-4">Edit details</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Customer name" value={form.customer_name} onChange={v => setForm(f => ({ ...f, customer_name: v }))} />
         <Field label="Phone" value={form.customer_phone} onChange={v => setForm(f => ({ ...f, customer_phone: v }))} />

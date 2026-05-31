@@ -67,7 +67,7 @@ export default function EmailsClient() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Mail size={20} className="text-green-400" />
-          <h1 className="text-xl font-black text-white">Email status</h1>
+          <h1 className="text-xl font-bold text-white">Email status</h1>
         </div>
         <button onClick={load} className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors">
           <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
@@ -77,8 +77,8 @@ export default function EmailsClient() {
       {/* 7-day headline counts */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {HEADLINE.map(h => (
-          <div key={h.key} className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
-            <div className={`text-2xl font-black ${h.color}`}>{counts[h.key] ?? 0}</div>
+          <div key={h.key} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+            <div className={`text-2xl font-bold ${h.color}`}>{counts[h.key] ?? 0}</div>
             <div className="text-xs text-gray-500 mt-0.5">{h.label} · 7d</div>
           </div>
         ))}
@@ -95,7 +95,7 @@ export default function EmailsClient() {
       </div>
 
       {/* Event feed */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {loading ? (
           <div className="flex items-center gap-2 text-gray-500 text-sm p-6"><Loader2 size={16} className="animate-spin" /> Loading…</div>
         ) : events.length === 0 ? (

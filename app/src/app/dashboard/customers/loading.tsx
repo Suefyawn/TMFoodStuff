@@ -5,7 +5,7 @@ export default function CustomersLoading() {
         <div className="h-7 w-32 bg-gray-800 rounded mb-2" />
         <div className="h-4 w-48 bg-gray-800 rounded" />
       </div>
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="border-b border-gray-800 last:border-0 p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-800" />

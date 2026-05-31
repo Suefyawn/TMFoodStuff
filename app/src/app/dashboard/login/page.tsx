@@ -35,11 +35,11 @@ export default function DashboardLogin() {
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-2xl p-8">
-        <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center text-white font-black text-xl mb-6 mx-auto">
+      <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-xl p-8">
+        <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center text-white font-bold text-xl mb-6 mx-auto">
           TM
         </div>
-        <h1 className="text-xl font-black text-white text-center mb-2">Admin Dashboard</h1>
+        <h1 className="text-xl font-bold text-white text-center mb-2">Admin Dashboard</h1>
         <p className="text-gray-500 text-sm text-center mb-8">TMFoodStuff</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

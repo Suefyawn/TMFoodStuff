@@ -15,7 +15,7 @@ const ROLES = [
 export default function PermissionsMatrix() {
   const [open, setOpen] = useState(false)
   return (
-    <section className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+    <section className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}

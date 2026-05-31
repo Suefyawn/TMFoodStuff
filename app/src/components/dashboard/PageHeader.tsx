@@ -59,7 +59,7 @@ export default function PageHeader({
             </div>
           )}
           <div className="min-w-0">
-            <h1 className="text-2xl font-black text-white leading-tight">{title}</h1>
+            <h1 className="text-2xl font-bold text-white leading-tight">{title}</h1>
             {subtitle && <p className="text-gray-500 text-sm mt-0.5">{subtitle}</p>}
           </div>
         </div>
