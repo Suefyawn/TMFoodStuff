@@ -36,6 +36,8 @@ export const OrderBodySchema = z.object({
   deliverySlot: z.string().trim().min(1, 'Pick a delivery slot').max(40),
   deliveryDate: z.string().trim().min(1, 'Pick a delivery date').max(20),
   locale: z.string().max(8).optional(),
+  // Client-generated key to dedupe double-submits / retries (idempotency).
+  idempotencyKey: z.string().trim().max(100).optional(),
   // Client also sends precomputed totals (subtotal/vat/total/etc) for
   // optimistic UI — server recomputes from DB, so we accept-and-ignore.
 }).passthrough()
