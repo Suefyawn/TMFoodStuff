@@ -13,6 +13,9 @@ export default function DashboardSetPassword() {
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  // Self-service recovery when the one-time link has expired.
+  const [resendEmail, setResendEmail] = useState('')
+  const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle')
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient()
@@ -52,6 +55,25 @@ export default function DashboardSetPassword() {
     }
   }
 
+  async function requestFreshLink(e: React.FormEvent) {
+    e.preventDefault()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resendEmail.trim())) { setError('Enter a valid email address.'); return }
+    setError('')
+    setResendState('sending')
+    try {
+      await fetch('/api/dashboard/team/resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resendEmail.trim() }),
+      })
+      // Always show success — the endpoint is deliberately non-revealing.
+      setResendState('sent')
+    } catch {
+      setError('Network error — please try again.')
+      setResendState('idle')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-xl p-8">
@@ -62,10 +84,34 @@ export default function DashboardSetPassword() {
         {!ready ? (
           <p className="text-gray-500 text-sm text-center">Verifying your invite…</p>
         ) : !authed ? (
-          <div className="text-center">
-            <p className="text-red-400 text-sm mb-4">This invite link is invalid or has expired.</p>
-            <p className="text-gray-500 text-sm">Ask an admin to re-send your invitation from Settings → Team.</p>
-          </div>
+          resendState === 'sent' ? (
+            <div className="text-center">
+              <p className="text-emerald-300 text-sm mb-2">Check your inbox.</p>
+              <p className="text-gray-500 text-sm">If that email is on the team, a fresh link is on its way. It expires in about an hour — please use it soon.</p>
+            </div>
+          ) : (
+            <form onSubmit={requestFreshLink} className="space-y-3">
+              <p className="text-red-400 text-sm text-center">This link is invalid or has expired.</p>
+              <p className="text-gray-500 text-xs text-center">Enter your email and we'll send a fresh one.</p>
+              <input
+                type="email"
+                value={resendEmail}
+                onChange={e => setResendEmail(e.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+                required
+                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
+              />
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+              <button
+                type="submit"
+                disabled={resendState === 'sending'}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50"
+              >
+                {resendState === 'sending' ? 'Sending…' : 'Email me a fresh link'}
+              </button>
+            </form>
+          )
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
