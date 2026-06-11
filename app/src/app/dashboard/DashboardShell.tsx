@@ -284,7 +284,12 @@ export default function DashboardShell({
         )}
 
         {/* ────────── Main content ────────── */}
-        <main className="lg:ml-60 pt-12 lg:pt-0 min-h-screen">
+        {/* overflow-x-clip: hard guarantee that no page content can widen the
+            viewport on mobile (page-level horizontal scroll). Unlike
+            overflow-hidden it does not create a scroll container, so sticky
+            elements and vertical scrolling behave normally. Wide tables keep
+            their own inner overflow-x-auto wrappers. */}
+        <main className="lg:ml-60 pt-12 lg:pt-0 min-h-screen overflow-x-clip">
           {children}
         </main>
       </div>

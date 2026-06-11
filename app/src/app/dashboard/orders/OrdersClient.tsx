@@ -175,7 +175,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: any[] }
             {emirates.map(em => <option key={em} value={em}>{em}</option>)}
           </select>
         )}
-        <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm">
+        <div className="inline-flex items-center gap-2 flex-wrap bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-sm">
           <Calendar size={14} className="text-gray-500" aria-hidden="true" />
           <input
             type="date"

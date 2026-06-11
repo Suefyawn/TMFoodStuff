@@ -116,6 +116,7 @@ export default async function WishlistInsightsPage() {
         {rows.length === 0 ? (
           <p className="p-12 text-center text-sm text-gray-500">No wishlist activity yet.</p>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-800">
@@ -162,6 +163,7 @@ export default async function WishlistInsightsPage() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </section>
       <p className="text-[11px] text-gray-500">

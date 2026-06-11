@@ -103,30 +103,32 @@ export default function EmailsClient() {
             No email events yet. They appear here as Resend reports delivery status for sent mail.
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-gray-500 text-xs uppercase tracking-wide border-b border-gray-800">
-                <th className="text-left font-bold py-3 px-4">Status</th>
-                <th className="text-left font-bold py-3 px-4">Recipient</th>
-                <th className="text-left font-bold py-3 px-4 hidden sm:table-cell">Subject</th>
-                <th className="text-right font-bold py-3 px-4">When</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800">
-              {events.map(ev => {
-                const b = badge(ev.event_type)
-                const when = ev.occurred_at || ev.created_at
-                return (
-                  <tr key={ev.id}>
-                    <td className="py-3 px-4"><span className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded-full ${b.cls}`}>{b.label}</span></td>
-                    <td className="py-3 px-4 text-gray-200">{ev.recipient || '—'}</td>
-                    <td className="py-3 px-4 text-gray-400 hidden sm:table-cell truncate max-w-[260px]">{ev.subject || '—'}</td>
-                    <td className="py-3 px-4 text-right text-gray-500 whitespace-nowrap">{new Date(when).toLocaleString('en-AE', { timeZone: 'Asia/Dubai', dateStyle: 'short', timeStyle: 'short' })}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-gray-500 text-xs uppercase tracking-wide border-b border-gray-800">
+                  <th className="text-left font-bold py-3 px-4">Status</th>
+                  <th className="text-left font-bold py-3 px-4">Recipient</th>
+                  <th className="text-left font-bold py-3 px-4 hidden sm:table-cell">Subject</th>
+                  <th className="text-right font-bold py-3 px-4">When</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800">
+                {events.map(ev => {
+                  const b = badge(ev.event_type)
+                  const when = ev.occurred_at || ev.created_at
+                  return (
+                    <tr key={ev.id}>
+                      <td className="py-3 px-4"><span className={`inline-block text-[11px] font-bold px-2 py-0.5 rounded-full ${b.cls}`}>{b.label}</span></td>
+                      <td className="py-3 px-4 text-gray-200 break-all">{ev.recipient || '—'}</td>
+                      <td className="py-3 px-4 text-gray-400 hidden sm:table-cell truncate max-w-[260px]">{ev.subject || '—'}</td>
+                      <td className="py-3 px-4 text-right text-gray-500 whitespace-nowrap">{new Date(when).toLocaleString('en-AE', { timeZone: 'Asia/Dubai', dateStyle: 'short', timeStyle: 'short' })}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

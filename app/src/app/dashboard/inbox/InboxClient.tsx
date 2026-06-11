@@ -259,7 +259,7 @@ export default function InboxClient({ initialThreads, currentUserEmail }: { init
                         {' · '}
                         {new Date(m.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                       </p>
-                      <p className="text-sm whitespace-pre-line">{m.body_text || stripHtml(m.body_html || '')}</p>
+                      <p className="text-sm whitespace-pre-line break-words">{m.body_text || stripHtml(m.body_html || '')}</p>
                     </div>
                   </article>
                 ))
