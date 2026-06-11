@@ -98,30 +98,6 @@ export default function HomeContent({ featuredProducts, mangoes = [] }: HomeCont
 
   return (
     <main className="scroll-mt-20">
-      {/* Promo banner strip */}
-      <div className="bg-forest text-white text-center py-2.5 px-4 text-sm font-semibold">
-        <span className="md:hidden">
-          {lang === 'ar'
-            ? <>توصيل مجاني · كود: <span className="bg-white/20 px-2 py-0.5 rounded font-black">FRESH10</span></>
-            : <>Free delivery · Code: <span className="bg-white/20 px-2 py-0.5 rounded font-black">FRESH10</span></>
-          }
-        </span>
-        <span className="hidden md:inline">
-          {lang === 'ar'
-            ? <>توصيل مجاني على أول طلب · استخدم كود:{' '}
-                <span className="bg-white/20 px-2 py-0.5 rounded font-black ml-1">FRESH10</span>
-                <span className="mx-3 opacity-50">·</span>
-                <span className="opacity-80">توصيل في نفس اليوم في جميع أنحاء الإمارات</span>
-              </>
-            : <>Free delivery on first order · Use code:{' '}
-                <span className="bg-white/20 px-2 py-0.5 rounded font-black ml-1">FRESH10</span>
-                <span className="mx-3 opacity-50">·</span>
-                <span className="opacity-80">Same-day delivery across UAE</span>
-              </>
-          }
-        </span>
-      </div>
-
       {/* Hero */}
       <section
         className="relative overflow-hidden lg:min-h-[calc(100vh-4rem)] flex items-center py-12 lg:py-0"
@@ -183,10 +159,11 @@ export default function HomeContent({ featuredProducts, mangoes = [] }: HomeCont
                   <ChevronRight size={20} />
                 </Link>
                 <Link
-                  href="/shop"
-                  className="border-2 border-white/40 text-white font-bold px-8 md:px-10 py-4 rounded-2xl text-base md:text-lg hover:bg-white/10 transition-all backdrop-blur-sm text-center w-full sm:w-auto"
+                  href="/mangoes"
+                  className="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black px-8 md:px-10 py-4 rounded-2xl text-base md:text-lg hover:from-amber-500 hover:to-orange-600 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-center inline-flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
-                  {lang === 'ar' ? 'تصفح الكل' : 'Browse All'}
+                  <span aria-hidden="true">🥭</span>
+                  {lang === 'ar' ? 'موسم المانجو' : 'Mango Season'}
                 </Link>
               </div>
             </div>

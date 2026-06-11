@@ -2,7 +2,6 @@
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { ScrollToTop } from '@/components/ScrollToTop'
-import LaunchBanner from '@/components/LaunchBanner'
 import MangoSeasonBanner from '@/components/MangoSeasonBanner'
 import ServiceAreaBar from '@/components/ServiceAreaBar'
 import HtmlWrapper from '@/components/HtmlWrapper'
@@ -23,7 +22,6 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
       <CartSync />
       <ServiceAreaBar />
       <MangoSeasonBanner />
-      <LaunchBanner />
       <Navbar />
       <div className="pb-16 md:pb-0">
         {children}
