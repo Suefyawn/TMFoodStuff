@@ -11,12 +11,14 @@ const STORAGE_KEY = 'mango-season-2026-dismissed'
 
 export default function MangoSeasonBanner() {
   const { lang } = useLang()
-  // Start hidden until we've checked localStorage to avoid a flash on reload.
-  const [visible, setVisible] = useState(false)
+  // Render server-side by default (no layout shift for the common, not-yet-
+  // dismissed visitor) and only hide once we confirm a prior dismissal in
+  // localStorage. Initial state matches SSR, so there is no hydration mismatch.
+  const [visible, setVisible] = useState(true)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (localStorage.getItem(STORAGE_KEY) !== '1') setVisible(true)
+    if (localStorage.getItem(STORAGE_KEY) === '1') setVisible(false)
   }, [])
 
   if (!visible) return null

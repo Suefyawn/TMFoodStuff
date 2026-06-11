@@ -46,7 +46,7 @@ export default function MangoSeason({ mangoes }: MangoSeasonProps) {
         aria-hidden="true"
         width={300}
         height={255}
-        className="hidden lg:block absolute -top-6 -right-10 w-64 opacity-90 rotate-12 pointer-events-none select-none drop-shadow-xl"
+        className="hidden lg:block absolute -top-6 -right-10 w-64 h-auto opacity-90 rotate-12 pointer-events-none select-none drop-shadow-xl"
       />
 
       <div className="relative max-w-7xl mx-auto px-4">
@@ -60,7 +60,6 @@ export default function MangoSeason({ mangoes }: MangoSeasonProps) {
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
-                priority
               />
               <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-amber-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
                 <Sparkles size={12} />
