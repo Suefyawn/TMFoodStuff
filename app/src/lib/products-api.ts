@@ -136,6 +136,32 @@ export async function getFeaturedProducts(limit = 10): Promise<Product[]> {
   return (data || []).map(mapProduct)
 }
 
+// Fetch the in-season mango lineup for the home page "Mango Season" feature.
+// `ilike 'mango %'` matches "Mango Tomy/Taimoor/Pakistani/Alphonso/Stick…" while
+// cleanly excluding "Mangosteen" (no space) and "Raw Mango" (a cooking veg).
+// Ordered cheapest-first so the showcase opens with an accessible price point.
+export async function getMangoProducts(limit = 5): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, categories(slug)')
+    .eq('is_active', true)
+    .ilike('name', 'mango %')
+    .order('price_aed')
+    .limit(limit)
+
+  if (error) {
+    console.error('Failed to fetch mango products:', error.message)
+    const { products } = await import('@/data/products')
+    return products
+      .filter(p => /^mango\s/i.test(p.name) && p.isActive !== false)
+      .sort((a, b) => a.priceAED - b.priceAED)
+      .slice(0, limit)
+      .map(fromStaticData)
+  }
+
+  return (data || []).map(mapProduct)
+}
+
 // Fetch single product by slug
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const { data, error } = await supabase

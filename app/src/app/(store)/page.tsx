@@ -1,5 +1,5 @@
 import HomeContent from './HomeContent'
-import { getFeaturedProducts } from '@/lib/products-api'
+import { getFeaturedProducts, getMangoProducts } from '@/lib/products-api'
 import { SITE_URL } from '@/lib/site'
 import { jsonLdHtml } from '@/lib/json-ld'
 
@@ -28,14 +28,17 @@ const STORE_JSON_LD = {
 }
 
 export default async function HomePage() {
-  const featured = await getFeaturedProducts(10)
+  const [featured, mangoes] = await Promise.all([
+    getFeaturedProducts(10),
+    getMangoProducts(5),
+  ])
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdHtml(STORE_JSON_LD) }}
       />
-      <HomeContent featuredProducts={featured} />
+      <HomeContent featuredProducts={featured} mangoes={mangoes} />
     </>
   )
 }

@@ -355,7 +355,7 @@ export const products: ProductData[] = [
     isFeatured: true,
     origin: 'Pakistan',
     emoji: '🥭',
-    imageUrl: '/products/fruit-020.jpg',
+    imageUrl: '/products/mango-trio.jpg',
     isActive: true,
   },
   {
@@ -369,7 +369,7 @@ export const products: ProductData[] = [
     unit: '250g',
     stock: 50,
     isOrganic: false,
-    isFeatured: false,
+    isFeatured: true,
     origin: 'UAE',
     emoji: '🥭',
     imageUrl: '/products/fruit-021.jpg',

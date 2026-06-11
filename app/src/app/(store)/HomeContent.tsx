@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
+import MangoSeason from '@/components/MangoSeason'
 import type { Product } from '@/lib/products-api'
 import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
@@ -47,9 +48,10 @@ const homeCategories = [
 
 interface HomeContentProps {
   featuredProducts: Product[]
+  mangoes?: Product[]
 }
 
-export default function HomeContent({ featuredProducts }: HomeContentProps) {
+export default function HomeContent({ featuredProducts, mangoes = [] }: HomeContentProps) {
   const { lang, tr } = useLang()
   const featured = featuredProducts
 
@@ -240,6 +242,9 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
           ))}
         </div>
       </section>
+
+      {/* Mango Season — seasonal feature */}
+      <MangoSeason mangoes={mangoes} />
 
       {/* Categories */}
       <section className="max-w-7xl mx-auto px-4 py-12 md:py-20 scroll-mt-20">
