@@ -30,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [
       { url: BASE, changeFrequency: 'daily', priority: 1.0 },
       { url: `${BASE}/shop`, changeFrequency: 'daily', priority: 0.9 },
+      { url: `${BASE}/mangoes`, changeFrequency: 'daily', priority: 0.9 },
       { url: `${BASE}/track`, changeFrequency: 'monthly', priority: 0.6 },
       { url: `${BASE}/about`, changeFrequency: 'monthly', priority: 0.5 },
       { url: `${BASE}/contact`, changeFrequency: 'monthly', priority: 0.5 },
@@ -40,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [
       { url: BASE, changeFrequency: 'daily', priority: 1.0 },
       { url: `${BASE}/shop`, changeFrequency: 'daily', priority: 0.9 },
+      { url: `${BASE}/mangoes`, changeFrequency: 'daily', priority: 0.9 },
     ]
   }
 }

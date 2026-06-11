@@ -101,7 +101,7 @@ export default function MangoSeason({ mangoes }: MangoSeasonProps) {
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
               <Link
-                href="/shop?category=fruits"
+                href="/mangoes"
                 className="inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-black px-8 py-3.5 rounded-2xl text-base transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 {lang === 'ar' ? 'تسوق المانجو' : 'Shop Mangoes'}

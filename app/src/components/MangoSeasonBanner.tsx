@@ -39,7 +39,7 @@ export default function MangoSeasonBanner() {
   return (
     <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white">
       <Link
-        href="/#mango-season"
+        href="/mangoes"
         className="block py-2.5 px-10 text-center text-sm font-semibold hover:brightness-105 transition"
       >
         <span className="inline-flex items-center justify-center gap-2">
