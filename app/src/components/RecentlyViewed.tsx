@@ -42,7 +42,6 @@ export default function RecentlyViewed({ excludeSlug }: { excludeSlug?: string }
                 src={item.imageUrl}
                 alt={item.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                emoji={item.emoji}
               />
             </div>
             <p className="text-xs font-bold text-gray-900 truncate group-hover:text-forest-dark transition-colors">

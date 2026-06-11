@@ -265,7 +265,6 @@ export default async function DashboardPage() {
                 {stats.reorderHints.map((h: { id: number; name: string; emoji: string | null; stock: number; perDay: number; daysLeft: number; reorderQty: number }) => (
                   <li key={h.id} className="flex items-center justify-between gap-3 text-xs flex-wrap">
                     <span className="text-blue-100 truncate">
-                      {h.emoji && <span className="mr-1">{h.emoji}</span>}
                       <span className="font-bold">{h.name}</span>
                       <span className="text-blue-300/70 ml-2">{h.perDay}/day · {h.stock} left ≈ {h.daysLeft}d</span>
                     </span>
@@ -395,7 +394,6 @@ export default async function DashboardPage() {
               {stats.lowStock.map((p: any) => (
                 <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
                   <div className="flex items-center gap-2">
-                    <span>{p.emoji}</span>
                     <span className="text-sm text-gray-300 truncate max-w-[150px]">{p.name}</span>
                   </div>
                   <span className={`text-xs font-bold px-2 py-1 rounded-full ${p.stock === 0 ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>

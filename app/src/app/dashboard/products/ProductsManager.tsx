@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Trash2, X, Download, Upload } from 'lucide-react'
+import { Search, Plus, Trash2, X, Download, Upload, Image as ImageIcon } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
 import ImageUploader from '@/components/ImageUploader'
 import BundleEditor, { type BundleItem } from './BundleEditor'
@@ -416,7 +416,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
             <div className="bg-gray-800 rounded-xl max-h-48 overflow-y-auto divide-y divide-gray-700 mb-5">
               {importRows.slice(0, 20).map((r, i) => (
                 <div key={i} className="px-4 py-2 flex items-center justify-between gap-3">
-                  <span className="text-sm text-white truncate">{r.emoji} {r.name || <span className="text-red-400 italic">missing name</span>}</span>
+                  <span className="text-sm text-white truncate">{r.name || <span className="text-red-400 italic">missing name</span>}</span>
                   <span className="text-xs text-gray-500 shrink-0">AED {r.price_aed} · {r.unit}</span>
                 </div>
               ))}
@@ -619,7 +619,6 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                 <input type="checkbox" checked={selected.has(product.id)} onChange={() => {
                   const s = new Set(selected); s.has(product.id) ? s.delete(product.id) : s.add(product.id); setSelected(s)
                 }} className="rounded shrink-0" />
-                {product.emoji && <span className="text-2xl shrink-0">{product.emoji}</span>}
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-semibold text-sm truncate">{product.name}</p>
                   <p className="text-gray-500 text-xs">{product.categories?.name || '—'} · {product.unit}</p>
@@ -685,10 +684,8 @@ export default function ProductsManager({ initialProducts, categories }: { initi
                         <div className="w-9 h-9 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0 flex items-center justify-center">
                           {imgs[0] ? (
                             <img src={imgs[0]} alt={product.name} className="w-full h-full object-cover" />
-                          ) : product.emoji ? (
-                            <span className="text-lg">{product.emoji}</span>
                           ) : (
-                            <span className="text-gray-600 text-xs">—</span>
+                            <ImageIcon size={14} className="text-gray-600" aria-hidden="true" />
                           )}
                         </div>
                         <div>

@@ -15,6 +15,7 @@ import StockNotifyForm from '@/components/StockNotifyForm'
 import ProductReviews from '@/components/ProductReviews'
 import RecentlyViewed from '@/components/RecentlyViewed'
 import TrackRecentView from '@/components/TrackRecentView'
+import CategoryIcon from '@/components/CategoryIcon'
 import { SITE_URL } from '@/lib/site'
 import { getServerLocale } from '@/lib/server-locale'
 
@@ -149,7 +150,6 @@ export default async function ProductPage({ params }: Props) {
         <div>
           <ProductImageGallery
             images={product.imageUrls}
-            emoji={product.emoji}
             name={product.name}
             isOrganic={product.isOrganic}
             isFeatured={product.isFeatured}
@@ -159,7 +159,8 @@ export default async function ProductPage({ params }: Props) {
         <div className="flex flex-col justify-start md:justify-center">
           {category && (
             <Link href={`/shop?category=${category.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-forest-dark bg-green-50 px-3 py-1.5 rounded-full mb-3 md:mb-4 w-fit hover:bg-green-100 transition-colors">
-              {category.emoji} {categoryName}
+              <CategoryIcon slug={category.slug} size={12} />
+              {categoryName}
             </Link>
           )}
 
@@ -256,7 +257,6 @@ export default async function ProductPage({ params }: Props) {
               {product.bundleItems.map((it, i) => (
                 <li key={`${it.product_id}-${i}`} className="flex items-center justify-between gap-2 bg-stone-50 rounded-xl px-3 py-2.5 text-sm">
                   <span className="text-stone-800 truncate">
-                    {it.emoji && <span className="mr-1.5">{it.emoji}</span>}
                     <span className="font-bold">{it.name}</span>
                   </span>
                   <span className="text-xs font-bold text-stone-500 tabular-nums shrink-0">× {it.quantity}</span>

@@ -215,7 +215,6 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
               {pickedItems.map(it => (
                 <li key={it.product.id} className="flex items-center justify-between gap-2 text-sm">
                   <span className="truncate font-bold text-stone-800">
-                    {it.product.emoji && <span className="mr-1">{it.product.emoji}</span>}
                     {(isAr ? it.product.name_ar : it.product.name_en) || `#${it.product.id}`}
                   </span>
                   <span className="inline-flex items-center gap-1 shrink-0">
@@ -240,7 +239,6 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
                 <li key={p.id} className="flex items-center justify-between gap-2 bg-stone-50 hover:bg-stone-100 rounded-lg px-3 py-2">
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-stone-800 truncate">
-                      {p.emoji && <span className="mr-1">{p.emoji}</span>}
                       {(isAr ? p.name_ar : p.name_en) || `#${p.id}`}
                     </p>
                     <p className="text-[10px] text-stone-500">AED {Number(p.price_aed || 0).toFixed(2)} / {p.unit}</p>

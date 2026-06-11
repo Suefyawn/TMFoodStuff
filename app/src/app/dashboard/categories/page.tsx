@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, X, Trash2 } from 'lucide-react'
+import { Plus, X, Trash2, Tags } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
 import SubNav, { CATALOG_SUBNAV } from '@/components/dashboard/SubNav'
 
@@ -176,7 +176,9 @@ export default function CategoriesPage() {
           ) : categories.map(cat => (
             <div key={cat.id} className="flex items-center justify-between px-4 py-3 gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <span className="text-2xl shrink-0">{cat.emoji}</span>
+                <span className="w-9 h-9 rounded-lg bg-gray-800 text-gray-400 flex items-center justify-center shrink-0">
+                  <Tags size={16} aria-hidden="true" />
+                </span>
                 <div className="min-w-0">
                   <p className="text-white font-semibold text-sm truncate">{cat.name}</p>
                   <p className="text-gray-500 text-xs font-mono truncate">{cat.slug}</p>
@@ -206,7 +208,9 @@ export default function CategoriesPage() {
                 <tr key={cat.id} className="hover:bg-gray-800/30 transition-colors">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{cat.emoji}</span>
+                      <span className="w-8 h-8 rounded-lg bg-gray-800 text-gray-400 flex items-center justify-center shrink-0">
+                        <Tags size={14} aria-hidden="true" />
+                      </span>
                       <div>
                         <p className="text-white font-semibold text-sm">{cat.name}</p>
                         <p className="text-gray-600 text-xs">{cat.name_ar}</p>

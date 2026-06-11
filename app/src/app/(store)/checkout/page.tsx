@@ -672,8 +672,6 @@ export default function CheckoutPage() {
                     <div className="relative w-10 h-10 rounded-lg bg-stone-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {item.imageUrl ? (
                         <Image src={item.imageUrl} alt={item.name} fill sizes="40px" className="object-cover" />
-                      ) : item.emoji ? (
-                        <span className="text-xl">{item.emoji}</span>
                       ) : (
                         <Package size={18} className="text-stone-300" />
                       )}

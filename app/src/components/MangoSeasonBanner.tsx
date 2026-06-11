@@ -29,12 +29,12 @@ export default function MangoSeasonBanner() {
   }
 
   const textMobile = lang === 'ar'
-    ? <>🥭 موسم المانجو هنا — مانجو باكستانية طازجة وحلوة</>
-    : <>🥭 Mango Season is here — sweet Pakistani mangoes</>
+    ? <>موسم المانجو هنا — مانجو باكستانية طازجة وحلوة</>
+    : <>Mango Season is here — sweet Pakistani mangoes</>
 
   const textDesktop = lang === 'ar'
-    ? <>🥭 <strong>موسم المانجو وصل!</strong> مانجو باكستانية طازجة، حلوة وعصيرية — تصل طازجة إلى باب منزلك</>
-    : <>🥭 <strong>Mango Season is Here!</strong> Sweet, juicy Pakistani mangoes — picked fresh, delivered to your door</>
+    ? <><strong>موسم المانجو وصل!</strong> مانجو باكستانية طازجة، حلوة وعصيرية — تصل طازجة إلى باب منزلك</>
+    : <><strong>Mango Season is Here!</strong> Sweet, juicy Pakistani mangoes — picked fresh, delivered to your door</>
 
   return (
     <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white">

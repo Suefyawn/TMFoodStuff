@@ -227,7 +227,6 @@ function Slip({ order, qrSvg, company, settings, bundleMap }: { order: OrderRow;
                         <span className="inline-block w-3 h-3 border border-gray-400 rounded ml-3" aria-label="check box" />
                       </td>
                       <td className="py-2 px-2 text-gray-700 pl-6">
-                        {c.emoji && <span className="mr-1">{c.emoji}</span>}
                         {c.name}
                       </td>
                       <td className="py-2 px-2 text-right tabular-nums font-mono text-sm text-gray-700">

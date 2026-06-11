@@ -8,7 +8,9 @@ export default async function NotFound() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center py-16" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className="text-7xl mb-4" aria-hidden="true">🥦</div>
+      <div className="w-20 h-20 rounded-3xl bg-green-100 text-green-700 flex items-center justify-center mb-5" aria-hidden="true">
+        <Leaf size={40} strokeWidth={1.75} />
+      </div>
       <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-2">404</h1>
       <p className="text-lg font-bold text-gray-700 mb-2">
         {isAr ? 'الصفحة غير موجودة' : 'Page not found'}

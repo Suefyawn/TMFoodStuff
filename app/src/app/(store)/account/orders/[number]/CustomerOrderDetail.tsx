@@ -226,7 +226,6 @@ export default function CustomerOrderDetail({ order, history = [] }: { order: Or
           {items.map((item, i) => (
             <li key={i} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                {item.emoji && <span className="text-2xl shrink-0" aria-hidden="true">{item.emoji}</span>}
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-stone-900 truncate">{item.name}</p>
                   <p className="text-xs text-stone-500">×{item.quantity} · AED {Number(item.price_aed).toFixed(2)} {isAr ? 'لكل' : 'per'} {item.unit || 'kg'}</p>

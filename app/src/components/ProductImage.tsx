@@ -7,7 +7,6 @@ interface ProductImageProps {
   src?: string
   alt: string
   className?: string
-  emoji?: string
 }
 
 export function ProductImage({ src, alt, className }: ProductImageProps) {

@@ -185,7 +185,6 @@ export default function SubscriptionsClient({ subscriptions }: { subscriptions: 
                     {s.items.map((it, i) => (
                       <li key={`${it.product_id}-${i}`} className="px-3 py-2 flex items-center justify-between gap-2 text-sm">
                         <span className="text-stone-700 truncate">
-                          {it.emoji && <span className="mr-1.5">{it.emoji}</span>}
                           <span className="font-bold">{it.name}</span>
                           <span className="text-stone-400 text-xs ml-1">× {it.quantity}</span>
                         </span>

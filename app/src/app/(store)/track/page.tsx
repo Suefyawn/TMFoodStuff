@@ -216,7 +216,6 @@ function TrackInner() {
                 {order.items.map((item: any, i: number) => (
                   <div key={i} className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
-                      {item.emoji && <span className="text-lg">{item.emoji}</span>}
                       <span className="text-sm text-stone-700">{item.name}</span>
                       <span className="text-xs text-stone-400">×{item.quantity}</span>
                     </div>

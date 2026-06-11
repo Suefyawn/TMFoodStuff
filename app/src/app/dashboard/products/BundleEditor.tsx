@@ -84,7 +84,6 @@ export default function BundleEditor({
             return (
               <li key={it.product_id} className="flex items-center justify-between gap-2 bg-gray-900 rounded-lg px-2.5 py-1.5 text-sm">
                 <span className="text-gray-200 truncate flex-1">
-                  {it.emoji && <span className="mr-1">{it.emoji}</span>}
                   <span className="font-bold">{it.name}</span>
                   {cat?.unit && <span className="text-gray-500 text-xs ml-1">/{cat.unit}</span>}
                 </span>
@@ -135,7 +134,6 @@ export default function BundleEditor({
                   className="w-full text-left px-3 py-2 text-xs hover:bg-gray-800 flex items-center justify-between gap-2"
                 >
                   <span className="text-gray-200 truncate">
-                    {p.emoji && <span className="mr-1">{p.emoji}</span>}
                     {p.name}
                   </span>
                   <span className="text-gray-500 shrink-0">AED {Number(p.price_aed ?? 0).toFixed(2)}</span>

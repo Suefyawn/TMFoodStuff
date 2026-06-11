@@ -146,7 +146,6 @@ export default async function WishlistInsightsPage() {
                   <tr key={r.id} className="hover:bg-gray-800/30 transition-colors">
                     <td className="px-5 py-3">
                       <Link href={`/product/${i?.slug || ''}`} target="_blank" className="text-white font-bold hover:text-emerald-400 inline-flex items-center gap-2">
-                        {i?.emoji && <span>{i.emoji}</span>}
                         {i?.name || `#${r.id}`}
                       </Link>
                       {i && !i.active && <span className="ml-2 text-[10px] font-bold uppercase text-gray-500 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">inactive</span>}

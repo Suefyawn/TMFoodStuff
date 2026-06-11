@@ -5,13 +5,12 @@ import { ChevronLeft, ChevronRight, X, ZoomIn, Leaf, Star } from 'lucide-react'
 
 interface Props {
   images: string[]
-  emoji?: string
   name: string
   isOrganic?: boolean
   isFeatured?: boolean
 }
 
-export default function ProductImageGallery({ images, emoji, name, isOrganic, isFeatured }: Props) {
+export default function ProductImageGallery({ images, name, isOrganic, isFeatured }: Props) {
   const [active, setActive] = useState(0)
   const [lightbox, setLightbox] = useState(false)
 
@@ -40,7 +39,7 @@ export default function ProductImageGallery({ images, emoji, name, isOrganic, is
   if (images.length === 0) {
     return (
       <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative w-full">
-        <span className="text-[80px] md:text-[120px]">{emoji}</span>
+        <Leaf size={96} className="text-sand" strokeWidth={1.25} aria-hidden="true" />
         <Badges isOrganic={isOrganic} isFeatured={isFeatured} />
       </div>
     )

@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Search, X, SlidersHorizontal, Apple, Leaf, Package, Sprout, PackageCheck } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import type { Product, Category } from '@/lib/products-api'
+import CategoryIcon from '@/components/CategoryIcon'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { ReactElement } from 'react'
 import { useLang } from '@/lib/use-lang'
@@ -329,7 +330,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
                         : 'bg-stone-100 text-stone-700 hover:bg-green-50 hover:text-forest-dark'
                     }`}
                   >
-                    <span aria-hidden="true">{sub.emoji}</span>
+                    <CategoryIcon slug={sub.slug} size={12} />
                     {subLabel} ({countForCategory(sub.slug)})
                   </button>
                 )
@@ -349,7 +350,7 @@ export default function ShopContent({ defaultCategory, initialProducts, initialC
             </p>
             {activeCategoryObj && (
               <span className="inline-flex items-center gap-1.5 bg-green-100 text-forest-dark text-xs font-bold px-3 py-1.5 rounded-full">
-                <span aria-hidden="true">{activeCategoryObj.emoji}</span>
+                <CategoryIcon slug={activeCategoryObj.slug} size={12} />
                 {isAr && activeCategoryObj.nameAr ? activeCategoryObj.nameAr : activeCategoryObj.name}
                 <button onClick={() => handleCategoryChange('')} aria-label={isAr ? 'إزالة' : 'Remove'} className="hover:text-forest ml-0.5">
                   <X size={12} aria-hidden="true" />

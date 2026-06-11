@@ -5,7 +5,7 @@ import ProductCard from '@/components/ProductCard'
 import type { Product } from '@/lib/products-api'
 import {
   Sparkles, ChevronRight, Sun, Droplets, BadgeCheck, Truck,
-  MessageCircle, Leaf, Clock, MapPin,
+  MessageCircle, Leaf, Clock, MapPin, Citrus,
 } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
@@ -235,7 +235,9 @@ export default function MangoesContent({ mangoes }: MangoesContentProps) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {varieties.map(v => (
             <div key={v.name} className="surface-card p-5 md:p-6">
-              <div className="text-2xl mb-3" aria-hidden="true">🥭</div>
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-3">
+                <Citrus size={20} aria-hidden="true" />
+              </div>
               <h3 className="font-bold text-stone-900 mb-2">{v.name}</h3>
               <p className="text-sm text-stone-500 leading-relaxed mb-3">{v.flavour}</p>
               <div className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -272,7 +274,9 @@ export default function MangoesContent({ mangoes }: MangoesContentProps) {
 
       {/* Final CTA */}
       <section className="max-w-3xl mx-auto px-4 py-14 md:py-20 text-center">
-        <div className="text-4xl mb-4" aria-hidden="true">🥭</div>
+        <div className="mx-auto w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mb-4">
+          <Citrus size={28} aria-hidden="true" />
+        </div>
         <h2 className="text-3xl md:text-4xl font-playfair font-bold text-stone-900 mb-3">
           {lang === 'ar' ? 'الموسم قصير — لا تفوّته' : 'The Season is Short — Don’t Miss It'}
         </h2>

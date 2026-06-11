@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'Mango season is here! Order sweet, juicy Pakistani Chaunsa, Taimoor, Alphonso and Tomy mangoes online. Hand-picked, quality-checked and delivered same-day across Dubai, Abu Dhabi, Sharjah and all UAE emirates.',
   alternates: { canonical: '/mangoes' },
   openGraph: {
-    title: 'Mango Season is Here 🥭 — Fresh Mangoes Delivered Across UAE',
+    title: 'Mango Season is Here — Fresh Mangoes Delivered Across UAE',
     description:
       'Sweet, juicy Pakistani & Indian mangoes — picked fresh, delivered to your door. Same-day delivery across all UAE emirates.',
     url: PAGE_URL,
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mango Season is Here 🥭 — Fresh Mangoes Delivered Across UAE',
+    title: 'Mango Season is Here — Fresh Mangoes Delivered Across UAE',
     description:
       'Sweet, juicy Pakistani & Indian mangoes — picked fresh, delivered to your door across the UAE.',
     images: [`${SITE_URL}/mango-hero.jpg`],

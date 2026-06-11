@@ -4,7 +4,7 @@ import Image from 'next/image'
 import ProductCard from '@/components/ProductCard'
 import MangoSeason from '@/components/MangoSeason'
 import type { Product } from '@/lib/products-api'
-import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Gift, BadgeCheck, Zap, ChevronRight, MapPin } from 'lucide-react'
+import { Truck, ShieldCheck, MessageCircle, Apple, Leaf, Sprout, Gift, BadgeCheck, Zap, ChevronRight, MapPin, Citrus } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
 
 const homeCategories = [
@@ -162,7 +162,7 @@ export default function HomeContent({ featuredProducts, mangoes = [] }: HomeCont
                   href="/mangoes"
                   className="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black px-8 md:px-10 py-4 rounded-2xl text-base md:text-lg hover:from-amber-500 hover:to-orange-600 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-center inline-flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
-                  <span aria-hidden="true">🥭</span>
+                  <Citrus size={20} aria-hidden="true" />
                   {lang === 'ar' ? 'موسم المانجو' : 'Mango Season'}
                 </Link>
               </div>
