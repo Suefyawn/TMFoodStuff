@@ -3,6 +3,12 @@ const { withSentryConfig } = require('@sentry/nextjs')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    // Serve images as-is. The Vercel image optimizer's monthly quota was
+    // exhausted (402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED), which broke
+    // every not-yet-cached variant site-wide. Catalog images are already
+    // pre-optimized (~40-80kB mozjpeg), so skipping runtime optimization
+    // costs little and removes the quota dependency entirely.
+    unoptimized: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'media.barakatfresh.ae' },
