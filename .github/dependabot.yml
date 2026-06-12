@@ -1,0 +1,24 @@
+# Automated dependency update PRs. Security advisories surface as PRs here
+# instead of waiting for a manual `npm audit` — pair with CI (test + build)
+# to make merging them low-risk.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /app
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Batch routine minor/patch bumps into one PR to keep noise down;
+      # majors still arrive individually for careful review.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
