@@ -4,6 +4,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requirePermission } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/audit'
 import { sendDailyDigest } from '@/lib/daily-digest'
 
 export const dynamic = 'force-dynamic'
@@ -20,5 +21,6 @@ export async function POST() {
   if (!result.sent) {
     return NextResponse.json({ error: result.reason || 'send_failed' }, { status: 500 })
   }
+  await logAdminAction({ supabase, action: 'digest.manual_send' })
   return NextResponse.json({ ok: true })
 }

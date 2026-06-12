@@ -11,12 +11,18 @@ interface AuditWrite {
   before?: unknown
   after?: unknown
   metadata?: Record<string, unknown>
+  // Overrides the session-derived actor. Only for endpoints that act without a
+  // dashboard session (e.g. the public self-service invite-link resend).
+  actor?: string
 }
 
 export async function logAdminAction(args: AuditWrite): Promise<void> {
   try {
-    const session = await getDashboardSession()
-    const actorEmail = session.state === 'ok' ? session.email : 'unknown'
+    let actorEmail = args.actor
+    if (!actorEmail) {
+      const session = await getDashboardSession()
+      actorEmail = session.state === 'ok' ? session.email : 'unknown'
+    }
     await args.supabase.from('admin_audit_log').insert({
       actor_email: actorEmail,
       action: args.action,

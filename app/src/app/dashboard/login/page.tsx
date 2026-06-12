@@ -24,6 +24,14 @@ export default function DashboardLogin() {
         setLoading(false)
         return
       }
+      // Audit trail: record the sign-in (server verifies the session; failures
+      // must never block login).
+      await fetch('/api/dashboard/auth-events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'login' }),
+        keepalive: true,
+      }).catch(() => {})
       // Hard redirect so the refreshed auth cookies are sent on the next request
       // and middleware lets the dashboard render.
       window.location.href = '/dashboard'

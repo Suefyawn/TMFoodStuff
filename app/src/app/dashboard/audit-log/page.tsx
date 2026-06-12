@@ -12,8 +12,8 @@ export default async function AuditLogPage() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
-  // Capped at 500 rows. Pagination can come later — for now the actor + action
-  // filters in the client narrow it down enough for the launch volumes.
+  // Newest 500 server-rendered; the client's "Load older events" button pages
+  // through the rest via /api/dashboard/audit-log (id-cursor, 200 per page).
   const { data } = await supabase
     .from('admin_audit_log')
     .select('id, actor_email, action, entity, before, after, metadata, created_at')

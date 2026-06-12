@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requirePermission } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/audit'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif']
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -59,6 +60,13 @@ export async function POST(request: Request) {
     .from('product-images')
     .getPublicUrl(data.path)
 
+  await logAdminAction({
+    supabase,
+    action: 'image.upload',
+    entity: `storage:${data.path}`,
+    metadata: { url: publicUrl, original_name: file.name, size_bytes: file.size, content_type: file.type },
+  })
+
   return NextResponse.json({ url: publicUrl })
 }
 
@@ -84,6 +92,13 @@ export async function DELETE(request: Request) {
 
   const path = decodeURIComponent(parts[1])
   await supabase.storage.from('product-images').remove([path])
+
+  await logAdminAction({
+    supabase,
+    action: 'image.delete',
+    entity: `storage:${path}`,
+    metadata: { url },
+  })
 
   return NextResponse.json({ ok: true })
 }

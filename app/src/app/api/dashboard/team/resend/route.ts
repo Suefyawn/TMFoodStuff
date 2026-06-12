@@ -10,6 +10,7 @@ import { readJsonBody } from '@/lib/http'
 import { isValidEmail } from '@/lib/validators'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import { SITE_URL } from '@/lib/site'
+import { logAdminAction } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,6 +71,17 @@ export async function POST(request: Request) {
       console.error('[team/resend] failed:', err)
     }
   }
+
+  // Security trail: this endpoint is public, so record every request — both
+  // legitimate resends and probes for non-member addresses. Actor is the
+  // requester, not an admin session.
+  await logAdminAction({
+    supabase,
+    actor: 'self-service',
+    action: 'team.invite_link_resend',
+    entity: `member:${email}`,
+    metadata: { email, ip: getClientIp(request), member_found: !!(member && member.is_active !== false) },
+  })
 
   return NextResponse.json({ ok: true })
 }

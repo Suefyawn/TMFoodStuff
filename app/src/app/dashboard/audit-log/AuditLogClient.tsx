@@ -21,19 +21,47 @@ const ACTION_COLORS: Record<string, string> = {
   'product.update':      'bg-blue-500/15 text-blue-300 border-blue-500/30',
   'product.delete':      'bg-rose-500/15 text-rose-300 border-rose-500/30',
   'settings.update':     'bg-purple-500/15 text-purple-300 border-purple-500/30',
+  'auth.login':          'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+  'auth.logout':         'bg-gray-500/15 text-gray-300 border-gray-500/30',
+  'image.upload':        'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+  'image.delete':        'bg-rose-500/15 text-rose-300 border-rose-500/30',
 }
 
 export default function AuditLogClient({ initialRows }: { initialRows: AuditRow[] }) {
+  const [rows, setRows] = useState(initialRows)
   const [search, setSearch] = useState('')
   const [actor, setActor] = useState('')
   const [action, setAction] = useState('')
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  // The server page renders the newest 500; assume more exist until a fetch
+  // for older rows comes back short.
+  const [hasMore, setHasMore] = useState(initialRows.length >= 500)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [loadError, setLoadError] = useState(false)
 
-  const actors = useMemo(() => Array.from(new Set(initialRows.map(r => r.actor_email))).sort(), [initialRows])
-  const actions = useMemo(() => Array.from(new Set(initialRows.map(r => r.action))).sort(), [initialRows])
+  async function loadOlder() {
+    if (loadingMore || rows.length === 0) return
+    setLoadingMore(true)
+    setLoadError(false)
+    try {
+      const oldestId = rows[rows.length - 1].id
+      const res = await fetch(`/api/dashboard/audit-log?before_id=${oldestId}`)
+      if (!res.ok) throw new Error(String(res.status))
+      const data = (await res.json()) as { rows: AuditRow[]; hasMore: boolean }
+      setRows(prev => [...prev, ...data.rows])
+      setHasMore(data.hasMore)
+    } catch {
+      setLoadError(true)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  const actors = useMemo(() => Array.from(new Set(rows.map(r => r.actor_email))).sort(), [rows])
+  const actions = useMemo(() => Array.from(new Set(rows.map(r => r.action))).sort(), [rows])
 
   const filtered = useMemo(() => {
-    return initialRows.filter(r => {
+    return rows.filter(r => {
       if (actor && r.actor_email !== actor) return false
       if (action && r.action !== action) return false
       if (search) {
@@ -47,7 +75,7 @@ export default function AuditLogClient({ initialRows }: { initialRows: AuditRow[
       }
       return true
     })
-  }, [initialRows, search, actor, action])
+  }, [rows, search, actor, action])
 
   function summarise(r: AuditRow): string {
     const meta = (r.metadata || {}) as Record<string, unknown>
@@ -71,7 +99,7 @@ export default function AuditLogClient({ initialRows }: { initialRows: AuditRow[
             Audit Log
           </h1>
           <p className="text-gray-500 text-sm">
-            {filtered.length} of {initialRows.length} events · last 500 only
+            {filtered.length} of {rows.length} loaded events
           </p>
         </div>
       </div>
@@ -149,6 +177,22 @@ export default function AuditLogClient({ initialRows }: { initialRows: AuditRow[
           </ul>
         )}
       </div>
+
+      {/* Cursor pagination — the server page only renders the newest 500 */}
+      {hasMore && (
+        <div className="text-center">
+          {loadError && (
+            <p className="text-xs text-red-400 mb-2">Couldn’t load older events — try again.</p>
+          )}
+          <button
+            onClick={loadOlder}
+            disabled={loadingMore}
+            className="text-sm font-bold text-gray-400 hover:text-white bg-gray-900 border border-gray-800 hover:border-gray-700 rounded-xl px-5 py-2.5 transition-colors disabled:opacity-50"
+          >
+            {loadingMore ? 'Loading…' : 'Load older events'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
