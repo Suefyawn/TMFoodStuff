@@ -11,6 +11,11 @@ export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'orders@tmfoodstuff.a
 // address; set SUPPORT_FROM_EMAIL (e.g. support@tmfoodstuff.ae) once that
 // inbox is receiving so replies come from the support address customers wrote to.
 export const SUPPORT_FROM_EMAIL = process.env.SUPPORT_FROM_EMAIL || FROM_EMAIL
+// Reply-To on customer-facing transactional emails, so a customer who hits
+// "reply" reaches a monitored, mail-routed inbox (e.g. Cloudflare Email
+// Routing → your Gmail) rather than the no-reply sending address. Override
+// with REPLY_TO_EMAIL; make sure that address is actually routed/received.
+export const REPLY_TO_EMAIL = process.env.REPLY_TO_EMAIL || 'support@tmfoodstuff.ae'
 
 export function getResend() {
   if (!RESEND_API_KEY) return null
@@ -413,6 +418,7 @@ export async function sendOrderConfirmation(order: OrderEmailData, locale: Local
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
+      replyTo: REPLY_TO_EMAIL,
       to: order.customer_email,
       subject: T[locale].subjectConfirmed(order.order_number),
       html: orderConfirmationHtml(order, locale),
@@ -429,6 +435,7 @@ export async function sendOutForDeliveryEmail(order: StatusUpdateEmailData, loca
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
+      replyTo: REPLY_TO_EMAIL,
       to: order.customer_email,
       subject: T[locale].subjectOutForDelivery(order.order_number),
       html: statusUpdateHtml(order, locale, 'out_for_delivery'),
@@ -498,6 +505,7 @@ export async function sendOrderStatusUpdateEmail(
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
+      replyTo: REPLY_TO_EMAIL,
       to: order.customer_email,
       subject,
       html,
@@ -514,6 +522,7 @@ export async function sendDeliveredEmail(order: StatusUpdateEmailData, locale: L
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
+      replyTo: REPLY_TO_EMAIL,
       to: order.customer_email,
       subject: T[locale].subjectDelivered(order.order_number),
       html: statusUpdateHtml(order, locale, 'delivered'),
@@ -592,6 +601,7 @@ export async function sendPointsThresholdEmail(args: {
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
+      replyTo: REPLY_TO_EMAIL,
       to: args.to,
       subject,
       html,
@@ -677,6 +687,7 @@ export async function sendBackInStockEmail(
   try {
     await resend.emails.send({
       from: `TM FoodStuff <${FROM_EMAIL}>`,
+      replyTo: REPLY_TO_EMAIL,
       to,
       subject: tr.subjectBackInStock(productName),
       html,
