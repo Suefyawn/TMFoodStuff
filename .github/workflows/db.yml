@@ -1,0 +1,118 @@
+# Database chores run by the Crew so nobody has to open Supabase by hand.
+# Manual only (workflow_dispatch). This repo is PUBLIC, so the logs are public:
+# print only subscription ids, emirates, area names and counts. Never names,
+# phones, emails, street addresses or order data.
+name: DB
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: read-areas (read only) or apply-area-fixes (updates only the listed ids)
+        type: choice
+        options: [read-areas, apply-area-fixes]
+        default: read-areas
+      fixes:
+        description: 'apply-area-fixes only: JSON list of {"id": "...", "area": "Exact listed area"}'
+        type: string
+        default: '[]'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tmf-db
+  cancel-in-progress: false
+
+jobs:
+  db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      ACTION: ${{ inputs.action }}
+      FIXES: ${{ inputs.fixes }}
+    steps:
+      - name: Preflight
+        run: |
+          if [ -z "$DB_URL" ]; then echo "::error::SUPABASE_DB_URL secret is empty or missing"; exit 1; fi
+          sudo apt-get install -y -qq postgresql-client >/dev/null
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tAc "select 1" >/dev/null && echo "Database reachable"
+
+      - name: Read active subscription areas
+        if: inputs.action == 'read-areas'
+        run: |
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -F $'\t' -c \
+            "select id::text, coalesce(delivery_emirate,''), coalesce(delivery_area,'') from subscriptions where status = 'active' order by id" > rows.tsv
+          python3 - <<'PY'
+          import unicodedata, re
+          AREAS = ["Ras Al Khor","Ras Al Khor Industrial 1","Ras Al Khor Industrial 2","Ras Al Khor Industrial 3",
+                   "Al Jaddaf","Nad Al Hamar","Dubai Festival City","Al Badia","Al Warsan","International City",
+                   "Dubai Silicon Oasis","Mirdif","Al Rashidiya","Muhaisnah","Al Qusais","Al Garhoud",
+                   "Business Bay","Dubai Creek Harbour"]
+          norm = lambda s: re.sub(r"\s+", " ", unicodedata.normalize("NFKC", s).strip()).lower()
+          listed = {norm(a): a for a in AREAS}
+          ok = fix = out = 0
+          lines = ["| id | emirate | area | status |", "|---|---|---|---|"]
+          for raw in open("rows.tsv", encoding="utf-8"):
+              raw = raw.rstrip("\n")
+              if not raw:
+                  continue
+              sid, emirate, area = (raw.split("\t") + ["", ""])[:3]
+              dubai = norm(emirate) in ("dubai", "دبي")
+              if dubai and norm(area) in listed:
+                  status, ok = "ok", ok + 1
+              elif dubai:
+                  status, fix = "needs a listed name", fix + 1
+              else:
+                  status, out = "outside Dubai", out + 1
+              lines.append(f"| {sid} | {emirate} | {area} | {status} |")
+          summary = [f"Active subscriptions: {ok + fix + out} (ok {ok}, needs fixing {fix}, outside Dubai {out})", ""] + lines
+          print("\n".join(summary))
+          with open(__import__("os").environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\n".join(summary) + "\n")
+          PY
+
+      - name: Apply approved area fixes
+        if: inputs.action == 'apply-area-fixes'
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          AREAS = {"Ras Al Khor","Ras Al Khor Industrial 1","Ras Al Khor Industrial 2","Ras Al Khor Industrial 3",
+                   "Al Jaddaf","Nad Al Hamar","Dubai Festival City","Al Badia","Al Warsan","International City",
+                   "Dubai Silicon Oasis","Mirdif","Al Rashidiya","Muhaisnah","Al Qusais","Al Garhoud",
+                   "Business Bay","Dubai Creek Harbour"}
+          fixes = json.loads(os.environ["FIXES"] or "[]")
+          if not isinstance(fixes, list) or not fixes:
+              sys.exit("::error::fixes must be a non-empty JSON list")
+          if len(fixes) > 200:
+              sys.exit("::error::too many fixes in one run")
+          ids = set()
+          for f in fixes:
+              sid, area = str(f.get("id", "")), f.get("area", "")
+              if not sid.isdigit() and not all(c.isalnum() or c == "-" for c in sid):
+                  sys.exit(f"::error::bad id {sid!r}")
+              if area not in AREAS:
+                  sys.exit(f"::error::area {area!r} is not on the delivery list")
+              if sid in ids:
+                  sys.exit(f"::error::duplicate id {sid}")
+              ids.add(sid)
+          q = lambda s: "'" + s.replace("'", "''") + "'"
+          values = ",\n  ".join(f"({q(str(f['id']))}, {q(f['area'])})" for f in fixes)
+          sql = f"""\\set ON_ERROR_STOP on
+          begin;
+          create temp table fx(id text primary key, area text) on commit drop;
+          insert into fx values
+            {values};
+          \\echo Backup (old values):
+          select s.id::text, s.delivery_emirate, s.delivery_area from subscriptions s join fx on fx.id = s.id::text order by s.id;
+          update subscriptions s set delivery_emirate = 'Dubai', delivery_area = fx.area
+            from fx where fx.id = s.id::text and s.status = 'active';
+          \\echo After:
+          select s.id::text, s.delivery_emirate, s.delivery_area from subscriptions s join fx on fx.id = s.id::text order by s.id;
+          commit;
+          """
+          open("fix.sql", "w", encoding="utf-8").write(sql)
+          PY
+          psql "$DB_URL" -F $'\t' -A -f fix.sql | tee out.txt
+          { echo '```'; cat out.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
