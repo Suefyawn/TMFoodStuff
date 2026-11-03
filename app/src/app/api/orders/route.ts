@@ -16,6 +16,7 @@ import { clearCustomerCart } from '@/lib/cart-recovery'
 import { validateSlotForDate } from '@/lib/delivery-slots'
 import { getCurrentCustomer } from '@/lib/customer'
 import { getCustomerBalance } from '@/lib/loyalty'
+import { isDeliverable, loadDeliveryAreas, NOT_DELIVERABLE_MESSAGE } from '@/lib/delivery-areas'
 
 const DEFAULT_WHATSAPP_NUMBER = '971544408411'
 
@@ -73,6 +74,16 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
+
+    // Delivery area: Dubai, near Ras Al Khor only (list in Dashboard > Settings).
+    // This is the guarantee; the checkout dropdown is only the convenience.
+    const deliveryAreas = await loadDeliveryAreas(supabase)
+    if (!isDeliverable(emirate, area, deliveryAreas)) {
+      return NextResponse.json(
+        { success: false, error: NOT_DELIVERABLE_MESSAGE[locale === 'ar' ? 'ar' : 'en'] },
+        { status: 400 },
+      )
+    }
 
     // Idempotency: if this exact submit was already processed (double-click,
     // network retry, back-button resubmit), return the existing order rather

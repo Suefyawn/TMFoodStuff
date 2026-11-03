@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
 
 ## Delivery Zones Configuration
 
-TMFoodStuff delivers across all 7 UAE emirates. The `Orders` collection stores the emirate as a select field.
+TMFoodStuff delivers in Dubai only, to areas around Ras Al Khor (setting `delivery_areas`). The `Orders` collection stores the emirate as a select field.
 
 ### Delivery Fee Logic
 

@@ -39,7 +39,7 @@ export default function MangoesContent({ mangoes }: MangoesContentProps) {
     {
       icon: Truck,
       title: lang === 'ar' ? 'توصيل في نفس اليوم' : 'Same-Day Delivery',
-      desc: lang === 'ar' ? 'في جميع أنحاء الإمارات' : 'Across Dubai, Abu Dhabi & all emirates',
+      desc: lang === 'ar' ? 'في دبي، قرب رأس الخور' : 'In Dubai, near Ras Al Khor',
     },
     {
       icon: Leaf,
@@ -155,8 +155,8 @@ export default function MangoesContent({ mangoes }: MangoesContentProps) {
               <div className="mt-6 flex items-center justify-center lg:justify-start gap-2 text-sm text-stone-500">
                 <MapPin size={14} className="text-forest flex-shrink-0" />
                 {lang === 'ar'
-                  ? 'نوصل إلى دبي، أبوظبي، الشارقة وجميع الإمارات'
-                  : 'Delivering to Dubai, Abu Dhabi, Sharjah & all emirates'}
+                  ? 'نوصل إلى المناطق القريبة من رأس الخور في دبي'
+                  : 'Delivering in Dubai, near Ras Al Khor'}
               </div>
             </div>
 

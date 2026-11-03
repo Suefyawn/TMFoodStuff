@@ -58,7 +58,7 @@ export default function ContactPage() {
           </div>
           <div>
             <div className="font-semibold text-stone-900 mb-1">Delivery Coverage</div>
-            <div className="text-sm text-stone-500">All UAE Emirates</div>
+            <div className="text-sm text-stone-500">Dubai, near Ras Al Khor</div>
           </div>
         </div>
       </div>

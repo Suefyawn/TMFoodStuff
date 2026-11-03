@@ -124,6 +124,16 @@ export default function SettingsPage() {
             <span className="text-sm text-gray-300">Free Delivery</span>
           </div>
         </div>
+        <div>
+          <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Delivery areas (Dubai)</label>
+          <textarea
+            rows={10}
+            value={settings.delivery_areas || ''}
+            onChange={e => setSettings({...settings, delivery_areas: e.target.value})}
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+          />
+          <p className="text-xs text-gray-500 mt-1.5">One area per line. Checkout only accepts these areas; any other address is told we do not deliver there yet. Staff can still deliver anywhere by editing an order by hand.</p>
+        </div>
       </div>
 
       </>)}

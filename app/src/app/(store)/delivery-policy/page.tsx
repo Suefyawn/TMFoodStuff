@@ -14,7 +14,7 @@ export default function DeliveryPolicyPage() {
       <div className="space-y-6 text-stone-600 leading-relaxed">
         <section>
           <h2 className="text-xl font-bold text-stone-900 mb-3">Delivery Areas</h2>
-          <p>We deliver across all UAE emirates: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain.</p>
+          <p>We deliver in Dubai only, to areas around Ras Al Khor. The full list of areas is shown at checkout. If your area is not listed, message us on WhatsApp and we will tell you if we can reach you.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-stone-900 mb-3">Delivery Times</h2>

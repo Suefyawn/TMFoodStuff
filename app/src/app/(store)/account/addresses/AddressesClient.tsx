@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, Pencil, Trash2, MapPin, Star, ArrowLeft } from 'lucide-react'
 import { useLang } from '@/lib/use-lang'
@@ -16,8 +16,9 @@ interface Address {
   is_default: boolean
 }
 
-const EMIRATES_EN = ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
-const EMIRATES_AR = ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
+// Delivery is Dubai only, near Ras Al Khor (area list is a store setting).
+const EMIRATE_EN = 'Dubai'
+const EMIRATE_AR = 'دبي'
 
 const emptyAddress: Omit<Address, 'id'> = {
   label: '', building: '', street: '', area: '', emirate: '', makani: '', is_default: false,
@@ -33,10 +34,19 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
   const [error, setError] = useState('')
   const confirm = useConfirm()
 
-  const emirates = isAr ? EMIRATES_AR : EMIRATES_EN
+  const emirate = isAr ? EMIRATE_AR : EMIRATE_EN
+  const [areas, setAreas] = useState<string[]>([])
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/delivery-areas')
+      .then(r => r.json())
+      .then(d => { if (!cancelled && Array.isArray(d?.areas)) setAreas(d.areas) })
+      .catch(() => { /* leave the list empty */ })
+    return () => { cancelled = true }
+  }, [])
 
   function startNew() {
-    setForm(emptyAddress)
+    setForm({ ...emptyAddress, emirate })
     setEditingId('new')
     setError('')
   }
@@ -44,7 +54,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
   function startEdit(a: Address) {
     setForm({
       label: a.label || '', building: a.building || '', street: a.street || '',
-      area: a.area || '', emirate: a.emirate || '', makani: a.makani || '',
+      area: a.area || '', emirate, makani: a.makani || '',
       is_default: a.is_default,
     })
     setEditingId(a.id)
@@ -52,7 +62,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
   }
 
   async function save() {
-    if (!form.emirate || !form.area) {
+    if (!form.area) {
       setError(isAr ? 'الإمارة والمنطقة مطلوبتان.' : 'Emirate and area are required.')
       return
     }
@@ -140,17 +150,19 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
             </div>
             <div>
               <label className="block text-xs font-bold text-stone-600 mb-1.5">{isAr ? 'الإمارة' : 'Emirate'} *</label>
-              <select value={form.emirate || ''} onChange={e => setForm(f => ({ ...f, emirate: e.target.value }))}
+              <select value={emirate} onChange={() => setForm(f => ({ ...f, emirate }))}
                 className="w-full border-2 border-stone-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-forest-light" required>
-                <option value="">{isAr ? 'اختر الإمارة' : 'Select emirate'}</option>
-                {emirates.map(e => <option key={e} value={e}>{e}</option>)}
+                <option value={emirate}>{emirate}</option>
               </select>
             </div>
             <div className="md:col-span-2">
               <label className="block text-xs font-bold text-stone-600 mb-1.5">{isAr ? 'المنطقة' : 'Area'} *</label>
-              <input value={form.area || ''} onChange={e => setForm(f => ({ ...f, area: e.target.value }))}
-                placeholder={isAr ? 'جميرا، المرسى…' : 'JLT, Marina, Khalidiyah…'}
-                className="w-full border-2 border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" required />
+              <select value={form.area || ''} onChange={e => setForm(f => ({ ...f, emirate, area: e.target.value }))}
+                className="w-full border-2 border-stone-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-forest-light" required>
+                <option value="">{isAr ? 'اختر المنطقة' : 'Select your area'}</option>
+                {areas.map(a => <option key={a} value={a}>{a}</option>)}
+              </select>
+              <p className="mt-1.5 text-xs text-stone-500">{isAr ? 'نوصل حاليا فقط إلى المناطق القريبة من رأس الخور في دبي.' : 'We deliver only to areas near Ras Al Khor in Dubai for now.'}</p>
             </div>
             <div>
               <label className="block text-xs font-bold text-stone-600 mb-1.5">{isAr ? 'المبنى / الفيلا' : 'Building / Villa'}</label>

@@ -8,8 +8,8 @@ export default function Footer() {
   const { lang, tr } = useLang()
 
   const deliveryAreas = lang === 'ar'
-    ? ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
-    : ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
+    ? ['رأس الخور، دبي']
+    : ['Ras Al Khor, Dubai']
 
   const shopLinks = [
     { icon: <Apple size={14} />, label: lang === 'ar' ? 'فواكه' : 'Fruits', href: '/shop?category=fruits' },

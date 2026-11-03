@@ -15,7 +15,7 @@ export const t = {
     heroTag: 'Free delivery on first order · Use code: FRESH10',
     heroTitle1: 'Farm Fresh',
     heroTitle2: 'To Your Door',
-    heroSubtitle: 'Premium fruits & vegetables sourced daily from the world\'s best farms. Delivered fresh across all UAE emirates.',
+    heroSubtitle: 'Premium fruits & vegetables sourced daily from the world\'s best farms. Delivered fresh in Dubai, around Ras Al Khor.',
     shopNow: 'Shop Now',
     browseFruits: 'Browse Fruits',
     // Trust

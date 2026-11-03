@@ -4,14 +4,14 @@ import { Sprout, Zap, BadgeCheck } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'About Us',
   description:
-    'TMFoodStuff is a UAE-based fresh produce delivery service sourcing direct from farms. Same-day delivery, fair prices, premium quality across all emirates.',
+    'TMFoodStuff is a UAE-based fresh produce delivery service sourcing direct from farms. Same-day delivery in Dubai, fair prices, premium quality.',
   alternates: { canonical: '/about' },
 }
 
 export default function AboutPage() {
   const values = [
     { icon: Sprout, title: 'Farm Direct', desc: 'We work directly with local and international farms, cutting out middlemen to ensure maximum freshness.' },
-    { icon: Zap, title: 'Fast Delivery', desc: 'Same-day delivery across all UAE emirates. Order before 2PM for morning delivery.' },
+    { icon: Zap, title: 'Fast Delivery', desc: 'Same-day delivery in Dubai, around Ras Al Khor. Order before 2PM for morning delivery.' },
     { icon: BadgeCheck, title: 'Quality Promise', desc: 'Every item is checked before packing. Not satisfied? We will make it right, guaranteed.' },
   ]
   return (

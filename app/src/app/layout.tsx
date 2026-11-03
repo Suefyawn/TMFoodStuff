@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: 'TMFoodStuff — Fresh Fruits & Vegetables UAE',
     template: '%s | TMFoodStuff',
   },
-  description: 'Order fresh fruits and vegetables online. Same-day delivery across Dubai, Abu Dhabi, Sharjah, Ajman and all UAE emirates. Premium quality, farm fresh daily.',
+  description: 'Order fresh fruits and vegetables online. Same-day delivery in Dubai, around Ras Al Khor. Premium quality, farm fresh daily.',
   keywords: ['fresh fruits UAE', 'vegetables delivery Dubai', 'grocery delivery UAE', 'organic fruits Dubai'],
   metadataBase: new URL(SITE_URL),
   manifest: '/manifest.json',
