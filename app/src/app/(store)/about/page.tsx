@@ -18,7 +18,7 @@ export default function AboutPage() {
     <div className="max-w-3xl mx-auto px-4 py-20">
       <h1 className="font-playfair text-4xl font-bold text-stone-900 mb-6">About TMFoodStuff</h1>
       <p className="text-lg text-stone-600 mb-6 leading-relaxed">
-        TMFoodStuff is a premium fresh fruits and vegetables delivery service operating across the UAE.
+        TMFoodStuff is a premium fresh fruits and vegetables delivery service operating in Dubai.
         We source directly from farms to bring you the freshest produce at fair prices, delivered to your door.
       </p>
       <div className="grid md:grid-cols-3 gap-6 mt-10">

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { DELIVERY_EMIRATE, loadDeliveryAreas } from '@/lib/delivery-areas'
 
+export const dynamic = 'force-dynamic'
+
 // Public: only the area list is exposed, nothing else from settings.
 export async function GET() {
   const supabase = createClient(

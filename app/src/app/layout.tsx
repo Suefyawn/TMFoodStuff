@@ -38,13 +38,13 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: 'TMFoodStuff',
     title: 'TMFoodStuff — Fresh Fruits & Vegetables UAE',
-    description: 'Premium fresh fruits & vegetables delivered across UAE. Same-day delivery.',
+    description: 'Premium fresh fruits & vegetables delivered in Dubai. Same-day delivery.',
     images: [{ url: '/icons/og-image.png', width: 1200, height: 630, alt: 'TMFoodStuff — Fresh Fruits & Vegetables UAE' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TMFoodStuff — Fresh Fruits & Vegetables UAE',
-    description: 'Premium fresh fruits & vegetables delivered across UAE. Same-day delivery.',
+    description: 'Premium fresh fruits & vegetables delivered in Dubai. Same-day delivery.',
     images: ['/icons/og-image.png'],
   },
   alternates: {

@@ -72,7 +72,14 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const defaultAddress = addresses.find(a => a.is_default) || addresses[0]
-  const [emirate, setEmirate] = useState(defaultAddress?.emirate || '')
+  const [emirate, setEmirate] = useState(defaultAddress?.emirate || 'Dubai')
+  const [deliveryAreas, setDeliveryAreas] = useState<string[]>([])
+  useEffect(() => {
+    fetch('/api/delivery-areas')
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d?.areas)) setDeliveryAreas(d.areas) })
+      .catch(() => { /* server still checks the area */ })
+  }, [])
   const [area, setArea] = useState(defaultAddress?.area || '')
   const [building, setBuilding] = useState(defaultAddress?.building || '')
   const [makani, setMakani] = useState(defaultAddress?.makani || '')
@@ -120,7 +127,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
       setError(isAr ? 'اختر منتجاً واحداً على الأقل.' : 'Pick at least one item.')
       return
     }
-    if (!emirate.trim() || !area.trim()) {
+    if (!area.trim()) {
       setError(isAr ? 'العنوان مطلوب.' : 'Address is required.')
       return
     }
@@ -138,7 +145,7 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
           items: pickedItems.map(it => ({ product_id: it.product.id, quantity: it.quantity })),
           frequency_days: frequencyDays,
           delivery_slot: slot,
-          delivery_emirate: emirate.trim(),
+          delivery_emirate: 'Dubai',
           delivery_area: area.trim(),
           delivery_building: building.trim() || undefined,
           delivery_makani: makani.trim() || undefined,
@@ -303,11 +310,17 @@ export default function NewSubscriptionClient({ products, addresses, defaultName
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'الإمارة' : 'Emirate'}</p>
-            <input type="text" required value={emirate} onChange={e => setEmirate(e.target.value)} placeholder="Dubai" className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
+            <select required value="Dubai" onChange={() => setEmirate('Dubai')} className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light">
+              <option value="Dubai">{isAr ? 'دبي' : 'Dubai'}</option>
+            </select>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'المنطقة' : 'Area'}</p>
-            <input type="text" required value={area} onChange={e => setArea(e.target.value)} placeholder="JBR" className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light" />
+            <select required value={area} onChange={e => { setEmirate('Dubai'); setArea(e.target.value) }} className="w-full bg-stone-50 border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-forest-light">
+              <option value="">{isAr ? 'اختر المنطقة' : 'Select your area'}</option>
+              {deliveryAreas.map(a => <option key={a} value={a}>{a}</option>)}
+            </select>
+            <p className="mt-1 text-xs text-stone-500">{isAr ? 'نوصل حاليا فقط إلى المناطق القريبة من رأس الخور في دبي.' : 'We deliver only to areas near Ras Al Khor in Dubai for now.'}</p>
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">{isAr ? 'المبنى' : 'Building'}</p>

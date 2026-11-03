@@ -78,7 +78,8 @@ export default function CheckoutPage() {
   // Delivery is Dubai only, near Ras Al Khor. The list is a store setting.
   const deliveryEmirate = lang === 'ar' ? 'دبي' : 'Dubai'
   const areaOnList = (a: string) => deliveryAreas.some(x => x.trim().toLowerCase() === a.trim().toLowerCase())
-  const areaNotDeliverable = areaUnlisted || (form.area !== '' && deliveryAreas.length > 0 && !areaOnList(form.area))
+  const emirateOk = ['dubai', 'دبي'].includes(form.emirate.trim().toLowerCase()) || form.emirate === ''
+  const areaNotDeliverable = areaUnlisted || !emirateOk || (form.area !== '' && deliveryAreas.length > 0 && !areaOnList(form.area))
   const notDeliverableMsg = lang === 'ar' ? NOT_DELIVERABLE_MESSAGE.ar : NOT_DELIVERABLE_MESSAGE.en
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
   const [activeAddressId, setActiveAddressId] = useState<number | null>(null)
@@ -117,7 +118,7 @@ export default function CheckoutPage() {
           fullName: prev.fullName || data.fullName || '',
           phone:    prev.phone    || data.phone    || '',
           email:    prev.email    || data.email    || '',
-          emirate:  prev.emirate  || deliveryEmirate,
+          emirate:  prev.emirate  || (defaultAddr?.emirate  || deliveryEmirate),
           area:     prev.area     || (defaultAddr?.area     || ''),
           building: prev.building || (defaultAddr?.building || ''),
           makani:   prev.makani   || (defaultAddr?.makani   || ''),
@@ -133,7 +134,7 @@ export default function CheckoutPage() {
     setAreaUnlisted(false)
     setForm(prev => ({
       ...prev,
-      emirate:  deliveryEmirate,
+      emirate:  a.emirate  || deliveryEmirate,
       area:     a.area     || '',
       building: a.building || '',
       makani:   a.makani   || '',
@@ -302,7 +303,7 @@ export default function CheckoutPage() {
           total_aed: finalTotal,
           payment_method: paymentMethod,
           delivery_slot: form.deliverySlot,
-          emirate: deliveryEmirate,
+          emirate: emirateOk ? deliveryEmirate : form.emirate,
           promo_code: promoApplied ? promoCode : undefined,
         })
 

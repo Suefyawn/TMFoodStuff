@@ -53,8 +53,8 @@ export default function Footer() {
             </div>
             <p className="text-sm leading-relaxed mb-6 text-gray-500">
               {lang === 'ar'
-                ? 'فواكه وخضروات طازجة فاخرة توصل يومياً في جميع أنحاء الإمارات. من المزرعة إلى بابك، دائماً طازج.'
-                : 'Premium fresh fruits & vegetables delivered daily across the UAE. Farm to door, always fresh.'}
+                ? 'فواكه وخضروات طازجة فاخرة توصل يومياً في دبي. من المزرعة إلى بابك، دائماً طازج.'
+                : 'Premium fresh fruits & vegetables delivered daily in Dubai. Farm to door, always fresh.'}
             </p>
 
             <a

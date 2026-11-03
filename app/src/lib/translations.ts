@@ -25,7 +25,7 @@ export const t = {
     whatsappUpdates: 'WhatsApp Updates',
     // Shop
     shopTitle: 'Shop Fresh',
-    shopSubtitle: 'Farm fresh produce delivered to your door across UAE',
+    shopSubtitle: 'Farm fresh produce delivered to your door in Dubai',
     allItems: 'All',
     productsFound: 'products found',
     outOfStock: 'Out of Stock',
@@ -100,7 +100,7 @@ export const t = {
     heroTag: 'توصيل مجاني على أول طلب · استخدم كود: FRESH10',
     heroTitle1: 'طازج من المزرعة',
     heroTitle2: 'إلى بابك',
-    heroSubtitle: 'فواكه وخضروات فاخرة يتم جلبها يومياً من أفضل المزارع حول العالم. توصيل طازج في جميع أنحاء الإمارات.',
+    heroSubtitle: 'فواكه وخضروات فاخرة يتم جلبها يومياً من أفضل المزارع حول العالم. توصيل طازج في دبي.',
     shopNow: 'تسوق الآن',
     browseFruits: 'تصفح الفواكه',
     // Trust

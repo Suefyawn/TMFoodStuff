@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     'Mango season is here! Order sweet, juicy Pakistani Chaunsa, Taimoor, Alphonso and Tomy mangoes online. Hand-picked, quality-checked and delivered same-day in Dubai, around Ras Al Khor.',
   alternates: { canonical: '/mangoes' },
   openGraph: {
-    title: 'Mango Season is Here — Fresh Mangoes Delivered Across UAE',
+    title: 'Mango Season is Here — Fresh Mangoes Delivered in Dubai',
     description:
-      'Sweet, juicy Pakistani & Indian mangoes — picked fresh, delivered to your door. Same-day delivery in Dubai, around Ras Al Khor.',
+      'Sweet, juicy Pakistani & Indian mangoes, picked fresh and delivered to your door. Same-day delivery in Dubai, around Ras Al Khor.',
     url: PAGE_URL,
     type: 'website',
     siteName: 'TMFoodStuff',
@@ -25,9 +25,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mango Season is Here — Fresh Mangoes Delivered Across UAE',
+    title: 'Mango Season is Here — Fresh Mangoes Delivered in Dubai',
     description:
-      'Sweet, juicy Pakistani & Indian mangoes — picked fresh, delivered to your door across the UAE.',
+      'Sweet, juicy Pakistani & Indian mangoes, picked fresh and delivered to your door in Dubai.',
     images: [`${SITE_URL}/mango-hero.jpg`],
   },
 }
@@ -40,10 +40,10 @@ export default async function MangoesPage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Mango Season — Fresh Mangoes Delivered Across UAE',
+    name: 'Mango Season — Fresh Mangoes Delivered in Dubai',
     url: PAGE_URL,
     description:
-      'Seasonal collection of fresh Pakistani and Indian mangoes delivered across the UAE.',
+      'Seasonal collection of fresh Pakistani and Indian mangoes delivered in Dubai.',
     mainEntity: {
       '@type': 'ItemList',
       itemListElement: mangoes.map((p, i) => ({

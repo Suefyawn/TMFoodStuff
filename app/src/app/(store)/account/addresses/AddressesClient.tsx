@@ -54,7 +54,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
   function startEdit(a: Address) {
     setForm({
       label: a.label || '', building: a.building || '', street: a.street || '',
-      area: a.area || '', emirate, makani: a.makani || '',
+      area: a.area || '', emirate: a.emirate || emirate, makani: a.makani || '',
       is_default: a.is_default,
     })
     setEditingId(a.id)
@@ -62,6 +62,10 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
   }
 
   async function save() {
+    if (form.emirate && !['dubai', 'دبي'].includes(form.emirate.trim().toLowerCase())) {
+      setError(isAr ? 'نوصل حاليا فقط إلى المناطق القريبة من رأس الخور في دبي. اختر منطقة من القائمة.' : 'We deliver only to areas near Ras Al Khor in Dubai for now. Pick an area from the list.')
+      return
+    }
     if (!form.area) {
       setError(isAr ? 'الإمارة والمنطقة مطلوبتان.' : 'Emirate and area are required.')
       return

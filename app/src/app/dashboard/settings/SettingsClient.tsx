@@ -42,11 +42,16 @@ export default function SettingsPage() {
 
   async function saveSettings() {
     setSaving(true)
-    await fetch('/api/dashboard/settings', {
+    const res = await fetch('/api/dashboard/settings', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings, promoCodes }),
     })
     setSaving(false)
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      window.alert(err?.error || 'Settings were not saved. Please check the values and try again.')
+      return
+    }
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }

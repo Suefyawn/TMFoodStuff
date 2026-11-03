@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Delivery Policy',
   description:
-    'Delivery zones, slots, cutoffs, fees, and freshness guarantee for TMFoodStuff orders across the UAE.',
+    'Delivery zones, slots, cutoffs, fees, and freshness guarantee for TMFoodStuff orders in Dubai.',
   alternates: { canonical: '/delivery-policy' },
 }
 
