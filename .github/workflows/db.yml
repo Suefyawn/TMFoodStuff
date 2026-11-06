@@ -1,21 +1,34 @@
 # Database chores run by the Crew so nobody has to open Supabase by hand.
 # Manual only (workflow_dispatch). This repo is PUBLIC, so the logs are public:
 # print only subscription ids, emirates, area names and counts. Never names,
-# phones, emails, street addresses or order data.
+# phones, emails, street addresses or order data. Free text that contains a digit
+# or is longer than 40 characters is masked in the read-areas output (a listed
+# area name is always shown). apply-area-fixes prints the old and new values of the
+# rows it changes, as its backup.
+#
+# Actions:
+#   read-areas        read only: lists active subscriptions and whether the area is listed
+#   apply-area-fixes  updates only the listed ids to an exact listed area
+#   live-check        no secret needed: GET /checkout on the live site and, with
+#                     area_guard on, one POST that can never create an order
 name: DB
 
 on:
   workflow_dispatch:
     inputs:
       action:
-        description: read-areas (read only) or apply-area-fixes (updates only the listed ids)
+        description: read-areas (read only), apply-area-fixes (updates only the listed ids) or live-check (no secret needed)
         type: choice
-        options: [read-areas, apply-area-fixes]
+        options: [read-areas, apply-area-fixes, live-check]
         default: read-areas
       fixes:
         description: 'apply-area-fixes only: JSON list of {"id": "...", "area": "Exact listed area"}'
         type: string
         default: '[]'
+      area_guard:
+        description: 'live-check only: also POST a payload to /api/orders that cannot create an order, to prove the delivery area guard is live'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -32,8 +45,10 @@ jobs:
       DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       ACTION: ${{ inputs.action }}
       FIXES: ${{ inputs.fixes }}
+      AREA_GUARD: ${{ inputs.area_guard }}
     steps:
       - name: Preflight
+        if: inputs.action != 'live-check'
         run: |
           if [ -z "$DB_URL" ]; then echo "::error::SUPABASE_DB_URL secret is empty or missing"; exit 1; fi
           sudo apt-get install -y -qq postgresql-client >/dev/null
@@ -52,6 +67,8 @@ jobs:
                    "Business Bay","Dubai Creek Harbour"]
           norm = lambda s: re.sub(r"\s+", " ", unicodedata.normalize("NFKC", s).strip()).lower()
           listed = {norm(a): a for a in AREAS}
+          # Public logs: free text with a digit or over 40 chars may be a street address.
+          mask = lambda v: v if norm(v) in listed else (f"[free text, {len(v)} chars]" if (len(v) > 40 or any(c.isdigit() for c in v)) else v)
           ok = fix = out = 0
           lines = ["| id | emirate | area | status |", "|---|---|---|---|"]
           for raw in open("rows.tsv", encoding="utf-8"):
@@ -66,7 +83,7 @@ jobs:
                   status, fix = "needs a listed name", fix + 1
               else:
                   status, out = "outside Dubai", out + 1
-              lines.append(f"| {sid} | {emirate} | {area} | {status} |")
+              lines.append(f"| {sid} | {mask(emirate)} | {mask(area)} | {status} |")
           summary = [f"Active subscriptions: {ok + fix + out} (ok {ok}, needs fixing {fix}, outside Dubai {out})", ""] + lines
           print("\n".join(summary))
           with open(__import__("os").environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
@@ -116,3 +133,72 @@ jobs:
           PY
           psql "$DB_URL" -F $'\t' -A -f fix.sql | tee out.txt
           { echo '```'; cat out.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Live site check
+        if: inputs.action == 'live-check'
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request, urllib.error
+          from datetime import datetime, timedelta, timezone
+          from zoneinfo import ZoneInfo
+
+          SITE = "https://tmfoodstuff.ae"
+          # Must match NOT_DELIVERABLE_MESSAGE.en in app/src/lib/delivery-areas.ts
+          NOT_DELIVERABLE_EN = "We deliver only to areas near Ras Al Khor in Dubai for now. Message us on WhatsApp if you are close by."
+          HEADERS = {"User-Agent": "tmf-db-live-check"}
+          rows = []
+
+          def call(req):
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      return r.status, r.read().decode("utf-8", "replace")
+              except urllib.error.HTTPError as e:
+                  return e.code, e.read().decode("utf-8", "replace")
+              except Exception as e:
+                  return 0, f"{type(e).__name__}"
+
+          # 1. Checkout page (GET follows redirects)
+          code, _ = call(urllib.request.Request(SITE + "/checkout", headers=HEADERS))
+          rows.append(("GET /checkout", "PASS" if code == 200 else "FAIL", f"HTTP {code}"))
+
+          # 2. Area guard: the order is stopped by the area check or by the unknown item
+          if os.environ.get("AREA_GUARD") == "true":
+              # Same as acceptableDeliveryDates() in app/src/app/api/orders/route.ts (today, Dubai time)
+              today = datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Dubai")).date()
+              body = {
+                  "form": {"fullName": "Live Check", "phone": "0501234567", "email": "check@example.com",
+                           "emirate": "Sharjah", "area": "Al Majaz"},
+                  "items": [{"id": "00000000-0000-0000-0000-000000000000", "quantity": 1}],
+                  "paymentMethod": "cod",
+                  "deliverySlot": "morning",
+                  "deliveryDate": today.isoformat(),
+                  "locale": "en",
+              }
+              req = urllib.request.Request(
+                  SITE + "/api/orders", data=json.dumps(body).encode(), method="POST",
+                  headers={**HEADERS, "Content-Type": "application/json"})
+              code, text = call(req)
+              try:
+                  err = json.loads(text).get("error", "")
+              except Exception:
+                  err = ""
+              if 200 <= code < 300:
+                  result, note = "FAIL", f"HTTP {code}: an order request was ACCEPTED, check the orders table now"
+              elif code == 400 and err == NOT_DELIVERABLE_EN:
+                  result, note = "PASS", "HTTP 400 with the not-deliverable message"
+              elif code == 400:
+                  result, note = "FAIL", "area guard not reached (HTTP 400, error: " + (err or "none")[:80] + ")"
+              else:
+                  result, note = "FAIL", f"HTTP {code}, expected 400"
+              rows.append(("POST /api/orders (Sharjah)", result, note))
+          else:
+              rows.append(("POST /api/orders (Sharjah)", "SKIPPED", "area_guard is off"))
+
+          lines = ["| check | result | detail |", "|---|---|---|"] + [f"| {a} | {b} | {c} |" for a, b, c in rows]
+          print("\n".join(lines))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\n".join(lines) + "\n")
+          for a, b, c in rows:
+              if b == "FAIL":
+                  print(f"::warning::{a}: {c}")
+          PY
