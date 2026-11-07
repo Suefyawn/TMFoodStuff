@@ -9,6 +9,7 @@
 # Actions:
 #   read-areas        read only: lists active subscriptions and whether the area is listed
 #   apply-area-fixes  updates only the listed ids to an exact listed area
+#   status-counts     read only: subscription status labels (cut to 30 chars) and counts, nothing else
 #   live-check        no secret needed: GET /checkout on the live site and, with
 #                     area_guard on, one POST that can never create an order
 name: DB
@@ -17,9 +18,9 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: read-areas (read only), apply-area-fixes (updates only the listed ids) or live-check (no secret needed)
+        description: read-areas (read only), status-counts (read only, labels and counts), apply-area-fixes (updates only the listed ids) or live-check (no secret needed)
         type: choice
-        options: [read-areas, apply-area-fixes, live-check]
+        options: [read-areas, apply-area-fixes, live-check, status-counts]
         default: read-areas
       fixes:
         description: 'apply-area-fixes only: JSON list of {"id": "...", "area": "Exact listed area"}'
@@ -87,6 +88,30 @@ jobs:
           summary = [f"Active subscriptions: {ok + fix + out} (ok {ok}, needs fixing {fix}, outside Dubai {out})", ""] + lines
           print("\n".join(summary))
           with open(__import__("os").environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\n".join(summary) + "\n")
+          PY
+
+      - name: Subscription status counts
+        if: inputs.action == 'status-counts'
+        run: |
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -F $'\t' -c \
+            "select coalesce(status::text, '(null)'), count(*) from subscriptions group by 1 order by 2 desc, 1" > status.tsv
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -c "select count(*) from subscriptions" > total.txt
+          python3 - <<'PY'
+          import os
+          # Public logs: print only the status label (cut to 30 chars) and its count.
+          clean = lambda v: " ".join(v.split()).replace("|", "/")[:30]
+          lines = ["| status | count |", "|---|---|"]
+          for raw in open("status.tsv", encoding="utf-8"):
+              raw = raw.rstrip("\n")
+              if not raw:
+                  continue
+              label, _, n = raw.rpartition("\t")
+              lines.append(f"| {clean(label)} | {n} |")
+          total = open("total.txt", encoding="utf-8").read().strip()
+          summary = [f"Total subscriptions: {total}", ""] + lines
+          print("\n".join(summary))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
               f.write("\n".join(summary) + "\n")
           PY
 
