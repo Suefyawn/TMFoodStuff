@@ -95,7 +95,7 @@ jobs:
         if: inputs.action == 'status-counts'
         run: |
           psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -F $'\t' -c \
-            "select coalesce(status::text, '(null)'), count(*) from subscriptions group by 1 order by 2 desc, 1" > status.tsv
+            "select left(regexp_replace(coalesce(status::text, '(null)'), '\s+', ' ', 'g'), 30), count(*) from subscriptions group by 1 order by 2 desc, 1" > status.tsv
           psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -c "select count(*) from subscriptions" > total.txt
           python3 - <<'PY'
           import os
@@ -107,6 +107,8 @@ jobs:
               if not raw:
                   continue
               label, _, n = raw.rpartition("\t")
+              if not n.isdigit():
+                  continue  # a stray fragment: never print it
               lines.append(f"| {clean(label)} | {n} |")
           total = open("total.txt", encoding="utf-8").read().strip()
           summary = [f"Total subscriptions: {total}", ""] + lines
