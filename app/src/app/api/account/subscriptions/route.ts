@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server'
 import { getCurrentCustomer, getServiceRoleClient } from '@/lib/customer'
 import { isValidUAEPhone, normaliseUAEPhone } from '@/lib/validators'
+import { isDeliverable, loadDeliveryAreas, NOT_DELIVERABLE_MESSAGE } from '@/lib/delivery-areas'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,6 +68,11 @@ export async function POST(request: Request) {
   }
 
   const supabase = getServiceRoleClient()
+
+  const deliveryAreas = await loadDeliveryAreas(supabase)
+  if (!isDeliverable(body.delivery_emirate, body.delivery_area, deliveryAreas)) {
+    return NextResponse.json({ error: NOT_DELIVERABLE_MESSAGE.en }, { status: 400 })
+  }
 
   // Resolve product snapshots from the catalog so we store a price that's
   // accurate at create-time — subsequent price changes don't retroactively

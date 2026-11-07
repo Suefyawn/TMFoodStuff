@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { NOT_DELIVERABLE_MESSAGE } from '@/lib/delivery-areas'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CheckCircle, ShoppingBag, Package, MessageCircle, Sunrise, Sun, Moon, Truck, Wallet, CreditCard, Loader2, Lock, MapPin, User, Sparkles, Clock } from 'lucide-react'
@@ -54,6 +55,8 @@ export default function CheckoutPage() {
   const [waMessage, setWaMessage] = useState('')
   const [waNumber, setWaNumber] = useState('')
   const [formError, setFormError] = useState('')
+  const [deliveryAreas, setDeliveryAreas] = useState<string[]>([])
+  const [areaUnlisted, setAreaUnlisted] = useState(false)
   const [promoError, setPromoError] = useState('')
   const [form, setForm] = useState({
     fullName: '',
@@ -72,6 +75,12 @@ export default function CheckoutPage() {
   const { result: validation } = useCartValidation()
   const checkoutBlocked = validation?.blocking ?? false
   const [signedIn, setSignedIn] = useState(false)
+  // Delivery is Dubai only, near Ras Al Khor. The list is a store setting.
+  const deliveryEmirate = lang === 'ar' ? 'دبي' : 'Dubai'
+  const areaOnList = (a: string) => deliveryAreas.some(x => x.trim().toLowerCase() === a.trim().toLowerCase())
+  const emirateOk = ['dubai', 'دبي'].includes(form.emirate.trim().toLowerCase()) || form.emirate === ''
+  const areaNotDeliverable = areaUnlisted || !emirateOk || (form.area !== '' && deliveryAreas.length > 0 && !areaOnList(form.area))
+  const notDeliverableMsg = lang === 'ar' ? NOT_DELIVERABLE_MESSAGE.ar : NOT_DELIVERABLE_MESSAGE.en
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
   const [activeAddressId, setActiveAddressId] = useState<number | null>(null)
   const [pointsBalance, setPointsBalance] = useState(0)
@@ -92,6 +101,10 @@ export default function CheckoutPage() {
   // an empty form.
   useEffect(() => {
     let cancelled = false
+    fetch('/api/delivery-areas')
+      .then(r => r.json())
+      .then(d => { if (!cancelled && Array.isArray(d?.areas)) setDeliveryAreas(d.areas) })
+      .catch(() => { /* server still checks the area on submit */ })
     fetch('/api/account/me')
       .then(r => r.json())
       .then(data => {
@@ -105,7 +118,7 @@ export default function CheckoutPage() {
           fullName: prev.fullName || data.fullName || '',
           phone:    prev.phone    || data.phone    || '',
           email:    prev.email    || data.email    || '',
-          emirate:  prev.emirate  || (defaultAddr?.emirate  || ''),
+          emirate:  prev.emirate  || (defaultAddr?.emirate  || deliveryEmirate),
           area:     prev.area     || (defaultAddr?.area     || ''),
           building: prev.building || (defaultAddr?.building || ''),
           makani:   prev.makani   || (defaultAddr?.makani   || ''),
@@ -118,18 +131,15 @@ export default function CheckoutPage() {
 
   function applyAddress(a: SavedAddress) {
     setActiveAddressId(a.id)
+    setAreaUnlisted(false)
     setForm(prev => ({
       ...prev,
-      emirate:  a.emirate  || '',
+      emirate:  a.emirate  || deliveryEmirate,
       area:     a.area     || '',
       building: a.building || '',
       makani:   a.makani   || '',
     }))
   }
-
-  const EMIRATES = lang === 'ar'
-    ? ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين']
-    : ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain']
 
   // Generate next 3 delivery dates in UAE timezone
   const DELIVERY_DATES = Array.from({ length: 3 }, (_, i) => {
@@ -228,7 +238,11 @@ export default function CheckoutPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setFormError('')
-    if (!form.fullName || !form.phone || !form.emirate || !form.area) {
+    if (areaNotDeliverable) {
+      setFormError(notDeliverableMsg)
+      return
+    }
+    if (!form.fullName || !form.phone || !form.area) {
       setFormError(lang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields.')
       return
     }
@@ -289,7 +303,7 @@ export default function CheckoutPage() {
           total_aed: finalTotal,
           payment_method: paymentMethod,
           delivery_slot: form.deliverySlot,
-          emirate: form.emirate,
+          emirate: emirateOk ? deliveryEmirate : form.emirate,
           promo_code: promoApplied ? promoCode : undefined,
         })
 
@@ -483,27 +497,35 @@ export default function CheckoutPage() {
                   <select
                     id="emirate"
                     name="emirate"
-                    value={form.emirate}
+                    value={deliveryEmirate}
                     onChange={handleChange}
                     className={`${inputClass} bg-white`}
                     required
                   >
-                    <option value="">{tr.selectEmirate}</option>
-                    {EMIRATES.map(e => <option key={e} value={e}>{e}</option>)}
+                    <option value={deliveryEmirate}>{deliveryEmirate}</option>
                   </select>
                 </div>
                 <div>
                   <label htmlFor="area" className="block text-sm font-semibold text-stone-700 mb-1.5">{tr.area} *</label>
-                  <input
-                    type="text"
+                  <select
                     id="area"
                     name="area"
-                    value={form.area}
-                    onChange={handleChange}
-                    placeholder={lang === 'ar' ? 'جميرا لايك تاورز، المرسى...' : 'JLT, Marina, Deira, Khalidiyah...'}
-                    className={inputClass}
+                    value={areaUnlisted ? '__other' : (areaOnList(form.area) ? form.area : '')}
+                    onChange={e => {
+                      const v = e.target.value
+                      if (v === '__other') { setAreaUnlisted(true); setForm(prev => ({ ...prev, emirate: deliveryEmirate, area: '' })) }
+                      else { setAreaUnlisted(false); setForm(prev => ({ ...prev, emirate: deliveryEmirate, area: v })) }
+                    }}
+                    className={`${inputClass} bg-white`}
                     required
-                  />
+                  >
+                    <option value="">{lang === 'ar' ? 'اختر المنطقة' : 'Select your area'}</option>
+                    {deliveryAreas.map(a => <option key={a} value={a}>{a}</option>)}
+                    <option value="__other">{lang === 'ar' ? 'منطقتي غير مدرجة' : 'My area is not listed'}</option>
+                  </select>
+                  {areaNotDeliverable && (
+                    <p role="alert" className="mt-2 text-sm text-red-700">{notDeliverableMsg}</p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="building" className="block text-sm font-semibold text-stone-700 mb-1.5">{tr.building}</label>
@@ -813,7 +835,7 @@ export default function CheckoutPage() {
 
               <button
                 type="submit"
-                disabled={isSubmitting || checkoutBlocked}
+                disabled={isSubmitting || checkoutBlocked || areaNotDeliverable}
                 title={checkoutBlocked
                   ? (lang === 'ar' ? 'يرجى حل المشكلات في السلة قبل المتابعة' : 'Please resolve the issues above before continuing')
                   : undefined}

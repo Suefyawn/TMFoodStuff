@@ -39,7 +39,7 @@ export default function MangoesContent({ mangoes }: MangoesContentProps) {
     {
       icon: Truck,
       title: lang === 'ar' ? 'توصيل في نفس اليوم' : 'Same-Day Delivery',
-      desc: lang === 'ar' ? 'في جميع أنحاء الإمارات' : 'Across Dubai, Abu Dhabi & all emirates',
+      desc: lang === 'ar' ? 'في دبي، قرب رأس الخور' : 'In Dubai, near Ras Al Khor',
     },
     {
       icon: Leaf,
@@ -131,8 +131,8 @@ export default function MangoesContent({ mangoes }: MangoesContentProps) {
               </h1>
               <p className="text-stone-600 text-base md:text-xl mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
                 {lang === 'ar'
-                  ? 'مانجو باكستانية وهندية حلوة وعصيرية — تُقطف طازجة، تُفحص يدويًا، وتصل إلى بابك في نفس اليوم في جميع أنحاء الإمارات.'
-                  : 'Sweet, juicy Pakistani and Indian mangoes — picked fresh, hand-checked, and delivered same-day across the UAE.'}
+                  ? 'مانجو باكستانية وهندية حلوة وعصيرية — تُقطف طازجة، تُفحص يدويًا، وتصل إلى بابك في نفس اليوم في دبي.'
+                  : 'Sweet, juicy Pakistani and Indian mangoes — picked fresh, hand-checked, and delivered same-day in Dubai.'}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                 <a
@@ -155,8 +155,8 @@ export default function MangoesContent({ mangoes }: MangoesContentProps) {
               <div className="mt-6 flex items-center justify-center lg:justify-start gap-2 text-sm text-stone-500">
                 <MapPin size={14} className="text-forest flex-shrink-0" />
                 {lang === 'ar'
-                  ? 'نوصل إلى دبي، أبوظبي، الشارقة وجميع الإمارات'
-                  : 'Delivering to Dubai, Abu Dhabi, Sharjah & all emirates'}
+                  ? 'نوصل إلى المناطق القريبة من رأس الخور في دبي'
+                  : 'Delivering in Dubai, near Ras Al Khor'}
               </div>
             </div>
 

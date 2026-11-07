@@ -39,7 +39,7 @@ export default function ReferralsClient({ code, shareUrl, referrals, rewardedCou
 
   const shareText = isAr
     ? `جرّب TM FoodStuff للحصول على فواكه وخضروات طازجة! استخدم رابطي للحصول على 50 نقطة عند طلبك الأول: ${shareUrl}`
-    : `I'm loving TM FoodStuff — fresh fruits & veg delivered across the UAE. Use my link to get 50 points (~AED 2.50) off your first order: ${shareUrl}`
+    : `I'm loving TM FoodStuff — fresh fruits & veg delivered in Dubai. Use my link to get 50 points (~AED 2.50) off your first order: ${shareUrl}`
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14" dir={isAr ? 'rtl' : 'ltr'}>

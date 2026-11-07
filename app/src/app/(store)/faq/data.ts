@@ -17,10 +17,10 @@ export const FAQS: Faq[] = [
   // ─── Delivery ────────────────────────────────────────────────────
   {
     group_en: 'Delivery', group_ar: 'التوصيل', group_order: 1,
-    q_en: 'Which emirates do you deliver to?',
-    q_ar: 'ما هي الإمارات التي توصلون إليها؟',
-    a_en: 'We deliver to all 7 emirates: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain.',
-    a_ar: 'نوصل إلى جميع الإمارات السبع: دبي، أبوظبي، الشارقة، عجمان، رأس الخيمة، الفجيرة، وأم القيوين.',
+    q_en: 'Where do you deliver?',
+    q_ar: 'أين توصلون؟',
+    a_en: 'We deliver in Dubai only, to areas near Ras Al Khor (for example Ras Al Khor, Al Jaddaf, Nad Al Hamar, Dubai Festival City, Mirdif and Business Bay). The full list is shown at checkout. We do not deliver to Sharjah, Ajman or Abu Dhabi yet.',
+    a_ar: 'نوصل في دبي فقط، إلى المناطق القريبة من رأس الخور (مثل رأس الخور، الجداف، ند الحمر، دبي فيستيفال سيتي، مردف والخليج التجاري). القائمة الكاملة تظهر عند إتمام الطلب. لا نوصل إلى الشارقة أو عجمان أو أبوظبي حاليا.',
   },
   {
     group_en: 'Delivery', group_ar: 'التوصيل', group_order: 1,
