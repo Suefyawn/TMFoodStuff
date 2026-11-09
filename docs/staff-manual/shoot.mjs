@@ -1,7 +1,8 @@
 // Takes the screenshots for staff-manual.md from a LOCAL run of the app with
 // seed data only. Usage (app running on localhost:3000):
 //   STAFF_EMAIL=... STAFF_PASSWORD=... node docs/staff-manual/shoot.mjs
-// Never point this at the live site.
+// Never point this at the live site. It creates a "Sample Mango Box" product in
+// the local database (delete it before a re-run) and expects a "Fruits" category.
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -10,7 +11,7 @@ const require = createRequire(import.meta.url)
 const { chromium } = require('playwright')
 
 const BASE = process.env.BASE_URL || 'http://localhost:3000'
-if (!/localhost|127\.0\.0\.1/.test(BASE)) throw new Error('Local runs only')
+if (!['localhost', '127.0.0.1'].includes(new URL(BASE).hostname)) throw new Error('Local runs only')
 const here = path.dirname(fileURLToPath(import.meta.url))
 const img = (n) => path.join(here, 'img', n)
 const email = process.env.STAFF_EMAIL
@@ -32,6 +33,7 @@ const sample = path.join(here, 'img', '_sample.png')
 
 async function shot(name, opts = {}) {
   await page.waitForTimeout(600)
+  await page.addStyleTag({ content: 'nextjs-portal{display:none!important}' }) // hides the dev-mode badge
   await page.screenshot({ path: img(name), ...opts })
   console.log('saved', name)
 }
@@ -58,7 +60,7 @@ await field('Name *').fill('Sample Mango Box')
 await field('Category').selectOption({ label: 'Fruits' })
 await field('Price (AED) *').fill('24.50')
 await field('Compare-at Price').fill('29.00')
-await field('Unit').fill('per kg')
+await field('Unit').fill('kg')
 await field('Stock').fill('40')
 await field('Low-stock alert').fill('5')
 await field('Origin').fill('Pakistan')

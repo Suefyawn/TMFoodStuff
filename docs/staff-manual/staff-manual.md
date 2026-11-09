@@ -14,7 +14,7 @@ Open the dashboard at your site address followed by `/dashboard`. Prices are in 
 
 ## 2. Find your way around
 
-The menu on the left has Products, Orders, Customers and Settings. Open **Products** to see every item in the shop. At the top of the list you can search by name, filter by category, or filter by Active and Inactive.
+The menu on the left has Products, Orders, Customers and, for administrators, Settings. Open **Products** to see every item in the shop. At the top of the list you can search by name, filter by category, or filter by Active and Inactive.
 
 ![The products list](img/02-products-list.png)
 
@@ -26,7 +26,7 @@ The menu on the left has Products, Orders, Customers and Settings. Open **Produc
    - **Category**: pick one from the list. Add new categories first (section 8).
    - **Price (AED)** is required. This is the price a customer pays for one unit.
    - **Compare-at Price (AED)**: the old, higher price. If you fill it in, the old price shows crossed out beside the new one. Leave it empty for no offer.
-   - **Unit** says how the product is sold. Type `per kg` for goods sold by weight, or `per piece`, `per box` or `per bunch` for items sold by count. The unit shows under the product name.
+   - **Unit** says how the product is sold. Type just the unit: `kg` for goods sold by weight, or `piece`, `box` or `bunch` for items sold by count. The shop adds the word "per" itself, so customers see "per kg".
    - **Stock**: how many units you have right now.
    - **Low-stock alert at**: you are warned when stock falls to this number.
    - **Origin**: where the product comes from.
@@ -71,6 +71,8 @@ To change many products at once, tick the boxes on the left of their rows. Butto
 ![The Active status on a product row](img/06-active-inactive.png)
 
 ## 7. Promotions and promo codes
+
+Promo codes and delivery areas live in **Settings**, which only administrator accounts can see. If you do not see Settings in your menu, ask an administrator to make the change or to give your account administrator access.
 
 There are two ways to run a promotion.
 
