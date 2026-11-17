@@ -41,6 +41,6 @@ Supabase project setup.
 
 - **Currency:** AED
 - **VAT:** 5% (Federal Tax Authority compliant)
-- **Delivery:** Dubai, Abu Dhabi, Sharjah, Ajman, RAK, Fujairah, Umm Al Quwain
+- **Delivery:** Dubai only, areas around Ras Al Khor (list in Dashboard > Settings, setting `delivery_areas`)
 - **Payments:** Cash on Delivery (Telr card support coming soon)
 - **Address:** Makani number support

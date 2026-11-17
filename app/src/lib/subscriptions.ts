@@ -15,6 +15,7 @@ import { computeOrderTotals } from '@/lib/pricing'
 import { fulfillOrder } from '@/lib/order-fulfillment'
 import { getResend, FROM_EMAIL } from '@/lib/email'
 import { SITE_URL } from '@/lib/site'
+import { isDeliverable, loadDeliveryAreas } from '@/lib/delivery-areas'
 
 export interface SubscriptionItemSnapshot {
   product_id: number
@@ -105,6 +106,7 @@ export async function dispatchDueSubscriptions(
     }))
 
   const settings = await loadSettings(supabase)
+  const deliveryAreas = await loadDeliveryAreas(supabase)
   let dispatched = 0
   let failed = 0
   let skipped = 0
@@ -112,6 +114,14 @@ export async function dispatchDueSubscriptions(
   for (const sub of rows) {
     // Honour pause windows.
     if (sub.pause_until && sub.pause_until >= todayIso) {
+      skipped++
+      continue
+    }
+
+    // Saved address is outside the delivery area: create no order, keep the
+    // subscription as it is (not cancelled or deleted) so staff can follow up.
+    if (!isDeliverable(sub.delivery_emirate, sub.delivery_area, deliveryAreas)) {
+      console.warn('[subscriptions] skipped, area not deliverable: sub', sub.id, sub.delivery_emirate, sub.delivery_area)
       skipped++
       continue
     }

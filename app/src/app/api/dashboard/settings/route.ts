@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requirePermission } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/audit'
+import { DEFAULT_DELIVERY_AREAS_TEXT, DELIVERY_AREAS_KEY, validateDeliveryAreasInput } from '@/lib/delivery-areas'
 
 function getSupabase() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -14,6 +15,7 @@ const DEFAULTS: Record<string, string> = {
   vat_rate: '5',
   min_order_amount: '0',
   free_delivery_threshold: '150',
+  [DELIVERY_AREAS_KEY]: DEFAULT_DELIVERY_AREAS_TEXT,
 }
 
 export async function GET() {
@@ -46,6 +48,11 @@ export async function PUT(request: Request) {
     const deliveryFee = parseFloat(settings.delivery_fee ?? '0')
     if (isNaN(deliveryFee) || deliveryFee < 0) {
       return NextResponse.json({ error: 'Delivery fee cannot be negative' }, { status: 400 })
+    }
+
+    if (DELIVERY_AREAS_KEY in settings) {
+      const areasError = validateDeliveryAreasInput(settings[DELIVERY_AREAS_KEY])
+      if (areasError) return NextResponse.json({ error: areasError }, { status: 400 })
     }
 
     for (const [key, value] of Object.entries(settings)) {
