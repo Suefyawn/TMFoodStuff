@@ -17,12 +17,12 @@ export default function ServiceAreaBar() {
         <MapPin size={11} className="text-forest flex-shrink-0" aria-hidden="true" />
         {/* Mobile: short label that fits one line, centred. md+: full emirate list. */}
         <span className="md:hidden text-[11px] leading-tight">
-          {isAr ? 'توصيل في جميع الإمارات السبع' : 'Delivering across all 7 emirates'}
+          {isAr ? 'توصيل في دبي، قرب رأس الخور' : 'Delivering in Dubai, near Ras Al Khor'}
         </span>
         <span className="hidden md:inline">
           {isAr
-            ? 'توصيل في جميع إمارات الدولة · دبي · أبوظبي · الشارقة · عجمان · رأس الخيمة · أم القيوين · الفجيرة'
-            : 'Delivering across all 7 emirates · Dubai · Abu Dhabi · Sharjah · Ajman · RAK · UAQ · Fujairah'}
+            ? 'توصيل في دبي، في المناطق القريبة من رأس الخور'
+            : 'Delivering in Dubai, to areas near Ras Al Khor'}
         </span>
       </div>
     </div>

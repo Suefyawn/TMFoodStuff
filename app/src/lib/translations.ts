@@ -15,7 +15,7 @@ export const t = {
     heroTag: 'Free delivery on first order · Use code: FRESH10',
     heroTitle1: 'Farm Fresh',
     heroTitle2: 'To Your Door',
-    heroSubtitle: 'Premium fruits & vegetables sourced daily from the world\'s best farms. Delivered fresh across all UAE emirates.',
+    heroSubtitle: 'Premium fruits & vegetables sourced daily from the world\'s best farms. Delivered fresh in Dubai, around Ras Al Khor.',
     shopNow: 'Shop Now',
     browseFruits: 'Browse Fruits',
     // Trust
@@ -25,7 +25,7 @@ export const t = {
     whatsappUpdates: 'WhatsApp Updates',
     // Shop
     shopTitle: 'Shop Fresh',
-    shopSubtitle: 'Farm fresh produce delivered to your door across UAE',
+    shopSubtitle: 'Farm fresh produce delivered to your door in Dubai',
     allItems: 'All',
     productsFound: 'products found',
     outOfStock: 'Out of Stock',
@@ -100,7 +100,7 @@ export const t = {
     heroTag: 'توصيل مجاني على أول طلب · استخدم كود: FRESH10',
     heroTitle1: 'طازج من المزرعة',
     heroTitle2: 'إلى بابك',
-    heroSubtitle: 'فواكه وخضروات فاخرة يتم جلبها يومياً من أفضل المزارع حول العالم. توصيل طازج في جميع أنحاء الإمارات.',
+    heroSubtitle: 'فواكه وخضروات فاخرة يتم جلبها يومياً من أفضل المزارع حول العالم. توصيل طازج في دبي.',
     shopNow: 'تسوق الآن',
     browseFruits: 'تصفح الفواكه',
     // Trust

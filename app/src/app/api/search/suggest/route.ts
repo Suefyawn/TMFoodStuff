@@ -10,10 +10,12 @@ import { createClient } from '@supabase/supabase-js'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-)
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) return null
+  return createClient(url, key)
+}
 
 interface ProductHit {
   type: 'product'
@@ -41,6 +43,10 @@ export async function GET(request: Request) {
   const raw = (url.searchParams.get('q') || '').trim()
   if (raw.length < 2) {
     return NextResponse.json({ products: [], categories: [] })
+  }
+  const supabase = getSupabase()
+  if (!supabase) {
+    return NextResponse.json({ products: [], categories: [] }, { status: 503 })
   }
   // Escape PostgREST `or` operators that would otherwise break the filter.
   const safe = raw.replace(/[%(),]/g, ' ').slice(0, 60)
