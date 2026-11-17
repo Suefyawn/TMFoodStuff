@@ -1,0 +1,231 @@
+# Database chores run by the Crew so nobody has to open Supabase by hand.
+# Manual only (workflow_dispatch). This repo is PUBLIC, so the logs are public:
+# print only subscription ids, emirates, area names and counts. Never names,
+# phones, emails, street addresses or order data. Free text that contains a digit
+# or is longer than 40 characters is masked in the read-areas output (a listed
+# area name is always shown). apply-area-fixes prints the old and new values of the
+# rows it changes, as its backup.
+#
+# Actions:
+#   read-areas        read only: lists active subscriptions and whether the area is listed
+#   apply-area-fixes  updates only the listed ids to an exact listed area
+#   status-counts     read only: subscription status labels (cut to 30 chars) and counts, nothing else
+#   live-check        no secret needed: GET /checkout on the live site and, with
+#                     area_guard on, one POST that can never create an order
+name: DB
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: read-areas (read only), status-counts (read only, labels and counts), apply-area-fixes (updates only the listed ids) or live-check (no secret needed)
+        type: choice
+        options: [read-areas, apply-area-fixes, live-check, status-counts]
+        default: read-areas
+      fixes:
+        description: 'apply-area-fixes only: JSON list of {"id": "...", "area": "Exact listed area"}'
+        type: string
+        default: '[]'
+      area_guard:
+        description: 'live-check only: also POST a payload to /api/orders that cannot create an order, to prove the delivery area guard is live'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tmf-db
+  cancel-in-progress: false
+
+jobs:
+  db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      ACTION: ${{ inputs.action }}
+      FIXES: ${{ inputs.fixes }}
+      AREA_GUARD: ${{ inputs.area_guard }}
+    steps:
+      - name: Preflight
+        if: inputs.action != 'live-check'
+        run: |
+          if [ -z "$DB_URL" ]; then echo "::error::SUPABASE_DB_URL secret is empty or missing"; exit 1; fi
+          sudo apt-get install -y -qq postgresql-client >/dev/null
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tAc "select 1" >/dev/null && echo "Database reachable"
+
+      - name: Read active subscription areas
+        if: inputs.action == 'read-areas'
+        run: |
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -F $'\t' -c \
+            "select id::text, coalesce(delivery_emirate,''), coalesce(delivery_area,'') from subscriptions where status = 'active' order by id" > rows.tsv
+          python3 - <<'PY'
+          import unicodedata, re
+          AREAS = ["Ras Al Khor","Ras Al Khor Industrial 1","Ras Al Khor Industrial 2","Ras Al Khor Industrial 3",
+                   "Al Jaddaf","Nad Al Hamar","Dubai Festival City","Al Badia","Al Warsan","International City",
+                   "Dubai Silicon Oasis","Mirdif","Al Rashidiya","Muhaisnah","Al Qusais","Al Garhoud",
+                   "Business Bay","Dubai Creek Harbour"]
+          norm = lambda s: re.sub(r"\s+", " ", unicodedata.normalize("NFKC", s).strip()).lower()
+          listed = {norm(a): a for a in AREAS}
+          # Public logs: free text with a digit or over 40 chars may be a street address.
+          mask = lambda v: v if norm(v) in listed else (f"[free text, {len(v)} chars]" if (len(v) > 40 or any(c.isdigit() for c in v)) else v)
+          ok = fix = out = 0
+          lines = ["| id | emirate | area | status |", "|---|---|---|---|"]
+          for raw in open("rows.tsv", encoding="utf-8"):
+              raw = raw.rstrip("\n")
+              if not raw:
+                  continue
+              sid, emirate, area = (raw.split("\t") + ["", ""])[:3]
+              dubai = norm(emirate) in ("dubai", "دبي")
+              if dubai and norm(area) in listed:
+                  status, ok = "ok", ok + 1
+              elif dubai:
+                  status, fix = "needs a listed name", fix + 1
+              else:
+                  status, out = "outside Dubai", out + 1
+              lines.append(f"| {sid} | {mask(emirate)} | {mask(area)} | {status} |")
+          summary = [f"Active subscriptions: {ok + fix + out} (ok {ok}, needs fixing {fix}, outside Dubai {out})", ""] + lines
+          print("\n".join(summary))
+          with open(__import__("os").environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\n".join(summary) + "\n")
+          PY
+
+      - name: Subscription status counts
+        if: inputs.action == 'status-counts'
+        run: |
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -F $'\t' -c \
+            "select left(regexp_replace(coalesce(status::text, '(null)'), '\s+', ' ', 'g'), 30), count(*) from subscriptions group by 1 order by 2 desc, 1" > status.tsv
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -c "select count(*) from subscriptions" > total.txt
+          python3 - <<'PY'
+          import os
+          # Public logs: print only the status label (cut to 30 chars) and its count.
+          clean = lambda v: " ".join(v.split()).replace("|", "/")[:30]
+          lines = ["| status | count |", "|---|---|"]
+          for raw in open("status.tsv", encoding="utf-8"):
+              raw = raw.rstrip("\n")
+              if not raw:
+                  continue
+              label, _, n = raw.rpartition("\t")
+              if not n.isdigit():
+                  continue  # a stray fragment: never print it
+              lines.append(f"| {clean(label)} | {n} |")
+          total = open("total.txt", encoding="utf-8").read().strip()
+          summary = [f"Total subscriptions: {total}", ""] + lines
+          print("\n".join(summary))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\n".join(summary) + "\n")
+          PY
+
+      - name: Apply approved area fixes
+        if: inputs.action == 'apply-area-fixes'
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          AREAS = {"Ras Al Khor","Ras Al Khor Industrial 1","Ras Al Khor Industrial 2","Ras Al Khor Industrial 3",
+                   "Al Jaddaf","Nad Al Hamar","Dubai Festival City","Al Badia","Al Warsan","International City",
+                   "Dubai Silicon Oasis","Mirdif","Al Rashidiya","Muhaisnah","Al Qusais","Al Garhoud",
+                   "Business Bay","Dubai Creek Harbour"}
+          fixes = json.loads(os.environ["FIXES"] or "[]")
+          if not isinstance(fixes, list) or not fixes:
+              sys.exit("::error::fixes must be a non-empty JSON list")
+          if len(fixes) > 200:
+              sys.exit("::error::too many fixes in one run")
+          ids = set()
+          for f in fixes:
+              sid, area = str(f.get("id", "")), f.get("area", "")
+              if not sid.isdigit() and not all(c.isalnum() or c == "-" for c in sid):
+                  sys.exit(f"::error::bad id {sid!r}")
+              if area not in AREAS:
+                  sys.exit(f"::error::area {area!r} is not on the delivery list")
+              if sid in ids:
+                  sys.exit(f"::error::duplicate id {sid}")
+              ids.add(sid)
+          q = lambda s: "'" + s.replace("'", "''") + "'"
+          values = ",\n  ".join(f"({q(str(f['id']))}, {q(f['area'])})" for f in fixes)
+          sql = f"""\\set ON_ERROR_STOP on
+          begin;
+          create temp table fx(id text primary key, area text) on commit drop;
+          insert into fx values
+            {values};
+          \\echo Backup (old values):
+          select s.id::text, s.delivery_emirate, s.delivery_area from subscriptions s join fx on fx.id = s.id::text order by s.id;
+          update subscriptions s set delivery_emirate = 'Dubai', delivery_area = fx.area
+            from fx where fx.id = s.id::text and s.status = 'active';
+          \\echo After:
+          select s.id::text, s.delivery_emirate, s.delivery_area from subscriptions s join fx on fx.id = s.id::text order by s.id;
+          commit;
+          """
+          open("fix.sql", "w", encoding="utf-8").write(sql)
+          PY
+          psql "$DB_URL" -F $'\t' -A -f fix.sql | tee out.txt
+          { echo '```'; cat out.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Live site check
+        if: inputs.action == 'live-check'
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request, urllib.error
+          from datetime import datetime, timedelta, timezone
+          from zoneinfo import ZoneInfo
+
+          SITE = "https://tmfoodstuff.ae"
+          # Must match NOT_DELIVERABLE_MESSAGE.en in app/src/lib/delivery-areas.ts
+          NOT_DELIVERABLE_EN = "We deliver only to areas near Ras Al Khor in Dubai for now. Message us on WhatsApp if you are close by."
+          HEADERS = {"User-Agent": "tmf-db-live-check"}
+          rows = []
+
+          def call(req):
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      return r.status, r.read().decode("utf-8", "replace")
+              except urllib.error.HTTPError as e:
+                  return e.code, e.read().decode("utf-8", "replace")
+              except Exception as e:
+                  return 0, f"{type(e).__name__}"
+
+          # 1. Checkout page (GET follows redirects)
+          code, _ = call(urllib.request.Request(SITE + "/checkout", headers=HEADERS))
+          rows.append(("GET /checkout", "PASS" if code == 200 else "FAIL", f"HTTP {code}"))
+
+          # 2. Area guard: the order is stopped by the area check or by the unknown item
+          if os.environ.get("AREA_GUARD") == "true":
+              # Same as acceptableDeliveryDates() in app/src/app/api/orders/route.ts (today, Dubai time)
+              today = datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Dubai")).date()
+              body = {
+                  "form": {"fullName": "Live Check", "phone": "0501234567", "email": "check@example.com",
+                           "emirate": "Sharjah", "area": "Al Majaz"},
+                  "items": [{"id": "00000000-0000-0000-0000-000000000000", "quantity": 1}],
+                  "paymentMethod": "cod",
+                  "deliverySlot": "morning",
+                  "deliveryDate": today.isoformat(),
+                  "locale": "en",
+              }
+              req = urllib.request.Request(
+                  SITE + "/api/orders", data=json.dumps(body).encode(), method="POST",
+                  headers={**HEADERS, "Content-Type": "application/json"})
+              code, text = call(req)
+              try:
+                  err = json.loads(text).get("error", "")
+              except Exception:
+                  err = ""
+              if 200 <= code < 300:
+                  result, note = "FAIL", f"HTTP {code}: an order request was ACCEPTED, check the orders table now"
+              elif code == 400 and err == NOT_DELIVERABLE_EN:
+                  result, note = "PASS", "HTTP 400 with the not-deliverable message"
+              elif code == 400:
+                  result, note = "FAIL", "area guard not reached (HTTP 400, error: " + (err or "none")[:80] + ")"
+              else:
+                  result, note = "FAIL", f"HTTP {code}, expected 400"
+              rows.append(("POST /api/orders (Sharjah)", result, note))
+          else:
+              rows.append(("POST /api/orders (Sharjah)", "SKIPPED", "area_guard is off"))
+
+          lines = ["| check | result | detail |", "|---|---|---|"] + [f"| {a} | {b} | {c} |" for a, b, c in rows]
+          print("\n".join(lines))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\n".join(lines) + "\n")
+          for a, b, c in rows:
+              if b == "FAIL":
+                  print(f"::warning::{a}: {c}")
+          PY

@@ -82,8 +82,8 @@ export default function MangoSeason({ mangoes }: MangoSeasonProps) {
             </h2>
             <p className="text-stone-600 text-base md:text-lg mb-6 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               {lang === 'ar'
-                ? 'من تومي إلى تيمور والألفونسو — أحلى أنواع المانجو في الموسم، تُجلب طازجة وتصل إلى بابك في جميع أنحاء الإمارات.'
-                : 'From Tomy to Taimoor and Alphonso — the season’s sweetest mangoes, sourced fresh and delivered to your door across the UAE.'}
+                ? 'من تومي إلى تيمور والألفونسو — أحلى أنواع المانجو في الموسم، تُجلب طازجة وتصل إلى بابك في دبي.'
+                : 'From Tomy to Taimoor and Alphonso — the season’s sweetest mangoes, sourced fresh and delivered to your door in Dubai.'}
             </p>
 
             {/* Perks */}

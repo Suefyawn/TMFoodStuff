@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const title = `${product.name} — ${formatAED(product.priceAED)} per ${product.unit} | TMFoodStuff`
   const description =
-    (product.description || `Buy fresh ${product.name.toLowerCase()} delivered across the UAE. Premium quality from TMFoodStuff.`).slice(0, 160)
+    (product.description || `Buy fresh ${product.name.toLowerCase()} delivered in Dubai. Premium quality from TMFoodStuff.`).slice(0, 160)
   const url = `${SITE_URL}/product/${product.slug}`
   const image = product.imageUrl
   return {

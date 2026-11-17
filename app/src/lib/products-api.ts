@@ -1,14 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 // Public storefront browsing uses the anon (publishable) key so the existing
 // "public read active products" / "public read categories" RLS policies
 // govern what's visible. Bypassing RLS with the service role here (the
 // previous behaviour) would expose inactive products and any future
 // row-level restrictions to anonymous visitors.
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-)
+// Built on first use, not at import, so a build without env can still collect page data.
+let client: SupabaseClient | undefined
+function getSupabase(): SupabaseClient {
+  client ??= createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
+  return client
+}
 
 export interface Product {
   id: string
@@ -101,7 +106,7 @@ function mapCategory(row: any): Category {
 
 // Fetch all active products
 export async function getProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('products')
     .select('*, categories(slug)')
     .eq('is_active', true)
@@ -119,7 +124,7 @@ export async function getProducts(): Promise<Product[]> {
 
 // Fetch featured products
 export async function getFeaturedProducts(limit = 10): Promise<Product[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('products')
     .select('*, categories(slug)')
     .eq('is_active', true)
@@ -141,7 +146,7 @@ export async function getFeaturedProducts(limit = 10): Promise<Product[]> {
 // cleanly excluding "Mangosteen" (no space) and "Raw Mango" (a cooking veg).
 // Ordered cheapest-first so the showcase opens with an accessible price point.
 export async function getMangoProducts(limit = 5): Promise<Product[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('products')
     .select('*, categories(slug)')
     .eq('is_active', true)
@@ -164,7 +169,7 @@ export async function getMangoProducts(limit = 5): Promise<Product[]> {
 
 // Fetch single product by slug
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('products')
     .select('*, categories(slug)')
     .eq('slug', slug)
@@ -183,7 +188,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 // Fetch products by category
 export async function getProductsByCategory(categorySlug: string): Promise<Product[]> {
-  const { data: cat } = await supabase
+  const { data: cat } = await getSupabase()
     .from('categories')
     .select('id')
     .eq('slug', categorySlug)
@@ -191,7 +196,7 @@ export async function getProductsByCategory(categorySlug: string): Promise<Produ
 
   if (!cat) return []
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('products')
     .select('*, categories(slug)')
     .eq('category_id', cat.id)
@@ -205,7 +210,7 @@ export async function getProductsByCategory(categorySlug: string): Promise<Produ
 // Fetch all categories (including the parent slug so the shop UI can build a
 // two-level nav without an extra round trip).
 export async function getCategories(): Promise<Category[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('categories')
     .select('*, parent:parent_id(slug)')
     .eq('is_active', true)
@@ -222,10 +227,11 @@ export async function getCategories(): Promise<Category[]> {
 
 // Fetch all product slugs (for static generation)
 export async function getAllProductSlugs(): Promise<string[]> {
-  const { data } = await supabase
-    .from('products')
-    .select('slug')
-    .eq('is_active', true)
+  // No Supabase env (a clean checkout build): use the bundled catalogue, as when the query returns nothing.
+  const hasEnv = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  const { data } = hasEnv
+    ? await getSupabase().from('products').select('slug').eq('is_active', true)
+    : { data: null }
 
   if (!data) {
     const { products } = await import('@/data/products')
