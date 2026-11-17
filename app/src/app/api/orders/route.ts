@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { logError, getRequestId } from '@/lib/log'
@@ -35,6 +35,7 @@ function acceptableDeliveryDates(): string[] {
 }
 
 export async function POST(request: Request) {
+  const t0 = Date.now()
   const reqId = getRequestId(request)
   try {
     if (!rateLimit(`orders:${getClientIp(request)}`, 10, 60_000)) {
@@ -75,9 +76,61 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     )
 
+    // Independent reads run together (they used to run one after another, about
+    // eight round trips). Results are checked below in the original order, so
+    // every error message and status code is unchanged.
+    const quantities: Record<string, number> = {}
+    let invalidItem = false
+    for (const it of items) {
+      const id = String(it?.id ?? '')
+      const qty = Math.floor(Number(it?.quantity))
+      if (!id || !Number.isFinite(qty) || qty <= 0 || qty > 1000) {
+        invalidItem = true
+        break
+      }
+      quantities[id] = (quantities[id] || 0) + qty
+    }
+    const productIds = invalidItem ? [] : Object.keys(quantities)
+    const promoText = promoCode && String(promoCode).trim() ? String(promoCode).trim() : ''
+
+    const [
+      deliveryAreas,
+      priorKey,
+      slotCheck,
+      productsRes,
+      settingsRes,
+      promoRes,
+      sessionCustomer,
+    ] = await Promise.all([
+      loadDeliveryAreas(supabase),
+      idempotencyKey
+        ? supabase
+            .from('order_idempotency_keys')
+            .select('order_id')
+            .eq('idempotency_key', idempotencyKey)
+            .maybeSingle()
+        : Promise.resolve(null),
+      validateSlotForDate(supabase, String(deliverySlot), String(deliveryDate)),
+      productIds.length > 0
+        ? supabase
+            .from('products')
+            .select('id, name, price_aed, unit, stock, is_active, emoji')
+            .in('id', productIds)
+        : Promise.resolve(null),
+      supabase.from('settings').select('key, value'),
+      promoText
+        ? supabase
+            .from('promo_codes')
+            .select('code, discount_percent, expires_at, is_active')
+            .eq('is_active', true)
+            .ilike('code', promoText)
+            .maybeSingle()
+        : Promise.resolve(null),
+      getCurrentCustomer().catch(() => null),
+    ])
+
     // Delivery area: Dubai, near Ras Al Khor only (list in Dashboard > Settings).
     // This is the guarantee; the checkout dropdown is only the convenience.
-    const deliveryAreas = await loadDeliveryAreas(supabase)
     if (!isDeliverable(emirate, area, deliveryAreas)) {
       return NextResponse.json(
         { success: false, error: NOT_DELIVERABLE_MESSAGE[locale === 'ar' ? 'ar' : 'en'] },
@@ -88,32 +141,26 @@ export async function POST(request: Request) {
     // Idempotency: if this exact submit was already processed (double-click,
     // network retry, back-button resubmit), return the existing order rather
     // than creating a duplicate / charging twice.
-    if (idempotencyKey) {
-      const { data: prior } = await supabase
-        .from('order_idempotency_keys')
-        .select('order_id')
-        .eq('idempotency_key', idempotencyKey)
+    const prior = priorKey?.data ?? null
+    if (prior) {
+      const { data: priorOrder } = await supabase
+        .from('orders')
+        .select('order_number, subtotal_aed, vat_aed, delivery_fee_aed, promo_code, promo_discount_aed, total_aed, payment_method')
+        .eq('id', prior.order_id)
         .maybeSingle()
-      if (prior) {
-        const { data: priorOrder } = await supabase
-          .from('orders')
-          .select('order_number, subtotal_aed, vat_aed, delivery_fee_aed, promo_code, promo_discount_aed, total_aed, payment_method')
-          .eq('id', prior.order_id)
-          .maybeSingle()
-        if (priorOrder) {
-          return NextResponse.json({
-            success: true,
-            duplicate: true,
-            orderNumber: priorOrder.order_number,
-            subtotal: Number(priorOrder.subtotal_aed ?? 0),
-            vat: Number(priorOrder.vat_aed ?? 0),
-            deliveryFee: Number(priorOrder.delivery_fee_aed ?? 0),
-            promoCode: priorOrder.promo_code || '',
-            promoDiscount: Number(priorOrder.promo_discount_aed ?? 0),
-            total: Number(priorOrder.total_aed ?? 0),
-            paymentMethod: priorOrder.payment_method || 'cod',
-          })
-        }
+      if (priorOrder) {
+        return NextResponse.json({
+          success: true,
+          duplicate: true,
+          orderNumber: priorOrder.order_number,
+          subtotal: Number(priorOrder.subtotal_aed ?? 0),
+          vat: Number(priorOrder.vat_aed ?? 0),
+          deliveryFee: Number(priorOrder.delivery_fee_aed ?? 0),
+          promoCode: priorOrder.promo_code || '',
+          promoDiscount: Number(priorOrder.promo_discount_aed ?? 0),
+          total: Number(priorOrder.total_aed ?? 0),
+          paymentMethod: priorOrder.payment_method || 'cod',
+        })
       }
     }
 
@@ -121,28 +168,17 @@ export async function POST(request: Request) {
     // table. Catches: unknown slot key, slot disabled for that weekday,
     // cutoff already passed, slot at capacity. Mirrors what the storefront
     // /api/delivery-slots?date= endpoint surfaces.
-    const slotCheck = await validateSlotForDate(supabase, String(deliverySlot), String(deliveryDate))
     if (!slotCheck.ok) {
       return NextResponse.json({ success: false, error: slotCheck.reason }, { status: 400 })
     }
 
     // ── Resolve cart items to authoritative products ───────────────────────
-    const quantities: Record<string, number> = {}
-    for (const it of items) {
-      const id = String(it?.id ?? '')
-      const qty = Math.floor(Number(it?.quantity))
-      if (!id || !Number.isFinite(qty) || qty <= 0 || qty > 1000) {
-        return NextResponse.json({ success: false, error: 'Your cart contains an invalid item.' }, { status: 400 })
-      }
-      quantities[id] = (quantities[id] || 0) + qty
+    if (invalidItem) {
+      return NextResponse.json({ success: false, error: 'Your cart contains an invalid item.' }, { status: 400 })
     }
-    const productIds = Object.keys(quantities)
 
-    const { data: products, error: prodErr } = await supabase
-      .from('products')
-      .select('id, name, price_aed, unit, stock, is_active, emoji')
-      .in('id', productIds)
-    if (prodErr) throw prodErr
+    const products = productsRes?.data
+    if (productsRes?.error) throw productsRes.error
 
     const productById: Record<string, {
       id: number
@@ -192,9 +228,8 @@ export async function POST(request: Request) {
       })
     }
 
-    const { data: settingsRows } = await supabase.from('settings').select('key, value')
     const settings: Record<string, string> = {}
-    for (const row of settingsRows || []) settings[row.key] = row.value
+    for (const row of settingsRes.data || []) settings[row.key] = row.value
     const whatsappNumber =
       (settings.whatsapp_number || DEFAULT_WHATSAPP_NUMBER).replace(/\D/g, '') || DEFAULT_WHATSAPP_NUMBER
 
@@ -209,17 +244,10 @@ export async function POST(request: Request) {
 
     let appliedPromoCode = ''
     let promoDiscountPercent = 0
-    if (promoCode && String(promoCode).trim()) {
-      const { data: promo } = await supabase
-        .from('promo_codes')
-        .select('code, discount_percent, expires_at, is_active')
-        .eq('is_active', true)
-        .ilike('code', String(promoCode).trim())
-        .maybeSingle()
-      if (promo && (!promo.expires_at || new Date(promo.expires_at) >= new Date())) {
-        appliedPromoCode = promo.code
-        promoDiscountPercent = Number(promo.discount_percent) || 0
-      }
+    const promo = promoRes?.data ?? null
+    if (promo && (!promo.expires_at || new Date(promo.expires_at) >= new Date())) {
+      appliedPromoCode = promo.code
+      promoDiscountPercent = Number(promo.discount_percent) || 0
     }
 
     const { subtotal, vat, deliveryFee, promoDiscount, total: totalBeforePoints } = computeOrderTotals({
@@ -234,7 +262,7 @@ export async function POST(request: Request) {
     let pointsValueAed = 0
     let redeemingCustomerId: number | null = null
     if (pointsRequested > 0) {
-      const customer = await getCurrentCustomer()
+      const customer = sessionCustomer
       if (!customer) {
         return NextResponse.json({ success: false, error: 'Sign in to redeem loyalty points.' }, { status: 401 })
       }
@@ -382,24 +410,29 @@ export async function POST(request: Request) {
     // ── Customer-attached side effects (referral + cart clear) ────────────
     // Both need the customer id; resolve once and run both. Best-effort —
     // failures here never block the order itself.
-    const customerId: number | null = redeemingCustomerId
-      ?? (await getCurrentCustomer())?.id
-      ?? null
+    const customerId: number | null = redeemingCustomerId ?? sessionCustomer?.id ?? null
     if (customerId) {
       const referralCode = request.headers.get('cookie')?.split(';')
         .map(s => s.trim())
         .find(s => s.startsWith(`${REFERRAL_COOKIE}=`))?.split('=')[1]
-      if (referralCode) {
-        await recordReferralOnFirstOrder(supabase, {
-          referralCode: decodeURIComponent(referralCode),
-          referredCustomerId: customerId,
-          orderId,
-        })
-      }
-      // Clear the server-side cart snapshot so the abandonment cron doesn't
-      // email a customer who just bought. The local cart is cleared by the
-      // checkout flow itself.
-      await clearCustomerCart(supabase, customerId)
+      // Runs after the response is sent; none of it can change the order.
+      after(async () => {
+        try {
+          if (referralCode) {
+            await recordReferralOnFirstOrder(supabase, {
+              referralCode: decodeURIComponent(referralCode),
+              referredCustomerId: customerId,
+              orderId,
+            })
+          }
+          // Clear the server-side cart snapshot so the abandonment cron doesn't
+          // email a customer who just bought. The local cart is cleared by the
+          // checkout flow itself.
+          await clearCustomerCart(supabase, customerId)
+        } catch (err) {
+          logError('orders.customer_side_effects', err, { reqId, orderId })
+        }
+      })
     }
 
     // ── Card payment: redirect to Stripe; fulfilment happens in the webhook ─
@@ -471,8 +504,10 @@ export async function POST(request: Request) {
       })
     }
 
-    // ── Cash on Delivery: fulfil inline ────────────────────────────────────
-    await fulfillOrder({
+    // ── Cash on Delivery: fulfil after the response ────────────────────────
+    // Emails, SMS and WhatsApp used to be awaited here and made Place Order
+    // take 8 seconds or more. fulfillOrder logs its own failures.
+    after(() => fulfillOrder({
       supabase,
       orderNumber,
       customer: { name: fullName, phone: normalisedPhone, email: email || undefined },
@@ -492,7 +527,7 @@ export async function POST(request: Request) {
       // skips the decrement but still runs its low-stock alert check.
       decrementStock: false,
       stockReserved: true,
-    })
+    }))
 
     const itemsList = lineItems
       .map((i) => `• ${i.name} x${i.quantity} = AED ${i.subtotal.toFixed(2)}`)
@@ -521,6 +556,8 @@ export async function POST(request: Request) {
         (form.notes ? `📝 Notes: ${form.notes}` : ''),
     )
 
+    const ms = Date.now() - t0
+    console.log(`orders.timing reqId=${reqId} ms=${ms}`)
     return NextResponse.json({
       success: true,
       orderNumber,
@@ -533,7 +570,7 @@ export async function POST(request: Request) {
       waMessage,
       waNumber: whatsappNumber,
       paymentMethod: 'cod',
-    })
+    }, { headers: { 'Server-Timing': `total;dur=${ms}` } })
   } catch (error) {
     logError('orders', error, { reqId, request })
     return NextResponse.json(
