@@ -8,17 +8,25 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 5
-    # Sentry is being removed (owner rule: no Sentry anywhere), so never bump it.
-    ignore:
-      - dependency-name: "@sentry/*"
+    open-pull-requests-limit: 2
     groups:
-      # Batch routine minor/patch bumps into one PR to keep noise down;
-      # majors still arrive individually for careful review.
+      # Framework and runtime bumps arrive as their own PR: they are HIGH under the Merging rules
+      # (rule 1: framework upgrades merge alone). Group order matters: the first matching group wins.
+      framework:
+        applies-to: version-updates
+        patterns: ["next", "eslint-config-next", "react", "react-dom", "@types/react", "@types/react-dom", "@supabase/*"]
+        update-types: ["minor", "patch"]
+      # Everything else lands as one PR a week (every deploy is a build).
       minor-and-patch:
-        update-types:
-          - minor
-          - patch
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      # Majors (typescript 7, stripe 23 and the like) are planned rows, not bot PRs.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+      # Sentry is being removed (owner rule: no Sentry anywhere), so never bump it.
+      - dependency-name: "@sentry/*"
 
   - package-ecosystem: github-actions
     directory: /
