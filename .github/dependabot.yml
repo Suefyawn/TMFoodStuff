@@ -9,6 +9,9 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    # Sentry is being removed (owner rule: no Sentry anywhere), so never bump it.
+    ignore:
+      - dependency-name: "@sentry/*"
     groups:
       # Batch routine minor/patch bumps into one PR to keep noise down;
       # majors still arrive individually for careful review.
