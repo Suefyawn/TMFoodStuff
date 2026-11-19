@@ -11,7 +11,12 @@ import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const totalItems = useCartStore(state => state.totalItems())
+  // Cart lives in localStorage and zustand rehydrates it before the first client
+  // render, so the badge must wait for mount to match the server HTML (error #418).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const storedItems = useCartStore(state => state.totalItems())
+  const totalItems = mounted ? storedItems : 0
   const pathname = usePathname()
   const { lang, tr } = useLang()
   // Reflect auth state in the account link (Sign in → My account).

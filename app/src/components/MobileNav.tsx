@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, ShoppingBag, ShoppingCart, User } from 'lucide-react'
@@ -7,7 +8,11 @@ import { useLang } from '@/lib/use-lang'
 
 export default function MobileNav() {
   const pathname = usePathname()
-  const totalItems = useCartStore(s => s.totalItems())
+  // Same reason as Navbar: no persisted cart in the first client render.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const storedItems = useCartStore(s => s.totalItems())
+  const totalItems = mounted ? storedItems : 0
   const { lang, tr } = useLang()
 
   const links = [

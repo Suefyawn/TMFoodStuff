@@ -44,6 +44,11 @@ export default function CheckoutPage() {
   // Stable per-attempt key so a double-click / retry dedupes server-side
   // instead of creating a second order. Reset after a successful placement.
   const idempotencyKeyRef = useRef('')
+  // The cart and language live in localStorage, so the server cannot know them.
+  // Render a neutral shell until mounted so the first client render matches the
+  // server HTML (React error #418).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const [paymentMethod, setPaymentMethod] = useState('cod')
   const [submitted, setSubmitted] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
@@ -339,6 +344,14 @@ export default function CheckoutPage() {
     }
   }
 
+  if (!mounted) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-24 text-center" aria-busy="true">
+        <div className="w-10 h-10 border-4 border-stone-200 border-t-stone-500 rounded-full animate-spin mx-auto" />
+      </div>
+    )
+  }
+
   if (submitted) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
@@ -584,7 +597,7 @@ export default function CheckoutPage() {
                     <input type="radio" name="deliveryDate" value={iso} checked={form.deliveryDate === iso}
                       onChange={() => setForm(f => ({ ...f, deliveryDate: iso }))} className="sr-only" />
                     <span className="font-bold text-stone-900 text-xs md:text-sm">{label}</span>
-                    <span className="text-xs text-stone-400 mt-0.5">{new Date(iso + 'T00:00:00').toLocaleDateString(lang === 'ar' ? 'ar-AE' : 'en-AE', { day: 'numeric', month: 'short' })}</span>
+                    <span className="text-xs text-stone-400 mt-0.5">{new Date(iso + 'T00:00:00Z').toLocaleDateString(lang === 'ar' ? 'ar-AE' : 'en-AE', { timeZone: 'UTC', day: 'numeric', month: 'short' })}</span>
                     {form.deliveryDate === iso && <CheckCircle size={14} className="text-forest mt-1" aria-hidden="true" />}
                   </label>
                 ))}
