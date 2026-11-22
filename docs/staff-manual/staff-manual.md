@@ -4,6 +4,8 @@ How to add and change products, run promotions and change where we deliver. Ever
 
 Open the dashboard at your site address followed by `/dashboard`. Prices are in AED.
 
+This guide is also inside the dashboard under **Help & guide**, and new users get a **Getting started** checklist on the Overview page that walks them through each task once.
+
 ## 1. Sign in
 
 1. Go to `/dashboard` on the store website. You land on the sign-in page.

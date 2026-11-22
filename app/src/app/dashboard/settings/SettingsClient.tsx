@@ -1,5 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
+import { GuideTip, useGuide } from '@/components/dashboard/Guide'
 import { Save, Plus, Trash2, X, Store, Truck, Ticket, CheckCircle2, Receipt } from 'lucide-react'
 import SubNav, { SETTINGS_SUBNAV } from '@/components/dashboard/SubNav'
 
@@ -30,6 +31,15 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false)
   const [newPromo, setNewPromo] = useState({ code: '', discount_percent: 10, expires_at: '' })
   const [tab, setTab] = useState<Tab>('store')
+  // Promo codes added or changed since the last save (they only work once saved).
+  const [unsaved, setUnsaved] = useState(false)
+  const guide = useGuide()
+
+  // ?tab=promos (from the getting-started guide) opens that tab directly.
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get('tab')
+    if (t && TABS.some(x => x.key === t)) setTab(t as Tab)
+  }, [])
 
   useEffect(() => {
     fetch('/api/dashboard/settings').then(r => r.json()).then(data => {
@@ -53,17 +63,22 @@ export default function SettingsPage() {
       return
     }
     setSaved(true)
+    setUnsaved(false)
+    if (tab === 'promos' && promoCodes.length > 0) guide.complete('promo')
+    if (tab === 'delivery') guide.complete('delivery')
     setTimeout(() => setSaved(false), 2000)
   }
 
   function addPromo() {
     if (!newPromo.code) return
     setPromoCodes(prev => [...prev, { ...newPromo, is_active: true, expires_at: newPromo.expires_at || null }])
+    setUnsaved(true)
     setNewPromo({ code: '', discount_percent: 10, expires_at: '' })
   }
 
   function removePromo(idx: number) {
     setPromoCodes(prev => prev.filter((_, i) => i !== idx))
+    setUnsaved(true)
   }
 
   if (loading) return <div className="p-6 text-gray-500">Loading settings...</div>
@@ -102,6 +117,11 @@ export default function SettingsPage() {
           )
         })}
       </div>
+
+      <Suspense fallback={null}>
+        {tab === 'promos' && <GuideTip steps={['promo']} />}
+        {tab === 'delivery' && <GuideTip steps={['delivery']} />}
+      </Suspense>
 
       {/* Store Info */}
       {tab === 'store' && (
@@ -177,6 +197,15 @@ export default function SettingsPage() {
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
         <h3 className="text-white font-bold inline-flex items-center gap-2"><Ticket size={16} className="text-gray-400" aria-hidden="true" /> Promo Codes</h3>
 
+        {promoCodes.length === 0 && (
+          <p className="text-sm text-gray-500">No promo codes yet. Type a code and a discount below, press +, then Save Settings.</p>
+        )}
+        {unsaved && (
+          <p role="status" className="text-sm text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2">
+            Not live yet. Press Save Settings at the top to make your promo code changes work.
+          </p>
+        )}
+
         {promoCodes.length > 0 && (
           <div className="space-y-2">
             {promoCodes.map((promo, i) => (
@@ -196,6 +225,7 @@ export default function SettingsPage() {
                     const updated = [...promoCodes]
                     updated[i] = { ...updated[i], is_active: !updated[i].is_active }
                     setPromoCodes(updated)
+                    setUnsaved(true)
                   }} className="text-xs px-2 py-1 bg-gray-700 rounded text-gray-300 hover:bg-gray-600">
                     {promo.is_active ? 'Disable' : 'Enable'}
                   </button>
@@ -221,7 +251,7 @@ export default function SettingsPage() {
               <input type="date" value={newPromo.expires_at} onChange={e => setNewPromo({...newPromo, expires_at: e.target.value})} style={{ colorScheme: 'dark' }} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
             </div>
           </div>
-          <button onClick={addPromo} disabled={!newPromo.code} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-500 disabled:opacity-50 sm:self-end">
+          <button onClick={addPromo} disabled={!newPromo.code} aria-label="Add promo code" title="Add promo code" className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-500 disabled:opacity-50 sm:self-end">
             <Plus size={16} />
           </button>
         </div>

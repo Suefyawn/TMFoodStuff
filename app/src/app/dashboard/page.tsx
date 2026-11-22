@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { TrendingUp, AlertTriangle, ShoppingCart, CheckCircle2 } from 'lucide-react'
+import { GettingStarted } from '@/components/dashboard/Guide'
 
 export const dynamic = 'force-dynamic'
 
@@ -212,6 +213,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      {/* First-run checklist for new staff; hides itself once done. */}
+      <GettingStarted />
       {/* Morning briefing — single-glance "what needs my attention now".
           Each chip is a one-click jump into the relevant surface. */}
       {briefingItems.length > 0 && (

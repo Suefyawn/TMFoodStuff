@@ -97,7 +97,7 @@ export default function ImageUploader({ images, onChange, maxImages = 6 }: Image
                   <Star size={8} fill="currentColor" /> Primary
                 </div>
               )}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100">
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 [@media(hover:none)]:bg-black/30 transition-all flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100">
                 {idx !== 0 && (
                   <button
                     type="button"
