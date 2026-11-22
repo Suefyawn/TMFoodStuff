@@ -50,7 +50,7 @@ export const GUIDE_STEPS: GuideStep[] = [
     summary: 'Give a product up to 6 pictures and pick the main one.',
     tip: [
       'Press Edit on a product (or open Add Product).',
-      'Under Product Images press Add more and choose a picture, up to 5 MB.',
+      'Under Product Images, press the picture box (it says Add more once there is a photo) and choose a picture, up to 5 MB.',
       'Press Set Primary on the picture customers should see first, then save.',
     ],
     href: '/dashboard/products?guide=photos',
@@ -63,7 +63,7 @@ export const GUIDE_STEPS: GuideStep[] = [
     tip: [
       'Type the product name in the search box.',
       'Press Edit at the end of its row, change what you need and press Save Changes.',
-      'For stock only, the minus and plus buttons beside the number change it by one.',
+      'On a computer, the minus and plus buttons beside the stock number change it by one.',
     ],
     href: '/dashboard/products?guide=edit-product',
     helpAnchor: 'edit-product',
@@ -85,7 +85,7 @@ export const GUIDE_STEPS: GuideStep[] = [
     title: 'Set up categories',
     summary: 'Group products so customers can browse them.',
     tip: [
-      'Press Add Category, give it a name and save.',
+      'Press Add Category, type a name and press Add.',
       'Press Edit on a row to rename it.',
       'Move products out before you delete a category, or they become uncategorized.',
     ],

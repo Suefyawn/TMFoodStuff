@@ -63,9 +63,9 @@ const SECTIONS: Section[] = [
     title: 'Add or change photos',
     body: (
       <ol>
-        <li>In the product form, under <b>Product Images</b>, press <b>Add more</b>.</li>
+        <li>In the product form, under <b>Product Images</b>, press the picture box. It says <b>Drop images here or click to browse</b> at first and <b>Add more</b> once there is a photo.</li>
         <li>Choose a picture from your phone or computer. JPG, PNG, WebP and AVIF pictures work, up to 5 MB each, and up to 6 per product.</li>
-        <li>The first picture is the main one, marked <b>Primary</b>. To make another picture the main one, press <b>Set Primary</b> on it. To remove a picture, press the small red cross on it.</li>
+        <li>The first picture is the main one, marked <b>Primary</b>. To make another picture the main one, press <b>Set Primary</b> on it. To remove a picture, press the small red cross on it. On a computer these buttons appear when you point at the picture.</li>
         <li>Press <b>Save Changes</b> (when editing) or <b>Add Product</b> (when adding).</li>
       </ol>
     ),
@@ -80,7 +80,7 @@ const SECTIONS: Section[] = [
           <li>Press <b>Edit</b> at the end of the row.</li>
           <li>Change what you need and press <b>Save Changes</b> at the bottom of the form.</li>
         </ol>
-        <p>A quick way to change stock: in the products list, press the <b>minus</b> or <b>plus</b> buttons beside the stock number. Each press changes it by one.</p>
+        <p>A quick way to change stock on a computer: in the products list, press the <b>minus</b> or <b>plus</b> buttons beside the stock number. Each press changes it by one. On a phone, use <b>Edit</b>.</p>
       </>
     ),
     img: { src: '/staff-guide/05-edit-product-form.webp', alt: 'The Edit Product form' },
@@ -92,7 +92,7 @@ const SECTIONS: Section[] = [
       <>
         <p>Each row has a status button: <b>Active</b> (customers can see and buy it) or <b>Inactive</b> (hidden from customers, nothing is deleted). Press it once to switch.</p>
         <p>You can also open <b>Edit</b>, scroll down and use the <b>Active</b> switch.</p>
-        <p>To change many products at once, tick the boxes on the left of their rows. Buttons appear above the list: <b>Activate</b>, <b>Deactivate</b>, <b>Feature</b>, <b>Unfeature</b> and <b>Delete</b>. Delete removes a product for good, so use Deactivate if you only want it hidden.</p>
+        <p>To change many products at once, tick the boxes on the left of their rows. Buttons appear above the list: <b>Activate</b>, <b>Deactivate</b>, <b>Feature</b>, <b>Unfeature</b> and, for administrators, <b>Delete</b>. Delete removes a product for good, so use Deactivate if you only want it hidden.</p>
       </>
     ),
     img: { src: '/staff-guide/06-active-inactive.webp', alt: 'The Active status on a product row' },
@@ -101,7 +101,7 @@ const SECTIONS: Section[] = [
     id: 'categories',
     title: 'Categories',
     body: (
-      <p>Open <b>Categories</b> from the tabs above the products list. Press <b>Add Category</b> to make a new one. Press <b>Edit</b> on a row to rename it, or the red bin to remove it. Removing a category does not delete its products, but they become uncategorized, so move them to another category first.</p>
+      <p>Open <b>Categories</b> from the tabs above the products list. Press <b>Add Category</b>, type a name and press <b>Add</b>. Press <b>Edit</b> on a row to rename it, or the red bin to remove it. Removing a category does not delete its products, but they become uncategorized, so move them to another category first.</p>
     ),
     img: { src: '/staff-guide/09-categories.webp', alt: 'The categories page' },
   },

@@ -211,6 +211,9 @@ export default function CategoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
+              {categories.length === 0 && (
+                <tr><td colSpan={4} className="p-8 text-center text-gray-500">No categories yet. Press Add Category to make your first one, for example Fruits or Vegetables.</td></tr>
+              )}
               {categories.map(cat => (
                 <tr key={cat.id} className="hover:bg-gray-800/30 transition-colors">
                   <td className="px-5 py-3">

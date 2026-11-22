@@ -131,7 +131,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       setSaveSuccess('Product updated')
       setTimeout(() => setSaveSuccess(''), 2500)
     } catch {
-      setApiError('Network error — please try again')
+      setApiError('Network error. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -160,7 +160,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       setTimeout(() => setSaveSuccess(''), 2500)
       router.refresh()
     } catch {
-      setApiError('Network error — please try again')
+      setApiError('Network error. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -187,7 +187,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       setProducts(prev => prev.filter(p => !selected.has(p.id)))
       setSelected(new Set())
     } catch {
-      setApiError('Network error — please try again')
+      setApiError('Network error. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -340,7 +340,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       setImportRows(null)
       router.refresh()
     } catch {
-      setApiError('Network error — please try again')
+      setApiError('Network error. Please try again.')
     } finally {
       setImporting(false)
     }
