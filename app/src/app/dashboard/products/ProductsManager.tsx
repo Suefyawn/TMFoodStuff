@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useState, useMemo, useRef } from 'react'
+import { GuideTip, useGuide } from '@/components/dashboard/Guide'
 import { useRouter } from 'next/navigation'
 import { Search, Plus, Trash2, X, Download, Upload, Image as ImageIcon } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
@@ -43,7 +44,11 @@ const emptyProduct = {
 
 export default function ProductsManager({ initialProducts, categories }: { initialProducts: Product[]; categories: Category[] }) {
   const router = useRouter()
+  const guide = useGuide()
   const [products, setProducts] = useState(initialProducts)
+  // router.refresh() after Add Product hands in a new list; without this the
+  // new product only appeared after a full page reload.
+  useEffect(() => { setProducts(initialProducts) }, [initialProducts])
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
   const [filterStatus, setFilterStatus] = useState<'' | 'active' | 'inactive'>('')
@@ -113,12 +118,14 @@ export default function ProductsManager({ initialProducts, categories }: { initi
         body: JSON.stringify({ id: editing, ...editData }),
       })
       const data = await res.json()
-      if (!res.ok) { setApiError(data.error || 'Save failed'); return }
+      if (!res.ok) { setApiError(apiErrorText(data, 'Save failed')); return }
       setProducts(prev => prev.map(p => p.id === editing ? {
         ...p,
         ...editData,
         image_url: editData.image_urls?.[0] ?? editData.image_url ?? p.image_url,
       } : p))
+      guide.complete('edit-product')
+      if (editData.image_urls?.length) guide.complete('photos')
       setEditing(null)
       setEditData(null)
       setSaveSuccess('Product updated')
@@ -140,10 +147,13 @@ export default function ProductsManager({ initialProducts, categories }: { initi
       const res = await fetch('/api/dashboard/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProduct),
+        // "Select..." is category 0, which the API rejects: send no category instead.
+        body: JSON.stringify({ ...newProduct, category_id: newProduct.category_id || null }),
       })
       const data = await res.json()
-      if (!res.ok || !data.ok) { setApiError(data.error || 'Failed to add product'); return }
+      if (!res.ok || !data.ok) { setApiError(apiErrorText(data, 'Failed to add product')); return }
+      guide.complete('add-product')
+      if (newProduct.image_urls.length) guide.complete('photos')
       setShowAdd(false)
       setNewProduct(emptyProduct)
       setSaveSuccess('Product created')
@@ -191,6 +201,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
         body: JSON.stringify({ id: String(id), is_active: !current }),
       })
       if (!res.ok) return
+      guide.complete('show-hide')
       setProducts(prev => prev.map(p => p.id === id ? { ...p, is_active: !current } : p))
     } catch { /* silent — user can retry */ }
   }
@@ -227,6 +238,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
     const patch: Record<string, boolean> = isActivate || isDeactivate
       ? { is_active: isActivate }
       : { is_featured: isFeature }
+    if (isActivate || isDeactivate) guide.complete('show-hide')
     try {
       await Promise.all(Array.from(selected).map(id =>
         fetch('/api/dashboard/products', {
@@ -376,6 +388,10 @@ export default function ProductsManager({ initialProducts, categories }: { initi
           </button>
         </div>
       </div>
+
+      <Suspense fallback={null}>
+        <GuideTip steps={['add-product', 'photos', 'edit-product', 'show-hide']} />
+      </Suspense>
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap items-center">
@@ -612,7 +628,7 @@ export default function ProductsManager({ initialProducts, categories }: { initi
         {/* Mobile card view */}
         <div className="sm:hidden divide-y divide-gray-800">
           {filtered.length === 0 ? (
-            <p className="p-12 text-center text-gray-600">No products found</p>
+            <EmptyProducts noneAtAll={products.length === 0} onAdd={() => setShowAdd(true)} />
           ) : filtered.map(product => (
             <div key={product.id} className={`p-4 space-y-2 transition-colors ${selected.has(product.id) ? 'bg-gray-800/30' : ''}`}>
               <div className="flex items-center gap-3">
@@ -667,6 +683,9 @@ export default function ProductsManager({ initialProducts, categories }: { initi
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
+              {filtered.length === 0 && (
+                <tr><td colSpan={7}><EmptyProducts noneAtAll={products.length === 0} onAdd={() => setShowAdd(true)} /></td></tr>
+              )}
               {filtered.map(product => {
                 const imgs = getProductImages(product)
                 return (
@@ -772,4 +791,31 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
       <span className="text-sm text-gray-300">{label}</span>
     </div>
   )
+}
+
+// Empty list: on a new shop, say what to do first; otherwise the filters hid everything.
+function EmptyProducts({ noneAtAll, onAdd }: { noneAtAll: boolean; onAdd: () => void }) {
+  if (!noneAtAll) {
+    return <p className="p-12 text-center text-gray-500">No products match your search or filters. Clear the search box or pick All to see everything.</p>
+  }
+  return (
+    <div className="p-10 text-center space-y-3">
+      <p className="text-white font-semibold">No products yet</p>
+      <p className="text-gray-500 text-sm max-w-sm mx-auto">Add your first item with its name, price in AED, unit (kg or piece) and stock. It shows in the shop as soon as you save.</p>
+      <button type="button" onClick={onAdd} className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-xl">
+        <Plus size={16} aria-hidden="true" /> Add your first product
+      </button>
+    </div>
+  )
+}
+
+// The API answers a bad form with { error: 'Invalid request body', fieldErrors }.
+// Show the field and its reason, which tells staff what to fix.
+function apiErrorText(data: { error?: string; fieldErrors?: Record<string, string> }, fallback: string): string {
+  const fields = data?.fieldErrors ? Object.entries(data.fieldErrors) : []
+  if (fields.length) {
+    const [field, msg] = fields[0]
+    return `${field.replace(/_/g, ' ')}: ${msg}`
+  }
+  return data?.error || fallback
 }

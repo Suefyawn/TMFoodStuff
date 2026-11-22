@@ -6,9 +6,10 @@ import {
   LayoutDashboard, Package, ShoppingCart, Tags, Users, Settings, LogOut, Store,
   Plug, Leaf, FileText, MessageSquare, Boxes, ClipboardCheck, Truck, Megaphone,
   UserCog, Search, FileSpreadsheet, Clock, Heart, Inbox, ChevronDown, Menu, X,
-  ExternalLink, Mail,
+  ExternalLink, Mail, BookOpen,
 } from 'lucide-react'
 import { ConfirmProvider } from '@/components/ConfirmDialog'
+import { GuideUserProvider } from '@/components/dashboard/Guide'
 
 // ─── Navigation model ─────────────────────────────────────────────────
 //
@@ -93,6 +94,9 @@ const NAV: NavSection[] = [
       // they get a direct entry into the Activity log instead of going
       // through the locked Settings page.
       { href: '/dashboard/audit-log', label: 'Activity log', icon: FileText, staffOnly: true },
+      // Staff guide + the getting-started checklist controls. Everyone
+      // except drivers (who never get this shell).
+      { href: '/dashboard/help', label: 'Help & guide', icon: BookOpen },
     ],
   },
 ]
@@ -183,6 +187,7 @@ export default function DashboardShell({
 
   return (
     <ConfirmProvider>
+      <GuideUserProvider email={userEmail} role={role}>
       <div className="min-h-screen bg-gray-950 text-gray-100">
         {/* ────────── Desktop sidebar ────────── */}
         <aside className="hidden lg:flex w-60 flex-col bg-gray-900 border-r border-gray-800 fixed h-full z-30">
@@ -293,6 +298,7 @@ export default function DashboardShell({
           {children}
         </main>
       </div>
+      </GuideUserProvider>
     </ConfirmProvider>
   )
 }

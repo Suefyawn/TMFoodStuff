@@ -1,5 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
+import { GuideTip, useGuide } from '@/components/dashboard/Guide'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Trash2, Tags } from 'lucide-react'
 import { useConfirm } from '@/components/ConfirmDialog'
@@ -16,6 +17,7 @@ interface Category {
 
 export default function CategoriesPage() {
   const router = useRouter()
+  const guide = useGuide()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState('')
@@ -50,6 +52,7 @@ export default function CategoriesPage() {
       const data = await res.json()
       if (!res.ok || !data.ok) { setApiError(data.error || 'Failed to add category'); return }
       setCategories(prev => [...prev, data.category])
+      guide.complete('categories')
       setShowAdd(false)
       setNewCat({ name: '', name_ar: '', slug: '', emoji: '', description: '' })
     } catch {
@@ -118,6 +121,10 @@ export default function CategoriesPage() {
         </button>
       </div>
 
+      <Suspense fallback={null}>
+        <GuideTip steps={['categories']} />
+      </Suspense>
+
       {apiError && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-xl">
           {apiError}
@@ -172,7 +179,7 @@ export default function CategoriesPage() {
         {/* Mobile card view */}
         <div className="sm:hidden divide-y divide-gray-800">
           {categories.length === 0 ? (
-            <p className="p-8 text-center text-gray-600">No categories yet</p>
+            <p className="p-8 text-center text-gray-500">No categories yet. Press Add Category to make your first one, for example Fruits or Vegetables.</p>
           ) : categories.map(cat => (
             <div key={cat.id} className="flex items-center justify-between px-4 py-3 gap-3">
               <div className="flex items-center gap-3 min-w-0">
