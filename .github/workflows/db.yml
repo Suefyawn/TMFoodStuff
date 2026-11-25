@@ -3,8 +3,9 @@
 # print only subscription ids, emirates, area names and counts. Never names,
 # phones, emails, street addresses or order data. Free text that contains a digit
 # or is longer than 40 characters is masked in the read-areas output (a listed
-# area name is always shown). apply-area-fixes prints the old and new values of the
-# rows it changes with the same mask, so the log is not a backup: the restore path
+# area name is always shown). apply-area-fixes prints the old and new area of the
+# rows it changes only when it is a listed area name (any other value as its length),
+# so the log is not a backup: the restore path
 # is the database's own backups (Supabase daily backups and point-in-time recovery).
 #
 # Actions:
@@ -145,7 +146,7 @@ jobs:
           q = lambda s: "'" + s.replace("'", "''") + "'"
           values = ",\n  ".join(f"({q(str(f['id']))}, {q(f['area'])})" for f in fixes)
           # Old and new rows go to JSON files, never straight to the log; they are
-          # printed below through the same mask as read-areas.
+          # printed below through the masks further down.
           pick = ("select coalesce(json_agg(json_build_array(s.id::text, coalesce(s.delivery_emirate, ''), "
                   "coalesce(s.delivery_area, '')) order by s.id), '[]'::json) "
                   "from subscriptions s join fx on fx.id = s.id::text;")
@@ -179,12 +180,15 @@ jobs:
           if run.returncode != 0:
               sys.exit(f"::error::psql failed (exit {run.returncode}), the transaction was rolled back")
 
-          # Same mask as read-areas: a listed area is shown, free text with a digit or
-          # over 40 chars may be a street address and is shown only as its length.
+          # Areas: only a listed area name is shown; any other value is shown only as its
+          # length, since it may be part of an address. Emirates use the read-areas mask
+          # (free text with a digit or over 40 chars is masked).
           norm = lambda s: re.sub(r"\s+", " ", unicodedata.normalize("NFKC", s).strip()).lower()
           listed = {norm(a): a for a in AREAS}
           mask = lambda v: v if norm(v) in listed else (f"[free text, {len(v)} chars]" if (len(v) > 40 or any(c.isdigit() for c in v)) else v)
+          mask_area = lambda v: v if norm(v) in listed else f"[free text, {len(v)} chars]"
           show = lambda v: " ".join(mask(v).split()).replace("|", "/")
+          show_area = lambda v: " ".join(mask_area(v).split()).replace("|", "/")
           before = {r[0]: r for r in json.load(open("before.json", encoding="utf-8"))}
           after = {r[0]: r for r in json.load(open("after.json", encoding="utf-8"))}
           lines = ["| id | old emirate | old area | new emirate | new area | changed |", "|---|---|---|---|---|---|"]
@@ -193,7 +197,7 @@ jobs:
               b, a = before[sid], after.get(sid, before[sid])
               moved = b[1:] != a[1:]
               changed += moved
-              lines.append(f"| {sid} | {show(b[1])} | {show(b[2])} | {show(a[1])} | {show(a[2])} | {'yes' if moved else 'no'} |")
+              lines.append(f"| {sid} | {show(b[1])} | {show_area(b[2])} | {show(a[1])} | {show_area(a[2])} | {'yes' if moved else 'no'} |")
           missing = sorted(ids - set(before))
           summary = [f"Fixes requested: {len(fixes)}, rows found: {len(before)}, rows changed: {changed}"
                      + (f", ids not found: {', '.join(missing)}" if missing else ""), ""] + lines
