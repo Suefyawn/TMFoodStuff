@@ -1,0 +1,98 @@
+# Checks for the port to Cloudflare. Manual only (workflow_dispatch). This repo is PUBLIC, so
+# the logs are public: table names, row counts, file counts and PASS or FAIL only.
+#
+# Checks:
+#   export  downloads the newest copy from R2 (supabase/latest.json), restores the dump into a
+#           throwaway Postgres 17 container, recounts every table and compares with counts.json;
+#           also checks files.tar.gz holds one file per storage object. PASS only when all match.
+#           Touches nothing but a read of the R2 bucket.
+# Later phases add migrations, smoke and signin.
+name: Verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to check out (the scripts come from it)
+        type: string
+        default: main
+      checks:
+        description: Which checks to run
+        type: choice
+        options: [export]
+        default: export
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tmf-verify
+  cancel-in-progress: false
+
+jobs:
+  export:
+    if: inputs.checks == 'export' || inputs.checks == 'all'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      pg:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: restore-check
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      BUCKET: tmfoodstuff-backups
+      PGURL: postgresql://postgres:restore-check@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Preflight
+        run: |
+          for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!v}" ]; then echo "::error::secret for $v is empty or missing"; exit 1; fi
+          done
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq postgresql-client-17 >/dev/null
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Download the newest copy
+        run: |
+          mkdir -p in
+          npx --yes wrangler@4 r2 object get "$BUCKET/supabase/latest.json" --file in/latest.json --remote >/dev/null
+          DAY=$(python3 -c "import json,re,sys; d=json.load(open('in/latest.json'))['day']; sys.exit('bad day') if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', d) else print(d)")
+          echo "Copy of $DAY"
+          for f in tmf.dump counts.json files.tar.gz; do
+            npx --yes wrangler@4 r2 object get "$BUCKET/supabase/$DAY/$f" --file "in/$f" --remote >/dev/null
+            echo "$f: $(stat -c %s "in/$f") bytes"
+          done
+
+      - name: Restore into a throwaway database
+        run: |
+          # Supabase roles and the extensions schema, so policies and defaults restore.
+          psql "$PGURL" -X -q -v ON_ERROR_STOP=1 -f scripts/port/restore-prep.sql
+          set +e
+          pg_restore --no-owner --no-privileges -d "$PGURL" in/tmf.dump 2> restore.err
+          code=$?
+          set -e
+          # The error text can quote row values, so only the count reaches the log.
+          echo "pg_restore exit $code, $(grep -c '^pg_restore: error' restore.err || true) errors (details not printed; the counts below decide)"
+          rm -f restore.err
+
+      - name: Compare counts
+        run: |
+          psql "$PGURL" -X -v ON_ERROR_STOP=1 -tA -F $'\t' -f scripts/port/counts.sql > restored.tsv
+          FILES=$(tar -tzf in/files.tar.gz | grep -vc '/$' || true)
+          python3 scripts/port/compare-counts.py in/counts.json restored.tsv "$FILES"
+
+      - name: Clean up
+        if: always()
+        run: rm -rf in restored.tsv restore.err
