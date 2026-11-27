@@ -1,0 +1,152 @@
+# Port to Cloudflare, phase 1: a full copy of the live Supabase project in a private R2 bucket.
+# Manual only (workflow_dispatch). This repo is PUBLIC, so the logs are public: they show
+# file names chosen by this workflow, file sizes, table names and row counts, nothing else.
+# Never rows, emails, phones, password hashes, object names, the project URL or a connection
+# string. No upload-artifact: the files go to R2 only.
+#
+# Actions:
+#   export  pg_dump of the public, auth and storage schemas (custom format), a plain schema-only
+#           dump and exact row counts, all read from one database snapshot, plus every file in
+#           the public storage buckets. Uploaded to R2 tmfoodstuff-backups/supabase/<UTC date>-<run id>/
+#           (files over 250 MiB in parts), then supabase/latest.json points at that folder.
+#           Reads Supabase only; writes only to that bucket, and only when it is private.
+#
+# SUPABASE_DB_URL must be a direct or session-mode connection (port 5432): pg_dump and the
+# exported snapshot do not work through the transaction pooler (port 6543).
+name: Ops
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: export (read only on Supabase, writes the copy to R2)
+        type: choice
+        options: [export]
+        default: export
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tmf-ops
+  cancel-in-progress: false
+
+env:
+  BUCKET: tmfoodstuff-backups
+  WRANGLER: wrangler@4.20.0
+
+jobs:
+  export:
+    if: inputs.action == 'export'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash -eo pipefail {0}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install the Postgres 17 client
+        run: |
+          # pg_dump must be at least the server's version: take 17 from the PGDG repo.
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq postgresql-client-17 >/dev/null
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Check the bucket is private
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!v}" ]; then echo "::error::secret for $v is empty or missing"; exit 1; fi
+          done
+          if ! npx --yes "$WRANGLER" r2 bucket info "$BUCKET" >/dev/null 2>&1; then
+            npx --yes "$WRANGLER" r2 bucket create "$BUCKET" >/dev/null
+            echo "Created bucket $BUCKET (private by default)"
+          fi
+          # Fail closed: upload only when the r2.dev URL is off and no custom domain is attached.
+          dev=$(npx --yes "$WRANGLER" r2 bucket dev-url get "$BUCKET" 2>&1 || true)
+          if ! grep -qi 'disabled' <<<"$dev"; then echo "::error::$BUCKET has its r2.dev URL on (or the check failed): not uploading customer data to it"; exit 1; fi
+          dom=$(npx --yes "$WRANGLER" r2 bucket domain list "$BUCKET" 2>&1 || true)
+          if ! grep -qi 'no custom domains' <<<"$dom"; then echo "::error::$BUCKET has a custom domain (or the check failed): not uploading customer data to it"; exit 1; fi
+          echo "Bucket $BUCKET is private: no r2.dev URL, no custom domain"
+
+      - name: Dump and count from one snapshot
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then echo "::error::SUPABASE_DB_URL secret is empty or missing"; exit 1; fi
+          if [[ "$DB_URL" == *":6543/"* ]]; then echo "::error::SUPABASE_DB_URL uses the transaction pooler (6543); use the session pooler or a direct connection (5432)"; exit 1; fi
+          psql "$DB_URL" -X -v ON_ERROR_STOP=1 -tAc "select 1" >/dev/null
+          echo "Database reachable, server $(psql "$DB_URL" -X -tAc 'show server_version' | cut -d' ' -f1)"
+          python3 scripts/port/supabase-url.py
+          mkdir -p out
+          # One session holds a read-only repeatable-read transaction open; everything below reads
+          # the snapshot it exported, so the counts describe exactly the rows in the dump.
+          coproc HOLD { psql "$DB_URL" -X -qtA -v ON_ERROR_STOP=1; }
+          echo "begin isolation level repeatable read read only; select pg_export_snapshot();" >&"${HOLD[1]}"
+          read -r -t 60 SNAP <&"${HOLD[0]}"
+          if ! [[ "$SNAP" =~ ^[0-9A-F-]+$ ]]; then echo "::error::could not export a snapshot"; exit 1; fi
+          pg_dump "$DB_URL" --snapshot="$SNAP" --format=custom --no-owner --no-privileges \
+            --schema=public --schema=auth --schema=storage -f out/tmf.dump
+          pg_dump "$DB_URL" --snapshot="$SNAP" --schema-only --no-owner --no-privileges \
+            --schema=public --schema=auth --schema=storage -f out/tmf-schema.sql
+          IN_SNAP="begin isolation level repeatable read read only; set transaction snapshot '$SNAP';"
+          psql "$DB_URL" -X -q -v ON_ERROR_STOP=1 -tA -F $'\t' -c "$IN_SNAP" -f scripts/port/counts.sql -c "commit" > counts.tsv
+          # objects.tsv holds object names: it stays on the runner and is never printed.
+          psql "$DB_URL" -X -q -v ON_ERROR_STOP=1 -tA -F $'\t' -c "$IN_SNAP" -c \
+            "select b.id, b.public::text, o.name from storage.objects o join storage.buckets b on b.id = o.bucket_id order by b.id, o.name" -c "commit" > objects.tsv
+          echo "commit;" >&"${HOLD[1]}"
+          exec {HOLD[1]}>&-
+          wait "$HOLD_PID" || true
+          ls -l out | awk 'NR>1 {print $5, $9}'
+
+      - name: Download the storage files
+        run: |
+          python3 scripts/port/fetch-storage.py objects.tsv files
+          tar -czf out/files.tar.gz -C files .
+          python3 scripts/port/counts.py counts.tsv out/counts.json objects.tsv files
+          rm -f objects.tsv
+          cat out/counts.json
+          echo "files.tar.gz: $(stat -c %s out/files.tar.gz) bytes"
+
+      - name: Upload to R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          # One folder per run, never overwritten; wrangler uploads at most 300 MiB a file, so
+          # anything bigger goes up in 250 MiB parts (verify joins them).
+          PREFIX="$(date -u +%Y-%m-%d)-$RUN_ID"
+          mkdir -p up
+          for f in tmf.dump tmf-schema.sql counts.json files.tar.gz; do
+            split -b 250M -d -a 3 "out/$f" "up/$f.part-"
+          done
+          for p in up/*; do
+            npx --yes "$WRANGLER" r2 object put "$BUCKET/supabase/$PREFIX/$(basename "$p")" --file "$p" --remote >/dev/null
+            echo "uploaded supabase/$PREFIX/$(basename "$p") ($(stat -c %s "$p") bytes)"
+          done
+          python3 scripts/port/latest.py "$PREFIX" out up > latest.json
+          npx --yes "$WRANGLER" r2 object put "$BUCKET/supabase/latest.json" --file latest.json --remote >/dev/null
+          echo "pointer supabase/latest.json -> $PREFIX"
+          {
+            echo "### Supabase export"
+            echo ""
+            echo "R2: \`$BUCKET/supabase/$PREFIX/\`"
+            echo ""
+            echo "| file | bytes |"; echo "|---|---|"
+            for f in tmf.dump tmf-schema.sql counts.json files.tar.gz; do echo "| $f | $(stat -c %s "out/$f") |"; done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Clean up
+        if: always()
+        run: rm -rf out up files counts.tsv objects.tsv latest.json
