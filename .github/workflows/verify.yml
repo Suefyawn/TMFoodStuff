@@ -2,9 +2,11 @@
 # the logs are public: table names, row counts, file counts and PASS or FAIL only.
 #
 # Checks:
-#   export  downloads the newest copy from R2 (supabase/latest.json), restores the dump into a
-#           throwaway Postgres 17 container, recounts every table and compares with counts.json;
-#           also checks files.tar.gz holds one file per storage object. PASS only when all match.
+#   export  downloads the newest copy from R2 (supabase/latest.json, parts joined), restores the
+#           dump into a throwaway Postgres 17 container, recounts every table and compares with
+#           counts.json (taken from the dump's own snapshot); extracts files.tar.gz and checks it
+#           holds one file per storage object and the exported byte total. PASS only when all
+#           match. Restore errors are listed by object type and schema.
 #           Touches nothing but a read of the R2 bucket.
 # Later phases add migrations, smoke and signin.
 name: Verify
@@ -29,11 +31,18 @@ concurrency:
   group: tmf-verify
   cancel-in-progress: false
 
+env:
+  BUCKET: tmfoodstuff-backups
+  WRANGLER: wrangler@4.20.0
+
 jobs:
   export:
-    if: inputs.checks == 'export' || inputs.checks == 'all'
+    if: inputs.checks == 'export'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash -eo pipefail {0}
     services:
       pg:
         image: postgres:17
@@ -43,20 +52,18 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      BUCKET: tmfoodstuff-backups
       PGURL: postgresql://postgres:restore-check@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.branch }}
 
-      - name: Preflight
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install the Postgres 17 client
         run: |
-          for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
-            if [ -z "${!v}" ]; then echo "::error::secret for $v is empty or missing"; exit 1; fi
-          done
           sudo install -d /usr/share/postgresql-common/pgdg
           sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
           echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
@@ -65,15 +72,25 @@ jobs:
           echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
 
       - name: Download the newest copy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          mkdir -p in
-          npx --yes wrangler@4 r2 object get "$BUCKET/supabase/latest.json" --file in/latest.json --remote >/dev/null
-          DAY=$(python3 -c "import json,re,sys; d=json.load(open('in/latest.json'))['day']; sys.exit('bad day') if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', d) else print(d)")
-          echo "Copy of $DAY"
-          for f in tmf.dump counts.json files.tar.gz; do
-            npx --yes wrangler@4 r2 object get "$BUCKET/supabase/$DAY/$f" --file "in/$f" --remote >/dev/null
-            echo "$f: $(stat -c %s "in/$f") bytes"
+          for v in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID; do
+            if [ -z "${!v}" ]; then echo "::error::secret for $v is empty or missing"; exit 1; fi
           done
+          mkdir -p in parts
+          npx --yes "$WRANGLER" r2 object get "$BUCKET/supabase/latest.json" --file in/latest.json --remote >/dev/null
+          python3 scripts/port/parts.py in/latest.json > parts.txt
+          PREFIX=$(head -1 parts.txt)
+          echo "Copy $PREFIX"
+          tail -n +2 parts.txt | while IFS=$'\t' read -r name part; do
+            npx --yes "$WRANGLER" r2 object get "$BUCKET/supabase/$PREFIX/$part" --file "parts/$part" --remote >/dev/null
+          done
+          python3 scripts/port/parts.py in/latest.json --join parts in
+          for f in tmf.dump tmf-schema.sql counts.json files.tar.gz; do echo "$f: $(stat -c %s "in/$f") bytes"; done
+          if [ ! -s in/tmf-schema.sql ]; then echo "::error::tmf-schema.sql is empty"; exit 1; fi
+          rm -rf parts parts.txt
 
       - name: Restore into a throwaway database
         run: |
@@ -83,16 +100,21 @@ jobs:
           pg_restore --no-owner --no-privileges -d "$PGURL" in/tmf.dump 2> restore.err
           code=$?
           set -e
-          # The error text can quote row values, so only the count reaches the log.
-          echo "pg_restore exit $code, $(grep -c '^pg_restore: error' restore.err || true) errors (details not printed; the counts below decide)"
+          echo "pg_restore exit $code"
+          # Error text can quote row values, so only the object type and schema of each failed
+          # entry reach the log.
+          python3 scripts/port/restore-errors.py restore.err
           rm -f restore.err
 
       - name: Compare counts
         run: |
           psql "$PGURL" -X -v ON_ERROR_STOP=1 -tA -F $'\t' -f scripts/port/counts.sql > restored.tsv
-          FILES=$(tar -tzf in/files.tar.gz | grep -vc '/$' || true)
-          python3 scripts/port/compare-counts.py in/counts.json restored.tsv "$FILES"
+          mkdir -p x
+          tar -xzf in/files.tar.gz -C x
+          FILES=$(find x -type f | wc -l)
+          BYTES=$(find x -type f -printf '%s\n' | awk '{s+=$1} END {print s+0}')
+          python3 scripts/port/compare-counts.py in/counts.json restored.tsv "$FILES" "$BYTES"
 
       - name: Clean up
         if: always()
-        run: rm -rf in restored.tsv restore.err
+        run: rm -rf in parts x restored.tsv restore.err parts.txt

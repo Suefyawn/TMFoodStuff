@@ -7,7 +7,6 @@ job with its id: it needs the service role key, which this workflow does not hol
 import os
 import sys
 import time
-import urllib.error
 import urllib.request
 from urllib.parse import quote
 
@@ -26,6 +25,8 @@ def read_objects(path):
 
 
 def safe_target(dest, bucket, name):
+    if not bucket or bucket in (".", "..") or "/" in bucket or "\\" in bucket:
+        return None
     target = os.path.normpath(os.path.join(dest, bucket, name))
     root = os.path.normpath(os.path.join(dest, bucket))
     if not target.startswith(root + os.sep):
@@ -42,7 +43,7 @@ def fetch(url, target, tries=3):
             with open(target, "wb") as f:
                 f.write(data)
             return True
-        except (urllib.error.URLError, TimeoutError, OSError):
+        except Exception:  # any network or read error; never echo the URL or name
             time.sleep(2 * (i + 1))
     return False
 
