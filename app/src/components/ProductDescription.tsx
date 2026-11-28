@@ -1,5 +1,5 @@
 'use client'
-import { useLangStore } from '@/lib/lang-store'
+import { useLang } from '@/lib/use-lang'
 
 // Renders the Arabic description when the customer's language is Arabic and
 // an AR description is available; otherwise falls back to the English copy.
@@ -14,7 +14,7 @@ export function ProductDescription({
   descriptionAr?: string
   className?: string
 }) {
-  const lang = useLangStore(s => s.lang)
+  const { lang } = useLang()
   const text = lang === 'ar' && descriptionAr ? descriptionAr : description
   const dir = lang === 'ar' && descriptionAr ? 'rtl' : 'ltr'
   if (!text) return null

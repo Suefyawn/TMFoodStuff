@@ -1,9 +1,11 @@
 'use client'
 import { Globe } from 'lucide-react'
 import { useLangStore } from '@/lib/lang-store'
+import { useLang } from '@/lib/use-lang'
 
 export default function LangToggle() {
-  const { lang, setLang } = useLangStore()
+  const { lang } = useLang()
+  const setLang = useLangStore(s => s.setLang)
   return (
     <button
       onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}

@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { PostHogProvider } from '@/components/PostHogProvider'
 import { SITE_URL } from '@/lib/site'
 import { getServerLocale } from '@/lib/server-locale'
+import { LangProvider } from '@/lib/lang-context'
 import './globals.css'
 
 const inter = Inter({
@@ -71,7 +72,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={`${inter.variable} ${playfair.variable} font-inter`}>
         <Suspense fallback={null}>
           <PostHogProvider>
-            {children}
+            <LangProvider initialLang={locale}>
+              {children}
+            </LangProvider>
           </PostHogProvider>
         </Suspense>
       </body>

@@ -1,8 +1,8 @@
 'use client'
-import { useLangStore } from '@/lib/lang-store'
+import { useLang } from '@/lib/use-lang'
 
 export function ProductNameDisplay({ name, nameAr }: { name: string; nameAr?: string }) {
-  const lang = useLangStore(s => s.lang)
+  const { lang } = useLang()
   if (lang === 'ar' && nameAr) {
     return (
       <>
